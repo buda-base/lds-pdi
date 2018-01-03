@@ -64,6 +64,7 @@ public class QueryProcessor {
 			fusekiUrl=ServiceConfig.getProperty("fuseki");
 		}
 		Query q=QueryFactory.create(prefixes+" "+query);
+		System.out.println("Processor query :" +query);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		ResultSet rs = qe.execSelect();
 		if(html) {
@@ -124,9 +125,9 @@ public class QueryProcessor {
 						}
 						if(index==0) {
 							if(baseUri==null) {
-							table=table+"><a href=\"lookup/resource/";
+							table=table+"><a href=\"lookup/query/";
 							}else {
-								table=table+"><a href=\""+baseUri+"resource/";	
+								table=table+"><a href=\""+baseUri+"query/";	
 							}
 							table=table+qs.get(str).asNode().getLocalName()+"\"> "
 							+qs.get(str).asNode().getLocalName()+"</a></td>";

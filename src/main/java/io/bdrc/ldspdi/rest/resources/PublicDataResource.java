@@ -31,6 +31,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.ldspdi.parse.PdiQueryParserException;
 import io.bdrc.ldspdi.parse.QueryFileParser;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
@@ -55,9 +56,40 @@ public class PublicDataResource {
 				
 				converted.put(st, ss);					
 			}
+		}		
+		QueryFileParser qfp;
+		final String query;
+		try {
+			qfp=new QueryFileParser(converted);
+			String q=qfp.getQuery();
+			String check=qfp.checkQueryArgsSyntax();
+			if(check.length()>0) {
+				throw new PdiQueryParserException("PdiQueryParserException : File->"
+												  + converted.get("searchType")+".arq; ERROR: "+check);
+			}
+			StrSubstitutor sub = new StrSubstitutor(converted);
+		    query = sub.replace(q);
 		}
-		QueryFileParser qfp=new QueryFileParser(converted);
-		String query=qfp.getQuery();		
+		catch(PdiQueryParserException pex) {
+			StreamingOutput stream = new StreamingOutput() {
+	            public void write(OutputStream os) throws IOException, WebApplicationException {
+	            	// when prefix is null, QueryProcessor default prefix is used*/
+	            	String res=pex.getMessage();
+	            	os.write(res.getBytes());
+	            }
+	        };
+	        return Response.ok(stream,media).build();
+		}
+		catch(IOException ex) {
+			StreamingOutput stream = new StreamingOutput() {
+	            public void write(OutputStream os) throws IOException, WebApplicationException {
+	            	// when prefix is null, QueryProcessor default prefix is used*/
+	            	os.write(ex.getLocalizedMessage().getBytes());
+	            }
+	        };
+	        return Response.ok(stream,media).build();
+			
+		}	
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
             	// when prefix is null, QueryProcessor default prefix is used*/
@@ -70,7 +102,7 @@ public class PublicDataResource {
 	}
 	
 	@GET
-	@Path("/resource/{res}")	
+	@Path("/query/{res}")	
 	public Response getResourceFile(@PathParam("res") final String res) {
 					
 		MediaType media=new MediaType("text","turtle","utf-8");

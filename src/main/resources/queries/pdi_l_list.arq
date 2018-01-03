@@ -4,8 +4,11 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3
 PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
 PREFIX f: <java:io.bdrc.ldsearch.query.functions.> 
 
-#Returns the list of lineage, lineage names
-#No arguments
+#QueryScope=Lineage
+#QueryReturnType=Table
+#QueryResults=the list (Id, name) of all lineages
+#QueryParams=NONE
+#QueryUrl=http://<server>:<port>/lds-pdi/query?searchType=pdi_l_list
 
 SELECT DISTINCT  ?lineage ?lineage_name 
 

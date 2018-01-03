@@ -1,0 +1,7 @@
+#QueryScope=General
+#QueryReturnType=Turtle graph
+#QueryResults=the turtle representation of a resource graph
+#QueryParams=ID
+#QueryUrl=http://<server>:<port>/lds-pdi/query/ID
+
+DESCRIBE <http://purl.bdrc.io/resource/${ID}>
