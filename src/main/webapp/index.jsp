@@ -1,7 +1,12 @@
 <%@page import="io.bdrc.ldspdi.parse.DocFileBuilder"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
-<% String content=DocFileBuilder.getContent(); %>
+<% 
+String serverName = request.getServerName();
+int portNumber = request.getServerPort();
+String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber)); 
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,7 +51,7 @@
 using this general url format:</p>
 http://server:port/lds-pdi/query/ID</p>
 <p>where ID is a BDRC resource ID (ex. P1583 or W27553)</p>
-<h2>Url specifications by query types</h2>
-<%= content %>
+<div align="center"><h2>Url specifications by query types</h2></div>
+<div align="center"><%= content %></div>
 </body>
 </html>

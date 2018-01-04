@@ -2,7 +2,7 @@
 #QueryReturnType=Table
 #QueryResults=the list (Id, topic names) of all topics
 #QueryParams=NONE
-#QueryUrl=http://server:port/lds-pdi/query?searchType=pdi_t_list
+#QueryUrl=/lds-pdi/query?searchType=pdi_t_list
 
 SELECT DISTINCT ?ID 
 (GROUP_CONCAT(DISTINCT ?topic;   SEPARATOR=" || ") AS ?topic_Names)

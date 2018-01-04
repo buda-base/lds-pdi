@@ -31,7 +31,7 @@ public class DocFileBuilder {
 		}
 	}
 	
-	public static String getContent() {	
+	public static String getContent(String base) {	
 		ArrayList<String> files=getQueryFiles();
 		String contents="";
 		specs=new HashMap<>();
@@ -49,7 +49,8 @@ public class DocFileBuilder {
 							+"<td>"+info.get(ParserConfig.QUERY_RETURN_TYPE)+"</td>"+LS
 							+"<td style=\"width:400px;\">"+info.get(ParserConfig.QUERY_RESULTS)+"</td>"+LS
 							+"<td>"+info.get(ParserConfig.QUERY_PARAMS)+"</td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_URL)+"</td></tr>"+LS;
+							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
+							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
 					specs.put(queryScope, tmp);
 					System.out.println("Added QueryScope="+queryScope+ " value="+tmp);
 					
@@ -65,7 +66,8 @@ public class DocFileBuilder {
 							+"<td>"+info.get(ParserConfig.QUERY_RETURN_TYPE)+"</td>"+LS
 							+"<td style=\"width:400px;\">"+info.get(ParserConfig.QUERY_RESULTS)+"</td>"+LS
 							+"<td>"+info.get(ParserConfig.QUERY_PARAMS)+"</td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_URL)+"</td></tr>"+LS;
+							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
+							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
 					System.out.println("Added QueryScope="+queryScope+ " value="+scope);
 					specs.put(queryScope, scope);
 				}
@@ -108,7 +110,7 @@ public class DocFileBuilder {
 	public static void main(String[] args) {
 		//System.out.println(DocFileBuilder.getQueryFiles());
 		//System.out.println(DocFileBuilder.getContent());
-		DocFileBuilder.getContent();
+		DocFileBuilder.getContent("Http://localhost:8080");
 	}
 
 }

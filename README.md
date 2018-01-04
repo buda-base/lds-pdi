@@ -21,7 +21,7 @@ fuseki=http://localhost:13180/fuseki/bdrcrw/query
 # Running
 
 ```
-mvn jetty:run serves the app locally
+mvn jetty:run then go to http://localhost:8080/lds-pdi/index.jsp
 ```
 
 
