@@ -63,8 +63,10 @@ public class QueryFileParser {
 	            readLine=readLine.trim();
 	            if(readLine.startsWith("#")) {
 	            	readLine=readLine.substring(1);
-	            	String[] info=readLine.split(Pattern.compile("=").toString());
-	            	metaInf.put(info[0],info[1]);	            	
+	            	int index=readLine.indexOf("=");
+	            	String info0=readLine.substring(0,index);
+	            	String info1=readLine.substring(index+1);	            	
+	            	metaInf.put(info0,info1);	            	
 	            }
 	            else {
 	            	query=query+" "+readLine;

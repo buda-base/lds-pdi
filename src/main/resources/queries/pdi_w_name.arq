@@ -2,7 +2,7 @@
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and the name of the work whose name contains the NAME param value
 #QueryParams=NAME
-#QueryUrl=http://server:port/lds-pdi/query?searchType=pdi_w_name&NAME=chos%20%dbyings
+#QueryUrl=http://server:port/lds-pdi/query?searchType=pdi_w_name&NAME=chos dbyings
 
 select ?Work_ID ?Work_Name
 where {

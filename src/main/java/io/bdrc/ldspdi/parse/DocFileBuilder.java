@@ -84,7 +84,7 @@ public class DocFileBuilder {
 		catch(IOException ex) {
 			return ex.getMessage();
 		}
-		System.out.println("In Builder: "+contents);
+		//System.out.println("In Builder: "+contents);
 		return contents;
 	}
 	
@@ -107,7 +107,8 @@ public class DocFileBuilder {
 	
 	public static void main(String[] args) {
 		//System.out.println(DocFileBuilder.getQueryFiles());
-		System.out.println(DocFileBuilder.getContent());
+		//System.out.println(DocFileBuilder.getContent());
+		DocFileBuilder.getContent();
 	}
 
 }
