@@ -38,11 +38,11 @@ public class DocFileBuilder {
 		String LS=System.lineSeparator();
 		try {
 			for(String file:files) {
-				System.out.println("Processing :"+file);
+				
 				QueryFileParser qfp=new QueryFileParser(file);
 				HashMap<String,String> info=qfp.getMetaInf();
 				String queryScope=info.get(ParserConfig.QUERY_SCOPE);
-				System.out.println("QueryScope="+queryScope);
+				
 				if(specs.containsKey(queryScope)) {
 					String tmp=specs.get(queryScope);
 					tmp=tmp+"<tr><td><b>"+file.substring(0, file.indexOf("."))+"</b></td>"+LS
@@ -52,7 +52,7 @@ public class DocFileBuilder {
 							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
 							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
 					specs.put(queryScope, tmp);
-					System.out.println("Added QueryScope="+queryScope+ " value="+tmp);
+					
 					
 				}else {
 					String scope="<h2>"+queryScope+"</h2><table id=\"specs\"><tr>"+LS
@@ -68,7 +68,7 @@ public class DocFileBuilder {
 							+"<td>"+info.get(ParserConfig.QUERY_PARAMS)+"</td>"+LS
 							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
 							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
-					System.out.println("Added QueryScope="+queryScope+ " value="+scope);
+					
 					specs.put(queryScope, scope);
 				}
 			}
@@ -86,14 +86,14 @@ public class DocFileBuilder {
 		catch(IOException ex) {
 			return ex.getMessage();
 		}
-		//System.out.println("In Builder: "+contents);
+		
 		return contents;
 	}
 	
 	public static ArrayList<String> getQueryFiles() {
 		ArrayList<String> files=new ArrayList<>();
 		Path directoryPath = Paths.get(ServiceConfig.getProperty("queryPath"));
-		System.out.println("Directory :"+directoryPath.toAbsolutePath());
+		
         if (Files.isDirectory(directoryPath)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(directoryPath)) {
                 for (Path path : stream) {
@@ -105,12 +105,6 @@ public class DocFileBuilder {
             }
         }
         return files;		
-	}
-	
-	public static void main(String[] args) {
-		//System.out.println(DocFileBuilder.getQueryFiles());
-		//System.out.println(DocFileBuilder.getContent());
-		DocFileBuilder.getContent("Http://localhost:8080");
 	}
 
 }

@@ -31,8 +31,7 @@ public class QueryFileParser {
 			throw new PdiQueryParserException("PdiQueryParserException : parser was unable to read File->"+ queryMap.get("searchType")+".arq  ");
 			   
 		}
-		parseFile();
-		System.out.println("META = "+metaInf);
+		parseFile();		
 	}
 	
 	public QueryFileParser(String filename) throws IOException,PdiQueryParserException{		
@@ -45,8 +44,7 @@ public class QueryFileParser {
 			throw new PdiQueryParserException("PdiQueryParserException : parser was unable to read File->"+ queryMap.get("searchType")+".arq  ");
 			   
 		}
-		parseFile();
-		System.out.println("META = "+metaInf);
+		parseFile();		
 	}
 	
 	
@@ -75,7 +73,7 @@ public class QueryFileParser {
 	   }
 	   br.close();
 	   String missingInfo=missingRequiredInfo();
-	   //System.out.println("Missing : "+missingInfo);
+	   
 	   if(missingInfo.length()>0) {
 	       String msg=missingInfo+" is missing but is a required information field";
 	       throw new PdiQueryParserException("PdiQueryParserException : File->"+ queryMap.get("searchType")+".arq; ERROR: "+msg);
@@ -87,7 +85,7 @@ public class QueryFileParser {
 		ArrayList<String> required=ParserConfig.requiredInfoType();
 		String test="";
 		for(String st:required) {
-			//System.out.println("MetaInf= : "+metaInf+" St="+st);
+			
 			if(!metaInf.keySet().contains(st)) {
 				test=st;
 			}
@@ -101,7 +99,7 @@ public class QueryFileParser {
 	
 	public String checkQueryArgsSyntax() {
 		String check="";
-		System.out.println("QUERY= : "+query);
+		
 		String[] args=metaInf.get(ParserConfig.QUERY_PARAMS).split(Pattern.compile(",").toString());
 		for(String arg:args) {
 			if((!arg.trim().equals(ParserConfig.QUERY_NO_ARGS)) && query.indexOf("${"+arg.trim()+"}")==-1) {

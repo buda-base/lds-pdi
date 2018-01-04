@@ -43,7 +43,7 @@ public class PublicDataResource {
 	@GET	
 	//@Path("query")
 	public Response getData(@Context UriInfo info) {
-		System.out.println("BASE URI="+info.getBaseUri());
+		
 		String baseUri=info.getBaseUri().toString();
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
@@ -115,24 +115,7 @@ public class PublicDataResource {
             }
         };
 		return Response.ok(stream,media).build();		
-	}
-	
-	@GET
-	@Path("/welcome")	
-	public Response getWelcomeFile() {
-					
-		MediaType media=new MediaType("text","html","utf-8");
-		
-		
-		StreamingOutput stream = new StreamingOutput() {
-			String content=DocFileBuilder.getContent();			
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-            	System.out.println("In rest: "+content);
-            	os.write(content.getBytes());            		
-            }
-        };
-		return Response.ok(stream,media).build();		
-	}
+	}	
 	
 	public RDFWriter getSTTLRDFWriter(Model m) throws IOException{
 		Lang sttl = STTLWriter.registerWriter();
