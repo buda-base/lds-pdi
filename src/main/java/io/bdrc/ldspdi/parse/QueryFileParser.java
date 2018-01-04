@@ -35,6 +35,25 @@ public class QueryFileParser {
 		System.out.println("META = "+metaInf);
 	}
 	
+	public QueryFileParser(String filename) throws IOException,PdiQueryParserException{		
+		metaInf= new HashMap<>();
+		String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_DIR)+filename;
+		try {
+		this.queryFile = new File(PublicDataResource.class.getClassLoader().getResource(queryFilename).getFile());
+		}
+		catch(Exception ex) {
+			throw new PdiQueryParserException("PdiQueryParserException : parser was unable to read File->"+ queryMap.get("searchType")+".arq  ");
+			   
+		}
+		parseFile();
+		System.out.println("META = "+metaInf);
+	}
+	
+	
+	public HashMap<String, String> getMetaInf() {
+		return metaInf;
+	}
+
 	private void parseFile() throws IOException,PdiQueryParserException{
 		
 		BufferedReader br = new BufferedReader(new FileReader(queryFile));		
@@ -45,16 +64,16 @@ public class QueryFileParser {
 	            if(readLine.startsWith("#")) {
 	            	readLine=readLine.substring(1);
 	            	String[] info=readLine.split(Pattern.compile("=").toString());
-	            	metaInf.put(info[0],info[1]);
-	            	System.out.println("	Parsed Line : "+readLine);
+	            	metaInf.put(info[0],info[1]);	            	
 	            }
 	            else {
 	            	query=query+" "+readLine;
 	            }
 	            	
 	   }
+	   br.close();
 	   String missingInfo=missingRequiredInfo();
-	   System.out.println("Missing : "+missingInfo);
+	   //System.out.println("Missing : "+missingInfo);
 	   if(missingInfo.length()>0) {
 	       String msg=missingInfo+" is missing but is a required information field";
 	       throw new PdiQueryParserException("PdiQueryParserException : File->"+ queryMap.get("searchType")+".arq; ERROR: "+msg);
@@ -66,7 +85,7 @@ public class QueryFileParser {
 		ArrayList<String> required=ParserConfig.requiredInfoType();
 		String test="";
 		for(String st:required) {
-			System.out.println("MetaInf= : "+metaInf+" St="+st);
+			//System.out.println("MetaInf= : "+metaInf+" St="+st);
 			if(!metaInf.keySet().contains(st)) {
 				test=st;
 			}

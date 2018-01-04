@@ -1,0 +1,16 @@
+#QueryScope=Topic
+#QueryReturnType=Table
+#QueryResults=A table containing the Id and the names of the topics whose name contains the NAME param value
+#QueryParams=NAME
+#QueryUrl=http://server:port/lds-pdi/query?searchType=pdi_t_name&NAME=rgyud
+
+SELECT DISTINCT ?ID 
+(GROUP_CONCAT(DISTINCT ?topic;   SEPARATOR=" || ") AS ?topic_Names)
+where{  
+	
+    ?ID a :Topic . 
+    ?ID skos:prefLabel ?topic .
+    Filter(CONTAINS(?topic,"${NAME}"))
+}
+GROUP by ?ID
+order by ?ID

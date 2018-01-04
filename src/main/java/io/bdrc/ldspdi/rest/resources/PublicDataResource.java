@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -31,6 +29,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.ldspdi.parse.DocFileBuilder;
 import io.bdrc.ldspdi.parse.PdiQueryParserException;
 import io.bdrc.ldspdi.parse.QueryFileParser;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -42,8 +41,8 @@ public class PublicDataResource {
 	public String fusekiUrl=ServiceConfig.getProperty("fuseki");
 	
 	@GET	
-	@Path("query")
-	public Response getPersonsData(@Context UriInfo info) {
+	//@Path("query")
+	public Response getData(@Context UriInfo info) {
 		System.out.println("BASE URI="+info.getBaseUri());
 		String baseUri=info.getBaseUri().toString();
 		MediaType media=new MediaType("text","html","utf-8");
@@ -102,7 +101,7 @@ public class PublicDataResource {
 	}
 	
 	@GET
-	@Path("/query/{res}")	
+	@Path("/{res}")	
 	public Response getResourceFile(@PathParam("res") final String res) {
 					
 		MediaType media=new MediaType("text","turtle","utf-8");
@@ -117,7 +116,24 @@ public class PublicDataResource {
         };
 		return Response.ok(stream,media).build();		
 	}
+	
+	@GET
+	@Path("/welcome")	
+	public Response getWelcomeFile() {
+					
+		MediaType media=new MediaType("text","html","utf-8");
 		
+		
+		StreamingOutput stream = new StreamingOutput() {
+			String content=DocFileBuilder.getContent();			
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+            	System.out.println("In rest: "+content);
+            	os.write(content.getBytes());            		
+            }
+        };
+		return Response.ok(stream,media).build();		
+	}
+	
 	public RDFWriter getSTTLRDFWriter(Model m) throws IOException{
 		Lang sttl = STTLWriter.registerWriter();
 		SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();

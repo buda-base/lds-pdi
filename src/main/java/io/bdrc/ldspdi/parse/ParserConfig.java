@@ -10,8 +10,8 @@ public class ParserConfig {
 	public static String QUERY_SCOPE="QueryScope";
 	public static String QUERY_RETURN_TYPE="QueryReturnType";
 	public static String QUERY_RESULTS="QueryResults";
-	public static String QUERY_PARAMS="QueryParams";
-	public static String QUERY_TYPE_DESC="Allowed QueryTypes are :";
+	public static String QUERY_PARAMS="QueryParams";	
+	public static String QUERY_URL="QueryUrl";
 	
 	public static String QUERY_NO_ARGS="NONE";
 	
@@ -22,7 +22,7 @@ public class ParserConfig {
 	public static final String LINEAGE="Lineage";
 	public static final String OFFICE="Office";
 	public static final String TOPIC="Topic";
-	public static final String GENERAL="Topic";
+	public static final String GENERAL="General";
 	
 	public static ArrayList<String> queryTypes = new ArrayList<>();;
 	public static HashMap<String,Boolean> infoTypes = new HashMap<>();
@@ -40,8 +40,8 @@ public class ParserConfig {
 		infoTypes.put(QUERY_SCOPE,true);
 		infoTypes.put(QUERY_RETURN_TYPE,true);
 		infoTypes.put(QUERY_RESULTS,true);
-		infoTypes.put(QUERY_PARAMS,true);
-		infoTypes.put(QUERY_TYPE_DESC,false);
+		infoTypes.put(QUERY_PARAMS,true);		
+		infoTypes.put(QUERY_URL,true);
 	}	
 	
 	public static boolean isRequired(String info) {

@@ -127,7 +127,7 @@ public class QueryProcessor {
 							if(baseUri==null) {
 							table=table+"><a href=\"lookup/query/";
 							}else {
-								table=table+"><a href=\""+baseUri+"query/";	
+								table=table+"><a href=\""+baseUri;	
 							}
 							table=table+qs.get(str).asNode().getLocalName()+"\"> "
 							+qs.get(str).asNode().getLocalName()+"</a></td>";
