@@ -73,10 +73,6 @@ public class DocFileBuilder {
 		return contents;
 	}
 	
-	public static String getTest() {
-		return "this is a test1";
-	}
-	
 	public static ArrayList<String> getQueryFiles() {
 		ArrayList<String> files=new ArrayList<>();
 		Path dpath = Paths.get(ServiceConfig.getProperty(ParserConfig.QUERY_PATH));		
