@@ -29,8 +29,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
-import io.bdrc.ldspdi.parse.DocFileBuilder;
-import io.bdrc.ldspdi.parse.PdiQueryParserException;
 import io.bdrc.ldspdi.parse.QueryFileParser;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
@@ -42,7 +40,7 @@ public class PublicDataResource {
 	
 	@GET	
 	//@Path("query")
-	public Response getData(@Context UriInfo info) {
+	public Response getData(@Context UriInfo info) throws Exception{
 		
 		String baseUri=info.getBaseUri().toString();
 		MediaType media=new MediaType("text","html","utf-8");
@@ -58,37 +56,16 @@ public class PublicDataResource {
 		}		
 		QueryFileParser qfp;
 		final String query;
-		try {
+		//try {
 			qfp=new QueryFileParser(converted);
 			String q=qfp.getQuery();
 			String check=qfp.checkQueryArgsSyntax();
 			if(check.length()>0) {
-				throw new PdiQueryParserException("PdiQueryParserException : File->"
+				throw new Exception("Exception : File->"
 												  + converted.get("searchType")+".arq; ERROR: "+check);
 			}
 			StrSubstitutor sub = new StrSubstitutor(converted);
-		    query = sub.replace(q);
-		}
-		catch(PdiQueryParserException pex) {
-			StreamingOutput stream = new StreamingOutput() {
-	            public void write(OutputStream os) throws IOException, WebApplicationException {
-	            	// when prefix is null, QueryProcessor default prefix is used*/
-	            	String res=pex.getMessage();
-	            	os.write(res.getBytes());
-	            }
-	        };
-	        return Response.ok(stream,media).build();
-		}
-		catch(IOException ex) {
-			StreamingOutput stream = new StreamingOutput() {
-	            public void write(OutputStream os) throws IOException, WebApplicationException {
-	            	// when prefix is null, QueryProcessor default prefix is used*/
-	            	os.write(ex.getLocalizedMessage().getBytes());
-	            }
-	        };
-	        return Response.ok(stream,media).build();
-			
-		}	
+		    query = sub.replace(q);		
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
             	// when prefix is null, QueryProcessor default prefix is used*/

@@ -4,7 +4,8 @@
 <% 
 String serverName = request.getServerName();
 int portNumber = request.getServerPort();
-String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber)); 
+String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber));
+
 
 %>
 <!DOCTYPE html>
@@ -49,7 +50,7 @@ String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+por
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 
 using this general url format:</p>
-http://server:port/lds-pdi/query/ID</p>
+<p>http://server:port/lds-pdi/query/ID</p>
 <p>where ID is a BDRC resource ID (ex. P1583 or W27553)</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center"><%= content %></div>

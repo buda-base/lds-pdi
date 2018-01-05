@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class ParserConfig {
 	
-	public static String QUERY_DIR="queryDir";
+	public static String QUERY_PATH="queryPath";
 	
 	public static String QUERY_SCOPE="QueryScope";
 	public static String QUERY_RETURN_TYPE="QueryReturnType";

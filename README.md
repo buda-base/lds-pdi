@@ -9,9 +9,16 @@ Moreover, each query file contains its own description taht is used to dynamical
 ```
 mvn clean package
 ```
-# Config
+# Configuration
 
-fuseki server name url is set in ldsrest.properties:
+Copy the queries directory to your file system : /local/dir/queries
+set the queryPath property in ldspdi,properties :
+
+```
+queryPath=/local/dir/queries/
+```
+
+fuseki server name url is set in ldsdpi.properties:
 
 ```
 #Fuseki server
@@ -26,7 +33,7 @@ mvn jetty:run then go to http://localhost:8080/lds-pdi/index.jsp
 
 # Usage
 
-This framework will automatically add new sparql query templates based on files published to the « src/main/resources/queries » directory.
+This framework will automatically add new sparql query templates based on files published to the « /local/dir/queries » directory.
 
 New query files must have the .arq extension and are formatted as follows :
 

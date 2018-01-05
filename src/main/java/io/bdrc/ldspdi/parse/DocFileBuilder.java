@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.parse;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -10,10 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.text.StrSubstitutor;
 
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
+
+
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class DocFileBuilder {
@@ -21,25 +19,18 @@ public class DocFileBuilder {
 	public static String content="";
 	public static HashMap<String,String> specs;
 	
-	static {
-		try {
-			File html = new File(PublicDataResource.class.getClassLoader().getResource("welcome.html").getFile());
-			content=FileUtils.readFileToString(html, "utf-8");
-			
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
 	
-	public static String getContent(String base) {	
+	
+	public static String getContent(String base) throws IOException{	
 		ArrayList<String> files=getQueryFiles();
+		
 		String contents="";
 		specs=new HashMap<>();
 		String LS=System.lineSeparator();
-		try {
+		
 			for(String file:files) {
 				
-				QueryFileParser qfp=new QueryFileParser(file);
+				QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+file);
 				HashMap<String,String> info=qfp.getMetaInf();
 				String queryScope=info.get(ParserConfig.QUERY_SCOPE);
 				
@@ -77,25 +68,20 @@ public class DocFileBuilder {
 				String val=specs.get(key)+"</table>";
 				specs.put(key, val);
 				contents=contents+" "+val;
-			}
-			
-		}
-		catch(PdiQueryParserException ex) {
-			return ex.getMessage();
-		}
-		catch(IOException ex) {
-			return ex.getMessage();
-		}
+			}		
 		
 		return contents;
 	}
 	
+	public static String getTest() {
+		return "this is a test1";
+	}
+	
 	public static ArrayList<String> getQueryFiles() {
 		ArrayList<String> files=new ArrayList<>();
-		Path directoryPath = Paths.get(ServiceConfig.getProperty("queryPath"));
-		
-        if (Files.isDirectory(directoryPath)) {
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(directoryPath)) {
+		Path dpath = Paths.get(ServiceConfig.getProperty(ParserConfig.QUERY_PATH));		
+		if (Files.isDirectory(dpath)) {        
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dpath)) {
                 for (Path path : stream) {
                     String tmp=path.toString();
                     files.add(tmp.substring(tmp.lastIndexOf("/")+1));

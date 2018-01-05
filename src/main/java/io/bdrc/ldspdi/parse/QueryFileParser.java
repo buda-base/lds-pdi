@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.text.StrSubstitutor;
 
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -20,30 +18,23 @@ public class QueryFileParser {
 	private HashMap<String,String> metaInf;
 	private String query;
 	
-	public QueryFileParser(HashMap<String,String> queryMap) throws IOException,PdiQueryParserException{
+	public QueryFileParser(HashMap<String,String> queryMap) throws IOException{
 		this.queryMap=queryMap;
 		metaInf= new HashMap<>();
-		String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_DIR)+queryMap.get("searchType")+".arq";
+		String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+queryMap.get("searchType")+".arq";
 		try {
-		this.queryFile = new File(PublicDataResource.class.getClassLoader().getResource(queryFilename).getFile());
+		this.queryFile = new File(queryFilename);
 		}
 		catch(Exception ex) {
-			throw new PdiQueryParserException("PdiQueryParserException : parser was unable to read File->"+ queryMap.get("searchType")+".arq  ");
-			   
+			ex.printStackTrace();	   
 		}
 		parseFile();		
 	}
 	
-	public QueryFileParser(String filename) throws IOException,PdiQueryParserException{		
+	public QueryFileParser(String filename) throws IOException{		
 		metaInf= new HashMap<>();
-		String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_DIR)+filename;
-		try {
-		this.queryFile = new File(PublicDataResource.class.getClassLoader().getResource(queryFilename).getFile());
-		}
-		catch(Exception ex) {
-			throw new PdiQueryParserException("PdiQueryParserException : parser was unable to read File->"+ queryMap.get("searchType")+".arq  ");
-			   
-		}
+		//String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename;
+		this.queryFile = new File(filename);
 		parseFile();		
 	}
 	
@@ -52,7 +43,7 @@ public class QueryFileParser {
 		return metaInf;
 	}
 
-	private void parseFile() throws IOException,PdiQueryParserException{
+	private void parseFile() throws IOException{
 		
 		BufferedReader br = new BufferedReader(new FileReader(queryFile));		
 		String readLine = "";	
@@ -76,7 +67,6 @@ public class QueryFileParser {
 	   
 	   if(missingInfo.length()>0) {
 	       String msg=missingInfo+" is missing but is a required information field";
-	       throw new PdiQueryParserException("PdiQueryParserException : File->"+ queryMap.get("searchType")+".arq; ERROR: "+msg);
 	   }
 	}		
 	
