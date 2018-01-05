@@ -33,7 +33,7 @@ mvn jetty:run then go to http://localhost:8080/lds-pdi/index.jsp
 
 # Usage
 
-This framework will automatically add new sparql query templates based on files published to the « /local/dir/queries » directory.
+This framework will automatically add new sparql query templates to the index page based on files published to the « /local/dir/queries » directory.
 
 New query files must have the .arq extension and are formatted as follows :
 
