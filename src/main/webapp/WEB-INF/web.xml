@@ -22,4 +22,13 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 <servlet-name >Jersey Service </servlet-name >
 <url-pattern >/query/*</url-pattern>
 </servlet-mapping >
+<servlet>
+	<servlet-name >Controller</servlet-name >	
+	<servlet-class>io.bdrc.ldspdi.service.OntologyController</servlet-class>	
+	<load-on-startup >1 </load-on-startup >
+</servlet>
+<servlet-mapping>
+    <servlet-name>Controller</servlet-name>
+    <url-pattern>/ontology</url-pattern>
+</servlet-mapping>
 </web-app>

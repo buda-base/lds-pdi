@@ -1,4 +1,3 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
@@ -24,7 +23,7 @@ List<OntClassModel> rootClasses=OntAccess.getOntRootClasses();
 <p>There are <%=OntAccess.getNumRootClasses()%> simple root OntClass(es):</p>
 <ul>
           <% for(OntClassModel root:rootClasses){ %>
-            <li><a href="/ontology/classes/<%=root.getUri()%>?url}"><%=root.getId()%></a></li>
+            <li><a href="ontology?classUri=<%=root.getUri()%>"><%=root.getId()%></a></li>
           <%} %>
         </ul>
 </body>
