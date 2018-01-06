@@ -46,6 +46,10 @@ String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+por
     To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to 
     Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
     </p>
+    
+<h2>Navigate through BDRC Ontology</h2>
+<p>you can use this service to access the current BDRC ontology:</p>
+<p><a href="ontOverview.jsp">Ontology service</a></p>
 
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 

@@ -2,10 +2,13 @@
 xmlns="http://java.sun.com/xml/ns/javaee" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-  
-
-
 <display-name>Archetype Created Web Application</display-name>
+ <!-- Listeners -->
+    <listener>
+        <listener-class>
+        io.bdrc.ldspdi.service.BootClass
+        </listener-class>
+    </listener>
 <servlet>
 	<servlet-name >Jersey Service </servlet-name >
 	<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
