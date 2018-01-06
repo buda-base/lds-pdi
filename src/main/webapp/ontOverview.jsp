@@ -23,7 +23,7 @@ List<OntClassModel> rootClasses=OntAccess.getOntRootClasses();
 <p>There are <%=OntAccess.getNumRootClasses()%> simple root OntClass(es):</p>
 <ul>
           <% for(OntClassModel root:rootClasses){ %>
-            <li><a href="ontology?classUri=<%=root.getUri()%>"><%=root.getId()%></a></li>
+            <li><a href="query/ontology?classUri=<%=root.getUri()%>"><%=root.getId()%></a></li>
           <%} %>
         </ul>
 </body>

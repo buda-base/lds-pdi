@@ -16,19 +16,14 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<param-name >jersey.config.server.provider.packages</param-name >
 	<param-value >io.bdrc.ldspdi.rest.resources</param-value >
 	</init-param >
+	<init-param>
+            <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature, org.glassfish.jersey.server.mvc.jsp.JspMvcFeature</param-value>
+    </init-param>
 	<load-on-startup >1 </load-on-startup >
 </servlet>
 <servlet-mapping>
 <servlet-name >Jersey Service </servlet-name >
 <url-pattern >/query/*</url-pattern>
 </servlet-mapping >
-<servlet>
-	<servlet-name >Controller</servlet-name >	
-	<servlet-class>io.bdrc.ldspdi.service.OntologyController</servlet-class>	
-	<load-on-startup >1 </load-on-startup >
-</servlet>
-<servlet-mapping>
-    <servlet-name>Controller</servlet-name>
-    <url-pattern>/ontology</url-pattern>
-</servlet-mapping>
 </web-app>

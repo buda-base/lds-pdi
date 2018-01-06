@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -24,8 +27,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
+import org.glassfish.jersey.server.mvc.Viewable;
 
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
@@ -39,9 +44,7 @@ public class PublicDataResource {
 	public String fusekiUrl=ServiceConfig.getProperty("fuseki");
 	
 	@GET	
-	//@Path("query")
-	public Response getData(@Context UriInfo info) throws Exception{
-		
+	public Response getData(@Context UriInfo info) throws Exception{		
 		String baseUri=info.getBaseUri().toString();
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
@@ -68,7 +71,7 @@ public class PublicDataResource {
 		    query = sub.replace(q);		
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-            	// when prefix is null, QueryProcessor default prefix is used*/
+            	// when prefix is null, QueryProcessor default prefix is used
             	String res=processor.getResource(query, null, true,baseUri);
             	os.write(res.getBytes());
             }
@@ -78,21 +81,36 @@ public class PublicDataResource {
 	}
 	
 	@GET
+    @Path("/ontology")
+	@Produces("text/html")
+	public Response getOntologyClassView(@QueryParam("classUri") String uri) {        
+		MediaType media=new MediaType("text","html","utf-8");		
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("model", new OntClassModel(uri));
+        return Response.ok(new Viewable("/ontClass.jsp", map),media).build();
+        //return new Viewable("test.jsp", map);
+    }
+	
+	@GET
 	@Path("/{res}")	
-	public Response getResourceFile(@PathParam("res") final String res) {
-					
+	public Response getResourceFile(@PathParam("res") final String res, @QueryParam("classUri") final String uri) {
+		if(uri!=null) {
+			Map<String, Object> map = new HashMap<String, Object>();
+	        map.put("model", new OntClassModel(uri));
+	        return Response.ok(new Viewable("/ontClass", map)).build();
+		}
 		MediaType media=new MediaType("text","turtle","utf-8");
 		
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-            	// when prefix is null, QueryProcessor default prefix is used*/
+            	// when prefix is null, QueryProcessor default prefix is used
             	Model model=processor.getResource(res,fusekiUrl,null);	
             	RDFWriter writer=getSTTLRDFWriter(model); 
             	writer.output(os);            		
             }
         };
 		return Response.ok(stream,media).build();		
-	}	
+	}
 	
 	public RDFWriter getSTTLRDFWriter(Model m) throws IOException{
 		Lang sttl = STTLWriter.registerWriter();

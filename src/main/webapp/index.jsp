@@ -48,7 +48,7 @@ String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+por
     </p>
     
 <h2>Navigate through BDRC Ontology</h2>
-<p>you can use this service to access the current BDRC ontology:</p>
+<p>You can use this service to access the current BDRC ontology and discover the data model:</p>
 <p><a href="ontOverview.jsp">Ontology service</a></p>
 
 <h2>Instructions</h2>
