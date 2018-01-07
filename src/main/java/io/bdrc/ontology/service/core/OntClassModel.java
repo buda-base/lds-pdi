@@ -9,8 +9,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
  * 
@@ -37,26 +35,24 @@ public class OntClassModel {
         clazz = c;
    }
     
-    @JsonGetter("isPresent")
     public boolean isPresent() {
         return !(OntClassNotPresent.class.equals(clazz.getClass()));
     }
 
-    @JsonGetter("uri")
     public String getUri() {
         return uri;
     }
 
-    @JsonGetter("id")
+    
     public String getId() {
         return OntAccess.MODEL.shortForm(uri);
     }
     
-    @JsonGetter("hasParent")
+    
     public boolean hasParent() {
         return clazz.getSuperClass() != null;
     }
-    @JsonGetter("parent")
+    
     public OntClassModel getParent() {
         OntClass sup3r = clazz.getSuperClass();
         if (sup3r != null) {
@@ -66,7 +62,6 @@ public class OntClassModel {
         }
     }
     
-    @JsonGetter("subclasses")
     public List<OntClassModel> getSubclasses() {
         List<OntClass> subs = clazz.listSubClasses(true).toList();
         List<OntClassModel> models = new ArrayList<OntClassModel>();
@@ -78,7 +73,6 @@ public class OntClassModel {
         return models;
     }
     
-    @JsonGetter("labels")
     public List<String> getLabels() {
         List<String> labels = new ArrayList<String>();
         
@@ -89,7 +83,6 @@ public class OntClassModel {
         return labels;
     }
     
-    @JsonGetter("comments")
     public List<String> getComments() {
         List<String> comments = new ArrayList<String>();
         
@@ -97,10 +90,9 @@ public class OntClassModel {
             comments.add(node.toString());
         }
         
-        return comments;
+        return comments; 
     }
     
-    @JsonGetter("properties")
     public List<StmtModel> getProperties() {
         List<StmtModel> properties = new ArrayList<StmtModel>();
         
@@ -111,7 +103,6 @@ public class OntClassModel {
         return properties;
     }
     
-    @JsonGetter("otherProperties")
     public List<StmtModel> getOtherProperties() {
         List<StmtModel> properties = new ArrayList<StmtModel>();
         

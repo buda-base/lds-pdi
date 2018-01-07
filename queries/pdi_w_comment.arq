@@ -1,0 +1,27 @@
+#QueryScope=Work
+#QueryReturnType=Table
+#QueryResults=A table containing the Id, the name, the types of the commentaries of works whose name contains the NAME param value, along with the root text ID and preferred name
+#QueryParams=NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_w_comment&NAME=rgyud bla ma
+
+
+select ?comment (GROUP_CONCAT(DISTINCT ?comment_type;  SEPARATOR=" <> ") AS ?comment_types)  ?comment_name ?root ?root_name
+where {
+	?comment :workIsAbout ?root;
+             :workGenre ?g ;	
+  		     skos:prefLabel ?comment_name.
+    ?g skos:prefLabel ?comment_type 
+  	{
+    	select distinct ?root ?root_name
+    	where  {  
+      		?root  skos:prefLabel ?root_name.
+      	FILTER (contains(?root_name, "${NAME}" )) 
+    	}
+    }
+    FILTER ((contains(?comment_type, "commentary" )) 
+         || (contains(?comment_type, "rnam bshad" )) 
+         || (contains(?comment_type, "'grel pa" ))
+         || (contains(f:SankritFilter(?comment_type), "ṭīkā" ))
+         || (contains(f:SankritFilter(?comment_type), "vyākhyā" )))
+}
+group by ?comment ?comment_name ?root ?root_name

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryFileParser {
@@ -65,24 +64,7 @@ public class QueryFileParser {
 	            	
 	   }
 	   br.close();
-	   String missingInfo=missingRequiredInfo();
 	   
-	   if(missingInfo.length()>0) {
-	       String msg=missingInfo+" is missing but is a required information field";
-	   }
-	}		
-	
-	
-	private String missingRequiredInfo() {
-		ArrayList<String> required=ParserConfig.requiredInfoType();
-		String test="";
-		for(String st:required) {
-			
-			if(!metaInf.keySet().contains(st)) {
-				test=st;
-			}
-		}
-		return test;
 	}
 	
 	public String getQuery() {

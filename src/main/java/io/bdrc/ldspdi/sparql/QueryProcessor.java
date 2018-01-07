@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.sparql;
 
 import java.util.List;
-import java.util.UUID;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -30,7 +29,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.riot.lang.LabelToNode;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 

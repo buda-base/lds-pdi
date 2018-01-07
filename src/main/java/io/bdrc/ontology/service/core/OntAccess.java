@@ -13,7 +13,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 
