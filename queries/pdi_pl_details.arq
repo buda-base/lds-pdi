@@ -1,0 +1,19 @@
+#QueryScope=Place
+#QueryReturnType=Table
+#QueryResults=A table containing the detailed info of a place whose name contains the NAME param value
+#QueryParams=NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_pl_details&NAME=dgon gsar
+
+SELECT DISTINCT * 
+WHERE {  
+	?ID a :Place ;  
+	skos:prefLabel ?Preferred_Name ; 
+	?p ?o . 
+	FILTER (?p != :PlaceEvent)  
+	FILTER (?p != adm:gitRevision)  
+	FILTER (?p != adm:logEntry)  
+	FILTER (?p != adm:status)  
+	FILTER (?p != rdf:type)  
+	FILTER (!isBlank(?o))  
+	FILTER contains(?Preferred_Name, "${NAME}" )  
+} 

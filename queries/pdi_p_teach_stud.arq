@@ -1,0 +1,23 @@
+#QueryScope=Person
+#QueryReturnType=Table
+#QueryResults=A table containing the Id, preferred name, teacher name and student name for people having their preferred name containing the NAME param value
+#QueryParams=NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_teach_stud&NAME=dri med 'od zer
+
+
+SELECT DISTINCT ?ID ?Preferred_Name ?Teacher ?Student 
+WHERE {  
+{ ?ID a :Person ;  
+  skos:prefLabel ?Preferred_Name ; 
+  :personStudentOf ?t_name . 
+  ?t_name skos:prefLabel ?Teacher . 
+  }  
+  UNION  { 
+  ?ID a :Person ;  
+  skos:prefLabel ?Preferred_Name ;  
+  :personTeacherOf ?s_name . 
+  ?s_name skos:prefLabel ?Student . 
+  }  
+  FILTER contains(?Preferred_Name, "${NAME}")  
+}  
+ORDER by ?ID ?Preferred_Name ?Teacher ?Student

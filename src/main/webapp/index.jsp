@@ -58,5 +58,6 @@ using this general url format:</p>
 <p>where ID is a BDRC resource ID (ex. P1583 or W27553)</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center"><%= content %></div>
+<br><br><hr><br>
 </body>
 </html>
