@@ -1,0 +1,53 @@
+#QueryScope=Person
+#QueryReturnType=Table
+#QueryResults=All the detailed info (name, events, students, teachers) about the person corresponding to the given ID
+#QueryParams=ID
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_details&ID=P1583
+
+
+select distinct 
+
+?ID  
+(GROUP_CONCAT(DISTINCT ?preferredName;   SEPARATOR=" || ") AS ?pref_Names)
+?property_type 
+?property_value 
+?e_property_type 
+?e_property_value 
+?stud ?stud_name 
+?teach ?teach_name
+
+where { 
+	{
+	  	?ID skos:prefLabel ?preferredName ;
+	    Filter(?ID=bdr:${ID})
+	}
+	{
+	  	OPTIONAL{ ?ID  :personName/rdfs:subClassOf* ?o }.
+	  	?o ?y ?property_value .
+	  	?o rdf:type ?property_type
+	  	Filter(?ID=bdr:${ID})  
+	  	Filter(isLiteral(?property_value)) 
+	}
+	UNION
+	{
+  		?ID skos:prefLabel ?preferredName ;
+    	OPTIONAL{ ?ID  :personEvent/rdfs:subClassOf* ?event }.
+  		?event ?event_p ?e_property_value .
+  		?event rdf:type ?e_property_type
+  		Filter(?ID=bdr:${ID})  
+  		Filter(isLiteral(?e_property_value)) 
+ 	}
+	UNION 
+	{
+		OPTIONAL{ ?ID  :personStudentOf ?stud }.
+    	?stud  skos:prefLabel ?stud_name.
+    	Filter(?ID=bdr:${ID})
+	}
+  	UNION {	
+    	OPTIONAL{ ?ID  :personTeacherOf ?teach }.
+    	?teach  skos:prefLabel ?teach_name.
+    	Filter(?ID=bdr:${ID})
+	}
+}
+group by ?ID ?property_type ?property_value ?e_property_type ?e_property_value ?stud ?stud_name ?teach ?teach_name
+order by DESC(?property_type) desc(?e_property_type) desc(?stud)

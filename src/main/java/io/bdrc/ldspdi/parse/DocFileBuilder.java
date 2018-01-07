@@ -80,7 +80,10 @@ public class DocFileBuilder {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(dpath)) {
                 for (Path path : stream) {
                     String tmp=path.toString();
-                    files.add(tmp.substring(tmp.lastIndexOf("/")+1));
+                    //Filtering arq files
+                    if(tmp.endsWith(".arq")) {
+                    	files.add(tmp.substring(tmp.lastIndexOf("/")+1));
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

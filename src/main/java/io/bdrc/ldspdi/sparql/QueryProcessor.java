@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.sparql;
 
 import java.util.List;
+import java.util.UUID;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -29,6 +30,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.lang.LabelToNode;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 
@@ -130,11 +132,20 @@ public class QueryProcessor {
 							}else {
 								table=table+"><a href=\""+baseUri;	
 							}
-							table=table+qs.get(str).asNode().getLocalName()+"\"> "
-							+qs.get(str).asNode().getLocalName()+"</a></td>";
+							if(qs.get(str).asNode().isBlank()) {
+								table=table+qs.get(str).asNode().getBlankNodeLabel()+"\"> "
+								+qs.get(str).asNode().getBlankNodeLabel()+"</a></td>";
+							}else {
+								table=table+qs.get(str).asNode().getLocalName()+"\"> "
+								+qs.get(str).asNode().getLocalName()+"</a></td>";
+							}
 						}
 						else {
-							table=table+">"+qs.get(str).asNode().getLocalName()+"</td>";
+							if(qs.get(str).asNode().isBlank()) {
+								table=table+">_b"+qs.get(str).asNode().getBlankNodeLabel().substring(0, 5)+"</td>";
+							}else {
+								table=table+">"+qs.get(str).asNode().getLocalName()+"</td>";
+							}
 						}
 					}
 					else if(node.isLiteral()) {
