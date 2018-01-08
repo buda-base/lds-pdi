@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.sparql.functions;
 
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 import io.bdrc.ldspdi.Utils.StringHelpers;
@@ -24,12 +23,5 @@ public class TibetanBasicFilter extends FunctionBase2{
 		boolean b=(v1.contains(v2));
 		return NodeValue.makeBoolean(b);
 	}
-
-	public static void main(String[] args) {
-		TibetanBasicFilter sbf=new TibetanBasicFilter();
-		NodeValue nv=sbf.exec(new NodeValueString("gsung gi mdzod 'jam dbyangs rdo rje'i glu"), new NodeValueString("གསུང་གི་མཛོད་འཇམ་དབྱངས་"));
-		System.out.println(nv);
-	}
-
 }
 

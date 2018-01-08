@@ -3,29 +3,31 @@ package io.bdrc.ontology.service.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import io.bdrc.ldspdi.composer.ClassProperties;
+import io.bdrc.ldspdi.composer.ClassProperty;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class OntAccess {
 	
 	public static OntModel MODEL;
     private static String OWL_URL;
+    public static HashMap<String,ClassProperties> ontData;
 
     public static void init() {
         Logger log = LoggerFactory.getLogger(OntAccess.class);
-        
-        OntModel ontModel = null;
-        //CONFIG = config;
+        OntModel ontModel = null;        
         
         try {
         	OWL_URL=ServiceConfig.getProperty("owlURL");
@@ -44,9 +46,71 @@ public class OntAccess {
 
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);
-        }
-        
+        }        
         MODEL = ontModel;
+        ontData=new HashMap<String,ClassProperties>();
+        List<OntClass> list=MODEL.listClasses().toList();
+		for(OntClass clazz:list) {			
+			List<OntProperty> props=clazz.listDeclaredProperties(true).toList();
+			for(OntProperty p:props) {
+				if(clazz.getLocalName()!=null) {					
+					addClassProperty(clazz.getURI(), p);
+				}
+			}
+		}
+    }
+    
+    private static void addClassProperty(String className,OntProperty prop) {
+    	ClassProperties classProps=ontData.get(className);
+    	if(classProps==null) {
+    		classProps=new ClassProperties();
+    	}
+    	classProps.addClassProperty(new ClassProperty(prop,className));
+    	ontData.put(className, classProps);
+    }
+    
+    public static ArrayList<ClassProperty> listAnnotationProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getAnnotationProps();
+    }
+    
+    public static ArrayList<ClassProperty> listObjectProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getObjectProps();
+    }
+    
+    public static ArrayList<ClassProperty> listDataTypeProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getDataTypeProps();
+    }
+    
+    public static ArrayList<ClassProperty> listSymmetricProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getSymmetricProps();
+    }
+    
+    public static ArrayList<ClassProperty> listFunctionalProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getFunctionalProps();
+    }
+    
+    public static ArrayList<ClassProperty> listClassProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getClassProps();
+    }
+    
+    public static ArrayList<ClassProperty> listIrreflexiveProps(String classLocalName){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getIrreflexiveProps();
+    }
+    
+    public static ArrayList<ClassProperty> listProps(String classLocalName,String rdfType){
+    	ClassProperties clProps=ontData.get(classLocalName);
+    	return clProps.getProps(rdfType);
+    }
+    
+    public static ClassProperties getClassAllProps(String classLocalName){
+    	return ontData.get(classLocalName);    	
     }
     
     public static String getOwlURL() {
@@ -104,7 +168,6 @@ public class OntAccess {
         return rez;
     }
     
-    //@JsonGetter("rootClasses")
     public static List<OntClassModel> getOntRootClasses() {
         List<OntClass> roots = getSimpleRootClasses();
         List<OntClassModel> models = new ArrayList<OntClassModel>();
@@ -116,37 +179,30 @@ public class OntAccess {
         return models;
     }
     
-    //@JsonGetter("numPrefixes")
     public static int getNumPrefixes() {
         return MODEL.numPrefixes();
     }
     
-    //@JsonGetter("name")
     public static String getName() {
         return MODEL.listOntologies().toList().get(0).getLabel(null);
     }
     
-    //@JsonGetter
     public static int getNumClasses() {
         return MODEL.listClasses().toList().size();
     }
     
-    //@JsonGetter
     public static int getNumObjectProperties() {
         return MODEL.listObjectProperties().toList().size();
     }
     
-    //@JsonGetter
     public static int getNumDatatypeProperties() {
         return MODEL.listDatatypeProperties().toList().size();
     }
     
-    //@JsonGetter
     public static int getNumAnnotationProperties() {
         return MODEL.listAnnotationProperties().toList().size();
     }
     
-    //@JsonGetter
     public static int getNumRootClasses() {
         return getSimpleRootClasses().size();
     }

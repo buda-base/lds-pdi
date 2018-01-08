@@ -112,7 +112,7 @@ public class OntClassModel {
               properties.add(new StmtModel(stmt));
             }
         }
-        
         return properties;
     }
+    
 }

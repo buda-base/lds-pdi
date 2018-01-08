@@ -14,9 +14,4 @@ public class JaroWinklerFilter extends FunctionBase2 {
         return NodeValue.makeDouble(new Double(d)); 
     }
 	
-	public static void main(String[] args) {
-		JaroWinklerDistance LD=new JaroWinklerDistance();
-        Double d = LD.apply("prajna", "prajñā");
-		System.out.println(d);
-	}
 }

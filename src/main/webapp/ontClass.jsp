@@ -1,6 +1,7 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
+<%@page import="io.bdrc.ldspdi.composer.*"%>
 <%@page import="java.util.*"%>
 <%
 HashMap t=(HashMap)request.getAttribute("model");
@@ -32,8 +33,57 @@ OntClassModel model = (OntClassModel)t.get("model");
 		<div style="white-space: pre-wrap;"><%=comment%></div><hr/>
 		<%}}else { %><p>No comments found.</p>
 		<%} %>
+		<h4>&#9658;Object properties:</h4>
+	    <%ArrayList<ClassProperty> object_Props= OntAccess.listObjectProps(model.getUri()) ; 
+	    if(object_Props.size()!=0){
+	      for(ClassProperty object_prop :object_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=object_prop.getName()%>:</b>  &#9675; Label: <i><%=object_prop.getLabel()%></i>  &#9675; Range: <i><%=object_prop.getRange()%></i></div>
+		<%}}else { %><p>No object properties found.</p>
+		<%} %>
+		<h4>&#9658;Datatype properties:</h4>
+	    <%ArrayList<ClassProperty> datatype_Props= OntAccess.listDataTypeProps(model.getUri()) ; 
+	    if(datatype_Props.size()!=0){
+	      for(ClassProperty datatype_prop :datatype_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=datatype_prop.getName()%>:</b>  &#9675; Label: <i><%=datatype_prop.getLabel()%></i>  &#9675; Range: <i><%=datatype_prop.getRange()%></i></div>
+		<%}}else { %><p>No datatype properties found.</p>
+		<%} %>
+		<h4>&#9658;Annotation properties:</h4>
+	    <%ArrayList<ClassProperty> annot_Props= OntAccess.listAnnotationProps(model.getUri()) ; 
+	    if(annot_Props.size()!=0){
+	      for(ClassProperty annot_Prop :annot_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=annot_Prop.getName()%>:</b>  &#9675; Label: <i><%=annot_Prop.getLabel()%></i>  &#9675; Range: <i><%=annot_Prop.getRange()%></i></div>
+		<%}}else { %><p>No annotation properties found.</p>
+		<%} %>
+		<h4>&#9658;Symmetric properties:</h4>
+	    <%ArrayList<ClassProperty> sym_Props= OntAccess.listSymmetricProps(model.getUri()) ; 
+	    if(sym_Props.size()!=0){
+	      for(ClassProperty sym_Prop :sym_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=sym_Prop.getName()%>:</b>  &#9675; Label: <i><%=sym_Prop.getLabel()%></i>  &#9675; Range: <i><%=sym_Prop.getRange()%></i></div>
+		<%}}else { %><p>No symmetric properties found.</p>
+		<%} %>
+		<h4>&#9658;Irreflexive properties:</h4>
+	    <%ArrayList<ClassProperty> irref_Props= OntAccess.listIrreflexiveProps(model.getUri()) ; 
+	    if(irref_Props.size()!=0){
+	      for(ClassProperty irref_Prop :irref_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=irref_Prop.getName()%>:</b>  &#9675; Label: <i><%=irref_Prop.getLabel()%></i>  &#9675; Range: <i><%=irref_Prop.getRange()%></i></div>
+		<%}}else { %><p>No irreflexive properties found.</p>
+		<%} %>
+		<h4>&#9658;Functional properties:</h4>
+	    <%ArrayList<ClassProperty> funct_Props= OntAccess.listFunctionalProps(model.getUri()) ; 
+	    if(funct_Props.size()!=0){
+	      for(ClassProperty funct_Prop :funct_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=funct_Prop.getName()%>:</b>  &#9675; Label: <i><%=funct_Prop.getLabel()%></i>  &#9675; Range: <i><%=funct_Prop.getRange()%></i></div>
+		<%}}else { %><p>No functional properties found.</p>
+		<%} %>
+		<h4>&#9658;Class properties:</h4>
+	    <%ArrayList<ClassProperty> class_Props= OntAccess.listClassProps(model.getUri()) ; 
+	    if(class_Props.size()!=0){
+	      for(ClassProperty class_Prop :class_Props){%>
+		<div style="white-space: pre-wrap;"><b><%=class_Prop.getName()%>:</b>  &#9675; Label: <i><%=class_Prop.getLabel()%></i>  &#9675; Range: <i><%=class_Prop.getRange()%></i></div>
+		<%}}else { %><p>No class properties found.</p>
+		<%} %>
 		<% List<StmtModel> stmts =model.getOtherProperties(); %>
-	            <h4>Other Properties:</h4>
+	            <h4>&#9658;Other Properties:</h4>
 	            <% if(stmts.size()!=0){
 	            	for(StmtModel stmt:stmts){ %><p><%=stmt.getPropertyId()%> 	            
 					<% if(stmt.objectHasUri()) {%>					
