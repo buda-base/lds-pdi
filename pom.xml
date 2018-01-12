@@ -173,7 +173,7 @@
          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->			
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-war-plugin</artifactId>
-			<version>3.2.0</version>
+			<version>3.1.0</version>
 			<configuration>
 		        <attachClasses>true</attachClasses>
 		        <webXml>src/main/webapp/WEB-INF/web.xml</webXml>

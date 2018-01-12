@@ -43,7 +43,7 @@ public class QueryProcessor {
 			+" PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
 			+" PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>"
 			+" PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"
-			+" PREFIX f: <java:io.bdrc.ldsearch.query.functions.>";
+			+" PREFIX f: <java:io.bdrc.ldspdi.query.functions.>";
 	
 	String baseUri=null;
 	
