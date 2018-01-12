@@ -34,16 +34,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
 	
-	String prefixes=
-			 "PREFIX : <http://purl.bdrc.io/ontology/core/> "
-			+" PREFIX adm: <http://purl.bdrc.io/ontology/admin/> "
-			+" PREFIX bdr: <http://purl.bdrc.io/resource/> "
-			+" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-			+" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"				
-			+" PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-			+" PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>"
-			+" PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"
-			+" PREFIX f: <java:io.bdrc.ldspdi.query.functions.>";
+	String prefixes=ServiceConfig.getPrefixes();
 	
 	String baseUri=null;
 	

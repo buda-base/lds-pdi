@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.File;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -24,9 +26,13 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import io.bdrc.ldspdi.parse.ParserConfig;
 
 
 public class ServiceConfig {
@@ -34,20 +40,22 @@ public class ServiceConfig {
 	static Properties prop = new Properties();
 	static ArrayList<String> mime=new ArrayList<String>();
 	public static Writer logWriter;
+	public static String sparqlPrefixes="";
 	
 	static{
 		try {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			// load a properties file
 			prop.load(input);
-			logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));
+			logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));		
+			String mimes=prop.getProperty("mime");
+			StringTokenizer st=new StringTokenizer(mimes,",");
+			while(st.hasMoreTokens()){
+				mime.add(st.nextToken());
+			}
+			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+"prefixes.txt")));
 		} catch (IOException ex) {
 			ex.printStackTrace();
-		}
-		String mimes=prop.getProperty("mime");
-		StringTokenizer st=new StringTokenizer(mimes,",");
-		while(st.hasMoreTokens()){
-			mime.add(st.nextToken());
 		}
 	}
 	
@@ -57,6 +65,9 @@ public class ServiceConfig {
 	
 	public static String getProperty(String key){
 		return prop.getProperty(key);
-	}		
+	}
 	
+	public static String getPrefixes(){
+		return sparqlPrefixes;
+	}
 }
