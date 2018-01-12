@@ -6,4 +6,5 @@
  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
  PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>
  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
- PREFIX f: <java:io.bdrc.ldspdi.query.functions.>
+ PREFIX text: <http://jena.apache.org/text#>
+ PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>
