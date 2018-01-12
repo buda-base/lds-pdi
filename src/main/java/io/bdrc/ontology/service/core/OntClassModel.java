@@ -38,6 +38,10 @@ public class OntClassModel {
     public boolean isPresent() {
         return !(OntClassNotPresent.class.equals(clazz.getClass()));
     }
+    
+    public boolean isRootClassModel() {
+    	return OntAccess.getOntRootClasses().contains(this);
+    }
 
     public String getUri() {
         return uri;

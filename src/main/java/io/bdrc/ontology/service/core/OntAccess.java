@@ -24,6 +24,7 @@ public class OntAccess {
 	public static OntModel MODEL;
     private static String OWL_URL;
     public static HashMap<String,ClassProperties> ontData;
+    private static ArrayList<String> rootClassesUris;
 
     public static void init() {
         Logger log = LoggerFactory.getLogger(OntAccess.class);
@@ -58,6 +59,15 @@ public class OntAccess {
 				}
 			}
 		}
+		rootClassesUris = new ArrayList<>();
+		List<OntClassModel> rootClasses=OntAccess.getOntRootClasses();
+		for(OntClassModel m:rootClasses) {
+			rootClassesUris.add(m.getUri());
+		}
+    }
+    
+    public static boolean isRootClass(String uri) {
+    	return rootClassesUris.contains(uri);
     }
     
     private static void addClassProperty(String className,OntProperty prop) {
@@ -70,43 +80,75 @@ public class OntAccess {
     }
     
     public static ArrayList<ClassProperty> listAnnotationProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getAnnotationProps();
+    	if(clProps != null) {
+    		return clProps.getAnnotationProps();
+    	}
+    	return list;
     }
     
-    public static ArrayList<ClassProperty> listObjectProps(String classLocalName){
+    public static ArrayList<ClassProperty> listObjectProps(String classLocalName){    	
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getObjectProps();
+    	if(clProps != null) {
+    		list= clProps.getObjectProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listDataTypeProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getDataTypeProps();
+    	if(clProps != null) {
+    		return clProps.getDataTypeProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listSymmetricProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getSymmetricProps();
+    	if(clProps != null) {
+    		return clProps.getSymmetricProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listFunctionalProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getFunctionalProps();
+    	if(clProps != null) {
+    		return clProps.getFunctionalProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listClassProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getClassProps();
+    	if(clProps != null) {
+    		return clProps.getClassProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listIrreflexiveProps(String classLocalName){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getIrreflexiveProps();
+    	if(clProps != null) {
+    		return clProps.getIrreflexiveProps();
+    	}
+    	return list;
     }
     
     public static ArrayList<ClassProperty> listProps(String classLocalName,String rdfType){
+    	ArrayList<ClassProperty> list=new ArrayList<>(); 
     	ClassProperties clProps=ontData.get(classLocalName);
-    	return clProps.getProps(rdfType);
+    	if(clProps != null) {
+    		return clProps.getProps(rdfType);
+    	}
+    	return list;
     }
     
     public static ClassProperties getClassAllProps(String classLocalName){
@@ -205,6 +247,12 @@ public class OntAccess {
     
     public static int getNumRootClasses() {
         return getSimpleRootClasses().size();
+    }
+    
+    public static void main(String[] ags) {
+    	OntClassModel cm = new OntClassModel("http://purl.bdrc.io/ontology/core/Place");
+    	
+    	
     }
 }
 

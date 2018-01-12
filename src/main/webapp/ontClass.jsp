@@ -33,6 +33,7 @@ OntClassModel model = (OntClassModel)t.get("model");
 		<div style="white-space: pre-wrap;"><%=comment%></div><hr/>
 		<%}}else { %><p>No comments found.</p>
 		<%} %>
+		<%if (!OntAccess.isRootClass(model.getUri())) {%>
 		<h4>&#9658;Object properties:</h4>
 	    <%ArrayList<ClassProperty> object_Props= OntAccess.listObjectProps(model.getUri()) ; 
 	    if(object_Props.size()!=0){
@@ -81,7 +82,7 @@ OntClassModel model = (OntClassModel)t.get("model");
 	      for(ClassProperty class_Prop :class_Props){%>
 		<div style="white-space: pre-wrap;"><b><%=class_Prop.getName()%>:</b>  &#9675; Label: <i><%=class_Prop.getLabel()%></i>  &#9675; Range: <i><%=class_Prop.getRange()%></i></div>
 		<%}}else { %><p>No class properties found.</p>
-		<%} %>
+		<%}} %>
 		<% List<StmtModel> stmts =model.getOtherProperties(); %>
 	            <h4>&#9658;Other Properties:</h4>
 	            <% if(stmts.size()!=0){
