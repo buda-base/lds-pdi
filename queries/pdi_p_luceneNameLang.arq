@@ -8,10 +8,10 @@
 select distinct ?Person ?Primary_Name ?Name_Type ?Name
 WHERE
 {
-(?Person ?sc1 ?Primary_Name) text:query ( "${NAME}" ) .
+(?Person ?sc1 ?Primary_Name) text:query ( '${NAME}'@${LANG} ) .
 ?Person a :Person .
 ?Person :personName ?p_name .
-(?p_name ?sc2 ?Name) text:query (rdfs:label '${NAME}') .
+(?p_name ?sc2 ?Name) text:query (rdfs:label '${NAME}'@${LANG}) .
 ?p_name rdf:type ?Name_Type .
 OPTIONAL {?p_name ?title ?Name} .
 FILTER (?Name_Type != :PersonName)
