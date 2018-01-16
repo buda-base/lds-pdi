@@ -44,19 +44,20 @@ public class QueryProcessor {
 			prefixes=pref;
 		}
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
 		return model;		
 	}
 	
 	public String getResource(String query,String fusekiUrl,boolean html,String baseUri){
+		System.out.println("Processor query select:" +query);
 		this.baseUri=baseUri;
 	    String ret="";
 		if(fusekiUrl == null) {
 			fusekiUrl=ServiceConfig.getProperty("fuseki");
 		}
 		Query q=QueryFactory.create(prefixes+" "+query);
-		System.out.println("Processor query :" +query);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		ResultSet rs = qe.execSelect();
 		if(html) {

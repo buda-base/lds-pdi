@@ -16,23 +16,11 @@ public class QueryFileParser {
 	private HashMap<String,String> metaInf;
 	private String query;
 	
-	public QueryFileParser(HashMap<String,String> queryMap) throws IOException{
-		this.queryMap=queryMap;
-		metaInf= new HashMap<>();
-		String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+queryMap.get("searchType")+".arq";
-		try {
-		this.queryFile = new File(queryFilename);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();	   
-		}
-		parseFile();		
-	}
 	
 	public QueryFileParser(String filename) throws IOException{		
-		metaInf= new HashMap<>();
+		metaInf= new HashMap<>();		
 		//String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename;
-		this.queryFile = new File(filename);
+		this.queryFile = new File(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename);
 		parseFile();		
 	}
 	

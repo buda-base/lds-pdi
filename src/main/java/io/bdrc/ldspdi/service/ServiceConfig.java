@@ -33,8 +33,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import io.bdrc.ldspdi.parse.ParserConfig;
-
-
 public class ServiceConfig {
 	
 	static Properties prop = new Properties();

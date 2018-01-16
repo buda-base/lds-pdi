@@ -23,4 +23,11 @@ public class StringHelpers {
 		 wl.fromWylie(s, warn);
 		 return warn.size()==0;
 	}
+	
+	public static String bdrcEncode(String url) {
+		String encoded=url.replace("\"", "%22");
+		encoded=encoded.replace(' ', '+');
+		encoded=encoded.replace("\'", "%27");
+		return encoded;
+	}
 }

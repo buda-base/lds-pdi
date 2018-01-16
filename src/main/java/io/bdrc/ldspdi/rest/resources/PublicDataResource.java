@@ -29,6 +29,7 @@ import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 import org.glassfish.jersey.server.mvc.Viewable;
 
+import io.bdrc.ldspdi.sparql.PreparedQuery;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.jena.sttl.CompareComplex;
@@ -48,27 +49,18 @@ public class PublicDataResource {
 		String baseUri=info.getBaseUri().toString();
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
-		HashMap<String,String> converted=new HashMap<>();
-		Set<String> set=mp.keySet();
-		for(String st:set) {
-			List<String> str=mp.get(st);
-			for(String ss:str) {
-				
-				converted.put(st, ss);					
-			}
-		}		
+		String filename= mp.getFirst("searchType")+".arq";		
 		QueryFileParser qfp;
 		final String query;
-		//try {
-			qfp=new QueryFileParser(converted);
-			String q=qfp.getQuery();
-			String check=qfp.checkQueryArgsSyntax();
-			if(check.length()>0) {
-				throw new Exception("Exception : File->"
-												  + converted.get("searchType")+".arq; ERROR: "+check);
-			}
-			StrSubstitutor sub = new StrSubstitutor(converted);
-		    query = sub.replace(q);		
+		
+		qfp=new QueryFileParser(filename);
+		String q=qfp.getQuery();
+		String check=qfp.checkQueryArgsSyntax();
+		if(check.length()>0) {
+			throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
+		}
+		PreparedQuery prep_query=new PreparedQuery(q,mp);		
+		query=prep_query.getPreparedQuery();		
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
             	// when prefix is null, QueryProcessor default prefix is used
@@ -87,8 +79,7 @@ public class PublicDataResource {
 		MediaType media=new MediaType("text","html","utf-8");		
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("model", new OntClassModel(uri));
-        return Response.ok(new Viewable("/ontClass.jsp", map),media).build();
-        //return new Viewable("test.jsp", map);
+        return Response.ok(new Viewable("/ontClass.jsp", map),media).build();        
     }
 	
 	@GET

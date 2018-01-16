@@ -18,6 +18,6 @@ WHERE {
   :personTeacherOf ?s_name . 
   ?s_name skos:prefLabel ?Student . 
   }  
-  FILTER contains(?Preferred_Name, "${NAME}")  
+  FILTER contains(?Preferred_Name, "${NAME}/")  
 }  
 ORDER by ?ID ?Preferred_Name ?Teacher ?Student

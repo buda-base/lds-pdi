@@ -1,6 +1,8 @@
 package io.bdrc.ldspdi.parse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,9 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.lang3.StringEscapeUtils;
 
-
-
+import io.bdrc.ldspdi.Utils.StringHelpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class DocFileBuilder {
@@ -30,18 +33,21 @@ public class DocFileBuilder {
 		
 			for(String file:files) {
 				
-				QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+file);
+				QueryFileParser qfp=new QueryFileParser(file);
 				HashMap<String,String> info=qfp.getMetaInf();
 				String queryScope=info.get(ParserConfig.QUERY_SCOPE);
-				
+				String url=info.get(ParserConfig.QUERY_URL);				
+				String return_type=info.get(ParserConfig.QUERY_RETURN_TYPE);
+				String query_params=info.get(ParserConfig.QUERY_PARAMS);
+				String query_results=info.get(ParserConfig.QUERY_RESULTS);
 				if(specs.containsKey(queryScope)) {
 					String tmp=specs.get(queryScope);
 					tmp=tmp+"<tr><td><b>"+file.substring(0, file.indexOf("."))+"</b></td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_RETURN_TYPE)+"</td>"+LS
-							+"<td style=\"width:400px;\">"+info.get(ParserConfig.QUERY_RESULTS)+"</td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_PARAMS)+"</td>"+LS
-							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
-							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
+							+"<td>"+return_type+"</td>"+LS
+							+"<td style=\"width:400px;\">"+query_results+"</td>"+LS
+							+"<td>"+query_params+"</td>"+LS
+							+"<td><a href=\""+base+StringHelpers.bdrcEncode(url)+"\">"+
+							base+url+"</a></td></tr>"+LS;
 					specs.put(queryScope, tmp);
 					
 					
@@ -54,11 +60,11 @@ public class DocFileBuilder {
 							+ "<th>Url format</th>"+LS
 							+ "</tr>"+LS;
 					scope=scope+"<tr><td><b>"+file.substring(0, file.indexOf("."))+"</b></td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_RETURN_TYPE)+"</td>"+LS
-							+"<td style=\"width:400px;\">"+info.get(ParserConfig.QUERY_RESULTS)+"</td>"+LS
-							+"<td>"+info.get(ParserConfig.QUERY_PARAMS)+"</td>"+LS
-							+"<td><a href=\""+base+info.get(ParserConfig.QUERY_URL)+"\">"+
-							base+info.get(ParserConfig.QUERY_URL)+"</a></td></tr>"+LS;
+							+"<td>"+return_type+"</td>"+LS
+							+"<td style=\"width:400px;\">"+query_results+"</td>"+LS
+							+"<td>"+query_params+"</td>"+LS
+							+"<td><a href=\""+base+StringHelpers.bdrcEncode(url)+"\">"+
+							base+url+"</a></td></tr>"+LS;
 					
 					specs.put(queryScope, scope);
 				}
