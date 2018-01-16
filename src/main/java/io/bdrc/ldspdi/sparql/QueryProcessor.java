@@ -58,10 +58,13 @@ public class QueryProcessor {
 			fusekiUrl=ServiceConfig.getProperty("fuseki");
 		}
 		Query q=QueryFactory.create(prefixes+" "+query);
+		long start=System.currentTimeMillis();
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		ResultSet rs = qe.execSelect();
+		long end=System.currentTimeMillis();
+		long elapsed=end-start;
 		if(html) {
-			ret=toHtmlTable(rs);
+			ret=toHtmlTable(rs,elapsed);
 		}else {
 			ret=toTable(rs);			
 		}
@@ -96,7 +99,8 @@ public class QueryProcessor {
 		return table;
 	}
 	
-	private String toHtmlTable(ResultSet rs) {
+	private String toHtmlTable(ResultSet rs,long elapsed) {
+		int num_res=0;
 		String table="<table style=\"width: 80%\" border=\"0\"><tr >";		
 		List<String> l=rs.getResultVars();
 		for(String st:l) {
@@ -105,6 +109,7 @@ public class QueryProcessor {
 		table=table+"</tr>";
 		boolean changeColor=false;
 		while(rs.hasNext()) {
+			num_res++;
 			QuerySolution qs=rs.next();	
 			table=table+"<tr>";	
 			int index=0;
@@ -159,7 +164,8 @@ public class QueryProcessor {
 			table=table+"</tr>";
 		}	
 		table=table+"</table>";
-		return table;
+		String time="<br><span><b> Returned "+num_res+" results in "+elapsed+" ms</b></span><br><br>";
+		return time+table;
 	}
 
 }
