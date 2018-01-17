@@ -1,0 +1,27 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+bdr:R3AG22  a           :Role ;
+    skos:prefLabel      "rje mkhan po"@bo-x-ewts , "Je Khenpo"@en ;
+    adm:logEntry        [ adm:logDate         "2011-05-06T16:35:07.305Z"^^xsd:dateTime ;
+                          adm:logMessage      "created"@en ;
+                          adm:logWho          bdr:U00002
+                        ] ,
+            [ adm:logDate         "2011-05-06T16:40:09.085Z"^^xsd:dateTime ;
+              adm:logWho          bdr:U00002
+            ] ,
+            [ adm:logDate         "2011-05-06T16:56:41.487Z"^^xsd:dateTime ;
+              adm:logMessage      "language encoding"@en ;
+              adm:logWho          bdr:U00002
+            ] ,
+            [ adm:logDate         "2012-06-14T15:14:25.12Z"^^xsd:dateTime ;
+              adm:logMessage      "edited title"@en ;
+              adm:logWho          bdr:U00020
+            ] ;
+    adm:status          bdr:StatusReleased .

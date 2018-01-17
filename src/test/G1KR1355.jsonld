@@ -1,0 +1,49 @@
+{
+  "@graph" : [ {
+    "skos:prefLabel" : {
+      "@language" : "zh",
+      "@value" : "义章寺"
+    },
+    "skos:altLabel" : {
+      "@language" : "zh",
+      "@value" : "义章寺协珠松曲扩林"
+    },
+    "@id" : "bdr:G1KR1355",
+    "@type" : "Place",
+    "placeChgisId" : "1355",
+    "placeEvent" : {
+      "@type" : "PlaceFounded",
+      "placeEventAffiliation" : "bdr:TraditionGeluk"
+    },
+    "placeGonpaPerEcumen" : "6.45",
+    "placeLat" : "30.75000",
+    "placeLocatedIn" : "bdr:G2187",
+    "placeLong" : "96.11667",
+    "placeType" : "bdr:PlaceTypeDgonPa",
+    "adm:place_id_TBRC" : "542132205:202",
+    "adm:place_id_lex" : "542132205:202",
+    "adm:status" : "bdr:StatusReleased",
+    "tbr:place_dist_py" : "Qamdo Diqu",
+    "tbr:place_gb_dist" : "5421",
+    "tbr:place_gonpa_per1000" : "6.452",
+    "tbr:place_prov_py" : "Xizang",
+    "tbr:place_town_ch" : "康沙乡",
+    "tbr:place_town_syl" : "Kang Sha Xiang",
+    "adm:logEntry" : [ {
+      "adm:logDate" : "2012-12-25T01:09:21.507Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "updated place from monastery csv"
+      },
+      "adm:logWho" : "bdr:U00057"
+    }, {
+      "adm:logDate" : "2012-12-25T01:09:21.507Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "created by monastery import"
+      },
+      "adm:logWho" : "bdr:U00057"
+    } ]
+  } ],
+  "@context" : "http://purl.bdrc.io/context.jsonld"
+}

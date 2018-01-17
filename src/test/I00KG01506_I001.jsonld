@@ -1,0 +1,56 @@
+{
+  "@graph" : [ {
+    "@id" : "bdr:I00KG01506_I001",
+    "@type" : "ItemImageAsset",
+    "itemHasVolume" : {
+      "@type" : "VolumeImageAsset",
+      "adm:legacyImageGroupRID" : "I00KG02816",
+      "imageCount" : 24,
+      "imageList" : "I00KG028160001.tif:24",
+      "volumeNumber" : 1,
+      "volumePagesTbrcIntro" : 2,
+      "volumePagesTotal" : 24,
+      "rdfs:comment" : "Volume 1 of bum sgrub kyi rdzas cung zad brjod pa"
+    },
+    "itemVolumes" : 1,
+    "adm:status" : "bdr:StatusReleased",
+    "adm:volumeScanVenue" : "Delhi",
+    "adm:logEntry" : [ {
+      "adm:logDate" : "2016-03-30T16:20:30.571Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "Updated total pages"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2008-02-08T16:10:24.906Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "updated scanning and QC status"
+      },
+      "adm:logWho" : "bdr:U00016"
+    }, {
+      "adm:logDate" : "2007-08-09T16:55:20.21Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "added image group for scan request"
+      },
+      "adm:logWho" : "bdr:U00016"
+    }, {
+      "adm:logDate" : "2016-04-28T23:50:58.855Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "Updated total pages and added page list"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2016-03-31T21:27:09.458Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "Added ondisk"
+      },
+      "adm:logWho" : "bdr:U00006"
+    } ]
+  } ],
+  "@context" : "http://purl.bdrc.io/context.jsonld"
+}

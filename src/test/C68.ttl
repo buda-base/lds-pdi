@@ -1,0 +1,29 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+bdr:C68  a              :Corporation ;
+    rdfs:comment        "sde dpon family" ;
+    skos:altLabel       "shar ka pa/"@bo-x-ewts ;
+    skos:prefLabel      "rgyal rtse shar kha/"@bo-x-ewts ;
+    :corporationHasMember  [ a                   :CorporationMemberBlood ;
+                             :corporationMember  bdr:P6905
+                           ] ,
+            [ a                   :CorporationMemberUnknown ;
+              :corporationMember  bdr:P6904
+            ] ;
+    :note               [ :noteText  "princely family gtsang, ruled from their fort at rgyal rtse.\n \t\nThe Sharkhapa family was one of the princely families of Gyantse. Members of this family ruled a large area of Tsang provice from their fortress at Gyantse (rgyal rtse). Drubchen Kunga Lodro was born into the Sharkhapa family in 1365."@en ] ;
+    adm:logEntry        [ adm:logDate         "2013-04-29T14:15:57.192Z"^^xsd:dateTime ;
+                          adm:logMessage      "added another name"@en ;
+                          adm:logWho          bdr:U00022
+                        ] ,
+            [ adm:logDate         "2016-11-15T16:03:17.725Z"^^xsd:dateTime ;
+              adm:logMessage      "added note"@en ;
+              adm:logWho          bdr:U00019
+            ] ;
+    adm:status          bdr:StatusReleased .

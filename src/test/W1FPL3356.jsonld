@@ -1,0 +1,66 @@
+{
+  "@graph" : [ {
+    "skos:prefLabel" : {
+      "@language" : "pi-x-iast",
+      "@value" : "bhikkhupācit aṭhakathā pāṭh"
+    },
+    "@id" : "bdr:W1FPL3356",
+    "@type" : "Work",
+    "itemBDRCHoldingStatement" : "1",
+    "workHasItem" : "bdr:I1FPL3356_001",
+    "workHasItemImageAsset" : "bdr:I1FPL3356_I001",
+    "workHasItemPhysicalAsset" : "bdr:I1FPL3356_P001",
+    "workNumberOfVolumes" : 1,
+    "workPublisherLocation" : {
+      "@language" : "en",
+      "@value" : "Nonthaburi, Thailand"
+    },
+    "workPublisherName" : {
+      "@language" : "en",
+      "@value" : "Fragile Palm Leaves Foundation"
+    },
+    "workTitle" : {
+      "@type" : "WorkBibliographicalTitle",
+      "rdfs:label" : [ {
+        "@language" : "pi-x-iast",
+        "@value" : "bhikkhupācit aṭhakathā pāṭh"
+      }, {
+        "@language" : "pi-x-iast",
+        "@value" : "bhikkhunīpācit aṭhakathā pāṭh"
+      } ]
+    },
+    "adm:access" : "bdr:AccessOpen",
+    "adm:license" : "bdr:LicensePublicDomain",
+    "adm:status" : "bdr:StatusReleased",
+    "adm:logEntry" : [ {
+      "adm:logDate" : "2016-12-06T12:04:56.81Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "FPL Import"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2016-12-06T12:04:56.81Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "FPL Import"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2017-08-28T14:31:58.652Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "added archiveInfo for FPL"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2017-08-28T14:40:13.266Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "added archiveInfo for FPL"
+      },
+      "adm:logWho" : "bdr:U00006"
+    } ]
+  } ],
+  "@context" : "http://purl.bdrc.io/context.jsonld"
+}

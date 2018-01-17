@@ -7,8 +7,7 @@
 select distinct ?s ?lit
 WHERE
 {
-  ?s ?sc ?lit .
-  Filter(!isblank(?s))
+  ?s ?sc ?lit .  
   Filter(?sc = skos:prefLabel || ?sc= rdfs:label)
   Filter(contains(?lit,"${NAME}") && (contains(?lit,"${ALT1}" ) || contains(?lit,"${ALT2}")))
 } 

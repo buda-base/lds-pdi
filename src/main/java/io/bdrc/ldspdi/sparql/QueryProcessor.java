@@ -39,15 +39,14 @@ public class QueryProcessor {
 	String baseUri=null;
 	
 	public Model getResource(String resID,String fusekiUrl,String pref){
-		
+		System.out.println("Processor url:" +fusekiUrl);
 		if(pref != null){
 			prefixes=pref;
 		}
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
 		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
-		Model model = qe.execDescribe();
-		System.out.println("Processor query MODEL:" +model);
+		Model model = qe.execDescribe();		
 		return model;		
 	}
 	
