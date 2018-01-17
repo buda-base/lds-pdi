@@ -1,0 +1,3 @@
+[submodule "src/main/resources/owl-file"]
+	path = src/main/resources/owl-file
+	url = https://github.com/BuddhistDigitalResourceCenter/owl-file.git

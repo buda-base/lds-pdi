@@ -47,6 +47,7 @@ public class QueryProcessor {
 		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
+		System.out.println("Processor query MODEL:" +model);
 		return model;		
 	}
 	

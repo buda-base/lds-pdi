@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.regex.Pattern;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -32,6 +35,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import io.bdrc.ldspdi.sparql.PreparedQuery;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ontology.service.core.OntClassModel;
+import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
@@ -101,6 +105,47 @@ public class PublicDataResource {
             }
         };
 		return Response.ok(stream,media).build();		
+	}
+	
+	@GET
+	@Path("/{res}.{ext}")	
+	public Response getTypedResourceFile(
+			@PathParam("res") final String res, 
+			@DefaultValue("ttl") @PathParam("ext") final String format,
+			@HeaderParam("fusekiUrl") final String fuseki,
+			@HeaderParam("prefix") final String prefix) {
+		
+		if(fuseki !=null){
+			fusekiUrl=fuseki;
+		}
+		MediaType media=new MediaType("text","turtle");
+		if(isValidExtension(format)){
+			String mime=ServiceConfig.getProperty("m"+format);
+			String[] parts=mime.split(Pattern.quote("/"));
+			media =new MediaType(parts[0],parts[1]);
+		}
+		StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+            	// when prefix is null, QueryProcessor default prefix is used*/
+            	Model model=processor.getResource(res,fusekiUrl,prefix); 
+            	if(isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
+            		if(format.equalsIgnoreCase("jsonld")) {
+            			Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
+            			JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);
+            		}else {
+            			model.write(os,ServiceConfig.getProperty(format));
+            		}
+            	}else{
+            	    RDFWriter writer=getSTTLRDFWriter(model);            		
+            		writer.output(os);            		            		
+            	}            	 
+            }
+        };
+		return Response.ok(stream,media).build();		
+	}
+	
+	public boolean isValidExtension(String ext){
+		return (ServiceConfig.getProperty(ext)!=null);
 	}
 	
 	public RDFWriter getSTTLRDFWriter(Model m) throws IOException{
