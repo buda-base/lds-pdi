@@ -172,15 +172,12 @@ public class LdsServiceTest extends JerseyTest {
 			//Excluding unsupported Etext format
 			if(!res.startsWith("U")) {
 				// Checking Model preservation through JSONLDFormatter process
-				Model m=addModelFromFileName(TestUtils.TESTDIR+res+".ttl", RDFLanguages.RDFXML);
-				System.out.println("*********MODEL m="+m);
+				Model m=addModelFromFileName(TestUtils.TESTDIR+res+".ttl", RDFLanguages.RDFXML);				
 				Object jsonObject=JSONLDFormatter.modelToJsonObject(m, res);
-				FileOutputStream fos=new FileOutputStream(new File(TestUtils.TESTDIR+res+".jsonld"));
-				System.out.println("*********FILE json="+new File(TestUtils.TESTDIR+res+".jsonld"));
+				FileOutputStream fos=new FileOutputStream(new File(TestUtils.TESTDIR+res+".jsonld"));			
 				JSONLDFormatter.jsonObjectToOutputStream(jsonObject, fos);
 				fos.close();			
-				Model json=getModelFromFileName(TestUtils.TESTDIR+res+".jsonld",RDFLanguages.JSONLD);
-				System.out.println("*********MODEL json="+json+" File :"+TestUtils.TESTDIR+res+".jsonld");
+				Model json=getModelFromFileName(TestUtils.TESTDIR+res+".jsonld",RDFLanguages.JSONLD);				
 				assertTrue(m.isIsomorphicWith(json));
 				
 				// Checking Model against QueryProcessor
@@ -344,8 +341,7 @@ public class LdsServiceTest extends JerseyTest {
 		             .lang(lang);		             
 		    pb.parse(StreamRDFLib.graph(g));
 		} catch (RiotException e) {
-		    writeLog("error reading "+fname);
-		    System.out.println("error reading "+fname+ " exception ");
+		    writeLog("error reading "+fname);		    
 		    e.printStackTrace();
 		    return null;
 		}		
