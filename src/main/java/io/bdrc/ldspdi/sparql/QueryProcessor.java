@@ -1,8 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-import java.util.List;
-
-
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -21,6 +18,8 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+
+import java.util.List;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;

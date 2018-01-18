@@ -1,9 +1,7 @@
 package io.bdrc.ldspdi.service;
 
-import java.io.File;
-
 /*******************************************************************************
- * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
  * If this file is a derivation of another work the license header will appear below; 
  * otherwise, this work is licensed under the Apache License, Version 2.0 
@@ -33,6 +31,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import io.bdrc.ldspdi.parse.ParserConfig;
+
 public class ServiceConfig {
 	
 	static Properties prop = new Properties();
