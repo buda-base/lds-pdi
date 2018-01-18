@@ -16,17 +16,17 @@
       "lineageWho" : "bdr:P3413"
     }, {
       "@type" : "LineageHolder",
-      "lineageReceived" : {
-        "lineageFrom" : "bdr:P3413"
-      },
-      "lineageWho" : "bdr:P0RK431"
-    }, {
-      "@type" : "LineageHolder",
       "lineageDownFrom" : "bdr:L0RKL89",
       "lineageReceived" : {
         "lineageFrom" : "bdr:P0RK431"
       },
       "lineageWho" : "bdr:P3091"
+    }, {
+      "@type" : "LineageHolder",
+      "lineageReceived" : {
+        "lineageFrom" : "bdr:P3413"
+      },
+      "lineageWho" : "bdr:P0RK431"
     } ],
     "lineageObject" : "bdr:T1543",
     "lineageRef" : "bdr:L1RKL901",
@@ -35,6 +35,11 @@
       "noteText" : {
         "@language" : "en",
         "@value" : "alternative lineage: L90f"
+      }
+    }, {
+      "noteText" : {
+        "@language" : "en",
+        "@value" : "alternative lineage: L90e"
       }
     }, {
       "noteText" : {
@@ -54,11 +59,6 @@
     }, {
       "noteText" : {
         "@language" : "en",
-        "@value" : "alternative lineage: L90e"
-      }
-    }, {
-      "noteText" : {
-        "@language" : "en",
         "@value" : "alternative lineage: L90c"
       }
     } ],
@@ -69,34 +69,31 @@
     },
     "adm:status" : "bdr:StatusReleased",
     "adm:logEntry" : [ {
-      "adm:logDate" : "2014-07-28T22:06:14.547Z",
+      "adm:logDate" : "2013-09-22T15:05:52.264Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "normalized names of who and received elements - for real this time"
+        "@value" : "edited name; added lin ref"
       },
-      "adm:logWho" : "bdr:U00006"
+      "adm:logWho" : "bdr:U00055"
     }, {
-      "adm:logDate" : "2014-07-29T16:42:13.479Z",
+      "adm:logDate" : "2007-07-12T14:00:58.923Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "normalized names of who and received elements - yet again"
+        "@value" : "first post to dlms"
       },
-      "adm:logWho" : "bdr:U00006"
-    }, {
-      "adm:logDate" : "2014-05-13T12:02:07.046Z",
-      "adm:logWho" : "bdr:U00019"
-    }, {
-      "adm:logDate" : "2013-12-20T12:54:02.383Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "edited according to gsan yig"
-      },
-      "adm:logWho" : "bdr:U00019"
+      "adm:logWho" : "bdr:U00012"
     }, {
       "adm:logDate" : "2014-07-28T21:20:44.974Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "normalized names of who and received elements"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2014-07-28T22:06:14.547Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "normalized names of who and received elements - for real this time"
       },
       "adm:logWho" : "bdr:U00006"
     }, {
@@ -110,19 +107,22 @@
       },
       "adm:logWho" : "bdr:U00019"
     }, {
-      "adm:logDate" : "2007-07-12T14:00:58.923Z",
+      "adm:logDate" : "2013-12-20T12:54:02.383Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "first post to dlms"
+        "@value" : "edited according to gsan yig"
       },
-      "adm:logWho" : "bdr:U00012"
+      "adm:logWho" : "bdr:U00019"
     }, {
-      "adm:logDate" : "2013-09-22T15:05:52.264Z",
+      "adm:logDate" : "2014-07-29T16:42:13.479Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "edited name; added lin ref"
+        "@value" : "normalized names of who and received elements - yet again"
       },
-      "adm:logWho" : "bdr:U00055"
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2014-05-13T12:02:07.046Z",
+      "adm:logWho" : "bdr:U00019"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"

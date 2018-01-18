@@ -47,14 +47,14 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2017-08-28T14:31:58.652Z",
+      "adm:logDate" : "2017-08-28T14:40:13.266Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "added archiveInfo for FPL"
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2017-08-28T14:40:13.266Z",
+      "adm:logDate" : "2017-08-28T14:31:58.652Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "added archiveInfo for FPL"
