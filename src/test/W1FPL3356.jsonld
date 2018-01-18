@@ -33,10 +33,10 @@
     "adm:license" : "bdr:LicensePublicDomain",
     "adm:status" : "bdr:StatusReleased",
     "adm:logEntry" : [ {
-      "adm:logDate" : "2016-12-06T12:04:56.81Z",
+      "adm:logDate" : "2017-08-28T14:31:58.652Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "FPL Import"
+        "@value" : "added archiveInfo for FPL"
       },
       "adm:logWho" : "bdr:U00006"
     }, {
@@ -54,10 +54,10 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2017-08-28T14:31:58.652Z",
+      "adm:logDate" : "2016-12-06T12:04:56.81Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "added archiveInfo for FPL"
+        "@value" : "FPL Import"
       },
       "adm:logWho" : "bdr:U00006"
     } ]

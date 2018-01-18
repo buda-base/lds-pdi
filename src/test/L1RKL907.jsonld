@@ -34,17 +34,12 @@
     "note" : [ {
       "noteText" : {
         "@language" : "en",
-        "@value" : "alternative lineage: L90f"
-      }
-    }, {
-      "noteText" : {
-        "@language" : "en",
-        "@value" : "alternative lineage: L90e"
-      }
-    }, {
-      "noteText" : {
-        "@language" : "en",
         "@value" : "alternative lineage: L90b"
+      }
+    }, {
+      "noteText" : {
+        "@language" : "en",
+        "@value" : "alternative lineage: L90c"
       }
     }, {
       "noteText" : {
@@ -59,7 +54,12 @@
     }, {
       "noteText" : {
         "@language" : "en",
-        "@value" : "alternative lineage: L90c"
+        "@value" : "alternative lineage: L90f"
+      }
+    }, {
+      "noteText" : {
+        "@language" : "en",
+        "@value" : "alternative lineage: L90e"
       }
     } ],
     "workLocation" : {
@@ -69,6 +69,13 @@
     },
     "adm:status" : "bdr:StatusReleased",
     "adm:logEntry" : [ {
+      "adm:logDate" : "2014-07-28T22:06:14.547Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "normalized names of who and received elements - for real this time"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
       "adm:logDate" : "2013-09-22T15:05:52.264Z",
       "adm:logMessage" : {
         "@language" : "en",
@@ -76,12 +83,8 @@
       },
       "adm:logWho" : "bdr:U00055"
     }, {
-      "adm:logDate" : "2007-07-12T14:00:58.923Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "first post to dlms"
-      },
-      "adm:logWho" : "bdr:U00012"
+      "adm:logDate" : "2014-05-13T12:02:07.046Z",
+      "adm:logWho" : "bdr:U00019"
     }, {
       "adm:logDate" : "2014-07-28T21:20:44.974Z",
       "adm:logMessage" : {
@@ -90,27 +93,10 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2014-07-28T22:06:14.547Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "normalized names of who and received elements - for real this time"
-      },
-      "adm:logWho" : "bdr:U00006"
-    }, {
-      "adm:logDate" : "2014-07-28T09:42:02.805Z",
-      "adm:logWho" : "bdr:U00019"
-    }, {
       "adm:logDate" : "2014-03-05T08:45:17.419Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "added short title"
-      },
-      "adm:logWho" : "bdr:U00019"
-    }, {
-      "adm:logDate" : "2013-12-20T12:54:02.383Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "edited according to gsan yig"
       },
       "adm:logWho" : "bdr:U00019"
     }, {
@@ -121,8 +107,22 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2014-05-13T12:02:07.046Z",
+      "adm:logDate" : "2013-12-20T12:54:02.383Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "edited according to gsan yig"
+      },
       "adm:logWho" : "bdr:U00019"
+    }, {
+      "adm:logDate" : "2014-07-28T09:42:02.805Z",
+      "adm:logWho" : "bdr:U00019"
+    }, {
+      "adm:logDate" : "2007-07-12T14:00:58.923Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "first post to dlms"
+      },
+      "adm:logWho" : "bdr:U00012"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"

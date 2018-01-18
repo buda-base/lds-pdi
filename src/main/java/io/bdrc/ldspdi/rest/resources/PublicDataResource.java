@@ -49,8 +49,12 @@ public class PublicDataResource {
 	public String fusekiUrl=ServiceConfig.getProperty("fuseki");
 	
 	@GET	
-	public Response getData(@Context UriInfo info) throws Exception{		
+	public Response getData(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{		
 		String baseUri=info.getBaseUri().toString();
+		
+		if(fuseki !=null){
+			fusekiUrl=fuseki;
+		}
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
 		String filename= mp.getFirst("searchType")+".arq";		
@@ -88,14 +92,24 @@ public class PublicDataResource {
 	
 	@GET
 	@Path("/{res}")	
-	public Response getResourceFile(@PathParam("res") final String res, @QueryParam("classUri") final String uri) {
+	public Response getResourceFile(
+			@PathParam("res") final String res,
+			@HeaderParam("Accept") final String format,
+			@HeaderParam("fusekiUrl") final String fuseki,
+			@QueryParam("classUri") final String uri) {
+		
+		if(fuseki !=null){
+			fusekiUrl=fuseki;
+		}
 		if(uri!=null) {
 			Map<String, Object> map = new HashMap<String, Object>();
 	        map.put("model", new OntClassModel(uri));
 	        return Response.ok(new Viewable("/ontClass", map)).build();
 		}
-		MediaType media=new MediaType("text","turtle","utf-8");
-		
+		MediaType media=new MediaType("text","turtle","utf-8");		
+		if(ServiceConfig.isValidMime(format)){
+			media=getMediaType(format);
+		}
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
             	// when prefix is null, QueryProcessor default prefix is used
@@ -142,6 +156,11 @@ public class PublicDataResource {
             }
         };
 		return Response.ok(stream,media).build();		
+	}
+	
+	public MediaType getMediaType(String format){
+		String[] parts=format.split(Pattern.quote("/"));
+		return new MediaType(parts[0],parts[1]);		
 	}
 	
 	public boolean isValidExtension(String ext){

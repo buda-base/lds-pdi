@@ -45,6 +45,7 @@ public class QueryProcessor {
 			prefixes=pref;
 		}
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
 		
