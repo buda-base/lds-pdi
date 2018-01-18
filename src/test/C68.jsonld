@@ -26,19 +26,19 @@
     "rdfs:comment" : "sde dpon family",
     "adm:status" : "bdr:StatusReleased",
     "adm:logEntry" : [ {
-      "adm:logDate" : "2016-11-15T16:03:17.725Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "added note"
-      },
-      "adm:logWho" : "bdr:U00019"
-    }, {
       "adm:logDate" : "2013-04-29T14:15:57.192Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "added another name"
       },
       "adm:logWho" : "bdr:U00022"
+    }, {
+      "adm:logDate" : "2016-11-15T16:03:17.725Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "added note"
+      },
+      "adm:logWho" : "bdr:U00019"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"

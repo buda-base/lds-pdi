@@ -1,0 +1,12 @@
+#QueryScope=General
+#QueryReturnType=Table
+#QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
+#QueryParams=NAME,LANG,LIM
+#QueryUrl=/lds-pdi/query?searchType=pdi_all_luceneLabel&NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LANG=bo-x-ewts&LIM=100
+
+select distinct ?s ?lit 
+WHERE { 
+  { (?s ?sc ?lit) text:query ( skos:prefLabel '${NAME}'@${LANG} ) . }
+  union
+  { (?s ?sc ?lit) text:query ( rdfs:label '${NAME}'@${LANG} ) . }
+} limit ${LIM}

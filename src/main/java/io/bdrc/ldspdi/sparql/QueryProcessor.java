@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.sparql;
 
 import java.util.List;
 
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -30,6 +31,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 
+
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
@@ -38,15 +40,14 @@ public class QueryProcessor {
 	
 	String baseUri=null;
 	
-	public Model getResource(String resID,String fusekiUrl,String pref){
-		System.out.println("Processor url:" +fusekiUrl);
+	public Model getResource(String resID,String fusekiUrl,String pref){			
 		if(pref != null){
 			prefixes=pref;
 		}
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
-		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
-		Model model = qe.execDescribe();		
+		Model model = qe.execDescribe();
+		
 		return model;		
 	}
 	

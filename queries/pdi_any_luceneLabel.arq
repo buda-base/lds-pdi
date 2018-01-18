@@ -1,6 +1,6 @@
 #QueryScope=General
 #QueryReturnType=Table
-#QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
+#QueryResults=A table containing the Id and matching skos:prefLabel for the given query and language tag with the given limit
 #QueryParams=NAME,LANG,LIM
 #QueryUrl=/lds-pdi/query?searchType=pdi_any_luceneLabel&NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LANG=bo-x-ewts&LIM=100
 
