@@ -146,12 +146,12 @@
 	    <artifactId>commons-text</artifactId>
 	    <version>1.2</version>
 	</dependency>	
-	<!-- dependency> 
+	<dependency> 
 		<groupId>org.slf4j</groupId> 
 		<artifactId>slf4j-simple</artifactId> 
 		<version>1.7.25</version> 
 		<scope>test</scope> 
-	</dependency-->
+	</dependency>
 			
  </dependencies>
   <build>
@@ -173,11 +173,20 @@
             <version>9.4.8.v20171121</version>
             <configuration>
 	            <webApp>
-	            	<contextPath>/lds-pdi</contextPath>
+                    <context-path>/lds-pdi</context-path>	            	                
 		            <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
-		            <containerIncludeJarPattern>^$</containerIncludeJarPattern>
-	            </webApp>	            
+		            <containerIncludeJarPattern>^$</containerIncludeJarPattern> 
+                    <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>                               
+	            </webApp>      
             </configuration>
+            <dependencies>                        
+                <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                    <version>1.7.25</version>
+                </dependency>
+            </dependencies>
          </plugin>
          <plugin>
          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->			
@@ -196,7 +205,9 @@
 		                <directory>src/main/resources</directory>		                		                
 		            </resource>		            
 		        </webResources>
+                
 		    </configuration>
+            
          </plugin>
      </plugins>
   </build>

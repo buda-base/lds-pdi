@@ -56,7 +56,7 @@ public class QueryProcessor {
 		this.baseUri=baseUri;
 	    String ret="";
 		if(fusekiUrl == null) {
-			fusekiUrl=ServiceConfig.getProperty("fuseki");
+		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 		}
 		Query q=QueryFactory.create(prefixes+" "+query);
 		long start=System.currentTimeMillis();

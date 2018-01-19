@@ -30,15 +30,13 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryFileParser {
 	
-	private File queryFile;
-	private HashMap<String,String> queryMap;
+	private File queryFile;	
 	private HashMap<String,String> metaInf;
 	private String query;
 	
 	
 	public QueryFileParser(String filename) throws IOException{		
-		metaInf= new HashMap<>();		
-		//String queryFilename=ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename;
+		metaInf= new HashMap<>();
 		this.queryFile = new File(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename);
 		parseFile();		
 	}
@@ -70,7 +68,6 @@ public class QueryFileParser {
 	            	
 	   }
 	   br.close();
-	   
 	}
 	
 	public String getQuery() {

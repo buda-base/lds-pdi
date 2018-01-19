@@ -58,8 +58,9 @@ public class DocFileBuilder {
 				String url=info.get(ParserConfig.QUERY_URL);				
 				String return_type=info.get(ParserConfig.QUERY_RETURN_TYPE);
 				String query_params=info.get(ParserConfig.QUERY_PARAMS);
-				String query_results=info.get(ParserConfig.QUERY_RESULTS);
+				String query_results=info.get(ParserConfig.QUERY_RESULTS);	
 				if(specs.containsKey(queryScope)) {
+				    //adds a row to the existing table
 					String tmp=specs.get(queryScope);
 					tmp=tmp+"<tr><td><b>"+file.substring(0, file.indexOf("."))+"</b></td>"+LS
 							+"<td>"+return_type+"</td>"+LS
@@ -68,9 +69,8 @@ public class DocFileBuilder {
 							+"<td><a href=\""+base+StringHelpers.bdrcEncode(url)+"\">"+
 							base+url+"</a></td></tr>"+LS;
 					specs.put(queryScope, tmp);
-					
-					
 				}else {
+				    //creates the table for the given scope and add the first row
 					String scope="<h2>"+queryScope+"</h2><table id=\"specs\"><tr>"+LS
 							+ "<th>Search type</th>"+LS
 							+ "<th>Return type</th>"+LS
@@ -90,6 +90,7 @@ public class DocFileBuilder {
 			}
 			Set<String> set=specs.keySet();
 			for(String key:set) {
+			    //ends each scope table
 				String val=specs.get(key)+"</table>";
 				specs.put(key, val);
 				contents=contents+" "+val;

@@ -27,7 +27,9 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import io.bdrc.ldspdi.parse.ParserConfig;
@@ -38,19 +40,26 @@ public class ServiceConfig {
 	static ArrayList<String> mime=new ArrayList<String>();
 	public static Writer logWriter;
 	public static String sparqlPrefixes="";
+	public static HashMap<String,String> params;
+	public final static String FUSEKI_URL="fusekiUrl";
 	
-	static{
-		try {
+	public static void init(HashMap<String,String> params) {
+	    ServiceConfig.params=params;
+	    try {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			// load a properties file
 			prop.load(input);
+			Set<String> set=params.keySet();
+			for(String st:set) {
+			    prop.setProperty(st, params.get(st));
+			}
 			logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));		
 			String mimes=prop.getProperty("mime");
 			StringTokenizer st=new StringTokenizer(mimes,",");
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
-			}
-			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+"prefixes.txt")));
+			}			
+			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(ParserConfig.QUERY_PATH)+"prefixes.txt")));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -67,4 +76,12 @@ public class ServiceConfig {
 	public static String getPrefixes(){
 		return sparqlPrefixes;
 	}
+	
+	/*public static String getFusekiUrl(){
+        return params.get("fusekiUrl");
+    }
+	
+	public static String getQueryPath(){
+        return params.get(ParserConfig.QUERY_PATH);
+    }*/
 }

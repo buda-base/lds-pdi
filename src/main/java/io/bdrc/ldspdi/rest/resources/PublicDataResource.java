@@ -21,6 +21,7 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -64,15 +66,23 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 @Path("/")
 public class PublicDataResource {
 
+    @Context ServletContext context;
 	QueryProcessor processor=new QueryProcessor();
-	public String fusekiUrl=ServiceConfig.getProperty("fuseki");
+	public String fusekiUrl="";
+	String fuse="";
 	
 	@GET	
 	public Response getData(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{		
-		String baseUri=info.getBaseUri().toString();
-		
+		String baseUri=info.getBaseUri().toString();		
+		Enumeration<String> enume=context.getInitParameterNames();
+		while(enume.hasMoreElements()) {
+		    System.out.println("param ="+enume.nextElement());
+		}
+		System.out.println("FUSEKI ="+context.getInitParameter("fuseki"));
 		if(fuseki !=null){
 			fusekiUrl=fuseki;
+		}else {
+		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
 		}
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
@@ -91,7 +101,7 @@ public class PublicDataResource {
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
             	// when prefix is null, QueryProcessor default prefix is used
-            	String res=processor.getResource(query, null, true,baseUri);
+            	String res=processor.getResource(query, fusekiUrl, true,baseUri);
             	os.write(res.getBytes());
             }
         };
@@ -116,10 +126,11 @@ public class PublicDataResource {
 			@HeaderParam("Accept") final String format,
 			@HeaderParam("fusekiUrl") final String fuseki,
 			@QueryParam("classUri") final String uri) {
-		
-		if(fuseki !=null){
-			fusekiUrl=fuseki;
-		}
+	    if(fuseki !=null){
+            fusekiUrl=fuseki;
+        }else {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
+        }
 		if(uri!=null) {
 			Map<String, Object> map = new HashMap<String, Object>();
 	        map.put("model", new OntClassModel(uri));
@@ -147,10 +158,11 @@ public class PublicDataResource {
 			@DefaultValue("ttl") @PathParam("ext") final String format,
 			@HeaderParam("fusekiUrl") final String fuseki,
 			@HeaderParam("prefix") final String prefix) {
-		
-		if(fuseki !=null){
-			fusekiUrl=fuseki;
-		}
+	    if(fuseki !=null){
+            fusekiUrl=fuseki;
+        }else {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
 		MediaType media=new MediaType("text","turtle");
 		if(isValidExtension(format)){
 			String mime=ServiceConfig.getProperty("m"+format);
