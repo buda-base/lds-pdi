@@ -32,7 +32,7 @@ public class OntAccess {
         
         try {
         	OWL_URL=ServiceConfig.getProperty("owlURL");
-            InputStream stream = HttpFile.stream(OWL_URL);
+        	InputStream stream = HttpFile.stream(OWL_URL);
 
             log.info("got stream for " + OWL_URL);
             
@@ -215,7 +215,9 @@ public class OntAccess {
         List<OntClassModel> models = new ArrayList<OntClassModel>();
        
         for (OntClass root : roots) {
-            models.add(new OntClassModel(root));
+            if(!root.isAnon()) {
+                models.add(new OntClassModel(root));
+            }
         }
         
         return models;

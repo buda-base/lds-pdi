@@ -50,7 +50,8 @@ public class OntClassModel {
     }
     
     public OntClassModel(OntClass c) {
-        this.uri = c.getURI();
+        
+        this.uri = c.getURI();        
         clazz = c;
    }
     
@@ -67,7 +68,7 @@ public class OntClassModel {
     }
 
     
-    public String getId() {
+    public String getId() {        
         return OntAccess.MODEL.shortForm(uri);
     }
     
@@ -90,7 +91,9 @@ public class OntClassModel {
         List<OntClassModel> models = new ArrayList<OntClassModel>();
         
         for (OntClass c : subs) {
-            models.add(new OntClassModel(c));
+            if(!c.isAnon()) {                
+                models.add(new OntClassModel(c));
+            }
         }
         
         return models;
@@ -137,5 +140,4 @@ public class OntClassModel {
         }
         return properties;
     }
-    
 }

@@ -107,7 +107,7 @@ public class PublicDataResource {
 	public Response getOntologyClassView(@QueryParam("classUri") String uri) {        
 		MediaType media=new MediaType("text","html","utf-8");		
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("model", new OntClassModel(uri));
+        map.put("model", new OntClassModel(uri)); 
         return Response.ok(new Viewable("/ontClass.jsp", map),media).build();        
     }
 	
