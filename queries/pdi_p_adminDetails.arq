@@ -1,8 +1,8 @@
 #QueryScope=Person
 #QueryReturnType=Table
 #QueryResults=All the detailed admin info (notes, status, log entries) about the person data
-#QueryParams=ID
-#QueryUrl=/lds-pdi/query?searchType=pdi_p_adminDetails&ID=P1583
+#QueryParams=R_RES
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_adminDetails&R_RES=P1583
 
 
 select distinct 
@@ -14,16 +14,16 @@ where {
   		?ID skos:prefLabel ?preferredName ;
         	adm:gitRevision ?git;
     		adm:status ?status .
-    	Filter(?ID=bdr:${ID})
+    	Filter(?ID=?R_RES)
  	}
   	UNION {
 	  	OPTIONAL{ ?ID  :note ?noteRef }.
 	  	?noteRef ?y ?note_value .	  	
-	  	Filter(?ID=bdr:${ID})
+	  	Filter(?ID=?R_RES)
 	}
   	UNION {
 	  	OPTIONAL{ ?ID  adm:logEntry ?admin_ref }.
 	  	?admin_ref ?admin_prop ?log_value .	  	
-	  	Filter(?ID=bdr:${ID}) 
+	  	Filter(?ID=?R_RES) 
 	}
 }

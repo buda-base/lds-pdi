@@ -1,13 +1,13 @@
 #QueryScope=General
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
-#QueryParams=NAME,ALT1,ALT2
-#QueryUrl=/lds-pdi/query?searchType=pdi_anyLabel&NAME=mkhan chen&ALT1='od zer&ALT2=ye shes
+#QueryParams=L_NAME,L_ALT1,L_ALT2
+#QueryUrl=/lds-pdi/query?searchType=pdi_anyLabel&L_NAME=mkhan chen&L_ALT1='od zer&L_ALT2=ye shes
 
 select distinct ?s ?lit
 WHERE
 {
   ?s ?sc ?lit .  
   Filter(?sc = skos:prefLabel || ?sc= rdfs:label)
-  Filter(contains(?lit,"${NAME}") && (contains(?lit,"${ALT1}" ) || contains(?lit,"${ALT2}")))
+  Filter(contains(?lit,?L_NAME) && (contains(?lit,?L_ALT1 ) || contains(?lit,?L_ALT2)))
 } 

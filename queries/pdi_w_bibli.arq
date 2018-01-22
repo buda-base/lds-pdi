@@ -1,8 +1,8 @@
 #QueryScope=Work
 #QueryReturnType=Table
 #QueryResults=A table containing bibliographic info of works whose name contains the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_w_bibli&NAME=rgyud bla ma
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_w_bibli&L_NAME=rgyud bla ma
 
 SELECT DISTINCT ?ID ?Preferred_Name ?cat_Info ?note ?num_Vol ?access ?license ?status 
 WHERE {  
@@ -14,5 +14,5 @@ WHERE {
 	OPTIONAL { ?ID :workCatalogInfo ?cat_Info }  
 	OPTIONAL { ?ID :workBiblioNote ?note }  
 	OPTIONAL { ?ID :workNumberOfVolumes ?num_Vol }  
-	FILTER contains(?Preferred_Name, "${NAME}")  
+	FILTER contains(?Preferred_Name, ?L_NAME)  
 } 

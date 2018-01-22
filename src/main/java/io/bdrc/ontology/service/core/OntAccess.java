@@ -248,11 +248,6 @@ public class OntAccess {
     public static int getNumRootClasses() {
         return getSimpleRootClasses().size();
     }
-    
-    public static void main(String[] ags) {
-    	OntClassModel cm = new OntClassModel("http://purl.bdrc.io/ontology/core/Place");
-    	
-    	
-    }
+   
 }
 

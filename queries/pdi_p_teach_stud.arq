@@ -1,8 +1,8 @@
 #QueryScope=Person
 #QueryReturnType=Table
 #QueryResults=A table containing the Id, preferred name, teacher name and student name for people having their preferred name containing the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_p_teach_stud&NAME=dri med 'od zer
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_teach_stud&L_NAME=dri med 'od zer
 
 
 SELECT DISTINCT ?ID ?Preferred_Name ?Teacher ?Student 
@@ -18,6 +18,6 @@ WHERE {
   :personTeacherOf ?s_name . 
   ?s_name skos:prefLabel ?Student . 
   }  
-  FILTER contains(?Preferred_Name, "${NAME}/")  
+  FILTER contains(?Preferred_Name, ?L_NAME)  
 }  
 ORDER by ?ID ?Preferred_Name ?Teacher ?Student

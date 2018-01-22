@@ -1,4 +1,4 @@
-<%@page import="io.bdrc.ldspdi.parse.DocFileBuilder"%>
+<%@page import="io.bdrc.ldspdi.Utils.DocFileBuilder"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <% 

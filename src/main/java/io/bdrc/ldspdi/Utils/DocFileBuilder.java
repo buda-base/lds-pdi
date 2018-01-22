@@ -1,8 +1,6 @@
-package io.bdrc.ldspdi.parse;
+package io.bdrc.ldspdi.Utils;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,11 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import io.bdrc.ldspdi.Utils.StringHelpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.ldspdi.sparql.QueryFileParser;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -54,11 +51,11 @@ public class DocFileBuilder {
 				
 				QueryFileParser qfp=new QueryFileParser(file);
 				HashMap<String,String> info=qfp.getMetaInf();
-				String queryScope=info.get(ParserConfig.QUERY_SCOPE);
-				String url=info.get(ParserConfig.QUERY_URL);				
-				String return_type=info.get(ParserConfig.QUERY_RETURN_TYPE);
-				String query_params=info.get(ParserConfig.QUERY_PARAMS);
-				String query_results=info.get(ParserConfig.QUERY_RESULTS);	
+				String queryScope=info.get(QueryConstants.QUERY_SCOPE);
+				String url=info.get(QueryConstants.QUERY_URL);				
+				String return_type=info.get(QueryConstants.QUERY_RETURN_TYPE);
+				String query_params=info.get(QueryConstants.QUERY_PARAMS);
+				String query_results=info.get(QueryConstants.QUERY_RESULTS);	
 				if(specs.containsKey(queryScope)) {
 				    //adds a row to the existing table
 					String tmp=specs.get(queryScope);
@@ -101,7 +98,7 @@ public class DocFileBuilder {
 	
 	public static ArrayList<String> getQueryFiles() {
 		ArrayList<String> files=new ArrayList<>();
-		Path dpath = Paths.get(ServiceConfig.getProperty(ParserConfig.QUERY_PATH));		
+		Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH));		
 		if (Files.isDirectory(dpath)) {        
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(dpath)) {
                 for (Path path : stream) {

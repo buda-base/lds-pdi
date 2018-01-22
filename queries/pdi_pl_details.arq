@@ -1,8 +1,8 @@
 #QueryScope=Place
 #QueryReturnType=Table
 #QueryResults=A table containing the detailed info of a place whose name contains the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_pl_details&NAME=dgon gsar
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_pl_details&L_NAME=dgon gsar
 
 SELECT DISTINCT * 
 WHERE {  
@@ -15,5 +15,5 @@ WHERE {
 	FILTER (?p != adm:status)  
 	FILTER (?p != rdf:type)  
 	FILTER (!isBlank(?o))  
-	FILTER contains(?Preferred_Name, "${NAME}" )  
+	FILTER contains(?Preferred_Name, ?L_NAME )  
 } 

@@ -35,15 +35,12 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
 	
-	String prefixes=ServiceConfig.getPrefixes();
 	
 	String baseUri=null;
 	
 	public Model getResource(String resID,String fusekiUrl,String pref){			
-		if(pref != null){
-			prefixes=pref;
-		}
-		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+		
+		Query q=QueryFactory.create(" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
 		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
@@ -58,7 +55,7 @@ public class QueryProcessor {
 		if(fusekiUrl == null) {
 		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 		}
-		Query q=QueryFactory.create(prefixes+" "+query);
+		Query q=QueryFactory.create(query);
 		long start=System.currentTimeMillis();
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		ResultSet rs = qe.execSelect();

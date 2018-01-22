@@ -25,7 +25,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.regex.Pattern;
 
@@ -45,7 +44,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.text.StrSubstitutor;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
@@ -53,14 +51,14 @@ import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import io.bdrc.ldspdi.sparql.PreparedQuery;
+import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
-import io.bdrc.ldspdi.parse.QueryFileParser;
+import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 @Path("/")
@@ -73,12 +71,8 @@ public class PublicDataResource {
 	
 	@GET	
 	public Response getData(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{		
-		String baseUri=info.getBaseUri().toString();		
-		Enumeration<String> enume=context.getInitParameterNames();
-		while(enume.hasMoreElements()) {
-		    System.out.println("param ="+enume.nextElement());
-		}
-		System.out.println("FUSEKI ="+context.getInitParameter("fuseki"));
+		
+	    String baseUri=info.getBaseUri().toString();	
 		if(fuseki !=null){
 			fusekiUrl=fuseki;
 		}else {
@@ -96,17 +90,15 @@ public class PublicDataResource {
 		if(check.length()>0) {
 			throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
 		}
-		PreparedQuery prep_query=new PreparedQuery(q,mp);		
-		query=prep_query.getPreparedQuery();		
+		query=InjectionTracker.getValidQuery(q, mp);			
 		StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-            	// when prefix is null, QueryProcessor default prefix is used
-            	String res=processor.getResource(query, fusekiUrl, true,baseUri);
-            	os.write(res.getBytes());
+               // when prefix is null, QueryProcessor default prefix is used
+                String res=processor.getResource(query, fusekiUrl, true,baseUri);
+                os.write(res.getBytes());
             }
         };
-		return Response.ok(stream,media).build();
-		
+        return Response.ok(stream,media).build();
 	}
 	
 	@GET

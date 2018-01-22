@@ -1,8 +1,8 @@
 #QueryScope=Person
 #QueryReturnType=Table
 #QueryResults=A table containing the Id, primary_name, name_type and name_type value for people whose any name contains the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_p_anyname&NAME='od zer
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_anyname&L_NAME='od zer
 
 
 select distinct ?Person ?Primary_Name ?Name_Type ?Name
@@ -15,5 +15,5 @@ WHERE
 OPTIONAL {?p_name ?title ?Name} .
 FILTER (?Name_Type != :PersonName)
 FILTER isLiteral(?Name)
-FILTER (contains(?Primary_Name, "${NAME}/") || contains(?name,"${NAME}/"))
+FILTER (contains(?Primary_Name, ?L_NAME) || contains(?name,?L_NAME))
 }

@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContextEvent;
 
-import io.bdrc.ldspdi.parse.ParserConfig;
+import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ontology.service.core.OntAccess;
 
 
@@ -37,7 +37,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
     public void contextInitialized(ServletContextEvent arg0) {
         try {
             HashMap<String,String> params=new HashMap<>();            
-            params.put(ParserConfig.QUERY_PATH,arg0.getServletContext().getInitParameter("queryPath"));
+            params.put(QueryConstants.QUERY_PATH,arg0.getServletContext().getInitParameter("queryPath"));
             params.put("fusekiUrl",arg0.getServletContext().getInitParameter("fuseki"));            
             
             ServiceConfig.init(params); 

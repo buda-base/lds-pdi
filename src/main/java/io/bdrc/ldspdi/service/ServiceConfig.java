@@ -32,7 +32,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import io.bdrc.ldspdi.parse.ParserConfig;
+import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ServiceConfig {
 	
@@ -41,8 +41,8 @@ public class ServiceConfig {
 	public static Writer logWriter;
 	public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
-	public final static String FUSEKI_URL="fusekiUrl";
-	
+	public final static String FUSEKI_URL="fusekiUrl";	
+		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
 	    try {
@@ -59,7 +59,7 @@ public class ServiceConfig {
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
 			}			
-			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(ParserConfig.QUERY_PATH)+"prefixes.txt")));
+			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"prefixes.txt")));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

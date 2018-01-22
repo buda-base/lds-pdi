@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.parse;
+package io.bdrc.ldspdi.sparql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +22,10 @@ import java.util.HashMap;
  * limitations under the License.
  ******************************************************************************/
 
-public class ParserConfig {
+public class QueryConstants {
 	
-	public static String QUERY_PATH="queryPath";
+    public static String QUERY_ERROR="ERROR";
+    public static String QUERY_PATH="queryPath";
 	
 	public static String QUERY_SCOPE="QueryScope";
 	public static String QUERY_RETURN_TYPE="QueryReturnType";
@@ -33,6 +34,12 @@ public class ParserConfig {
 	public static String QUERY_URL="QueryUrl";
 	
 	public static String QUERY_NO_ARGS="NONE";
+	public static String INT_ARGS_PARAMPREFIX="I_";
+	public static String LITERAL_ARGS_PARAMPREFIX="L_";
+	public static String RES_ARGS_PARAMPREFIX="R_";
+	
+	//public static String QUERY_LIMIT="LIM";
+	//public static String QUERY_RESOURCE="RES";
 	
 	public static final String WORK="Work";
 	public static final String PERSON="Person";
@@ -61,7 +68,7 @@ public class ParserConfig {
 		infoTypes.put(QUERY_RESULTS,true);
 		infoTypes.put(QUERY_PARAMS,true);		
 		infoTypes.put(QUERY_URL,true);
-	}	
+	}
 	
 	public static boolean isRequired(String info) {
 		return infoTypes.get(info);
@@ -84,6 +91,4 @@ public class ParserConfig {
 		}
 		return required;
 	}
-	
-	
 }

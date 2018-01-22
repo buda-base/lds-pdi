@@ -203,7 +203,8 @@ public class JSONLDFormatter {
     	 return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY);
      }
      
-     public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format) {
+     @SuppressWarnings("unchecked")
+    public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format) {
          JsonLDWriteContext ctx = new JsonLDWriteContext();
          JSONLDVariant variant;
          if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) { 

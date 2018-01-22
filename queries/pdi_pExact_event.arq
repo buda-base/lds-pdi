@@ -1,8 +1,8 @@
 #QueryScope=Person
 #QueryReturnType=Table
 #QueryResults=A table containing the Id, preferred name, event type and event name of a person whose name matches the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_pExact_event&NAME='jigs med rgyal mtshan
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_pExact_event&L_NAME='jigs med rgyal mtshan
 
 SELECT DISTINCT ?ID ?Preferred_Name ?Event_Type ?Name 
 WHERE {  
@@ -14,5 +14,5 @@ WHERE {
 	FILTER (?Event_Type != :PersonEvent)  
 	FILTER (?Name != ?Event_Type)  
 	FILTER (?Name != :PersonEvent)  
-	FILTER f:ExactFilter(?Preferred_Name, "${NAME}")  
+	FILTER f:ExactFilter(?Preferred_Name, ?L_NAME)  
 } 

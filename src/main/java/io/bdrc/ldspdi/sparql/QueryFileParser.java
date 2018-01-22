@@ -1,4 +1,5 @@
-package io.bdrc.ldspdi.parse;
+package io.bdrc.ldspdi.sparql;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -37,9 +38,16 @@ public class QueryFileParser {
 	
 	public QueryFileParser(String filename) throws IOException{		
 		metaInf= new HashMap<>();
-		this.queryFile = new File(ServiceConfig.getProperty(ParserConfig.QUERY_PATH)+filename);
+		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+filename);
 		parseFile();		
 	}
+	
+	//For testing purpose only - to be removed//
+	public QueryFileParser(String queryPath, String filename) throws IOException{        
+        metaInf= new HashMap<>();
+        this.queryFile = new File(queryPath+filename);
+        parseFile();        
+    }
 	
 	
 	public HashMap<String, String> getMetaInf() {
@@ -77,10 +85,10 @@ public class QueryFileParser {
 	public String checkQueryArgsSyntax() {
 		String check="";
 		
-		String[] args=metaInf.get(ParserConfig.QUERY_PARAMS).split(Pattern.compile(",").toString());
+		String[] args=metaInf.get(QueryConstants.QUERY_PARAMS).split(Pattern.compile(",").toString());
 		for(String arg:args) {
-			if((!arg.trim().equals(ParserConfig.QUERY_NO_ARGS)) && query.indexOf("${"+arg.trim()+"}")==-1) {
-				check="Arg syntax is incorrect : query does not have a ${"+arg.trim()+"} placeholder";
+			if((!arg.trim().equals(QueryConstants.QUERY_NO_ARGS)) && query.indexOf("?"+arg.trim())==-1) {
+				check="Arg syntax is incorrect : query does not have a ?"+arg.trim()+" variable";
 				return check;
 			}
 		}

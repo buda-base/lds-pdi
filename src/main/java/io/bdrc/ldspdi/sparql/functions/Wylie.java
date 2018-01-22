@@ -1362,14 +1362,14 @@ public class Wylie {
  }
 
  // debug print
- private void debug (String str) {
+ /*private void debug (String str) {
 	System.out.println(str);
- }
+ }*/
 
  // debug variable value
- private void debugvar(Object o, String name) {
+ /*private void debugvar(Object o, String name) {
 	System.out.println(">>" + name + "<< : (" + (o == null ? "NULL" : o.toString()) + ")");
- }
+ }*/
  
  // join a list (ArrayList or LinkedList) of strings into a single string
  private String joinStrings(List<String> a, String sep) {

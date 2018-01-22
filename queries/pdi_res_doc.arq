@@ -1,7 +1,7 @@
 #QueryScope=General
 #QueryReturnType=Turtle graph
 #QueryResults=the turtle representation of a resource graph
-#QueryParams=ID
+#QueryParams=RES
 #QueryUrl=/lds-pdi/query/P1583
 
-DESCRIBE <http://purl.bdrc.io/resource/${ID}>
+DESCRIBE ?RES
