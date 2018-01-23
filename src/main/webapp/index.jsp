@@ -1,9 +1,11 @@
 <%@page import="io.bdrc.ldspdi.Utils.DocFileBuilder"%>
+<%@page import="io.bdrc.ldspdi.service.GitService"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <% 
 String serverName = request.getServerName();
 int portNumber = request.getServerPort();
+GitService.update();
 String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber));
 
 

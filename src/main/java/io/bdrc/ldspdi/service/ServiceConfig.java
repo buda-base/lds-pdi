@@ -59,7 +59,7 @@ public class ServiceConfig {
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
 			}			
-			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"prefixes.txt")));
+			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

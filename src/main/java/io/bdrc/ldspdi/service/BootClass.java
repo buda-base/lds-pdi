@@ -42,6 +42,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
             
             ServiceConfig.init(params); 
             OntAccess.init();
+            GitService.update();
              
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

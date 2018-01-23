@@ -77,7 +77,7 @@ public class PublicDataResource {
 			fusekiUrl=fuseki;
 		}else {
 		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
-		}
+		}		
 		MediaType media=new MediaType("text","html","utf-8");
 		MultivaluedMap<String,String> mp=info.getQueryParameters();
 		String filename= mp.getFirst("searchType")+".arq";		

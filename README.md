@@ -18,7 +18,7 @@ in tomcat context.xml file, add the following lines:
 ```
 <Parameter name="fuseki" value="http://<server:port>/fuseki/bdrcrw/query"
          override="false"/>
-<Parameter name="queryPath" value="/local/path/to/queries/"
+<Parameter name="queryPath" value="/local/path/to/"
          override="false"/>
 
 ```
@@ -38,9 +38,20 @@ in src/main/webapp/WEB-INF/webdefault.xml set your local values in
 </context-param>
 <context-param>
     <param-name>queryPath</param-name>
-    <param-value>/local/path/to/queries/</param-value>
+    <param-value>/local/path/to/</param-value>
 </context-param>
 
+```
+# Query file repository
+
+All query templates files are automatically fetched from lds-queries github repository (https://github.com/BuddhistDigitalResourceCenter/lds-queries).
+This repository is being cloned locally to the location specified by the queryPath parameter mentionned above.
+
+You can therefore create, TEST thoroughly (10 times better than one), and share your queries by pushing them to the github repository.
+
+Changes will appears after refreshing
+```
+http://localhost:8080/lds-pdi/index.jsp
 ```
 
 # Running

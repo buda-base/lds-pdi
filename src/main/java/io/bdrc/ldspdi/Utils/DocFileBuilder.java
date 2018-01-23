@@ -98,7 +98,7 @@ public class DocFileBuilder {
 	
 	public static ArrayList<String> getQueryFiles() {
 		ArrayList<String> files=new ArrayList<>();
-		Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH));		
+		Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");		
 		if (Files.isDirectory(dpath)) {        
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(dpath)) {
                 for (Path path : stream) {

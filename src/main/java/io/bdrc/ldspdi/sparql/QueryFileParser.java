@@ -38,7 +38,7 @@ public class QueryFileParser {
 	
 	public QueryFileParser(String filename) throws IOException{		
 		metaInf= new HashMap<>();
-		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+filename);
+		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
 		parseFile();		
 	}
 	
