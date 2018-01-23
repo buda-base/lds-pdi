@@ -2,7 +2,7 @@
 
 Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
 
-Moreover, each query file contains its own description taht is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
+Moreover, each query file contains its own description that is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
 
 # Compiling and deploying
 
@@ -46,12 +46,17 @@ in src/main/webapp/WEB-INF/webdefault.xml set your local values in
 # Running
 
 ```
-mvn jetty:run http://localhost:8080/lds-pdi/index.jsp
+mvn jetty:run
 ```
 #### Access to predefined queries
 ```
 http://localhost:8080/lds-pdi/index.jsp
 ```
+#### Access to ontology browsing service
+```
+http://localhost:8080/lds-pdi/ontOverview.jsp
+```
+
 #### Access to resources graph using turtle serialization
 
 ```
@@ -122,29 +127,27 @@ Note : the parameter placeholder of the query must match the value of QueryPara
 ldspdi performs a strict parameter evaluation in order to prevent Sparql injection. It therefore requires parameter types to be specified. Parameter types are as follows :
 
 Literal : each literal parameter name must be prefixed by « L_ » (Ex : L_NAME)
+
 Integer : each literal parameter name must be prefixed by « I_ » (Ex : I_LIM)
+
 Resource : each literal parameter name must be prefixed by « R_ » (Ex : R_RES)
+
 
 Additional rule : Filter on variables should be the last ones in a query
 
 ex:
-
+```
 FILTER (contains(?root_name, ?NAME ))
+
 FILTER ((contains(?comment_type, "commentary" ))
-         || (contains(?comment_type, "rnam bshad" ))
-         || (contains(?comment_type, "'grel pa" ))
-         || (contains(f:SankritFilter(?comment_type), "ṭīkā" ))
-         || (contains(f:SankritFilter(?comment_type), "vyākhyā" )))
+```
 
 will fail because it is subject to an injection attack while :
-
+```
 FILTER ((contains(?comment_type, "commentary" ))
-         || (contains(?comment_type, "rnam bshad" ))
-         || (contains(?comment_type, "'grel pa" ))
-         || (contains(f:SankritFilter(?comment_type), "ṭīkā" ))
-         || (contains(f:SankritFilter(?comment_type), "vyākhyā" )))
-FILTER (contains(?root_name, ?NAME ))
 
+FILTER (contains(?root_name, ?NAME ))
+```
 will go through without any issue.
 
 ### Example :
