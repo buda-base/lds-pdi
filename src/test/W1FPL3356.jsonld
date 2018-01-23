@@ -40,17 +40,17 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2016-12-06T12:04:56.81Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "FPL Import"
-      },
-      "adm:logWho" : "bdr:U00006"
-    }, {
       "adm:logDate" : "2017-08-28T14:40:13.266Z",
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "added archiveInfo for FPL"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2016-12-06T12:04:56.81Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "FPL Import"
       },
       "adm:logWho" : "bdr:U00006"
     }, {

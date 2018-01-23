@@ -9,18 +9,18 @@
     "hasBrother" : "bdr:P744",
     "incarnationGeneral" : "bdr:P1AG28",
     "personEvent" : [ {
-      "@type" : "PersonAssumesOffice",
-      "onOrAbout" : "?",
-      "personEventRole" : "bdr:R1AG30"
-    }, {
-      "@type" : "PersonBirth",
-      "onOrAbout" : "1906"
-    }, {
       "@type" : "PersonDeath",
       "onOrAbout" : "1942/1943"
     }, {
       "@type" : "PersonOccupiesSeat",
       "personEventPlace" : "bdr:G4687"
+    }, {
+      "@type" : "PersonBirth",
+      "onOrAbout" : "1906"
+    }, {
+      "@type" : "PersonAssumesOffice",
+      "onOrAbout" : "?",
+      "personEventRole" : "bdr:R1AG30"
     } ],
     "personName" : [ {
       "@type" : "PersonPrimaryName",
@@ -61,6 +61,9 @@
       },
       "adm:logWho" : "bdr:U00002"
     }, {
+      "adm:logDate" : "2015-06-16T18:03:24.256Z",
+      "adm:logWho" : "bdr:U00002"
+    }, {
       "adm:logDate" : "2015-06-16T18:00:57.789Z",
       "adm:logMessage" : {
         "@language" : "en",
@@ -74,9 +77,6 @@
         "@value" : "reviewed by ls, cz, cn, kg"
       },
       "adm:logWho" : "bdr:U00016"
-    }, {
-      "adm:logDate" : "2015-06-16T18:03:24.256Z",
-      "adm:logWho" : "bdr:U00002"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"
