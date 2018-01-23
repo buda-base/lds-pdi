@@ -33,14 +33,14 @@
       "adm:logDate" : "2012-12-25T01:09:21.507Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "updated place from monastery csv"
+        "@value" : "created by monastery import"
       },
       "adm:logWho" : "bdr:U00057"
     }, {
       "adm:logDate" : "2012-12-25T01:09:21.507Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "created by monastery import"
+        "@value" : "updated place from monastery csv"
       },
       "adm:logWho" : "bdr:U00057"
     } ]

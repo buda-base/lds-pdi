@@ -65,6 +65,24 @@ public class ServiceConfig {
 		}
 	}
 	
+	public static void initForTests() {
+        
+        try {
+            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            // load a properties file
+            prop.load(input);
+            
+            logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));       
+            String mimes=prop.getProperty("mime");
+            StringTokenizer st=new StringTokenizer(mimes,",");
+            while(st.hasMoreTokens()){
+                mime.add(st.nextToken());
+            }          
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+	
 	public static boolean isValidMime(String mimeString){
 		return mime.contains(mimeString);
 	}
@@ -77,11 +95,4 @@ public class ServiceConfig {
 		return sparqlPrefixes;
 	}
 	
-	/*public static String getFusekiUrl(){
-        return params.get("fusekiUrl");
-    }
-	
-	public static String getQueryPath(){
-        return params.get(ParserConfig.QUERY_PATH);
-    }*/
 }

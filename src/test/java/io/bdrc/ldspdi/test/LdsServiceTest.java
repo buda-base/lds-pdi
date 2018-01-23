@@ -89,6 +89,7 @@ public class LdsServiceTest extends JerseyTest {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+		ServiceConfig.initForTests();
 		loadData();		
 		srvds.setDefaultModel(model);
 		//Creating a fuseki server
@@ -195,7 +196,7 @@ public class LdsServiceTest extends JerseyTest {
 			for(String fmt:formats){				
 				if(!fmt.equals("ttl") && !fmt.equals("jsonld") ){							
 					
-					String ct1=ServiceConfig.getProperty("m"+fmt);
+					String ct1=TestUtils.getContentTypes().get(fmt);					
 					Response output = target("/"+res+"."+fmt)
 							.request()
 							.header("fusekiUrl", fusekiUrl)

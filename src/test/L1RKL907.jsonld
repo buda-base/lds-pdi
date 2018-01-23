@@ -12,8 +12,10 @@
     "@type" : "Lineage",
     "lineageHolder" : [ {
       "@type" : "LineageHolder",
-      "lineageDownTo" : "bdr:L0RKL89",
-      "lineageWho" : "bdr:P3413"
+      "lineageReceived" : {
+        "lineageFrom" : "bdr:P3413"
+      },
+      "lineageWho" : "bdr:P0RK431"
     }, {
       "@type" : "LineageHolder",
       "lineageDownFrom" : "bdr:L0RKL89",
@@ -23,10 +25,8 @@
       "lineageWho" : "bdr:P3091"
     }, {
       "@type" : "LineageHolder",
-      "lineageReceived" : {
-        "lineageFrom" : "bdr:P3413"
-      },
-      "lineageWho" : "bdr:P0RK431"
+      "lineageDownTo" : "bdr:L0RKL89",
+      "lineageWho" : "bdr:P3413"
     } ],
     "lineageObject" : "bdr:T1543",
     "lineageRef" : "bdr:L1RKL901",
@@ -34,22 +34,12 @@
     "note" : [ {
       "noteText" : {
         "@language" : "en",
-        "@value" : "alternative lineage: L90b"
-      }
-    }, {
-      "noteText" : {
-        "@language" : "en",
-        "@value" : "alternative lineage: L90c"
+        "@value" : "alternative lineage: L90d"
       }
     }, {
       "noteText" : {
         "@language" : "en",
         "@value" : "alternative lineage: L90a"
-      }
-    }, {
-      "noteText" : {
-        "@language" : "en",
-        "@value" : "alternative lineage: L90d"
       }
     }, {
       "noteText" : {
@@ -60,6 +50,16 @@
       "noteText" : {
         "@language" : "en",
         "@value" : "alternative lineage: L90e"
+      }
+    }, {
+      "noteText" : {
+        "@language" : "en",
+        "@value" : "alternative lineage: L90b"
+      }
+    }, {
+      "noteText" : {
+        "@language" : "en",
+        "@value" : "alternative lineage: L90c"
       }
     } ],
     "workLocation" : {
@@ -76,15 +76,15 @@
       },
       "adm:logWho" : "bdr:U00006"
     }, {
-      "adm:logDate" : "2013-09-22T15:05:52.264Z",
+      "adm:logDate" : "2014-07-28T09:42:02.805Z",
+      "adm:logWho" : "bdr:U00019"
+    }, {
+      "adm:logDate" : "2007-07-12T14:00:58.923Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "edited name; added lin ref"
+        "@value" : "first post to dlms"
       },
-      "adm:logWho" : "bdr:U00055"
-    }, {
-      "adm:logDate" : "2014-05-13T12:02:07.046Z",
-      "adm:logWho" : "bdr:U00019"
+      "adm:logWho" : "bdr:U00012"
     }, {
       "adm:logDate" : "2014-07-28T21:20:44.974Z",
       "adm:logMessage" : {
@@ -92,6 +92,9 @@
         "@value" : "normalized names of who and received elements"
       },
       "adm:logWho" : "bdr:U00006"
+    }, {
+      "adm:logDate" : "2014-05-13T12:02:07.046Z",
+      "adm:logWho" : "bdr:U00019"
     }, {
       "adm:logDate" : "2014-03-05T08:45:17.419Z",
       "adm:logMessage" : {
@@ -114,15 +117,12 @@
       },
       "adm:logWho" : "bdr:U00019"
     }, {
-      "adm:logDate" : "2014-07-28T09:42:02.805Z",
-      "adm:logWho" : "bdr:U00019"
-    }, {
-      "adm:logDate" : "2007-07-12T14:00:58.923Z",
+      "adm:logDate" : "2013-09-22T15:05:52.264Z",
       "adm:logMessage" : {
         "@language" : "en",
-        "@value" : "first post to dlms"
+        "@value" : "edited name; added lin ref"
       },
-      "adm:logWho" : "bdr:U00012"
+      "adm:logWho" : "bdr:U00055"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"
