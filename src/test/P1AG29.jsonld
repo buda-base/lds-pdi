@@ -23,16 +23,16 @@
       "personEventRole" : "bdr:R1AG30"
     } ],
     "personName" : [ {
+      "@type" : "PersonTulkuTitle",
+      "rdfs:label" : {
+        "@language" : "bo-x-ewts",
+        "@value" : "dge rtse ge tog 04"
+      }
+    }, {
       "@type" : "PersonPrimaryName",
       "rdfs:label" : {
         "@language" : "bo-x-ewts",
         "@value" : "'gyur med thub bstan nyin byed/"
-      }
-    }, {
-      "@type" : "PersonOtherName",
-      "rdfs:label" : {
-        "@language" : "en",
-        "@value" : "gyurme tubten nyinje"
       }
     }, {
       "@type" : "PersonPersonalName",
@@ -41,10 +41,10 @@
         "@value" : "bstan pa'i nyi ma/"
       }
     }, {
-      "@type" : "PersonTulkuTitle",
+      "@type" : "PersonOtherName",
       "rdfs:label" : {
-        "@language" : "bo-x-ewts",
-        "@value" : "dge rtse ge tog 04"
+        "@language" : "en",
+        "@value" : "gyurme tubten nyinje"
       }
     } ],
     "personStudentOf" : [ "bdr:P711", "bdr:P733", "bdr:P235", "bdr:P11MS246" ],
@@ -61,9 +61,6 @@
       },
       "adm:logWho" : "bdr:U00002"
     }, {
-      "adm:logDate" : "2015-06-16T18:03:24.256Z",
-      "adm:logWho" : "bdr:U00002"
-    }, {
       "adm:logDate" : "2015-06-16T18:00:57.789Z",
       "adm:logMessage" : {
         "@language" : "en",
@@ -77,6 +74,9 @@
         "@value" : "reviewed by ls, cz, cn, kg"
       },
       "adm:logWho" : "bdr:U00016"
+    }, {
+      "adm:logDate" : "2015-06-16T18:03:24.256Z",
+      "adm:logWho" : "bdr:U00002"
     } ]
   } ],
   "@context" : "http://purl.bdrc.io/context.jsonld"

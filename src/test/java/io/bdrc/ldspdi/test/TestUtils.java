@@ -80,7 +80,7 @@ public class TestUtils {
 		ArrayList<String> res=new ArrayList<String>();
 		res.add("R3AG22");
 		res.add("C68");
-		res.add("UT23637_006_0000");
+		//res.add("UT23637_006_0000");
 		res.add("I00KG01506_I001");
 		res.add("L1RKL907");
 		res.add("P1AG29");

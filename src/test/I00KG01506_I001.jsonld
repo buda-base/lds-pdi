@@ -16,6 +16,13 @@
     "adm:status" : "bdr:StatusReleased",
     "adm:volumeScanVenue" : "Delhi",
     "adm:logEntry" : [ {
+      "adm:logDate" : "2016-03-31T21:27:09.458Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "Added ondisk"
+      },
+      "adm:logWho" : "bdr:U00006"
+    }, {
       "adm:logDate" : "2007-08-09T16:55:20.21Z",
       "adm:logMessage" : {
         "@language" : "en",
@@ -41,13 +48,6 @@
       "adm:logMessage" : {
         "@language" : "en",
         "@value" : "Updated total pages"
-      },
-      "adm:logWho" : "bdr:U00006"
-    }, {
-      "adm:logDate" : "2016-03-31T21:27:09.458Z",
-      "adm:logMessage" : {
-        "@language" : "en",
-        "@value" : "Added ondisk"
       },
       "adm:logWho" : "bdr:U00006"
     } ]
