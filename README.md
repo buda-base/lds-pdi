@@ -1,6 +1,6 @@
-﻿# LDS-PDI
+# LDS-PDI
 
-Contains a framework for executing external queries files through a rest API.
+Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
 
 Moreover, each query file contains its own description taht is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
 
@@ -11,27 +11,91 @@ mvn clean package
 ```
 # Configuration
 
-Copy the queries directory to your file system : /local/dir/queries
-set the queryPath property in ldspdi,properties :
+### Deployment on a tomcat server :
+in tomcat context.xml file, add the following lines:
+
 
 ```
-queryPath=/local/dir/queries/
-```
+<Parameter name="fuseki" value="http://<server:port>/fuseki/bdrcrw/query"
+         override="false"/>
+<Parameter name="queryPath" value="/local/path/to/queries/"
+         override="false"/>
 
-fuseki server name url is set in ldsdpi.properties:
+```
+### Running it in tomcat from Eclipse IDE:
+
+update context.xml as above in workspaceDir/Servers/tomcatXXX/
+
+### Running it using Maven Jetty plugin:
+
+in src/main/webapp/WEB-INF/webdefault.xml set your local values in
+
 
 ```
-#Fuseki server
-fuseki=http://localhost:13180/fuseki/bdrcrw/query
+<context-param>
+    <param-name>fuseki</param-name>
+    <param-value>http://<server;port>/fuseki/bdrcrw/query</param-value>;
+</context-param>
+<context-param>
+    <param-name>queryPath</param-name>
+    <param-value>/local/path/to/queries/</param-value>
+</context-param>
+
 ```
 
 # Running
 
 ```
-mvn jetty:run then go to http://localhost:8080/lds-pdi/index.jsp
+mvn jetty:run http://localhost:8080/lds-pdi/index.jsp
 ```
+#### Access to predefined queries
+```
+http://localhost:8080/lds-pdi/index.jsp
+```
+#### Access to resources graph using turtle serialization
 
-# Usage
+```
+http://localhost:8080/lds-pdi/query/RES_ID
+```
+or using curl:
+
+```
+curl -v -H "Accept: text/turtle" http://localhost:8080/lds-pdi/query/RES_ID
+```
+Ex:
+http://localhost:8080/lds-pdi/query/W1EE12
+
+#### Access to resources graph using other formats
+```
+http://localhost:8080/lds-pdi/query/RES_ID.{ext}
+```
+##### Supported mime types and file extensions
+
+text/turtle=ttl (default : processed by BDRC STTLWriter)
+
+application/n-triples=nt
+
+application/n-quads=nq
+
+text/trig=trig
+
+application/rdf+xml=rdf
+
+application/owl+xml=owl
+
+application/ld+json=jsonld (processed by BDRC JSONLDFormatter)
+
+application/rdf+thrift=rt
+
+application/rdf+thrift=trdf
+
+application/json=rj
+
+application/json=json
+
+application/trix+xml=trix
+
+# Query templates
 
 This framework will automatically add new sparql query templates to the index page based on files published to the « /local/dir/queries » directory.
 
@@ -40,18 +104,100 @@ New query files must have the .arq extension and are formatted as follows :
 ```
 #QueryScope=Place
 #QueryReturnType=Table
-#QueryResults=A table containing the Id and the name of the place whose name contains the NAME param value
-#QueryParams=NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_pl_name&NAME=dgon gsar
+#QueryResults=A table containing the Id and the name of the place whose name contains the L_NAME param value
+#QueryParams=L_NAME
+#QueryUrl=/lds-pdi/query?searchType=pdi_pl_name&L_NAME=dgon gsar
 
 select ?Place_ID ?Place_Name
 where {
   ?Place_ID a :Place;
    skos:prefLabel ?Place_Name .
-  Filter(contains(?Place_Name, "${NAME}"))
+  Filter(contains(?Place_Name, ?NAME))
 }
 ```
 Note : the parameter placeholder of the query must match the value of QueryParams.
+
+### Guidelines for creating query templates
+
+ldspdi performs a strict parameter evaluation in order to prevent Sparql injection. It therefore requires parameter types to be specified. Parameter types are as follows :
+
+Literal : each literal parameter name must be prefixed by « L_ » (Ex : L_NAME)
+Integer : each literal parameter name must be prefixed by « I_ » (Ex : I_LIM)
+Resource : each literal parameter name must be prefixed by « R_ » (Ex : R_RES)
+
+Additional rule : Filter on variables should be the last ones in a query
+
+ex:
+
+FILTER (contains(?root_name, ?NAME ))
+FILTER ((contains(?comment_type, "commentary" ))
+         || (contains(?comment_type, "rnam bshad" ))
+         || (contains(?comment_type, "'grel pa" ))
+         || (contains(f:SankritFilter(?comment_type), "ṭīkā" ))
+         || (contains(f:SankritFilter(?comment_type), "vyākhyā" )))
+
+will fail because it is subject to an injection attack while :
+
+FILTER ((contains(?comment_type, "commentary" ))
+         || (contains(?comment_type, "rnam bshad" ))
+         || (contains(?comment_type, "'grel pa" ))
+         || (contains(f:SankritFilter(?comment_type), "ṭīkā" ))
+         || (contains(f:SankritFilter(?comment_type), "vyākhyā" )))
+FILTER (contains(?root_name, ?NAME ))
+
+will go through without any issue.
+
+### Example :
+
+
+```
+#QueryScope=General
+#QueryReturnType=Table
+#QueryResults=A table containing the Id and matching skos:prefLabel for the given query and language tag with the given limit
+#QueryParams=L_NAME,L_LANG,I_LIM
+#QueryUrl=/lds-pdi/query?searchType=pdi_any_luceneLabel&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+
+
+select distinct ?s ?lit
+WHERE
+{
+  (?s ?sc ?lit) text:query ( ?L_NAME?L_LANG ) .
+} limit ?I_LIM
+
+```
+Note : the @ is now part of the L_LANG literal parameter and is not part of the query skeleton anymore.
+
+```
+#QueryScope=Person
+#QueryReturnType=Table
+#QueryResults=All the detailed admin info (notes, status, log entries) about the person data
+#QueryParams=R_RES
+#QueryUrl=/lds-pdi/query?searchType=pdi_p_adminDetails&R_RES=P1583
+
+
+select distinct
+?ID
+?preferredName
+?y ?noteRef ?note_value ?admin_prop ?admin_ref ?log_value ?git ?status
+where {
+  	{
+  		?ID skos:prefLabel ?preferredName ;
+        	adm:gitRevision ?git;
+    		adm:status ?status .
+    	Filter(?ID=?R_RES)
+ 	}
+  	UNION {
+	  	OPTIONAL{ ?ID  :note ?noteRef }.
+	  	?noteRef ?y ?note_value .	  	
+	  	Filter(?ID=?R_RES)
+	}
+  	UNION {
+	  	OPTIONAL{ ?ID  adm:logEntry ?admin_ref }.
+	  	?admin_ref ?admin_prop ?log_value .	  	
+	  	Filter(?ID=?R_RES)
+	}
+}
+```
 
 # Copyright and License
 
