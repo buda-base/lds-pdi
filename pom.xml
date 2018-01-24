@@ -50,7 +50,14 @@
 	<dependency>
 	    <groupId>org.glassfish.jersey.ext</groupId>
 	    <artifactId>jersey-mvc-jsp</artifactId>	       
-	</dependency>		
+	</dependency>
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
+<dependency>
+    <groupId>org.glassfish.jersey.test-framework</groupId>
+    <artifactId>jersey-test-framework-core</artifactId>
+    
+</dependency>
+    		
 	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
 	<dependency>
 	    <groupId>org.apache.jena</groupId>
@@ -146,12 +153,12 @@
 	    <artifactId>commons-text</artifactId>
 	    <version>1.2</version>
 	</dependency>	
-	<dependency> 
+	<!--  dependency> 
 		<groupId>org.slf4j</groupId> 
 		<artifactId>slf4j-simple</artifactId> 
 		<version>1.7.25</version> 
 		<scope>test</scope> 
-	</dependency>
+	</dependency-->
     
     <!-- https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit -->
     <dependency>
@@ -176,7 +183,7 @@
     	<plugin>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
-            <version>9.4.8.v20171121</version>
+            <version>9.4.7.RC0</version>
             <configuration>
 	            <webApp>
                     <context-path>/lds-pdi</context-path>	            	                
@@ -184,20 +191,7 @@
 		            <containerIncludeJarPattern>^$</containerIncludeJarPattern> 
                     <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>                               
 	            </webApp>      
-            </configuration>
-            <dependencies>                        
-                <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                    <version>1.7.25</version>
-                </dependency>
-                <dependency> 
-                    <groupId>org.slf4j</groupId> 
-                    <artifactId>slf4j-simple</artifactId> 
-                    <version>1.7.25</version>
-                </dependency>
-            </dependencies>
+            </configuration>            
          </plugin>
          <plugin>
          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->			

@@ -1,0 +1,30 @@
+{
+  "@graph" : [ {
+    "skos:prefLabel" : [ {
+      "@language" : "en",
+      "@value" : "Drigu Godkya Tulku"
+    }, {
+      "@language" : "bo-x-ewts",
+      "@value" : "gri gu rgod skya sprul sku'i skye brgyud/"
+    } ],
+    "@id" : "bdr:R8LS12819",
+    "@type" : "Role",
+    "adm:status" : "bdr:StatusReleased",
+    "adm:logEntry" : [ {
+      "adm:logDate" : "2014-03-25T11:06:01.776Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "added eng desc"
+      },
+      "adm:logWho" : "bdr:U00020"
+    }, {
+      "adm:logDate" : "2012-12-20T16:54:03.734Z",
+      "adm:logMessage" : {
+        "@language" : "en",
+        "@value" : "created new office"
+      },
+      "adm:logWho" : "bdr:U00019"
+    } ]
+  } ],
+  "@context" : "http://purl.bdrc.io/context.jsonld"
+}

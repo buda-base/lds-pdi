@@ -73,7 +73,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.test.TestUtils;
 
 
-public class LdsServiceTest extends JerseyTest {
+public class LdsTest extends JerseyTest {
 	
 	public static Writer logWriter;	
 	private static FusekiServer server ;
@@ -137,6 +137,33 @@ public class LdsServiceTest extends JerseyTest {
 		}		
 	}
 	
+	@Test
+    public void testJSONLDFormatter() throws IOException{
+        // Loads resource model from .ttl file
+        // Creates a jsonld object of that model and saves it to.jsonld file
+        // Loads Model from jsonld file
+        ArrayList<String> resList=TestUtils.getResourcesList();
+        for(String res:resList) {       
+            //Excluding unsupported Etext format
+            if(!res.startsWith("U")) {
+                // Checking Model preservation through JSONLDFormatter process
+                Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", RDFLanguages.RDFXML);                
+                Object jsonObject=JSONLDFormatter.modelToJsonObject(m, res);
+                FileOutputStream fos=new FileOutputStream(new File(TestUtils.TESTDIR+res+".jsonld"));
+                JSONLDFormatter.jsonObjectToOutputStream(jsonObject, fos);
+                fos.close();            
+                Model json=getModelFromFileName(TestUtils.TESTDIR+res+".jsonld",RDFLanguages.JSONLD);
+                assertTrue(m.isIsomorphicWith(json));
+                
+                // Checking Model against QueryProcessor
+                Map<String,String> prefixMap=m.getNsPrefixMap();
+                String prefix=TestUtils.convertToString(prefixMap);
+                QueryProcessor processor=new QueryProcessor();
+                Model mq=processor.getResource(res,fusekiUrl,prefix);
+                assertTrue(mq.isIsomorphicWith(json));
+            }
+        }
+    }
 	
 	@Test
 	public void testGetSTTLSyntax() throws IOException{
@@ -154,34 +181,7 @@ public class LdsServiceTest extends JerseyTest {
 		}		
 	}
 		
-	@Test
-	public void testJSONLDFormatter() throws IOException{
-		// Loads resource model from .ttl file
-		// Creates a jsonld object of that model and saves it to.jsonld file
-		// Loads Model from jsonld file
-		ArrayList<String> resList=TestUtils.getResourcesList();
-		for(String res:resList) {		
-			//Excluding unsupported Etext format
-			if(!res.startsWith("U")) {
-				// Checking Model preservation through JSONLDFormatter process
-				Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", RDFLanguages.RDFXML);
-				
-				Object jsonObject=JSONLDFormatter.modelToJsonObject(m, res);
-				FileOutputStream fos=new FileOutputStream(new File(TestUtils.TESTDIR+res+".jsonld"));
-				JSONLDFormatter.jsonObjectToOutputStream(jsonObject, fos);
-				fos.close();			
-				Model json=getModelFromFileName(TestUtils.TESTDIR+res+".jsonld",RDFLanguages.JSONLD);	
-				assertTrue(m.isIsomorphicWith(json));
-				
-				// Checking Model against QueryProcessor
-				Map<String,String> prefixMap=m.getNsPrefixMap();
-				String prefix=TestUtils.convertToString(prefixMap);
-				QueryProcessor processor=new QueryProcessor();
-				Model mq=processor.getResource(res,fusekiUrl,prefix);
-				assertTrue(mq.isIsomorphicWith(json));
-			}
-		}
-	}
+	
 	
 	@Test
 	public void testResponseOtherContentType() throws IOException{
@@ -196,7 +196,7 @@ public class LdsServiceTest extends JerseyTest {
 			for(String fmt:formats){				
 				if(!fmt.equals("ttl") && !fmt.equals("jsonld") ){							
 					
-					String ct1=TestUtils.getContentTypes().get(fmt);					
+					String ct1=TestUtils.getContentTypes().get(fmt);			
 					Response output = target("/"+res+"."+fmt)
 							.request()
 							.header("fusekiUrl", fusekiUrl)
@@ -319,6 +319,7 @@ public class LdsServiceTest extends JerseyTest {
 		    pb.parse(StreamRDFLib.graph(g));
 		} catch (RiotException e) {
 		    writeLog("error reading "+fname);
+		    e.printStackTrace();
 		    return null;
 		}		
 		return m;

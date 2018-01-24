@@ -1,0 +1,20 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+bdr:R8LS12819  a        :Role ;
+    skos:prefLabel      "gri gu rgod skya sprul sku'i skye brgyud/"@bo-x-ewts , "Drigu Godkya Tulku"@en ;
+    adm:logEntry        [ adm:logDate         "2012-12-20T16:54:03.734Z"^^xsd:dateTime ;
+                          adm:logMessage      "created new office"@en ;
+                          adm:logWho          bdr:U00019
+                        ] ,
+            [ adm:logDate         "2014-03-25T11:06:01.776Z"^^xsd:dateTime ;
+              adm:logMessage      "added eng desc"@en ;
+              adm:logWho          bdr:U00020
+            ] ;
+    adm:status          bdr:StatusReleased .
