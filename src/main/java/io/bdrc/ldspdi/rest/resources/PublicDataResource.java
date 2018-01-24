@@ -21,17 +21,19 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletContext;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -53,6 +55,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.sparql.json.JsonResultSet;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
@@ -64,8 +67,9 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 @Path("/")
 public class PublicDataResource {
 
-    @Context ServletContext context;
-	QueryProcessor processor=new QueryProcessor();
+      
+	
+    QueryProcessor processor=new QueryProcessor();
 	public String fusekiUrl="";
 	String fuse="";
 	
@@ -100,6 +104,38 @@ public class PublicDataResource {
         };
         return Response.ok(stream,media).build();
 	}
+	
+	@POST 
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response postData(@Context UriInfo info, 
+            @HeaderParam("fusekiUrl") final String fuseki,
+            MultivaluedMap<String,String> map) throws Exception{     
+	    MediaType media=new MediaType("application","ld+json");
+	    String baseUri=info.getBaseUri().toString();
+        if(fuseki !=null){
+            fusekiUrl=fuseki;
+        }else {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
+        }        
+        String filename= map.getFirst("searchType")+".arq";      
+        QueryFileParser qfp;
+        final String query;
+        
+        qfp=new QueryFileParser(filename);
+        String q=qfp.getQuery();
+        String check=qfp.checkQueryArgsSyntax();
+        if(check.length()>0) {
+            throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
+        }
+        query=InjectionTracker.getValidQuery(q, map); 
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {               
+                        JsonResultSet jrs=processor.getJsonObject(query, fuseki, baseUri);
+                        JSONLDFormatter.jsonObjectToOutputStream(jrs, os);
+            }
+        };
+        return Response.ok(stream,media).build();
+    }
 	
 	@GET
     @Path("/ontology")

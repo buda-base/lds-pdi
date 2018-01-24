@@ -1,5 +1,8 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /*******************************************************************************
@@ -23,6 +26,8 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContextEvent;
 
+import org.apache.commons.io.FileUtils;
+
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ontology.service.core.OntAccess;
 
@@ -36,17 +41,35 @@ public class BootClass implements javax.servlet.ServletContextListener{
  
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            HashMap<String,String> params=new HashMap<>();            
-            params.put(QueryConstants.QUERY_PATH,arg0.getServletContext().getInitParameter("queryPath"));
-            params.put("fusekiUrl",arg0.getServletContext().getInitParameter("fuseki"));            
             
+            String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
+            String queryPath=arg0.getServletContext().getInitParameter("queryPath");
+            HashMap<String,String> params=new HashMap<>();            
+            params.put(QueryConstants.QUERY_PATH,queryPath);
+            params.put("fusekiUrl",fuseki);            
+            GitService.update(queryPath);
             ServiceConfig.init(params); 
             OntAccess.init();
-            GitService.update();
+            
              
-        } catch (IllegalArgumentException e) {
+        } 
+        catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
+        
     }
+    
+    private String initParamsString(String qPath,String f_server) {
+        String params="<context-param>\n" + 
+                "    <param-name>fuseki</param-name>\n" + 
+                "    <param-value>"+f_server+"</param-value>\n" + 
+                "</context-param>\n" + 
+                "<context-param>\n" + 
+                "    <param-name>queryPath</param-name>\n" + 
+                "    <param-value>"+qPath+"</param-value>\n" + 
+                "</context-param>";
+        return params;
+    }
+    
 
 }

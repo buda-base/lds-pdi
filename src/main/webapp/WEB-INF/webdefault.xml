@@ -25,11 +25,11 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
    </servlet-mapping>   
 <context-param>
     <param-name>fuseki</param-name>
-    <param-value>http://localhost:13180/fuseki/bdrcrw/query</param-value>
+    <param-value>http://buda1.bdrc.io:13180/fuseki/bdrcrw/query</param-value>
 </context-param>
 <context-param>
     <param-name>queryPath</param-name>
-    <param-value>/home/marc/lds-pdi/queries/</param-value>
-</context-param>   
+    <param-value>/home/marc/lds-queries/</param-value>
+</context-param>
 </web-app>
 

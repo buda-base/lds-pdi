@@ -5,7 +5,7 @@
 <% 
 String serverName = request.getServerName();
 int portNumber = request.getServerPort();
-GitService.update();
+GitService.update(request.getServletContext().getInitParameter("queryPath"));
 String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber));
 
 

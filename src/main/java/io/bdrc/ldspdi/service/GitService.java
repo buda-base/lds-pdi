@@ -17,15 +17,15 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class GitService {
     
-    private static String GIT_LOCAL_PATH=ServiceConfig.getProperty(QueryConstants.QUERY_PATH);
-    private static String GIT_REMOTE_URL="git@github.com:BuddhistDigitalResourceCenter/lds-queries.git";
+    private static String GIT_LOCAL_PATH;
+    private static String GIT_REMOTE_URL="https://github.com/BuddhistDigitalResourceCenter/lds-queries.git";
     private static Repository localRepo;
    
     
     static Logger log = LoggerFactory.getLogger(GitService.class);
     
-    public static void update() {
-        
+    public static void update(String localPath) {
+        GIT_LOCAL_PATH=localPath;
         FileRepositoryBuilder builder=new FileRepositoryBuilder();
         File localGit=new File(GitService.GIT_LOCAL_PATH+"/.git");
         File WlocalGit=new File(GitService.GIT_LOCAL_PATH); 

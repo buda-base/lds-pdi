@@ -32,6 +32,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.json.JsonResultSet;
 
 public class QueryProcessor {
 	
@@ -40,7 +41,8 @@ public class QueryProcessor {
 	
 	public Model getResource(String resID,String fusekiUrl,String pref){			
 		
-		Query q=QueryFactory.create(" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+	    String prefixes=ServiceConfig.getPrefixes();
+		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
 		System.out.println("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
@@ -64,10 +66,24 @@ public class QueryProcessor {
 		if(html) {
 			ret=toHtmlTable(rs,elapsed);
 		}else {
-			ret=toTable(rs);			
+			ret=toTable(rs);
 		}
 		return ret;		
 	}
+	
+	public JsonResultSet getJsonObject(String query,String fusekiUrl,String baseUri){
+        System.out.println("Processor query select:" +query);
+        this.baseUri=baseUri;
+        String ret="";
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        Query q=QueryFactory.create(query);
+        long start=System.currentTimeMillis();
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+        ResultSet rs = qe.execSelect();
+        return new JsonResultSet(rs);           
+    }
 	
 	private String toTable(ResultSet rs) {
 		String table="";		
