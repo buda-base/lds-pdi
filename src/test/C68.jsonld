@@ -11,11 +11,11 @@
     "@id" : "bdr:C68",
     "@type" : "Corporation",
     "corporationHasMember" : [ {
-      "@type" : "CorporationMemberUnknown",
-      "corporationMember" : "bdr:P6904"
-    }, {
       "@type" : "CorporationMemberBlood",
       "corporationMember" : "bdr:P6905"
+    }, {
+      "@type" : "CorporationMemberUnknown",
+      "corporationMember" : "bdr:P6904"
     } ],
     "note" : {
       "noteText" : {
