@@ -26,7 +26,8 @@ import java.util.Set;
 
 public class TestUtils {
 	
-	final static String TESTDIR = "src/test/";	
+	final static String TESTDIR = "src/test/";
+	final static String TmpDIR = "/tmp";
 	
 	public static String prefixes=
 			 "PREFIX : <http://purl.bdrc.io/ontology/core/> "

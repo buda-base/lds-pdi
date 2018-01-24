@@ -151,10 +151,11 @@ public class LdsTest extends JerseyTest {
                 Object jsonObject=JSONLDFormatter.modelToJsonObject(m, res);
                 FileOutputStream fos=new FileOutputStream(new File(TestUtils.TESTDIR+res+".jsonld"));
                 JSONLDFormatter.jsonObjectToOutputStream(jsonObject, fos);
-                fos.close();            
+                fos.close();                
                 Model json=getModelFromFileName(TestUtils.TESTDIR+res+".jsonld",RDFLanguages.JSONLD);
                 assertTrue(m.isIsomorphicWith(json));
-                
+                File to_delete=new File(TestUtils.TESTDIR+res+".jsonld");
+                to_delete.delete();
                 // Checking Model against QueryProcessor
                 Map<String,String> prefixMap=m.getNsPrefixMap();
                 String prefix=TestUtils.convertToString(prefixMap);
