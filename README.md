@@ -47,7 +47,7 @@ in src/main/webapp/WEB-INF/webdefault.xml set your local values in
 All query templates files are automatically fetched from lds-queries github repository (https://github.com/BuddhistDigitalResourceCenter/lds-queries).
 This repository is being cloned locally to the location specified by the queryPath parameter mentionned above.
 
-You can therefore create, TEST thoroughly (10 times better than one), and share your queries by pushing them to the github repository.
+Any authorized user for the github lds-queries repo can therefore create, TEST thoroughly (10 times better than one), and share your queries by pushing them to the github repository.
 
 Changes will appears after refreshing
 ```
@@ -67,13 +67,25 @@ http://localhost:8080/lds-pdi/index.jsp
 ```
 http://localhost:8080/lds-pdi/ontOverview.jsp
 ```
+#### Access to predefined queries JSON results (POST)
+
+The following get URL (in the browser)  :
+```
+http://buda1.bdrc.io:13280/lds-pdi/query?searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma
+```
+which returns an Html table has its POST equivalent :
+```
+curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://buda1.bdrc.io:13280/lds-pdi/query
+```
+that returns Jsonld results.
+
 
 #### Access to resources graph using turtle serialization
 
 ```
 http://localhost:8080/lds-pdi/query/RES_ID
 ```
-or using curl:
+or using curl (GET):
 
 ```
 curl -v -H "Accept: text/turtle" http://localhost:8080/lds-pdi/query/RES_ID

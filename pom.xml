@@ -195,7 +195,7 @@
 		            <containerIncludeJarPattern>^$</containerIncludeJarPattern> 
                     <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>                               
 	            </webApp>      
-            </configuration>            
+            </configuration>
          </plugin>
          <plugin>
          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->			
