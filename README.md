@@ -84,6 +84,7 @@ It is also possible to post JSON :
 ```
 curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/lds-pdi/query
 ```
+Json results format  is the dfault jena fuseki raw response format : https://www.w3.org/TR/rdf-sparql-json-res/
 
 
 
