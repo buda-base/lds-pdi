@@ -49,7 +49,7 @@ This repository is being cloned locally to the location specified by the queryPa
 
 Any authorized user for the github lds-queries repo can therefore create, TEST thoroughly (10 times better than one), and share your queries by pushing them to the github repository.
 
-Changes will appears after refreshing
+Changes will appear after refreshing
 ```
 http://localhost:8080/lds-pdi/index.jsp
 ```
@@ -77,7 +77,9 @@ which returns an Html table has its POST equivalent :
 ```
 curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://buda1.bdrc.io:13280/lds-pdi/query
 ```
-that returns Jsonld results.
+that returns Jsonld results. NOTE : While curl doesn't require it, you might need to add "Content-Type: application/x-www-form-urlencoded" to your POST request. 
+
+
 
 
 #### Access to resources graph using turtle serialization
