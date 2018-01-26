@@ -77,7 +77,13 @@ which returns an Html table has its POST equivalent :
 ```
 curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://buda1.bdrc.io:13280/lds-pdi/query
 ```
-that returns Jsonld results. NOTE : While curl doesn't require it, you might need to add "Content-Type: application/x-www-form-urlencoded" to your POST request. 
+that returns Jsonld results. NOTE : While curl doesn't require it, you might need to add "Content-Type: application/x-www-form-urlencoded" to your POST request.
+
+#### Posting Json
+It is also possible to post JSON :
+```
+curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/lds-pdi/query
+```
 
 
 
