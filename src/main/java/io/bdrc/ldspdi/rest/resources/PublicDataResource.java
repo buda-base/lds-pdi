@@ -46,6 +46,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
@@ -55,7 +57,6 @@ import org.glassfish.jersey.server.mvc.Viewable;
 
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.json.JsonResultSet;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
@@ -130,8 +131,8 @@ public class PublicDataResource {
         query=InjectionTracker.getValidQuery(q, map); 
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {               
-                        JsonResultSet jrs=processor.getJsonObject(query, fuseki, baseUri);
-                        JSONLDFormatter.jsonObjectToOutputStream(jrs, os);
+                        ResultSet jrs=processor.getJsonObject(query, fuseki);
+                        ResultSetFormatter.outputAsJSON(os, jrs);                        
             }
         };
         return Response.ok(stream,media).build();

@@ -32,7 +32,6 @@ import org.apache.jena.rdf.model.RDFNode;
 
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.json.JsonResultSet;
 
 public class QueryProcessor {
 	
@@ -69,20 +68,17 @@ public class QueryProcessor {
 			ret=toTable(rs);
 		}
 		return ret;		
-	}
-	
-	public JsonResultSet getJsonObject(String query,String fusekiUrl,String baseUri){
-        System.out.println("Processor query select:" +query);
-        this.baseUri=baseUri;
-        String ret="";
+	}	
+		
+	public ResultSet getJsonObject(String query,String fusekiUrl){
+        System.out.println("Processor Json query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        Query q=QueryFactory.create(query);
-        long start=System.currentTimeMillis();
+        Query q=QueryFactory.create(query);        
         QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
         ResultSet rs = qe.execSelect();
-        return new JsonResultSet(rs);           
+        return rs;           
     }
 	
 	private String toTable(ResultSet rs) {

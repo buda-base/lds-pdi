@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.TextProgressMonitor;
@@ -13,7 +12,6 @@ import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class GitService {
     
@@ -59,7 +57,8 @@ public class GitService {
                     .setDirectory(new File(GitService.GIT_LOCAL_PATH))                    
                     .setURI(GitService.GIT_REMOTE_URL)
                     .setProgressMonitor(new TextProgressMonitor()).call();
-            result.checkout().setName("master").call();            
+            result.checkout().setName("master").call(); 
+            result.close();
 
         }
         catch(Exception ex) {

@@ -1,8 +1,5 @@
 package io.bdrc.ldspdi.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /*******************************************************************************
@@ -25,8 +22,6 @@ import java.util.HashMap;
  ******************************************************************************/
 
 import javax.servlet.ServletContextEvent;
-
-import org.apache.commons.io.FileUtils;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ontology.service.core.OntAccess;
