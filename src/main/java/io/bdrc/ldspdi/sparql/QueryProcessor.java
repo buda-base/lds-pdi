@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.sparql;
 
+import java.io.IOException;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -20,7 +22,9 @@ package io.bdrc.ldspdi.sparql;
  ******************************************************************************/
 
 import java.util.List;
+import java.util.SortedMap;
 
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -29,8 +33,16 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.sparql.mgt.Explain.InfoLevel;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.vocabulary.SKOS;
 
-
+import io.bdrc.jena.sttl.CompareComplex;
+import io.bdrc.jena.sttl.ComparePredicates;
+import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
@@ -70,11 +82,11 @@ public class QueryProcessor {
 		return ret;		
 	}	
 		
-	public ResultSet getJsonObject(String query,String fusekiUrl){
+	public ResultSet getResultSet(String query,String fusekiUrl){
         System.out.println("Processor Json query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        }
+        }        
         Query q=QueryFactory.create(query);        
         QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
         ResultSet rs = qe.execSelect();
@@ -177,5 +189,6 @@ public class QueryProcessor {
 		String time="<br><span><b> Returned "+num_res+" results in "+elapsed+" ms</b></span><br><br>";
 		return time+table;
 	}
+	
 
 }

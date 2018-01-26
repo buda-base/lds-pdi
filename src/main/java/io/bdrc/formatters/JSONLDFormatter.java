@@ -138,7 +138,7 @@ public class JSONLDFormatter {
         return getFrameObject(type, mainResourceName);
     }
     
-     static class MigrationComparator implements Comparator<String>
+    static class MigrationComparator implements Comparator<String>
      {
          public int compare(String s1, String s2)
          {

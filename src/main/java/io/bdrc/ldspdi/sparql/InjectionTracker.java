@@ -22,6 +22,10 @@ public class InjectionTracker {
                 converted.put(st, ss);                
             }
         }
+        return getValidQuery(query,converted);
+    }
+    
+    public static String getValidQuery(String query,HashMap<String,String> converted) {
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
         Set<String> s = converted.keySet();        
         for(String st:s) {
@@ -37,5 +41,5 @@ public class InjectionTracker {
             }
         }
         return queryStr.toString();
-    }    
+    }
 }
