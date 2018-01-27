@@ -86,15 +86,6 @@ Ex GET: http://localhost:8080/resource/P1583.jsonld
 Ex POST : curl -X POST http://localhost:8080/resource/P634.rdf
 Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"res":"P1583","ext":"jsonld"}' http://localhost:8080/resource
 ```
-# Query templates
-
-### GET && POST
-/templates (POST requests return JSON format - Jena raw response format - see https://www.w3.org/TR/rdf-sparql-json-res/ )
-```
-Ex GET: http://localhost:8080/resource/templates?searchType=pdi_p_luceneName&L_NAME=klu+sgrub
-Ex POST: curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://localhost:8080/resource/templates
-Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/resource/templates
-```
 
 ##### Supported mime types and file extensions
 
@@ -121,6 +112,15 @@ application/json=rj
 application/json=json
 
 application/trix+xml=trix
+# Query templates
+
+### GET && POST
+/templates (POST requests return JSON format - Jena raw response format - see https://www.w3.org/TR/rdf-sparql-json-res/ )
+```
+Ex GET: http://localhost:8080/resource/templates?searchType=pdi_p_luceneName&L_NAME=klu+sgrub
+Ex POST: curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://localhost:8080/resource/templates
+Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/resource/templates
+```
 
 # Query templates format specifications
 
