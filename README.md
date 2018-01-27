@@ -70,7 +70,7 @@ http://localhost:8080/ontOverview.jsp
 ```
 # Resources
 
-###GET && POST
+### GET && POST
 /resource/{res} 
 
 (returns turtle format by default)
