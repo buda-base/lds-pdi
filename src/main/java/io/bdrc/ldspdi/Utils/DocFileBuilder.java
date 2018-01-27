@@ -1,19 +1,5 @@
 package io.bdrc.ldspdi.Utils;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
-import io.bdrc.ldspdi.Utils.StringHelpers;
-import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -33,23 +19,43 @@ import io.bdrc.ldspdi.sparql.QueryFileParser;
  * limitations under the License.
  ******************************************************************************/
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import io.bdrc.ldspdi.Utils.StringHelpers;
+import io.bdrc.ldspdi.rest.resources.PublicDataResource;
+import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.ldspdi.sparql.QueryFileParser;
+
+
 public class DocFileBuilder {
 	
 	public static String content="";
 	public static HashMap<String,String> specs;
+	public static Logger log=Logger.getLogger(DocFileBuilder.class.getName());
 	
 	
-	
-	public static String getContent(String base) throws IOException{	
-		ArrayList<String> files=getQueryFiles();
-		
+	public static String getContent(String base){	
+	    
+	    log.addHandler(new ConsoleHandler());
+	    ArrayList<String> files=getQueryTemplates();
 		String contents="";
 		specs=new HashMap<>();
 		String LS=System.lineSeparator();
 		
 			for(String file:files) {
 				
-				QueryFileParser qfp=new QueryFileParser(file);
+				QueryFileParser qfp=new QueryFileParser(file);				
 				HashMap<String,String> info=qfp.getMetaInf();
 				String queryScope=info.get(QueryConstants.QUERY_SCOPE);
 				String url=info.get(QueryConstants.QUERY_URL);				
@@ -96,7 +102,7 @@ public class DocFileBuilder {
 		return contents;
 	}
 	
-	public static ArrayList<String> getQueryFiles() {
+	public static ArrayList<String> getQueryTemplates() {
 		ArrayList<String> files=new ArrayList<>();
 		Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");		
 		if (Files.isDirectory(dpath)) {        
@@ -109,7 +115,8 @@ public class DocFileBuilder {
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.log(Level.FINEST, "Error while getting query templates", e);
+                e.printStackTrace();
             }
         }
         return files;		

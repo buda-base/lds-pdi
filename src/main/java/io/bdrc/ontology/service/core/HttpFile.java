@@ -30,17 +30,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import io.bdrc.ldspdi.sparql.QueryFileParser;
 
 public class HttpFile {
+    
+    public static Logger log=Logger.getLogger(HttpFile.class.getName());
 
     public static Reader reader(String link) 
             throws MalformedURLException, IOException
     {
+        log.addHandler(new ConsoleHandler());
         InputStream stream = stream(link);
         if (stream != null) {
             try {
                 return new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             } catch (UnsupportedEncodingException ex) {
+                log.log(Level.FINEST, "HttpFile reader error", ex);
                 return null;
             }
         } else {
@@ -51,6 +60,7 @@ public class HttpFile {
     public static InputStream stream(String link) 
             throws MalformedURLException, IOException
     {
+        
         URL url = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         Map<String, List<String>> headers = connection.getHeaderFields();

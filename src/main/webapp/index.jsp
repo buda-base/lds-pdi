@@ -6,7 +6,7 @@
 String serverName = request.getServerName();
 int portNumber = request.getServerPort();
 GitService.update(request.getServletContext().getInitParameter("queryPath"));
-String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber));
+String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+portNumber+"/resource/templates"));
 
 
 %>
@@ -56,8 +56,8 @@ String content=DocFileBuilder.getContent(new String("http://"+serverName+":"+por
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 
 using this general url format:</p>
-<p>http://server:port/lds-pdi/query/ID</p>
-<p>where ID is a BDRC resource ID (ex. P1583 or W27553)</p>
+<p><a href="http://<%=serverName+":"+portNumber%>/resource/P1583">http://<%=serverName+":"+portNumber%>/resource/P1583</a></p>
+<p>where P1583 is a BDRC resource ID</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center"><%= content %></div>
 <br><br><hr><br>

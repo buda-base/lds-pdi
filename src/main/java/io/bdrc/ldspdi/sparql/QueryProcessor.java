@@ -1,7 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-import java.io.IOException;
-
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -22,9 +20,7 @@ import java.io.IOException;
  ******************************************************************************/
 
 import java.util.List;
-import java.util.SortedMap;
 
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -33,16 +29,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFWriter;
-import org.apache.jena.sparql.mgt.Explain.InfoLevel;
-import org.apache.jena.sparql.util.Context;
-import org.apache.jena.sparql.util.Symbol;
-import org.apache.jena.vocabulary.SKOS;
 
-import io.bdrc.jena.sttl.CompareComplex;
-import io.bdrc.jena.sttl.ComparePredicates;
-import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
@@ -50,7 +37,7 @@ public class QueryProcessor {
 	
 	String baseUri=null;
 	
-	public Model getResource(String resID,String fusekiUrl,String pref){			
+	public Model getResource(String resID,String fusekiUrl){			
 		
 	    String prefixes=ServiceConfig.getPrefixes();
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");

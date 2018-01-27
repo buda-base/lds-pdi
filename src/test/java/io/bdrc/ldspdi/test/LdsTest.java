@@ -160,7 +160,7 @@ public class LdsTest extends JerseyTest {
                 Map<String,String> prefixMap=m.getNsPrefixMap();
                 String prefix=TestUtils.convertToString(prefixMap);
                 QueryProcessor processor=new QueryProcessor();
-                Model mq=processor.getResource(res,fusekiUrl,prefix);
+                Model mq=processor.getResource(res,fusekiUrl);
                 assertTrue(mq.isIsomorphicWith(json));
             }
         }
@@ -241,7 +241,7 @@ public class LdsTest extends JerseyTest {
 		Map<String,String> prefixMap=m.getNsPrefixMap();
 		String prefix=TestUtils.convertToString(prefixMap);
 		
-		Model mq=processor.getResource(res,fusekiUrl,prefix);			
+		Model mq=processor.getResource(res,fusekiUrl);			
 		Model[] ret={m,mq};		
 		return ret;
 	}

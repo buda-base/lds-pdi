@@ -1,14 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
-import io.bdrc.ldspdi.service.ServiceConfig;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -28,14 +19,29 @@ import io.bdrc.ldspdi.service.ServiceConfig;
  * limitations under the License.
  ******************************************************************************/
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import io.bdrc.ldspdi.service.BootClass;
+import io.bdrc.ldspdi.service.ServiceConfig;
+
 public class QueryFileParser {
 	
 	private File queryFile;	
 	private HashMap<String,String> metaInf;
 	private String query;
+	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
 	
 	
-	public QueryFileParser(String filename) throws IOException{		
+	public QueryFileParser(String filename) {
+	    log.addHandler(new ConsoleHandler());
 		metaInf= new HashMap<>();
 		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
 		parseFile();		
@@ -53,28 +59,34 @@ public class QueryFileParser {
 		return metaInf;
 	}
 
-	private void parseFile() throws IOException{
-		
-		BufferedReader br = new BufferedReader(new FileReader(queryFile));		
-		String readLine = "";	
-		query=""; 
-	    while ((readLine = br.readLine()) != null) {	            
-	            readLine=readLine.trim();
-	            if(readLine.startsWith("#")) {
-	            	readLine=readLine.substring(1);
-	            	int index=readLine.indexOf("=");
-	            	if(index!=-1) {
-		            	String info0=readLine.substring(0,index);
-		            	String info1=readLine.substring(index+1);	            	
-		            	metaInf.put(info0,info1);
-	            	}
-	            }
-	            else {
-	            	query=query+" "+readLine;
-	            }
-	            	
+	private void parseFile() {
+		try {
+    		BufferedReader br = new BufferedReader(new FileReader(queryFile));		
+    		String readLine = "";	
+    		query=""; 
+    	    while ((readLine = br.readLine()) != null) {	            
+    	            readLine=readLine.trim();
+    	            if(readLine.startsWith("#")) {
+    	            	readLine=readLine.substring(1);
+    	            	int index=readLine.indexOf("=");
+    	            	if(index!=-1) {
+    		            	String info0=readLine.substring(0,index);
+    		            	String info1=readLine.substring(index+1);	            	
+    		            	metaInf.put(info0,info1);
+    	            	}
+    	            }
+    	            else {
+    	            	query=query+" "+readLine;
+    	            }
+    	            	
+    	   }
+    	   br.close();
 	   }
-	   br.close();
+	   catch(IOException ex){
+	       log.log(Level.FINEST, "QueryFile parsing error", ex);
+	       ex.printStackTrace();
+	   }
+	    
 	}
 	
 	public String getQuery() {

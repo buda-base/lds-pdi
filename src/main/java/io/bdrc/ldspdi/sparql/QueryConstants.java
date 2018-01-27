@@ -1,8 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -21,6 +18,9 @@ import java.util.HashMap;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class QueryConstants {
 	

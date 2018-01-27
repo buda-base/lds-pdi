@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.atlas.lib.Chars;
@@ -59,7 +60,8 @@ public class JSONLDFormatter {
     static final ObjectMapper mapper = new ObjectMapper();
     public static final Map<String,Object> jsonldcontext = getJsonLdContext(); // todo: read the thingy
     public static final String BDR = "http://purl.bdrc.io/resource/";
-    public static Writer logWriter = new PrintWriter(new OutputStreamWriter(System.err));	
+    //public static Writer logWriter = new PrintWriter(new OutputStreamWriter(System.err));	
+    public static Logger log=Logger.getLogger(JSONLDFormatter.class.getName());
     
     public static enum DocType {
 	    CORPORATION,
@@ -111,7 +113,7 @@ public class JSONLDFormatter {
             map = mapper.readValue(inputStream, new TypeReference<Map<String, Map<String,Object>>>(){});
             inputStream.close();
         } catch (Exception e) {
-            writeLog("Error reading context file :"+ e);
+            log.log(Level.FINEST,"Error reading context file :"+ e);
             return null;
         }
         return map.get("@context");
@@ -243,14 +245,6 @@ public class JSONLDFormatter {
              e.printStackTrace();
          }
          IO.flush(wr) ;
-     }
-     
-     static void writeLog(String s) {
-         try {
-             logWriter.write(s+"\n");
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-     }	
+     }     
 }
 

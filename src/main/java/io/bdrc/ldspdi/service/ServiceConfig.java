@@ -31,7 +31,11 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ServiceConfig {
@@ -41,10 +45,12 @@ public class ServiceConfig {
 	public static Writer logWriter;
 	public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
-	public final static String FUSEKI_URL="fusekiUrl";	
+	public final static String FUSEKI_URL="fusekiUrl";
+	public static Logger log=Logger.getLogger(ServiceConfig.class.getName());
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
+	    log.addHandler(new ConsoleHandler());
 	    try {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			// load a properties file
@@ -61,6 +67,7 @@ public class ServiceConfig {
 			}			
 			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
 		} catch (IOException ex) {
+		    log.log(Level.FINEST, "ServiceConfig init error", ex);
 			ex.printStackTrace();
 		}
 	}

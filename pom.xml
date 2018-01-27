@@ -157,12 +157,6 @@
         <artifactId>commons-io</artifactId>
         <version>2.6</version>
     </dependency>
-	<!--  dependency> 
-		<groupId>org.slf4j</groupId> 
-		<artifactId>slf4j-simple</artifactId> 
-		<version>1.7.25</version> 
-		<scope>test</scope> 
-	</dependency-->
     
     <!-- https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit -->
     <dependency>
@@ -190,11 +184,12 @@
             <version>9.4.7.RC0</version>
             <configuration>
 	            <webApp>
-                    <context-path>/lds-pdi</context-path>	            	                
+                    <context-path>/</context-path>	            	                
 		            <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
 		            <containerIncludeJarPattern>^$</containerIncludeJarPattern> 
-                    <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>                               
-	            </webApp>      
+                    <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>  
+                                              
+	            </webApp>
             </configuration>
          </plugin>
          <plugin>

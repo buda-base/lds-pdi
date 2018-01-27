@@ -1,7 +1,29 @@
 package io.bdrc.ldspdi.service;
 
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -9,8 +31,7 @@ import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.FS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 
 public class GitService {
@@ -20,9 +41,10 @@ public class GitService {
     private static Repository localRepo;
    
     
-    static Logger log = LoggerFactory.getLogger(GitService.class);
+    static Logger log = Logger.getLogger(GitService.class.getName());
     
     public static void update(String localPath) {
+        log.addHandler(new ConsoleHandler());
         GIT_LOCAL_PATH=localPath;
         FileRepositoryBuilder builder=new FileRepositoryBuilder();
         File localGit=new File(GitService.GIT_LOCAL_PATH+"/.git");
@@ -42,7 +64,7 @@ public class GitService {
                
             }
             catch(IOException ex) {
-                log.error("Git was unable to setup repository at "+localGit.getPath()+" directory : "+ex.getMessage());
+                log.log(Level.FINEST, "Git was unable to setup repository at "+localGit.getPath()+" directory ", ex);
                 ex.printStackTrace();
             }
             updateRepo();            
@@ -62,7 +84,7 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.error(ex.getClass()+ " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+ex.getMessage());
+            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex);
             ex.printStackTrace();
         }
     }
@@ -76,7 +98,7 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.error(ex.getClass()+ " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+ex.getMessage());
+            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex);
             ex.printStackTrace();
         }
     }

@@ -1,7 +1,5 @@
 package io.bdrc.ldspdi.service;
 
-import java.util.HashMap;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -23,6 +21,11 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContextEvent;
 
+import java.util.HashMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ontology.service.core.OntAccess;
 
@@ -30,13 +33,15 @@ import io.bdrc.ontology.service.core.OntAccess;
 
 public class BootClass implements javax.servlet.ServletContextListener{
 	
-	public void contextDestroyed(ServletContextEvent arg0) {
+    public static Logger log=Logger.getLogger(BootClass.class.getName());
+    
+    public void contextDestroyed(ServletContextEvent arg0) {
         //Do nothing;
     }
  
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            
+            log.addHandler(new ConsoleHandler());
             String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
             String queryPath=arg0.getServletContext().getInitParameter("queryPath");
             HashMap<String,String> params=new HashMap<>();            
@@ -49,6 +54,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
              
         } 
         catch (IllegalArgumentException e) {
+            log.log(Level.FINEST, "BootClass init error", e);
             e.printStackTrace();
         }
         
