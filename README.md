@@ -59,53 +59,43 @@ http://localhost:8080/lds-pdi/index.jsp
 ```
 mvn jetty:run
 ```
-#### Access to predefined queries
+# Home page
 ```
-http://localhost:8080/lds-pdi/index.jsp
+http://localhost:8080/index.jsp
 ```
-#### Access to ontology browsing service
-```
-http://localhost:8080/lds-pdi/ontOverview.jsp
-```
-#### Access to predefined queries JSON results (POST)
 
-The following get URL (in the browser)  :
+# Ontology browsing service page
 ```
-http://buda1.bdrc.io:13280/lds-pdi/query?searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma
+http://localhost:8080/ontOverview.jsp
 ```
-which returns an Html table has its POST equivalent :
-```
-curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://buda1.bdrc.io:13280/lds-pdi/query
-```
-that returns Jsonld results. NOTE : While curl doesn't require it, you might need to add "Content-Type: application/x-www-form-urlencoded" to your POST request.
+# Resources
 
-#### Posting Json
-It is also possible to post JSON :
-```
-curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/lds-pdi/query
-```
-Json results format  is the dfault jena fuseki raw response format : https://www.w3.org/TR/rdf-sparql-json-res/
+###GET && POST
+/resource/{res} 
 
-
-
-
-#### Access to resources graph using turtle serialization
-
+(returns turtle format by default)
 ```
-http://localhost:8080/lds-pdi/query/RES_ID
+Ex GET: http://localhost:8080/resource/P1583
+Ex POST: curl -X POST http://localhost:8080/resource/P1583
 ```
-or using curl (GET):
+/resource/{res}.{ext}
 
+(returns format according to extensions {ext} - see below for supported formats/ext mapping)
 ```
-curl -v -H "Accept: text/turtle" http://localhost:8080/lds-pdi/query/RES_ID
+Ex GET: http://localhost:8080/resource/P1583.jsonld
+Ex POST : curl -X POST http://localhost:8080/resource/P634.rdf
+Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"res":"P1583","ext":"jsonld"}' http://localhost:8080/resource
 ```
-Ex:
-http://localhost:8080/lds-pdi/query/W1EE12
+# Query templates
 
-#### Access to resources graph using other formats
+### GET && POST
+/templates (POST requests return JSON format - Jena raw response format - see https://www.w3.org/TR/rdf-sparql-json-res/ )
 ```
-http://localhost:8080/lds-pdi/query/RES_ID.{ext}
+Ex GET: http://localhost:8080/resource/templates?searchType=pdi_p_luceneName&L_NAME=klu+sgrub
+Ex POST: curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://localhost:8080/resource/templates
+Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/resource/templates
 ```
+
 ##### Supported mime types and file extensions
 
 text/turtle=ttl (default : processed by BDRC STTLWriter)
@@ -132,7 +122,7 @@ application/json=json
 
 application/trix+xml=trix
 
-# Query templates
+# Query templates format specifications
 
 This framework will automatically add new sparql query templates to the index page based on files published to the « /local/dir/queries » directory.
 
