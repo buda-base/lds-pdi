@@ -1,0 +1,3 @@
+[submodule "src/main/submodule"]
+	path = src/main/submodule
+	url = https://github.com/BuddhistDigitalResourceCenter/owl-schema.git
