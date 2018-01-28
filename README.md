@@ -133,7 +133,7 @@ New query files must have the .arq extension and are formatted as follows :
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and the name of the place whose name contains the L_NAME param value
 #QueryParams=L_NAME
-#QueryUrl=/lds-pdi/query?searchType=pdi_pl_name&L_NAME=dgon gsar
+#QueryUrl=?searchType=pdi_pl_name&L_NAME=dgon gsar
 
 select ?Place_ID ?Place_Name
 where {
@@ -180,7 +180,7 @@ will go through without any issue.
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching skos:prefLabel for the given query and language tag with the given limit
 #QueryParams=L_NAME,L_LANG,I_LIM
-#QueryUrl=/lds-pdi/query?searchType=pdi_any_luceneLabel&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+#QueryUrl=?searchType=pdi_any_luceneLabel&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
 
 
 select distinct ?s ?lit
@@ -197,7 +197,7 @@ Note : the @ is now part of the L_LANG literal parameter and is not part of the
 #QueryReturnType=Table
 #QueryResults=All the detailed admin info (notes, status, log entries) about the person data
 #QueryParams=R_RES
-#QueryUrl=/lds-pdi/query?searchType=pdi_p_adminDetails&R_RES=P1583
+#QueryUrl=?searchType=pdi_p_adminDetails&R_RES=P1583
 
 
 select distinct
