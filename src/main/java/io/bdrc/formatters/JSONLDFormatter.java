@@ -6,11 +6,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -109,11 +113,12 @@ public class JSONLDFormatter {
         Map<String, Map<String,Object>> map = null;
         try {
             ClassLoader classLoader = JSONLDFormatter.class.getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream("context.jsonld");
+            InputStream inputStream = classLoader.getResourceAsStream("context.jsonld");            
             map = mapper.readValue(inputStream, new TypeReference<Map<String, Map<String,Object>>>(){});
             inputStream.close();
         } catch (Exception e) {
             log.log(Level.FINEST,"Error reading context file :"+ e);
+            e.printStackTrace();
             return null;
         }
         return map.get("@context");
@@ -245,6 +250,7 @@ public class JSONLDFormatter {
              e.printStackTrace();
          }
          IO.flush(wr) ;
-     }     
+     } 
+     
 }
 

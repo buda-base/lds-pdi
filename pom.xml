@@ -198,10 +198,7 @@
 			<artifactId>maven-war-plugin</artifactId>
 			<version>3.2.0</version>
 			<configuration>
-                <packagingExcludes>src/main/resources/owl-schema/i18/*</packagingExcludes>
-                <packagingExcludes>src/main/resources/owl-schema/reasoning/*</packagingExcludes>
-                <packagingExcludes>src/main/resources/owl-schema/resources/*</packagingExcludes>
-		        <attachClasses>true</attachClasses>
+                <attachClasses>true</attachClasses>
 		        <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 		        <webResources>
 		            <resource>
@@ -210,7 +207,7 @@
 		            </resource>
 		            <resource>
 		                <directory>src/main/resources</directory>		                		                
-		            </resource>	            
+		            </resource>                              
 		        </webResources>                
 		    </configuration>            
          </plugin>
