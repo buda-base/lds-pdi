@@ -59,14 +59,14 @@ http://localhost:8080/lds-pdi/index.jsp
 ```
 mvn jetty:run
 ```
-# Home page
+# Home demo page
 ```
-http://localhost:8080/index.jsp
+http://localhost:8080/demo/index.jsp
 ```
 
-# Ontology browsing service page
+# Ontology browsing service demo page
 ```
-http://localhost:8080/ontOverview.jsp
+http://localhost:8080/demo/ontOverview.jsp
 ```
 # Resources
 

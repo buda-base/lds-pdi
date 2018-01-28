@@ -21,6 +21,8 @@ package io.bdrc.ldspdi.service;
 
 import javax.servlet.ServletContextEvent;
 
+import org.glassfish.jersey.server.ResourceConfig;
+
 import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -49,7 +51,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
             params.put("fusekiUrl",fuseki);            
             GitService.update(queryPath);
             ServiceConfig.init(params); 
-            OntAccess.init();
+            OntAccess.init();            
         } 
         catch (IllegalArgumentException e) {
             log.log(Level.FINEST, "BootClass init error", e);

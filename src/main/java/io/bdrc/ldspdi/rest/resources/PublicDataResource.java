@@ -48,6 +48,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
+import org.glassfish.jersey.server.mvc.Template;
 import org.glassfish.jersey.server.mvc.Viewable;
 
 import io.bdrc.formatters.JSONLDFormatter;
@@ -74,7 +75,7 @@ public class PublicDataResource {
     }
 
     @GET
-    @Path("/{res}") 
+    @Path("/resource/{res}") 
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
         @HeaderParam("fusekiUrl") final String fuseki,
@@ -103,7 +104,7 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/{res}") 
+    @Path("/resource/{res}") 
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
@@ -133,7 +134,7 @@ public class PublicDataResource {
     }
      
     @GET
-    @Path("/{res}.{ext}")   
+    @Path("/resource/{res}.{ext}")   
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
@@ -172,7 +173,7 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/{res}.{ext}")
+    @Path("/resource/{res}.{ext}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getFormattedResourceGraphPost(
             @PathParam("res") final String res, 
@@ -212,7 +213,7 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/")
+    @Path("/resource")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getFormattedResourceGraphJsonPost(            
             HashMap<String,String> map,
@@ -247,16 +248,9 @@ public class PublicDataResource {
         return Response.ok(stream,media).build();       
     }
        
-    @GET
-    @Path("/ontology")
-    @Produces("text/html")
-    public Response getOntologyClassView(@QueryParam("classUri") String uri) {
-        log.info("Call to getOntologyClassView()");
-        MediaType media=new MediaType("text","html","utf-8");       
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("model", new OntClassModel(uri)); 
-        return Response.ok(new Viewable("/ontClass.jsp", map),media).build();        
-    }
+    
+    
+    
     
     public MediaType getMediaType(String format){
         String[] parts=format.split(Pattern.quote("/"));

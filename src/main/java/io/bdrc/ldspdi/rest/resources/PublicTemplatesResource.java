@@ -55,7 +55,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     public String fusekiUrl="";
     
     @GET
-    @Path("/templates")
+    @Path("/resource/templates")
     public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
         
         log.info("Call to getQueryTemplateResults()");
@@ -90,7 +90,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     } 
     
     @POST 
-    @Path("/templates")
+    @Path("/resource/templates")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getQueryTemplateResultsPost(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -122,7 +122,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     }
     
     @POST 
-    @Path("/templates")
+    @Path("/resource/templates")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getQueryTemplateResultsJsonPost(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
