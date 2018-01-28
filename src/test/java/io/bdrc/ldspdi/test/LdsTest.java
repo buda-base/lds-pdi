@@ -196,7 +196,7 @@ public class LdsTest extends JerseyTest {
 				if(!fmt.equals("ttl") && !fmt.equals("jsonld") ){							
 					
 					String ct1=TestUtils.getContentTypes().get(fmt);			
-					Response output = target("/"+res+"."+fmt)
+					Response output = target("/resource/"+res+"."+fmt)
 							.request()
 							.header("fusekiUrl", fusekiUrl)
 							.get();
@@ -213,7 +213,7 @@ public class LdsTest extends JerseyTest {
 		for(String res : resList){
 			for(String ct: cts){
 				if(!ct.equals("text/turtle") && !ct.equals("application/ld+json")) {
-					Response output = target("/"+res)
+					Response output = target("/resource/"+res)
 							.request()
 							.header("fusekiUrl", fusekiUrl)
 							.header("Accept", ct)
@@ -249,7 +249,7 @@ public class LdsTest extends JerseyTest {
 		
 		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
 		Model m_rest = ModelFactory.createDefaultModel();
-		Response output = target("/"+res).request().header("fusekiUrl", fusekiUrl).get();
+		Response output = target("/resource/"+res).request().header("fusekiUrl", fusekiUrl).get();
 		String resp=output.readEntity(String.class).trim();		
 		ByteArrayInputStream is=new ByteArrayInputStream(resp.getBytes());
 		m_rest.read(is,null,"TURTLE");
@@ -271,7 +271,7 @@ public class LdsTest extends JerseyTest {
 		String prefix=TestUtils.convertToString(prefixMap);
 		
 		Model m_rest = ModelFactory.createDefaultModel();
-		Response output = target("/"+res)
+		Response output = target("/resource/"+res)
 				.request()
 				.header("fusekiUrl", fusekiUrl)
 				.header("prefix", prefix)
