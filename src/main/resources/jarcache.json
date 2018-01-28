@@ -1,7 +1,0 @@
-[
-  {
-    "Content-Location": "http://purl.bdrc.io/context.jsonld",
-    "X-Classpath": "context.jsonld",
-    "Content-Type": "application/ld+json"
-  }
-]

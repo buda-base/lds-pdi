@@ -50,8 +50,6 @@ public class BootClass implements javax.servlet.ServletContextListener{
             GitService.update(queryPath);
             ServiceConfig.init(params); 
             OntAccess.init();
-            
-             
         } 
         catch (IllegalArgumentException e) {
             log.log(Level.FINEST, "BootClass init error", e);
@@ -59,18 +57,5 @@ public class BootClass implements javax.servlet.ServletContextListener{
         }
         
     }
-    
-    private String initParamsString(String qPath,String f_server) {
-        String params="<context-param>\n" + 
-                "    <param-name>fuseki</param-name>\n" + 
-                "    <param-value>"+f_server+"</param-value>\n" + 
-                "</context-param>\n" + 
-                "<context-param>\n" + 
-                "    <param-name>queryPath</param-name>\n" + 
-                "    <param-value>"+qPath+"</param-value>\n" + 
-                "</context-param>";
-        return params;
-    }
-    
 
 }

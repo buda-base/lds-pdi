@@ -156,9 +156,7 @@ public class LdsTest extends JerseyTest {
                 assertTrue(m.isIsomorphicWith(json));
                 File to_delete=new File(TestUtils.TESTDIR+res+".jsonld");
                 to_delete.delete();
-                // Checking Model against QueryProcessor
-                Map<String,String> prefixMap=m.getNsPrefixMap();
-                String prefix=TestUtils.convertToString(prefixMap);
+                // Checking Model against QueryProcessor                              
                 QueryProcessor processor=new QueryProcessor();
                 Model mq=processor.getResource(res,fusekiUrl);
                 assertTrue(mq.isIsomorphicWith(json));
@@ -237,10 +235,7 @@ public class LdsTest extends JerseyTest {
 		
 		QueryProcessor processor=new QueryProcessor();
 		
-		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);
-		Map<String,String> prefixMap=m.getNsPrefixMap();
-		String prefix=TestUtils.convertToString(prefixMap);
-		
+		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
 		Model mq=processor.getResource(res,fusekiUrl);			
 		Model[] ret={m,mq};		
 		return ret;

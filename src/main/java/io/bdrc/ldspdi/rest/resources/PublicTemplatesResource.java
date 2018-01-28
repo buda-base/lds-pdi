@@ -77,6 +77,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
+        log.info("Query before Injection Tracking -->"+filename+".arq"+System.lineSeparator()+q);
         query=InjectionTracker.getValidQuery(q, mp);            
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {

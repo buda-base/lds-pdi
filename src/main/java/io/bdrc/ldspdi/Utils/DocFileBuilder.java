@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.bdrc.ldspdi.Utils.StringHelpers;
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;

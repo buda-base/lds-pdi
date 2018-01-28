@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import io.bdrc.ldspdi.service.BootClass;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryFileParser {

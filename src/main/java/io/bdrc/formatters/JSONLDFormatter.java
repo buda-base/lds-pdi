@@ -2,19 +2,15 @@ package io.bdrc.formatters;
 
 import java.io.IOException;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -112,10 +108,8 @@ public class JSONLDFormatter {
     public static Map<String,Object> getJsonLdContext() {
         Map<String, Map<String,Object>> map = null;
         try {
-            ClassLoader classLoader = JSONLDFormatter.class.getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream("context.jsonld");            
-            map = mapper.readValue(inputStream, new TypeReference<Map<String, Map<String,Object>>>(){});
-            inputStream.close();
+            URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
+            map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});                       
         } catch (Exception e) {
             log.log(Level.FINEST,"Error reading context file :"+ e);
             e.printStackTrace();
@@ -232,7 +226,7 @@ public class JSONLDFormatter {
          try {
              tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, base, ctx);
              // replacing context with URI
-             tm.replace("@context", "http://purl.bdrc.io/context.jsonld");
+             //tm.replace("@context", "http://purl.bdrc.io/context.jsonld");
              tm = orderEntries(tm);
          } catch (JsonLdError | IOException e) {
              e.printStackTrace();

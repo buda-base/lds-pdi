@@ -39,12 +39,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -58,8 +55,6 @@ import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.InjectionTracker;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ontology.service.core.OntClassModel;
 
