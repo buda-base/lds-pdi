@@ -244,7 +244,7 @@ returns JSON objects of the form
 ```
 Where descLink is a link to the JSON query template representation.
 
-## Query templates descrition
+## Query templates description
 ```
 GET or POST: http://localhost:8080/queries/{template_name}
 ```
