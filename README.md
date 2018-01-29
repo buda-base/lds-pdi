@@ -47,7 +47,7 @@ in src/main/webapp/WEB-INF/webdefault.xml set your local values in
 All query templates files are automatically fetched from lds-queries github repository (https://github.com/BuddhistDigitalResourceCenter/lds-queries).
 This repository is being cloned locally to the location specified by the queryPath parameter mentionned above.
 
-Any authorized user for the github lds-queries repo can therefore create, TEST thoroughly (10 times better than one), and share your queries by pushing them to the github repository.
+Any authorized user for the github lds-queries repo can therefore create, TEST thoroughly (10 times better than one), and share queries by pushing them to the github repository.
 
 Changes will appear after refreshing
 ```
@@ -229,6 +229,20 @@ where {
 	}
 }
 ```
+
+# JSON API
+
+## Available query templates
+
+```
+GET or POST: http://localhost:8080/queries
+```
+
+return JSON objects of the form
+```
+{"name":"Lineage_list","descLink":"http://localhost:8080/queries/Lineage_list"}
+```
+Where descLink is a link to the JSON query template representation.
 
 # Copyright and License
 
