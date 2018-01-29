@@ -238,12 +238,29 @@ where {
 GET or POST: http://localhost:8080/queries
 ```
 
-return JSON objects of the form
+returns JSON objects of the form
 ```
 {"name":"Lineage_list","descLink":"http://localhost:8080/queries/Lineage_list"}
 ```
 Where descLink is a link to the JSON query template representation.
 
+## Query templates descrition
+```
+GET or POST: http://localhost:8080/queries/{template_name}
+```
+returns JSON queryTemplate object :
+```
+{ 
+  "name" : "Lineage_list", 
+  "queryScope" : "Lineage", 
+  "queryResults" : "the list (Id, name) of all lineages",
+  "queryReturn" : "Table", 
+  "queryParams" : "NONE", 
+  "queryString" : "?searchType=Lineage_list", 
+  "template" : " SELECT DISTINCT ?lineage ?lineage_name WHERE { ?lineage a :Lineage . ?lineage skos:prefLabel ?lineage_name . }", 
+  "demoLink" : "http://localhost:8080/resource/templates?searchType=Lineage_list" 
+}
+```
 # Copyright and License
 
 All the code and API are Copyright (C) 2017 Buddhist Digital Resource Center and are under the Apache 2.0 Public License.

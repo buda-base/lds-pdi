@@ -36,6 +36,7 @@ public class QueryFileParser {
 	private File queryFile;	
 	private HashMap<String,String> metaInf;
 	private String query;
+	private String queryName;
 	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
 	
 	
@@ -43,6 +44,7 @@ public class QueryFileParser {
 	    log.addHandler(new ConsoleHandler());
 		metaInf= new HashMap<>();
 		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
+		queryName=filename.substring(0,filename.lastIndexOf("."));
 		parseFile();		
 	}
 	
@@ -50,9 +52,13 @@ public class QueryFileParser {
 	public QueryFileParser(String queryPath, String filename) throws IOException{        
         metaInf= new HashMap<>();
         this.queryFile = new File(queryPath+filename);
+        queryName=filename.substring(0,filename.lastIndexOf("."));
         parseFile();        
     }
 	
+	public String getTemplateName() {
+	    return this.queryName;
+	}
 	
 	public HashMap<String, String> getMetaInf() {
 		return metaInf;

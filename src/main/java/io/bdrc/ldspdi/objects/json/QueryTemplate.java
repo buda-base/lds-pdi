@@ -1,25 +1,29 @@
 package io.bdrc.ldspdi.objects.json;
 
-public class QueryTemplateModel {
+public class QueryTemplate {
     
     String name;
     String queryScope;
     String queryResults;
+    String queryReturn;
     String queryParams;
-    String queryUrl;
+    String queryString;
     String template;
+    String demoLink;
     
     
     
-    public QueryTemplateModel(String name, String queryScope, String queryResults, String queryParams,
-            String queryUrl, String template) {
+    public QueryTemplate(String name, String demoLink, String queryScope, String queryResults, String queryReturn, String queryParams,
+            String queryString, String template) {
         super();
         this.name = name;
         this.queryScope = queryScope;
         this.queryResults = queryResults;
+        this.queryReturn = queryReturn;
         this.queryParams = queryParams;
-        this.queryUrl = queryUrl;
+        this.queryString = queryString;
         this.template = template;
+        this.demoLink = demoLink;
     }
     public String getName() {
         return name;
@@ -45,17 +49,30 @@ public class QueryTemplateModel {
     public void setQueryParams(String queryParams) {
         this.queryParams = queryParams;
     }
-    public String getQueryUrl() {
-        return queryUrl;
+    
+    public String getQueryString() {
+        return queryString;
     }
-    public void setQueryUrl(String queryUrl) {
-        this.queryUrl = queryUrl;
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
     }
     public String getTemplate() {
         return template;
     }
     public void setTemplate(String template) {
         this.template = template;
+    }
+    public String getQueryReturn() {
+        return queryReturn;
+    }
+    public void setQueryReturn(String queryReturn) {
+        this.queryReturn = queryReturn;
+    }
+    public String getDemoLink() {
+        return demoLink;
+    }
+    public void setDemoLink(String demoLink) {
+        this.demoLink = demoLink;
     }
     
 }
