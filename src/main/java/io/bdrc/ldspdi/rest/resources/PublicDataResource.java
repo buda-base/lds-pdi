@@ -51,6 +51,10 @@ import org.apache.jena.vocabulary.SKOS;
 import org.glassfish.jersey.server.mvc.Template;
 import org.glassfish.jersey.server.mvc.Viewable;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
@@ -72,6 +76,22 @@ public class PublicDataResource {
     public PublicDataResource() {
         super();
         log.addHandler(new ConsoleHandler());
+    }
+    
+    @GET 
+    @Path("/context.jsonld")
+    @Produces(MediaType.TEXT_HTML)    
+    public String getJsonContext() throws IOException{
+        log.info("Call to getJsonContext()"); 
+        return ServiceConfig.JSONLD_CONTEXT_HTML;         
+    } 
+    
+    @POST 
+    @Path("/context.jsonld")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String postJsonContext() throws JsonProcessingException{
+        log.info("Call to getJsonContext()");    
+        return ServiceConfig.JSONLD_CONTEXT;         
     }
 
     @GET
@@ -247,10 +267,7 @@ public class PublicDataResource {
         };
         return Response.ok(stream,media).build();       
     }
-       
-    
-    
-    
+        
     
     public MediaType getMediaType(String format){
         String[] parts=format.split(Pattern.quote("/"));

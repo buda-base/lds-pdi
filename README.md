@@ -68,6 +68,11 @@ http://localhost:8080/demo/index.jsp
 ```
 http://localhost:8080/demo/ontOverview.jsp
 ```
+
+# Json Context of lds-pdi
+```
+GET or POST: http://localhost:8080/context.jsonld
+```
 # Resources
 
 ### GET && POST
@@ -112,6 +117,7 @@ application/json=rj
 application/json=json
 
 application/trix+xml=trix
+
 # Query templates
 
 ### GET && POST

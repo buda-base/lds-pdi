@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.BufferedReader;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -21,13 +23,19 @@ package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -46,6 +54,8 @@ public class ServiceConfig {
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public static Logger log=Logger.getLogger(ServiceConfig.class.getName());
+	public static String JSONLD_CONTEXT_HTML;
+	public static String JSONLD_CONTEXT;
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
@@ -65,7 +75,10 @@ public class ServiceConfig {
 				mime.add(st.nextToken());
 			}			
 			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
-		} catch (IOException ex) {
+			JSONLD_CONTEXT_HTML=setJsonLDContext(true);	
+			JSONLD_CONTEXT=setJsonLDContext(false);
+			
+	    } catch (IOException ex) {
 		    log.log(Level.FINEST, "ServiceConfig init error", ex);
 			ex.printStackTrace();
 		}
@@ -87,6 +100,25 @@ public class ServiceConfig {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+	
+	private static String setJsonLDContext(boolean html) throws MalformedURLException, IOException {
+        
+	    URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();        
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String st="";
+        String JSONLD_CONTEXT_HTML="";
+        String line="";
+        while ((line = in.readLine()) != null) {
+            if(html) {
+                st=st+line+"<br>";
+            }else {
+                st=st+line;
+            }
+        }
+        in.close();        
+        return st;
     }
 	
 	public static boolean isValidMime(String mimeString){
