@@ -81,17 +81,30 @@ public class PublicDataResource {
     @GET 
     @Path("/context.jsonld")
     @Produces(MediaType.TEXT_HTML)    
-    public String getJsonContext() throws IOException{
+    public Response getJsonContext() throws IOException{
         log.info("Call to getJsonContext()"); 
-        return ServiceConfig.JSONLD_CONTEXT_HTML;         
+        //return ServiceConfig.JSONLD_CONTEXT_HTML; 
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                // when prefix is null, QueryProcessor default prefix is used
+                JSONLDFormatter.jsonObjectToOutputStream(ServiceConfig.JSONLD_CONTEXT, os);                                 
+            }
+        };
+        return Response.ok(stream).build(); 
     } 
     
     @POST 
     @Path("/context.jsonld")
     @Produces(MediaType.APPLICATION_JSON)
-    public String postJsonContext() throws JsonProcessingException{
+    public Response postJsonContext() throws JsonProcessingException{
         log.info("Call to getJsonContext()");    
-        return ServiceConfig.JSONLD_CONTEXT;         
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                // when prefix is null, QueryProcessor default prefix is used
+                JSONLDFormatter.jsonObjectToOutputStream(ServiceConfig.JSONLD_CONTEXT, os);                                 
+            }
+        };
+        return Response.ok(stream).build();          
     }
 
     @GET
