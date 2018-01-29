@@ -3,8 +3,6 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <% 
-String serverName = request.getServerName();
-int portNumber = request.getServerPort();
 GitService.update(request.getServletContext().getInitParameter("queryPath"));
 String content=DocFileBuilder.getContent(new String("/resource/templates"));
 
@@ -51,12 +49,12 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
     
 <h2>Navigate through BDRC Ontology</h2>
 <p>You can use this service to access the current BDRC ontology and discover the data model:</p>
-<p><a href="ontOverview.jsp">Ontology service</a></p>
+<p><a href="/demo/ontOverview.jsp">Ontology service</a></p>
 
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 
 using this general url format:</p>
-<p><a href="http://<%=serverName+":"+portNumber%>/resource/P1583">http://<%=serverName+":"+portNumber%>/resource/P1583</a></p>
+<p><a href="/resource/P1583">http://serverName:portNumber/resource/P1583</a></p>
 <p>where P1583 is a BDRC resource ID</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center"><%= content %></div>

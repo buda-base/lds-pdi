@@ -58,8 +58,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     @Path("/resource/templates")
     public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
         
-        log.info("Call to getQueryTemplateResults()");
-        String baseUri=info.getBaseUri().toString();    
+        log.info("Call to getQueryTemplateResults()");           
         if(fuseki !=null){
             fusekiUrl=fuseki;
         }else {
@@ -82,7 +81,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                // when prefix is null, QueryProcessor default prefix is used
-                String res=processor.getResource(query, fusekiUrl, true,baseUri);
+                String res=processor.getResource(query, fusekiUrl, true);
                 os.write(res.getBytes());
             }
         };

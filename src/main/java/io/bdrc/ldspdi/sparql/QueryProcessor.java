@@ -32,10 +32,8 @@ import org.apache.jena.rdf.model.RDFNode;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 
-public class QueryProcessor {
+public class QueryProcessor {	
 	
-	
-	String baseUri=null;
 	
 	public Model getResource(String resID,String fusekiUrl){			
 		
@@ -48,9 +46,8 @@ public class QueryProcessor {
 		return model;		
 	}
 	
-	public String getResource(String query,String fusekiUrl,boolean html,String baseUri){
-		System.out.println("Processor query select:" +query);
-		this.baseUri=baseUri;
+	public String getResource(String query,String fusekiUrl,boolean html){
+		System.out.println("Processor query select:" +query);		
 	    String ret="";
 		if(fusekiUrl == null) {
 		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -131,11 +128,7 @@ public class QueryProcessor {
 							table=table+" style=\"background-color: #f2f2f2;\"";
 						}
 						if(index==0) {
-							if(baseUri==null) {
-							table=table+"><a href=\"lookup/query/";
-							}else {
-								table=table+"><a href=\""+baseUri;	
-							}
+							table=table+"><a href=\"/resource/";
 							if(qs.get(str).asNode().isBlank()) {
 								table=table+qs.get(str).asNode().getBlankNodeLabel()+"\"> "
 								+qs.get(str).asNode().getBlankNodeLabel()+"</a></td>";

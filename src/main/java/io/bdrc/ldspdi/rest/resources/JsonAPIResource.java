@@ -21,7 +21,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
@@ -47,12 +46,12 @@ public class JsonAPIResource {
     @GET 
     @Path("/queries")
     @Produces(MediaType.TEXT_HTML)    
-    public Response queriesListGet(@Context UriInfo info) {
+    public Response queriesListGet() {
         log.info("Call to queriesListGet()");               
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                ArrayList<QueryListItem> queryList=getQueryListItems(info.getBaseUri().toString(),fileList);
+                ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
                 log.info(queryList.toString());
                 JSONLDFormatter.jsonObjectToOutputStream(queryList, os);                                 
             }
@@ -63,9 +62,9 @@ public class JsonAPIResource {
     @POST 
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)    
-    public ArrayList<QueryListItem> queriesListPost(@Context UriInfo info) {
+    public ArrayList<QueryListItem> queriesListPost() {
         log.info("Call to queriesListPost()"); 
-        ArrayList<QueryListItem> queryList=getQueryListItems(info.getBaseUri().toString(),fileList);
+        ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
         log.info(queryList.toString());
         return queryList;
     }
@@ -73,7 +72,7 @@ public class JsonAPIResource {
     @GET 
     @Path("/queries/{template}")
     @Produces(MediaType.TEXT_HTML)    
-    public Response queryDescGet(@Context UriInfo info,@PathParam("template") String name) {
+    public Response queryDescGet(@PathParam("template") String name) {
         log.info("Call to queriesListGet()");               
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -82,7 +81,7 @@ public class JsonAPIResource {
                 HashMap<String, String> meta=qfp.getMetaInf();
                 QueryTemplate qt= new QueryTemplate(
                         qfp.getTemplateName(),
-                        info.getBaseUri()+"resource/templates"+meta.get(QueryConstants.QUERY_URL),
+                        "/resource/templates"+meta.get(QueryConstants.QUERY_URL),
                         meta.get(QueryConstants.QUERY_SCOPE),
                         meta.get(QueryConstants.QUERY_RESULTS),
                         meta.get(QueryConstants.QUERY_RETURN_TYPE),
@@ -98,13 +97,13 @@ public class JsonAPIResource {
     @POST 
     @Path("/queries/{template}")
     @Produces(MediaType.APPLICATION_JSON)    
-    public QueryTemplate queryDescPost(@Context UriInfo info,@PathParam("template") String name) {
+    public QueryTemplate queryDescPost(@PathParam("template") String name) {
         log.info("Call to queriesListGet()");               
         QueryFileParser qfp=new QueryFileParser(name);
         HashMap<String, String> meta=qfp.getMetaInf();
         QueryTemplate qt= new QueryTemplate(
                 qfp.getTemplateName(),
-                info.getBaseUri()+"resource/templates"+meta.get(QueryConstants.QUERY_URL),
+                "/resource/templates"+meta.get(QueryConstants.QUERY_URL),
                 meta.get(QueryConstants.QUERY_SCOPE),
                 meta.get(QueryConstants.QUERY_RESULTS),
                 meta.get(QueryConstants.QUERY_RETURN_TYPE),
@@ -115,11 +114,10 @@ public class JsonAPIResource {
         return qt;        
     }
     
-    private ArrayList<QueryListItem> getQueryListItems(String baseUri,ArrayList<String> filesList){
+    private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList){
         ArrayList<QueryListItem> items=new ArrayList<>();        
         for(String file:fileList) {
-            //String filename=file.substring(0, file.lastIndexOf("."));
-            QueryListItem qli=new QueryListItem(file,baseUri+"queries/"+file);
+            QueryListItem qli=new QueryListItem(file,"/queries/"+file);
             items.add(qli);
         }
         return items;

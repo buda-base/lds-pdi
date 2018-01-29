@@ -51,7 +51,7 @@ Any authorized user for the github lds-queries repo can therefore create, TEST t
 
 Changes will appear after refreshing
 ```
-http://localhost:8080/lds-pdi/index.jsp
+http://localhost:8080/index.jsp
 ```
 
 # Running
@@ -61,7 +61,7 @@ mvn jetty:run
 ```
 # Home demo page
 ```
-http://localhost:8080/demo/index.jsp
+http://localhost:8080/index.jsp
 ```
 
 # Ontology browsing service demo page
