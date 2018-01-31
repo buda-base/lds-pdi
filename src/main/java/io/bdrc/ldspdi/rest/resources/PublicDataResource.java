@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
@@ -48,12 +47,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
-import org.glassfish.jersey.server.mvc.Template;
-import org.glassfish.jersey.server.mvc.Viewable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
@@ -61,7 +56,7 @@ import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ontology.service.core.OntClassModel;
+
 
 @Path("/")
 public class PublicDataResource {

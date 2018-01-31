@@ -121,11 +121,51 @@ application/trix+xml=trix
 # Query templates
 
 ### GET && POST
-/templates (POST requests return JSON format - Jena raw response format - see https://www.w3.org/TR/rdf-sparql-json-res/ )
+/templates : POST requests return the following JSON format :
 ```
-Ex GET: http://localhost:8080/resource/templates?searchType=pdi_p_luceneName&L_NAME=klu+sgrub
-Ex POST: curl --data "searchType=pdi_w_bibli&L_NAME=rgyud+bla+ma" http://localhost:8080/resource/templates
-Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"searchType":"pdi_w_bibli","L_NAME":"chos dbyings bstod pa"}' http://localhost:8080/resource/templates
+{
+  "execTime" : 461,
+  "numResults" : 81,
+  "headers" : [ "s", "lit" ],
+  "rows" : [ {
+    "dataRow" : {
+      "s" : "http://purl.bdrc.io/resource/P0RK26",
+      "lit" : "mkhan chen 'od zer dpal/@bo-x-ewts"
+    }
+  },
+ .... more datRows
+  {
+    "dataRow" : {
+      "s" : "804c3b056a079b77deaa6a5e91905f6f",
+      "lit" : "yongs kyi bshes gnyen chen po dbon stod pa mkhan chen thams cad mkhyen pa mkhyen rab chos kyi nyi ma 'phrin las mtha' yas pa'i 'od zer gyi rnam par thar pa cung tsam brjod pa dag pa'i snang ba/@bo-x-ewts"
+    }
+  } 
+  ]
+}
+```
+
+```
+Ex GET: http://localhost:8080/resource/templates?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+Ex POST: curl --data "searchType=Res_byName&L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&L_LANG=@bo-x-ewts&I_LIM=100" http://localhost:8080/resource/templates
+```
+
+Ex Testing POST JSON : 
+
+
+1) Create a file param.json :
+
+```
+{
+  "searchType": "Res_byName",
+  "L_NAME": "(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))",
+  "L_LANG": "@bo-x-ewts",
+  "I_LIM":"100"
+}
+```
+
+2) running curl :
+```
+curl -H "Content-Type: application/json" -X POST -d @param.json http://localhost:8080/resource/templates
 ```
 
 # Query templates format specifications
@@ -184,15 +224,15 @@ will go through without any issue.
 ```
 #QueryScope=General
 #QueryReturnType=Table
-#QueryResults=A table containing the Id and matching skos:prefLabel for the given query and language tag with the given limit
+#QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
 #QueryParams=L_NAME,L_LANG,I_LIM
-#QueryUrl=?searchType=pdi_any_luceneLabel&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
-
+#QueryUrl=?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
 
 select distinct ?s ?lit
-WHERE
-{
-  (?s ?sc ?lit) text:query ( ?L_NAME?L_LANG ) .
+WHERE {
+  { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME?L_LANG ) . }
+  union
+  { (?s ?sc ?lit) text:query ( rdfs:label ?L_NAME?L_LANG ) . }
 } limit ?I_LIM
 
 ```
@@ -203,7 +243,7 @@ Note : the @ is now part of the L_LANG literal parameter and is not part of the
 #QueryReturnType=Table
 #QueryResults=All the detailed admin info (notes, status, log entries) about the person data
 #QueryParams=R_RES
-#QueryUrl=?searchType=pdi_p_adminDetails&R_RES=P1583
+#QueryUrl=?searchType=Person_adminDetails&R_RES=P1583
 
 
 select distinct
@@ -211,22 +251,22 @@ select distinct
 ?preferredName
 ?y ?noteRef ?note_value ?admin_prop ?admin_ref ?log_value ?git ?status
 where {
-  	{
-  		?ID skos:prefLabel ?preferredName ;
-        	adm:gitRevision ?git;
-    		adm:status ?status .
-    	Filter(?ID=?R_RES)
- 	}
-  	UNION {
-	  	OPTIONAL{ ?ID  :note ?noteRef }.
-	  	?noteRef ?y ?note_value .	  	
-	  	Filter(?ID=?R_RES)
-	}
-  	UNION {
-	  	OPTIONAL{ ?ID  adm:logEntry ?admin_ref }.
-	  	?admin_ref ?admin_prop ?log_value .	  	
-	  	Filter(?ID=?R_RES)
-	}
+    {
+      ?ID skos:prefLabel ?preferredName ;
+          adm:gitRevision ?git;
+        adm:status ?status .
+      Filter(?ID=?R_RES)
+  }
+    UNION {
+      OPTIONAL{ ?ID  :note ?noteRef }.
+      ?noteRef ?y ?note_value .
+      Filter(?ID=?R_RES)
+  }
+    UNION {
+      OPTIONAL{ ?ID  adm:logEntry ?admin_ref }.
+      ?admin_ref ?admin_prop ?log_value .
+      Filter(?ID=?R_RES)
+  }
 }
 ```
 

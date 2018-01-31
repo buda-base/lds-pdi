@@ -1,15 +1,5 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -29,6 +19,21 @@ import javax.ws.rs.POST;
  * limitations under the License.
  ******************************************************************************/
 
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -39,17 +44,20 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.bdrc.ldspdi.Utils.StringHelpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.sparql.results.ResultSetCopy;
 
 @Path("/")
 public class PublicTemplatesResource {
     
-public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     
     QueryProcessor processor=new QueryProcessor();
     public String fusekiUrl="";
@@ -66,6 +74,14 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
         }       
         MediaType media=new MediaType("text","html","utf-8");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
+        HashMap<String,String> converted=new HashMap<>();
+        Set<String> set=mp.keySet();
+        for(String st:set) {
+            List<String> str=mp.get(st);
+            for(String ss:str) {
+                converted.put(st, StringHelpers.bdrcEncode(ss));                
+            }
+        }
         String filename= mp.getFirst("searchType")+".arq";      
         QueryFileParser qfp;
         final String query;
@@ -94,7 +110,7 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     public Response getQueryTemplateResultsPost(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             MultivaluedMap<String,String> map) throws Exception{ 
-        log.info("Call to getQueryTemplateResults()");              
+        log.info("Call to getQueryTemplateResultsPost()");              
         if(fuseki !=null){
             fusekiUrl=fuseki;
         }else {
@@ -113,8 +129,14 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
         query=InjectionTracker.getValidQuery(q, map); 
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {               
+                long start=System.currentTimeMillis();
                 ResultSet jrs=processor.getResultSet(query, fuseki);
-                ResultSetFormatter.outputAsJSON(os, jrs);                        
+                long end=System.currentTimeMillis();
+                long elapsed=end-start;
+                ObjectMapper mapper = new ObjectMapper();
+                ResultSetCopy copy=new ResultSetCopy(jrs,elapsed);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(os , copy);
+                //JSONLDFormatter.jsonObjectToOutputStream(copy, os);  
             }
         };
         return Response.ok(stream).build();
@@ -144,9 +166,13 @@ public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
         }
         query=InjectionTracker.getValidQuery(q, map); 
         StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {               
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                        long start=System.currentTimeMillis();
                         ResultSet jrs=processor.getResultSet(query, fuseki);
-                        ResultSetFormatter.outputAsJSON(os, jrs);                        
+                        long end=System.currentTimeMillis();
+                        long elapsed=end-start;ObjectMapper mapper = new ObjectMapper();
+                        ResultSetCopy copy=new ResultSetCopy(jrs,elapsed);
+                        mapper.writerWithDefaultPrettyPrinter().writeValue(os , copy);  
             }
         };
         return Response.ok(stream).build();

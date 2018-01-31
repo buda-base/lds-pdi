@@ -23,6 +23,9 @@ import java.util.HashMap;
 
 
 public class QueryConstants {
+    
+    /********* ResultSetCopy Constants ****************/
+    public static String RES_URI="URI";
 	
     public static String QUERY_ERROR="ERROR";
     public static String QUERY_PATH="queryPath";

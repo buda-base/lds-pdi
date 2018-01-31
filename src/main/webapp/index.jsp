@@ -39,8 +39,8 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
 <title>BDRC Public data Interface</title>
 </head>
 <body>
-<h1>TBRC Public Data Interface</h1>
-        <p>This resource provides direct data access to the TBRC Library</p>
+<h1>BDRC Public Data Interface</h1>
+        <p>This resource provides direct data access to the BDRC Library</p>
         <p>The data is provided under a Creative Commons CC-BY license.</p>
         <p>This work is licensed under the Creative Commons Attribution 3.0 Unported License.<br> 
     To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to 

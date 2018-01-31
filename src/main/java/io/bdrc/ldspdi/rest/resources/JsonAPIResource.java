@@ -17,17 +17,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.bdrc.formatters.JSONLDFormatter;
+import io.bdrc.ldspdi.Utils.StringHelpers;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.results.ResultSetCopy;
 
 
 
@@ -52,8 +55,9 @@ public class JsonAPIResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
                 ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
-                log.info(queryList.toString());
-                JSONLDFormatter.jsonObjectToOutputStream(queryList, os);                                 
+                log.info(queryList.toString());                
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writerWithDefaultPrettyPrinter().writeValue(os , queryList);
             }
         };
         return Response.ok(stream).build();        
@@ -81,14 +85,15 @@ public class JsonAPIResource {
                 HashMap<String, String> meta=qfp.getMetaInf();
                 QueryTemplate qt= new QueryTemplate(
                         qfp.getTemplateName(),
-                        "/resource/templates"+meta.get(QueryConstants.QUERY_URL),
+                        StringHelpers.bdrcEncode("/resource/templates"+meta.get(QueryConstants.QUERY_URL)),
                         meta.get(QueryConstants.QUERY_SCOPE),
                         meta.get(QueryConstants.QUERY_RESULTS),
                         meta.get(QueryConstants.QUERY_RETURN_TYPE),
                         meta.get(QueryConstants.QUERY_PARAMS),
-                        meta.get(QueryConstants.QUERY_URL),
+                        StringHelpers.bdrcEncode(meta.get(QueryConstants.QUERY_URL)),
                         qfp.getQuery());
-                JSONLDFormatter.jsonObjectToOutputStream(qt, os);                                 
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writerWithDefaultPrettyPrinter().writeValue(os , qt);
             }
         };
         return Response.ok(stream).build();        

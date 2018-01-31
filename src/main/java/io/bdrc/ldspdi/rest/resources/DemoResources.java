@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.rest.resources;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -12,10 +11,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+
 
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -23,8 +20,6 @@ import org.glassfish.jersey.server.mvc.Template;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 
-import io.bdrc.formatters.JSONLDFormatter;
-import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ontology.service.core.OntClassModel;
 
 @Path("/")
@@ -54,9 +49,8 @@ public class DemoResources {
     @Produces(MediaType.TEXT_HTML)
     public Viewable templateRelative(@PathParam("file") String file) {
         log.info("Call to templateRelative()");
-        log.info("Called file -->"+file);
         return new Viewable("/"+file);         
-    } 
+    }
     
     @GET
     @Path("demo/ontology")

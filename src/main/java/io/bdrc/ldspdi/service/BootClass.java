@@ -21,8 +21,6 @@ package io.bdrc.ldspdi.service;
 
 import javax.servlet.ServletContextEvent;
 
-import org.glassfish.jersey.server.ResourceConfig;
-
 import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;

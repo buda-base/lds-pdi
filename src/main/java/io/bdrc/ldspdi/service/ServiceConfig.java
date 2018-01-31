@@ -34,8 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -107,8 +105,7 @@ public class ServiceConfig {
 	    URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();        
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String st="";
-        String JSONLD_CONTEXT_HTML="";
+        String st="";        
         String line="";
         while ((line = in.readLine()) != null) {
             if(html) {
