@@ -26,6 +26,9 @@ public class QueryConstants {
     
     /********* ResultSetCopy Constants ****************/
     public static String RES_URI="URI";
+    public static String PAGE_SIZE="pageSize";
+    public static String PAGE_NUMBER="pageNumber";
+    public static String RESULT_HASH="hash";
 	
     public static String QUERY_ERROR="ERROR";
     public static String QUERY_PATH="queryPath";
@@ -35,6 +38,7 @@ public class QueryConstants {
 	public static String QUERY_RESULTS="QueryResults";
 	public static String QUERY_PARAMS="QueryParams";	
 	public static String QUERY_URL="QueryUrl";
+	public static String SEARCH_TYPE="searchType";
 	
 	public static String QUERY_NO_ARGS="NONE";
 	public static String INT_ARGS_PARAMPREFIX="I_";
