@@ -24,7 +24,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
-import io.bdrc.ldspdi.Utils.StringHelpers;
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -85,12 +85,12 @@ public class JsonAPIResource {
                 HashMap<String, String> meta=qfp.getMetaInf();
                 QueryTemplate qt= new QueryTemplate(
                         qfp.getTemplateName(),
-                        StringHelpers.bdrcEncode("/resource/templates"+meta.get(QueryConstants.QUERY_URL)),
+                        Helpers.bdrcEncode("/resource/templates"+meta.get(QueryConstants.QUERY_URL)),
                         meta.get(QueryConstants.QUERY_SCOPE),
                         meta.get(QueryConstants.QUERY_RESULTS),
                         meta.get(QueryConstants.QUERY_RETURN_TYPE),
                         meta.get(QueryConstants.QUERY_PARAMS),
-                        StringHelpers.bdrcEncode(meta.get(QueryConstants.QUERY_URL)),
+                        Helpers.bdrcEncode(meta.get(QueryConstants.QUERY_URL)),
                         qfp.getQuery());
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , qt);

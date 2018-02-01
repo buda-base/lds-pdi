@@ -23,9 +23,7 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -46,7 +44,7 @@ import org.apache.jena.query.ResultSet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.bdrc.ldspdi.Utils.StringHelpers;
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
@@ -70,27 +68,29 @@ public class PublicTemplatesResource {
         
         log.info("Call to getQueryTemplateResults()"); 
         log.info("URL :"+info.getRequestUri());
-        if(fuseki !=null){
-            fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
-        }       
+        
+        if(fuseki !=null)
+            {fusekiUrl=fuseki;}
+        else 
+            {fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);}
+        
+        //Settings
         MediaType media=new MediaType("text","html","utf-8");
+        String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> converted=new HashMap<>();
-        Set<String> set=mp.keySet();
-        for(String st:set) {
-            List<String> str=mp.get(st);
-            for(String ss:str) {
-                converted.put(st, StringHelpers.bdrcEncode(ss));                
-            }
-        }
+        HashMap<String,String> hm=Helpers.convertMulti(mp);
+        hm.put(QueryConstants.REQ_METHOD, "GET");
+        hm.put(QueryConstants.REQ_URI, relativeUri);        
         ObjectMapper mapper = new ObjectMapper();
-        String filename= mp.getFirst(QueryConstants.SEARCH_TYPE)+".arq";
-        String jsonParams=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mp);
-        int pageSize =getPageSize(mp.getFirst(QueryConstants.PAGE_SIZE));
-        int pageNumber=getPageNumber(mp.getFirst(QueryConstants.PAGE_NUMBER));
-        int hash=getHash(mp.getFirst(QueryConstants.RESULT_HASH));
+        
+        //params
+        String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";        
+        int pageSize =getPageSize(hm.get(QueryConstants.PAGE_SIZE));
+        int pageNumber=getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
+        int hash=getHash(hm.get(QueryConstants.RESULT_HASH));
+        boolean jsonOutput=getJsonOutput(hm.get(QueryConstants.JSON_OUT));
+        
+        //process
         QueryFileParser qfp;
         final String query;
         
@@ -104,10 +104,14 @@ public class PublicTemplatesResource {
         query=InjectionTracker.getValidQuery(q, mp);            
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                // when prefix is null, QueryProcessor default prefix is used 
+                
                 Results res = getResults(query, fuseki, hash, pageSize); 
-                ResultPage rp=new ResultPage(res,pageNumber,jsonParams);
-                os.write(StringHelpers.renderHtmlResultPage(rp,info.getRequestUri().toString()).getBytes());
+                ResultPage rp=new ResultPage(res,pageNumber,hm);
+                if(jsonOutput) {
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
+                }else {
+                    os.write(Helpers.renderHtmlResultPage(rp,info.getRequestUri().toString()).getBytes());
+                }
             }
         };
         return Response.ok(stream,media).build();
@@ -118,19 +122,20 @@ public class PublicTemplatesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getQueryTemplateResultsPost(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
-            MultivaluedMap<String,String> map) throws Exception{ 
+            MultivaluedMap<String,String> mp) throws Exception{ 
         log.info("Call to getQueryTemplateResultsPost()");              
         if(fuseki !=null){
             fusekiUrl=fuseki;
         }else {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         } 
+        HashMap<String,String> hm=Helpers.convertMulti(mp);
         ObjectMapper mapper = new ObjectMapper();
-        String filename= map.getFirst(QueryConstants.SEARCH_TYPE)+".arq";
+        String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";
         
-        int pageSize =getPageSize(map.getFirst(QueryConstants.PAGE_SIZE));
-        int pageNumber=getPageNumber(map.getFirst(QueryConstants.PAGE_NUMBER));
-        int hash=getHash(map.getFirst(QueryConstants.RESULT_HASH));
+        int pageSize =getPageSize(hm.get(QueryConstants.PAGE_SIZE));
+        int pageNumber=getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
+        int hash=getHash(hm.get(QueryConstants.RESULT_HASH));
         QueryFileParser qfp; 
         final String query;
         
@@ -140,18 +145,15 @@ public class PublicTemplatesResource {
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(q, map);
-        MultivaluedMap<String,String> copy=map;
+        query=InjectionTracker.getValidQuery(q, hm);
+        //MultivaluedMap<String,String> copy=map;
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException { 
                 
-                Results res = getResults(query, fuseki, hash, pageSize); 
-                copy.remove(QueryConstants.RESULT_HASH);
-                copy.add(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                copy.remove(QueryConstants.PAGE_SIZE);
-                copy.add(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                String jsonParams=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(copy);
-                ResultPage rp=new ResultPage(res,pageNumber,jsonParams);
+                Results res = getResults(query, fuseki, hash, pageSize);                
+                hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+                hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
+                ResultPage rp=new ResultPage(res,pageNumber,hm);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);                 
             }
         };
@@ -187,15 +189,13 @@ public class PublicTemplatesResource {
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(q, map);
-        HashMap<String,String> copy=map;
+        query=InjectionTracker.getValidQuery(q, map);        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 Results res = getResults(query, fuseki, hash, pageSize);                
-                copy.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                copy.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                String jsonParams=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(copy);
-                ResultPage rp=new ResultPage(res,pageNumber,jsonParams);
+                map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+                map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+                ResultPage rp=new ResultPage(res,pageNumber,map);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
             }
         };
@@ -253,5 +253,15 @@ public class PublicTemplatesResource {
         }
         return hash;
     }
+    
+    public boolean getJsonOutput(String param) {
+        boolean json;
+        try {
+            json=Boolean.parseBoolean(param);            
+        }catch(Exception ex){
+            json=false;            
+        }
+        return json;
+    }  
     
 }

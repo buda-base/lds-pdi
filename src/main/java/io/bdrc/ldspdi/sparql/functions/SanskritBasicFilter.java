@@ -24,7 +24,7 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.function.FunctionBase2;
 
-import io.bdrc.ldspdi.Utils.StringHelpers;
+import io.bdrc.ldspdi.Utils.Helpers;
 
 public class SanskritBasicFilter extends FunctionBase2{
 	
@@ -33,7 +33,7 @@ public SanskritBasicFilter() { super() ; }
 	public NodeValue exec(NodeValue value1, NodeValue value2){
 		String v1=value1.asString();
 		String v2=value2.asString();
-		String v11=StringHelpers.removeAccents(v1);
+		String v11=Helpers.removeAccents(v1);
 		
 		if(v11.indexOf(v2)>=0) {
 			String test=v2+"-āīūṛṝḷḹṃḥ'ṭḍṅñṇśṣ";			

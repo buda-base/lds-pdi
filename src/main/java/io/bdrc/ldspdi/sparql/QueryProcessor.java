@@ -35,7 +35,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 public class QueryProcessor {	
 	
 	
-	public Model getResource(String resID,String fusekiUrl){			
+	public Model getResourceGraph(String resID,String fusekiUrl){			
 		
 	    String prefixes=ServiceConfig.getPrefixes();
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
@@ -45,26 +45,6 @@ public class QueryProcessor {
 		
 		return model;		
 	}
-	
-	public String getResource(String query,String fusekiUrl,boolean html){
-		System.out.println("Processor query select:" +query);		
-	    String ret="";
-		if(fusekiUrl == null) {
-		    fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-		}
-		Query q=QueryFactory.create(query);
-		long start=System.currentTimeMillis();
-		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
-		ResultSet rs = qe.execSelect();
-		long end=System.currentTimeMillis();
-		long elapsed=end-start;
-		if(html) {
-			ret=toHtmlTable(rs,elapsed);
-		}else {
-			ret=toTable(rs);
-		}
-		return ret;		
-	}	
 		
 	public ResultSet getResultSet(String query,String fusekiUrl){
         System.out.println("Processor Json query select:" +query);        
@@ -76,99 +56,5 @@ public class QueryProcessor {
         ResultSet rs = qe.execSelect();
         return rs;           
     }
-	
-	private String toTable(ResultSet rs) {
-		String table="";		
-		List<String> l=rs.getResultVars();	
-		for(String st:l) {
-			table=table+"\t"+st;			
-		}
-		table=table+"\t"+System.lineSeparator();
-		while(rs.hasNext()) {
-			QuerySolution qs=rs.next();
-			table=table+System.lineSeparator();
-			for(String str:l) {
-				
-				RDFNode node=qs.get(str);
-				if(node !=null) {
-					if(node.isResource()) {
-						table=table+qs.get(str).asNode().getLocalName()+"\t";
-					}
-					else if(node.isLiteral()) {
-						table=table+qs.get(str)+"\t";	
-					}
-				}else {
-					table=table+"\t";
-				}
-			}
-		}		
-		return table;
-	}
-	
-	private String toHtmlTable(ResultSet rs,long elapsed) {
-		int num_res=0;
-		String table="<table style=\"width: 80%\" border=\"0\"><tr >";		
-		List<String> l=rs.getResultVars();
-		for(String st:l) {
-			table=table+"<td style=\"background-color: #f7f7c5;\">"+st+"</td>";			
-		}
-		table=table+"</tr>";
-		boolean changeColor=false;
-		while(rs.hasNext()) {
-			num_res++;
-			QuerySolution qs=rs.next();	
-			table=table+"<tr>";	
-			int index=0;
-			for(String str:l) {				
-				RDFNode node=qs.get(str);
-				if(node !=null) {
-					if(node.isResource() ) {
-						table=table+"<td";
-						if(changeColor) {
-							table=table+" style=\"background-color: #f2f2f2;\"";
-						}
-						if(index==0) {
-							table=table+"><a href=\"/resource/";
-							if(qs.get(str).asNode().isBlank()) {
-								table=table+qs.get(str).asNode().getBlankNodeLabel()+"\"> "
-								+qs.get(str).asNode().getBlankNodeLabel()+"</a></td>";
-							}else {
-								table=table+qs.get(str).asNode().getLocalName()+"\"> "
-								+qs.get(str).asNode().getLocalName()+"</a></td>";
-							}
-						}
-						else {
-							if(qs.get(str).asNode().isBlank()) {
-								table=table+">_b"+qs.get(str).asNode().getBlankNodeLabel().substring(0, 5)+"</td>";
-							}else {
-								table=table+">"+qs.get(str).asNode().getLocalName()+"</td>";
-							}
-						}
-					}
-					else if(node.isLiteral()) {
-						table=table+"<td";
-						if(changeColor) {
-							table=table+" style=\"background-color: #f2f2f2;\"";
-						}
-						table=table+">"+qs.get(str)+"</td>";	
-					}
-				}else {
-					table=table+"<td";
-					if(changeColor) {
-						table=table+" style=\"background-color: #f2f2f2;\"";
-					}
-					table=table+"></td>";
-					
-				}
-				index++;
-			}
-			changeColor=!changeColor;
-			table=table+"</tr>";
-		}	
-		table=table+"</table>";
-		String time="<br><span><b> Returned "+num_res+" results in "+elapsed+" ms</b></span><br><br>";
-		return time+table;
-	}
-	
 
 }

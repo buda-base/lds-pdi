@@ -31,7 +31,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import io.bdrc.ldspdi.Utils.StringHelpers;
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
@@ -68,7 +68,7 @@ public class DocFileBuilder {
 							+"<td>"+return_type+"</td>"+LS
 							+"<td style=\"width:400px;\">"+query_results+"</td>"+LS
 							+"<td>"+query_params+"</td>"+LS
-							+"<td><a href=\""+base+StringHelpers.bdrcEncode(url)+"\">"+
+							+"<td><a href=\""+base+Helpers.bdrcEncode(url)+"\">"+
 							base+url+"</a></td></tr>"+LS;
 					specs.put(queryScope, tmp);
 				}else {
@@ -84,7 +84,7 @@ public class DocFileBuilder {
 							+"<td>"+return_type+"</td>"+LS
 							+"<td style=\"width:400px;\">"+query_results+"</td>"+LS
 							+"<td>"+query_params+"</td>"+LS
-							+"<td><a href=\""+base+StringHelpers.bdrcEncode(url)+"\">"+
+							+"<td><a href=\""+base+Helpers.bdrcEncode(url)+"\">"+
 							base+url+"</a></td></tr>"+LS;
 					
 					specs.put(queryScope, scope);

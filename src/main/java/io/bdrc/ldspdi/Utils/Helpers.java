@@ -1,7 +1,9 @@
 package io.bdrc.ldspdi.Utils;
 
 import java.util.List;
+import java.util.Set;
 
+import javax.ws.rs.core.MultivaluedMap;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -25,12 +27,13 @@ import java.util.List;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 import io.bdrc.ldspdi.sparql.results.QuerySolutionItem;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 
-public class StringHelpers {
+public class Helpers {
 	
 	public static String removeAccents(String text) {		
 		String f=text;
@@ -128,5 +131,12 @@ public class StringHelpers {
 	    return table;
 	}
 	
-	
+	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
+	    HashMap<String,String> copy=new HashMap<>();
+	    Set<String> set=map.keySet();
+	    for(String key:set) {
+	        copy.put(key, map.getFirst(key));
+	    }
+	    return copy;
+	}
 }

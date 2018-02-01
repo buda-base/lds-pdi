@@ -24,11 +24,14 @@ import java.util.HashMap;
 
 public class QueryConstants {
     
-    /********* ResultSetCopy Constants ****************/
+    /********* Results Objects Constants ****************/
     public static String RES_URI="URI";
     public static String PAGE_SIZE="pageSize";
     public static String PAGE_NUMBER="pageNumber";
     public static String RESULT_HASH="hash";
+    public static String JSON_OUT="jsonOut";
+    public static String REQ_METHOD="method";
+    public static String REQ_URI="reqUri";
 	
     public static String QUERY_ERROR="ERROR";
     public static String QUERY_PATH="queryPath";

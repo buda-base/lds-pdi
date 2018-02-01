@@ -123,7 +123,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                Model model=processor.getResource(res,fusekiUrl);  
+                Model model=processor.getResourceGraph(res,fusekiUrl);  
                 RDFWriter writer=getSTTLRDFWriter(model); 
                 writer.output(os);                  
             }
@@ -153,7 +153,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                Model model=processor.getResource(res,fusekiUrl);  
+                Model model=processor.getResourceGraph(res,fusekiUrl);  
                 Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                 JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);                                 
             }
@@ -183,7 +183,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResource(res,fusekiUrl); 
+                Model model=processor.getResourceGraph(res,fusekiUrl); 
                 if(isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
@@ -223,7 +223,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResource(res,fusekiUrl); 
+                Model model=processor.getResourceGraph(res,fusekiUrl); 
                 if(isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
@@ -259,7 +259,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResource(res,fusekiUrl); 
+                Model model=processor.getResourceGraph(res,fusekiUrl); 
                 if(isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
