@@ -110,7 +110,7 @@ public class PublicTemplatesResource {
                 if(jsonOutput) {
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
                 }else {
-                    os.write(Helpers.renderHtmlResultPage(rp,info.getRequestUri().toString()).getBytes());
+                    os.write(Helpers.renderHtmlResultPage(rp,relativeUri).getBytes());
                 }
             }
         };
