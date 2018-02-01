@@ -90,3 +90,6 @@ catalog-v001.xml
 # Custom Editor specifics
 # 
 .directory
+
+#JCS caching stuffs
+jcs_swap/
