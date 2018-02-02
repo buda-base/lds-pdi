@@ -121,11 +121,27 @@ application/trix+xml=trix
 # Query templates
 
 ### GET && POST
+
+lds-pdi serves paginated results based on several parameters values.
+
 /templates : POST requests return the following JSON format :
 ```
 {
-  "execTime" : 461,
+  "pageNumber" : 1,
+  "numberOfPages" : 2,
+  "pageSize" : 50,
   "numResults" : 81,
+  "execTime" : 517,
+  "hash" : 1287965507,
+  "isLastPage" : false,
+  "isFirstPage" : true,
+  "pLinks" : {
+    "prevGet" : null,
+    "nextGet" : null,
+    "currJsonParams" : "{\"L_NAME\":\"(\\\"mkhan chen\\\" AND (\\\"'od zer\\\" OR \\\"ye shes\\\"))\",\"searchType\":\"Res_byName\",\"pageSize\":\"50\",\"I_LIM\":\"100\",\"hash\":\"1287965507\",\"LG_NAME\":\"bo-x-ewts\"}",
+    "prevJsonParams" : null,
+    "nextJsonParams" : "{\"L_NAME\":\"(\\\"mkhan chen\\\" AND (\\\"'od zer\\\" OR \\\"ye shes\\\"))\",\"pageNumber\":\"2\",\"searchType\":\"Res_byName\",\"pageSize\":\"50\",\"I_LIM\":\"100\",\"hash\":\"1287965507\",\"LG_NAME\":\"bo-x-ewts\"}"
+  },
   "headers" : [ "s", "lit" ],
   "rows" : [ {
     "dataRow" : {
@@ -143,29 +159,32 @@ application/trix+xml=trix
   ]
 }
 ```
+pLinks is an object giving prev and next pages for GET request (prevGet & nextGet) along with post json request params of the current, next and previous pages (For request posting json)
 
 ```
 Ex GET: http://localhost:8080/resource/templates?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
-Ex POST: curl --data "searchType=Res_byName&L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&L_LANG=@bo-x-ewts&I_LIM=100" http://localhost:8080/resource/templates
+Ex POST: curl --data "searchType=Res_byName&L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/resource/templates
 ```
+
+**NOTE:** You can get this json output format using GET requests by adding &jsonOut=true to your URL request.
 
 Ex Testing POST JSON : 
 
 
-1) Create a file param.json :
+1) Create a file test.json :
 
 ```
 {
   "searchType": "Res_byName",
   "L_NAME": "(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))",
-  "L_LANG": "@bo-x-ewts",
+  "LG_NAME": "bo-x-ewts",
   "I_LIM":"100"
 }
 ```
 
 2) running curl :
 ```
-curl -H "Content-Type: application/json" -X POST -d @param.json http://localhost:8080/resource/templates
+curl -H "Content-Type: application/json" -X POST -d @test.json http://localhost:8080/resource/templates
 ```
 
 # Query templates format specifications
@@ -196,6 +215,8 @@ ldspdi performs a strict parameter evaluation in order to prevent Sparql injecti
 
 Literal : each literal parameter name must be prefixed by « L_ » (Ex : L_NAME)
 
+Literal Lang: each literal parameter can be associated with a language using a parameter prefixed by LG_ (Ex : if you want L_FOO to be search in the ewts language, you must add a LG_FOO=bo-x-ewts to your request and declare it in the #QueryParams section of your template.
+
 Integer : each literal parameter name must be prefixed by « I_ » (Ex : I_LIM)
 
 Resource : each literal parameter name must be prefixed by « R_ » (Ex : R_RES)
@@ -225,18 +246,18 @@ will go through without any issue.
 #QueryScope=General
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
-#QueryParams=L_NAME,L_LANG,I_LIM
-#QueryUrl=?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+#QueryParams=L_NAME,LG_NAME,I_LIM
+#QueryUrl=?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
 
 select distinct ?s ?lit
 WHERE {
-  { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME?L_LANG ) . }
+  { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . }
   union
-  { (?s ?sc ?lit) text:query ( rdfs:label ?L_NAME?L_LANG ) . }
+  { (?s ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . }
 } limit ?I_LIM
 
 ```
-Note : the @ is now part of the L_LANG literal parameter and is not part of the query skeleton anymore.
+
 
 ```
 #QueryScope=Person
@@ -301,6 +322,23 @@ returns JSON queryTemplate object :
   "demoLink" : "http://localhost:8080/resource/templates?searchType=Lineage_list" 
 }
 ```
+
+# CORS support
+
+lds-pdi offers CORS support. Cors configuration parameters can be specified in the ldspdi.properties file, as follows:
+
+```
+#cors settings
+
+Allow-Origin=*
+Allow-Headers=origin, content-type, accept, authorization
+Allow-Credentials=true
+Allow-Methods=GET, POST, PUT, DELETE, OPTIONS, HEAD
+```
+
+These parameter apply to the whole application.
+
+
 # Copyright and License
 
 All the code and API are Copyright (C) 2017 Buddhist Digital Resource Center and are under the Apache 2.0 Public License.
