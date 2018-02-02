@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -41,6 +42,9 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.query.ResultSet;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,6 +65,12 @@ public class PublicTemplatesResource {
     
     QueryProcessor processor=new QueryProcessor();
     public String fusekiUrl="";
+    
+    public PublicTemplatesResource() {
+        super();        
+        ResourceConfig config=new ResourceConfig(PublicTemplatesResource.class);
+        config.register(CorsFilter.class);        
+    } 
     
     @GET
     @Path("/resource/templates")

@@ -21,6 +21,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.glassfish.jersey.server.ResourceConfig;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
@@ -42,6 +44,8 @@ public class JsonAPIResource {
     
     public JsonAPIResource() {
         super();
+        ResourceConfig config=new ResourceConfig( JsonAPIResource.class);
+        config.register(CorsFilter.class);
         log.addHandler(new ConsoleHandler());
         fileList=getQueryTemplates();
     }

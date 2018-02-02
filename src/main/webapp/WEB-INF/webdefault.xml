@@ -32,6 +32,6 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     <context-param>
         <param-name>queryPath</param-name>
         <param-value>/home/marc/lds-queries/</param-value>
-    </context-param>
+    </context-param>        
 </web-app>
 

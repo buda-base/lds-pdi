@@ -47,6 +47,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
+import org.glassfish.jersey.server.ResourceConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -70,6 +71,8 @@ public class PublicDataResource {
     
     public PublicDataResource() {
         super();
+        ResourceConfig config=new ResourceConfig(PublicDataResource.class);
+        config.register(CorsFilter.class);
         log.addHandler(new ConsoleHandler());
     }
     

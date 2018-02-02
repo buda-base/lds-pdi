@@ -140,7 +140,8 @@
 	    <groupId>org.eclipse.jetty</groupId>
 	    <artifactId>jetty-http</artifactId>
 	    <version>9.4.8.v20171121</version>
-	</dependency>	
+	</dependency>
+    	
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 	<dependency>
 	    <groupId>org.apache.commons</groupId>
@@ -204,8 +205,7 @@
                     <context-path>/</context-path>	            	                
 		            <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
 		            <containerIncludeJarPattern>^$</containerIncludeJarPattern> 
-                    <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>  
-                                              
+                    <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>
 	            </webApp>
             </configuration>
          </plugin>
