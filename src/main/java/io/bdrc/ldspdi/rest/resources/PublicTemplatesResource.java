@@ -98,7 +98,7 @@ public class PublicTemplatesResource {
         String q=qfp.getQuery();
         String check=qfp.checkQueryArgsSyntax();
         if(check.length()>0) {
-            throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
+            throw new Exception("Exception : File->"+ filename+"; ERROR: "+check);
         }
         log.info("Query before Injection Tracking -->"+filename+".arq"+System.lineSeparator()+q);
         query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());            

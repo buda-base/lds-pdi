@@ -109,19 +109,23 @@ public class QueryFileParser {
 		List<String> params=Arrays.asList(args);
 		for(String arg:args) {
 		    if(!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
+		        //Param is not a Lang param --> if it's not present in the query --> Send error
 		        if(!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?"+arg)==-1) {
 		            check="Arg syntax is incorrect : query does not have a ?"+arg+" variable";
 		            return check;
-		        }else {		            
+		        }
+		        //Param is a Lang param --> check if the corresponding lit param is present 
+		        if(arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
+		           
 		            String expectedLiteralParam=QueryConstants.LITERAL_ARGS_PARAMPREFIX+arg.substring(arg.indexOf("_")+1);		            
-		            if(!params.contains(expectedLiteralParam)) {
-		                check="Arg syntax is incorrect : query does not have a literal variable "+
-		                        expectedLiteralParam+" corresponding to lang "+arg+" variable";
-		                return check;
-		            }
-		            else {
-		                litLangParams.put(expectedLiteralParam, arg); 
-		            }
+    		        if(!params.contains(expectedLiteralParam)) {
+    		            check="Arg syntax is incorrect : query does not have a literal variable "+
+    		                   expectedLiteralParam+" corresponding to lang "+arg+" variable";
+    		            return check;
+    		        }
+    		        else {
+    		            litLangParams.put(expectedLiteralParam, arg); 
+    		        }
 		        }
 		    }
 		}
