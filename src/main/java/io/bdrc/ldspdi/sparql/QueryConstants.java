@@ -46,6 +46,7 @@ public class QueryConstants {
 	public static String QUERY_NO_ARGS="NONE";
 	public static String INT_ARGS_PARAMPREFIX="I_";
 	public static String LITERAL_ARGS_PARAMPREFIX="L_";
+	public static String LITERAL_LG_ARGS_PARAMPREFIX="LG_";
 	public static String RES_ARGS_PARAMPREFIX="R_";
 	
 	//public static String QUERY_LIMIT="LIM";

@@ -53,10 +53,8 @@ public class Results implements Serializable{
         this.execTime=execTime;
         numResults=0;
         rows=new ArrayList<>();
-        while(rs.hasNext()) {
-            //log.info(headers.toString());
-            QuerySolution qs=rs.next();
-            //log.info(qs.toString());
+        while(rs.hasNext()) {            
+            QuerySolution qs=rs.next();            
             QuerySolutionItem row=new QuerySolutionItem(qs,headers);
             rows.add(row);
             numResults++;

@@ -13,8 +13,7 @@ public class ResultPageLinks {
     public String nextGet;
     public String currJsonParams;
     public String prevJsonParams;
-    public String nextJsonParams;
-    
+    public String nextJsonParams;    
     
     
     public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws JsonProcessingException{

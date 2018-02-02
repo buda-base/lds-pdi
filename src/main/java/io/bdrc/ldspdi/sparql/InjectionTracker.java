@@ -20,33 +20,23 @@ package io.bdrc.ldspdi.sparql;
  ******************************************************************************/
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.logging.Logger;
 
 import org.apache.jena.query.ParameterizedSparqlString;
 
+import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
-public class InjectionTracker {
+public class InjectionTracker {    
     
-    public static String getValidQuery(String query,MultivaluedMap<String,String> mvm) {
-        
-        HashMap<String,String> converted=new HashMap<>();
-        Set<String> set=mvm.keySet();
-        for(String st:set) {
-            List<String> str=mvm.get(st);
-            for(String ss:str) {
-                converted.put(st, ss);                
-            }
-        }
-        return getValidQuery(query,converted);
-    }
+    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     
-    public static String getValidQuery(String query,HashMap<String,String> converted) {
+    public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) {
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
-        Set<String> s = converted.keySet();        
+        Set<String> s = converted.keySet(); 
+        Set<String> lit = litParams.keySet();        
         for(String st:s) {
             
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
@@ -56,7 +46,14 @@ public class InjectionTracker {
                 queryStr.setIri(st, "http://purl.bdrc.io/resource/"+converted.get(st));                
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
-                queryStr.setLiteral(st, converted.get(st));
+                if(lit.contains(st)) {
+                    queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));
+                    log.info("Setting literal st:"+st+ " with value:"+converted.get(st)+" lang:"+converted.get(litParams.get(st)));
+                }else {
+                    //Some literals do not have a lang associated with them
+                    queryStr.setLiteral(st, converted.get(st));
+                    log.info("Setting literal without specified lang: st="+st+ " with value:"+converted.get(st));
+                }
             }
         }
         return queryStr.toString();

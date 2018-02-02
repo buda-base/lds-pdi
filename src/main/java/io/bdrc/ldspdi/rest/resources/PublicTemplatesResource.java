@@ -101,7 +101,7 @@ public class PublicTemplatesResource {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
         log.info("Query before Injection Tracking -->"+filename+".arq"+System.lineSeparator()+q);
-        query=InjectionTracker.getValidQuery(q, mp);            
+        query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());            
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
@@ -145,7 +145,7 @@ public class PublicTemplatesResource {
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(q, hm);
+        query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());
         //MultivaluedMap<String,String> copy=map;
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException { 
@@ -189,7 +189,7 @@ public class PublicTemplatesResource {
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(q, map);        
+        query=InjectionTracker.getValidQuery(q, map,qfp.getLitLangParams());        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 Results res = getResults(query, fuseki, hash, pageSize);                

@@ -41,7 +41,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
  
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            log.addHandler(new ConsoleHandler());
+            
             String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
             String queryPath=arg0.getServletContext().getInitParameter("queryPath");
             HashMap<String,String> params=new HashMap<>();            

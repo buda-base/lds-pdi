@@ -32,8 +32,7 @@ public class ResultsCache {
     private static CacheAccess<Integer,Results> CACHE = JCS.getInstance( "default" );
     public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     
-    public static void addToCache(Results res, int hash) {
-        log.info("Hash is:"+hash);
+    public static void addToCache(Results res, int hash) {        
         try{
             CACHE.put( new Integer(hash), res );
         }

@@ -42,18 +42,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.ldspdi.sparql.results.Results;
 
 public class ServiceConfig {
 	
 	static Properties prop = new Properties();
 	static ArrayList<String> mime=new ArrayList<String>();
-	public static Writer logWriter;
 	public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public static Logger log=Logger.getLogger(ServiceConfig.class.getName());
 	public static String JSONLD_CONTEXT_HTML;
 	public static String JSONLD_CONTEXT;
+	
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
@@ -66,7 +67,7 @@ public class ServiceConfig {
 			for(String st:set) {
 			    prop.setProperty(st, params.get(st));
 			}
-			logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));		
+					
 			String mimes=prop.getProperty("mime");
 			StringTokenizer st=new StringTokenizer(mimes,",");
 			while(st.hasMoreTokens()){
@@ -87,9 +88,8 @@ public class ServiceConfig {
         try {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
-            prop.load(input);
-            
-            logWriter = new PrintWriter(new OutputStreamWriter(System.err, "UTF-8"));       
+            prop.load(input);            
+                
             String mimes=prop.getProperty("mime");
             StringTokenizer st=new StringTokenizer(mimes,",");
             while(st.hasMoreTokens()){

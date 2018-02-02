@@ -23,7 +23,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +40,7 @@ public class QueryFileParser {
 	private HashMap<String,String> metaInf;
 	private String query;
 	private String queryName;
+	private HashMap<String,String> litLangParams=new HashMap<>();
 	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
 	
 	
@@ -76,7 +80,7 @@ public class QueryFileParser {
     	            	int index=readLine.indexOf("=");
     	            	if(index!=-1) {
     		            	String info0=readLine.substring(0,index);
-    		            	String info1=readLine.substring(index+1);	            	
+    		            	String info1=readLine.substring(index+1).trim();	            	
     		            	metaInf.put(info0,info1);
     	            	}
     	            }
@@ -102,14 +106,44 @@ public class QueryFileParser {
 		String check="";
 		
 		String[] args=metaInf.get(QueryConstants.QUERY_PARAMS).split(Pattern.compile(",").toString());
+		List<String> params=Arrays.asList(args);
 		for(String arg:args) {
-			if((!arg.trim().equals(QueryConstants.QUERY_NO_ARGS)) && query.indexOf("?"+arg.trim())==-1) {
-				check="Arg syntax is incorrect : query does not have a ?"+arg.trim()+" variable";
-				return check;
-			}
+		    if(!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
+		        if(!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?"+arg)==-1) {
+		            check="Arg syntax is incorrect : query does not have a ?"+arg+" variable";
+		            return check;
+		        }else {		            
+		            String expectedLiteralParam=QueryConstants.LITERAL_ARGS_PARAMPREFIX+arg.substring(arg.indexOf("_")+1);		            
+		            if(!params.contains(expectedLiteralParam)) {
+		                check="Arg syntax is incorrect : query does not have a literal variable "+
+		                        expectedLiteralParam+" corresponding to lang "+arg+" variable";
+		                return check;
+		            }
+		            else {
+		                litLangParams.put(expectedLiteralParam, arg); 
+		            }
+		        }
+		    }
 		}
 		return check;
 	}
+
+    public File getQueryFile() {
+        return queryFile;
+    }
+
+    public String getQueryName() {
+        return queryName;
+    }
+
+    public HashMap<String, String> getLitLangParams() {
+        return litLangParams;
+    }
+
+    public static Logger getLog() {
+        return log;
+    }
+	
 	
 
 }
