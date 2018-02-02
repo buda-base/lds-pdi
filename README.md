@@ -198,13 +198,13 @@ New query files must have the .arq extension and are formatted as follows :
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and the name of the place whose name contains the L_NAME param value
 #QueryParams=L_NAME
-#QueryUrl=?searchType=pdi_pl_name&L_NAME=dgon gsar
+#QueryUrl=?searchType=Place_byName&L_NAME=dgon gsar
 
 select ?Place_ID ?Place_Name
 where {
   ?Place_ID a :Place;
    skos:prefLabel ?Place_Name .
-  Filter(contains(?Place_Name, ?NAME))
+  Filter(contains(?Place_Name, ?L_NAME))
 }
 ```
 Note : the parameter placeholder of the query must match the value of QueryParams.
@@ -215,11 +215,11 @@ ldspdi performs a strict parameter evaluation in order to prevent Sparql injecti
 
 Literal : each literal parameter name must be prefixed by « L_ » (Ex : L_NAME)
 
-Literal Lang: each literal parameter can be associated with a language using a parameter prefixed by LG_ (Ex : if you want L_FOO to be search in the ewts language, you must add a LG_FOO=bo-x-ewts to your request and declare it in the #QueryParams section of your template.
+Literal Lang: each literal parameter can be associated with a language using a parameter prefixed by LG_ (Ex : if you want L_FOO to be searched in the ewts language, you must add a LG_FOO=bo-x-ewts to your request and declare it in the #QueryParams section of your template).
 
 Integer : each literal parameter name must be prefixed by « I_ » (Ex : I_LIM)
 
-Resource : each literal parameter name must be prefixed by « R_ » (Ex : R_RES)
+Resource : each Resource ID parameter must be prefixed by « R_ » (Ex : R_RES)
 
 
 Additional rule : Filter on variables should be the last ones in a query
