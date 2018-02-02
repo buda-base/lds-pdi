@@ -64,8 +64,8 @@ public class GitService {
                
             }
             catch(IOException ex) {
-                log.log(Level.FINEST, "Git was unable to setup repository at "+localGit.getPath()+" directory ", ex);
-                ex.printStackTrace();
+                log.log(Level.FINEST, "Git was unable to setup repository at "+localGit.getPath()+" directory ", ex.getMessage());
+                
             }
             updateRepo();            
         }
@@ -84,8 +84,8 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex);
-            ex.printStackTrace();
+            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex.getMessage());
+            
         }
     }
     
@@ -98,8 +98,8 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex);
-            ex.printStackTrace();
+            log.log(Level.WARNING, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory "+ex.getMessage());
+            
         }
     }
 

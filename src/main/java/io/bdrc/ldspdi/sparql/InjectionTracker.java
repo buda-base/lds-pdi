@@ -20,6 +20,7 @@ package io.bdrc.ldspdi.sparql;
  ******************************************************************************/
 
 import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -47,6 +48,12 @@ public class InjectionTracker {
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
                 if(lit.contains(st)) {
+                    String lang=converted.get(litParams.get(st));
+                    try {
+                        new Locale.Builder().setLanguageTag(lang).build();
+                    }catch(IllformedLocaleException ex) {
+                        return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag";
+                    }
                     queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));
                     log.info("Setting literal st:"+st+ " with value:"+converted.get(st)+" lang:"+converted.get(litParams.get(st)));
                 }else {

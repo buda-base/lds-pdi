@@ -104,13 +104,17 @@ public class PublicTemplatesResource {
         query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());            
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                
-                Results res = getResults(query, fuseki, hash, pageSize); 
-                ResultPage rp=new ResultPage(res,pageNumber,hm);
-                if(jsonOutput) {
-                    mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
-                }else {
-                    os.write(Helpers.renderHtmlResultPage(rp,relativeUri).getBytes());
+                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+                    os.write(query.getBytes());
+                }
+                else {
+                    Results res = getResults(query, fuseki, hash, pageSize); 
+                    ResultPage rp=new ResultPage(res,pageNumber,hm);
+                    if(jsonOutput) {
+                        mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
+                    }else {
+                        os.write(Helpers.renderHtmlResultPage(rp,relativeUri).getBytes());
+                    }
                 }
             }
         };
@@ -149,12 +153,15 @@ public class PublicTemplatesResource {
         //MultivaluedMap<String,String> copy=map;
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException { 
-                
-                Results res = getResults(query, fuseki, hash, pageSize);                
-                hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
-                ResultPage rp=new ResultPage(res,pageNumber,hm);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);                 
+                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+                    os.write(query.getBytes());
+                }else {
+                    Results res = getResults(query, fuseki, hash, pageSize);                
+                    hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+                    hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
+                    ResultPage rp=new ResultPage(res,pageNumber,hm);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
+                }
             }
         };
         return Response.ok(stream).build();
@@ -192,11 +199,15 @@ public class PublicTemplatesResource {
         query=InjectionTracker.getValidQuery(q, map,qfp.getLitLangParams());        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                Results res = getResults(query, fuseki, hash, pageSize);                
-                map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                ResultPage rp=new ResultPage(res,pageNumber,map);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
+                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+                    os.write(query.getBytes());
+                }else {
+                    Results res = getResults(query, fuseki, hash, pageSize);                
+                    map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+                    map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+                    ResultPage rp=new ResultPage(res,pageNumber,map);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
+                }
             }
         };
         return Response.ok(stream).build();
