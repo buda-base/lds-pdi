@@ -42,6 +42,7 @@ public class QueryConstants {
     public static String QUERY_PATH="queryPath";
 	
 	public static String QUERY_SCOPE="QueryScope";
+	public static String QUERY_PUBLIC_DOMAIN="public";
 	public static String QUERY_RETURN_TYPE="QueryReturnType";
 	public static String QUERY_RESULTS="QueryResults";
 	public static String QUERY_PARAMS="QueryParams";	

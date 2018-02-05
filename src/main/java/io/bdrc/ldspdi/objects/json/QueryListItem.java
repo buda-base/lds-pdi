@@ -7,7 +7,7 @@ public class QueryListItem {
        
     public QueryListItem(String name, String descLink) {
         super();
-        this.name = name;
+        this.name = name.substring(0,name.lastIndexOf("."));
         this.descLink = descLink;        
     }
     

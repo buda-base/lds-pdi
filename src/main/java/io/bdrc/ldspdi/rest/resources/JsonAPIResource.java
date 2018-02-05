@@ -82,16 +82,16 @@ public class JsonAPIResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                QueryFileParser qfp=new QueryFileParser(name);
+                QueryFileParser qfp=new QueryFileParser(name+".arq");
                 HashMap<String, String> meta=qfp.getMetaInf();
                 QueryTemplate qt= new QueryTemplate(
                         qfp.getTemplateName(),
+                        QueryConstants.QUERY_PUBLIC_DOMAIN,
                         Helpers.bdrcEncode("/resource/templates"+meta.get(QueryConstants.QUERY_URL)),
                         meta.get(QueryConstants.QUERY_SCOPE),
                         meta.get(QueryConstants.QUERY_RESULTS),
                         meta.get(QueryConstants.QUERY_RETURN_TYPE),
-                        meta.get(QueryConstants.QUERY_PARAMS),
-                        Helpers.bdrcEncode(meta.get(QueryConstants.QUERY_URL)),
+                        meta.get(QueryConstants.QUERY_PARAMS),                        
                         qfp.getQuery());
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , qt);
@@ -105,16 +105,16 @@ public class JsonAPIResource {
     @Produces(MediaType.APPLICATION_JSON)    
     public QueryTemplate queryDescPost(@PathParam("template") String name) {
         log.info("Call to queriesListGet()");               
-        QueryFileParser qfp=new QueryFileParser(name);
+        QueryFileParser qfp=new QueryFileParser(name+".arq");
         HashMap<String, String> meta=qfp.getMetaInf();
         QueryTemplate qt= new QueryTemplate(
                 qfp.getTemplateName(),
+                QueryConstants.QUERY_PUBLIC_DOMAIN,
                 "/resource/templates"+meta.get(QueryConstants.QUERY_URL),
                 meta.get(QueryConstants.QUERY_SCOPE),
                 meta.get(QueryConstants.QUERY_RESULTS),
                 meta.get(QueryConstants.QUERY_RETURN_TYPE),
-                meta.get(QueryConstants.QUERY_PARAMS),
-                meta.get(QueryConstants.QUERY_URL),
+                meta.get(QueryConstants.QUERY_PARAMS),                
                 qfp.getQuery());
                 
         return qt;        

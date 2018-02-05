@@ -2,34 +2,42 @@ package io.bdrc.ldspdi.objects.json;
 
 public class QueryTemplate {
     
-    String name;
+    String id;
+    String domain;
     String queryScope;
     String queryResults;
     String queryReturn;
-    String queryParams;
-    String queryString;
+    String queryParams;    
     String template;
     String demoLink;
     
     
     
-    public QueryTemplate(String name, String demoLink, String queryScope, String queryResults, String queryReturn, String queryParams,
-            String queryString, String template) {
+    public QueryTemplate(String id, String domain, String demoLink, String queryScope, String queryResults, String queryReturn, String queryParams,
+            String template) {
         super();
-        this.name = name;
+        this.id = id;
+        this.domain=domain;
         this.queryScope = queryScope;
         this.queryResults = queryResults;
         this.queryReturn = queryReturn;
-        this.queryParams = queryParams;
-        this.queryString = queryString;
+        this.queryParams = queryParams;        
         this.template = template;
         this.demoLink = demoLink;
     }
-    public String getName() {
-        return name;
+    
+    
+    public String getId() {
+        return id;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getDomain() {
+        return domain;
+    }
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
     public String getQueryScope() {
         return queryScope;
@@ -48,13 +56,6 @@ public class QueryTemplate {
     }
     public void setQueryParams(String queryParams) {
         this.queryParams = queryParams;
-    }
-    
-    public String getQueryString() {
-        return queryString;
-    }
-    public void setQueryString(String queryString) {
-        this.queryString = queryString;
     }
     public String getTemplate() {
         return template;
