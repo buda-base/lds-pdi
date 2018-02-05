@@ -65,6 +65,7 @@ public class StmtModel {
         }
     }
     
+       
     public boolean objectHasUri() {
         RDFNode obj = stmt.getObject();
         return obj.isURIResource();
