@@ -322,6 +322,28 @@ returns JSON queryTemplate object :
   "demoLink" : "http://localhost:8080/resource/templates?searchType=Lineage_list" 
 }
 ```
+# Quick search support
+
+lds-pdi offers a quick cross language "search by name" feature using simple Urls as follows:
+
+exact name search:
+```
+http://localhost:8080/resource/{type}/exact/{name}
+```
+fuzzy search (returns only the first 100 results):
+```
+http://localhost:8080/resource/{type}/{name}
+```
+{type} must be one of the following : 
+
+work ; person ; place ; role ; lineage ;
+
+#### Examples:
+```
+http://localhost:8080/resource/person/exact/西岡祖秀
+
+http://localhost:8080/resource/work/stong pa nyid bdun cu
+```
 
 # CORS support
 

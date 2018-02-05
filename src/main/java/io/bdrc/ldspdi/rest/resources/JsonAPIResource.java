@@ -25,15 +25,12 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
-import io.bdrc.ldspdi.sparql.results.Results;
-
 
 
 @Path("/")

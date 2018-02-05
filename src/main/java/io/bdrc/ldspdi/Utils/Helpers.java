@@ -93,8 +93,7 @@ public class Helpers {
 	    table=table+"</tr>";
         boolean changeColor=false;
         for(QuerySolutionItem qsi:rows) {
-            table=table+"<tr>"; 
-            int index=0;
+            table=table+"<tr>";             
             for(String st:headers) {
                 table=table+"<td";
                 if(changeColor) {
@@ -130,6 +129,55 @@ public class Helpers {
         }
 	    return table;
 	}
+	
+	public static String renderSingleHtmlResultPage(ResultPage page,String URL) {
+        String table="<br><span><b> Returned "+page.numResults+" results in "+page.getExecTime()+" ms</b></span><br>";
+        
+        table=table+"<br><br><table style=\"width: 80%\" border=\"0\"><tr >";
+        List<String> headers=page.getHeaders();
+        ArrayList<QuerySolutionItem> rows=page.getRows();
+        for(String st:headers) {
+            table=table+"<td style=\"background-color: #f7f7c5;\">"+st+"</td>";            
+        }
+        table=table+"</tr>";
+        boolean changeColor=false;
+        for(QuerySolutionItem qsi:rows) {
+            table=table+"<tr>";             
+            for(String st:headers) {
+                table=table+"<td";
+                if(changeColor) {
+                    table=table+" style=\"background-color: #f2f2f2;\">"+qsi.getValue(st)+"</td>";
+                }else {
+                    table=table+">"+qsi.getValue(st)+"</td>";
+                }
+            }
+            table=table+"</tr>";
+            changeColor=!changeColor;
+        }
+        table=table+"</table>";
+        if( page.numberOfPages>1) {
+            if(page.getPageNumber()==1 ) {
+                if(!URL.contains("&pageNumber=")) {
+                table=table+"<br><a href=\""+URL+"&pageNumber=2&hash="+page.getHash()+"\">Next</a><br><br>";
+                }
+                else {
+                    int next=page.getPageNumber()+1;
+                    String nextUrl=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                    table=table+"<br><a href=\""+nextUrl+"\">Next</a>";   
+                }
+            }else {
+                int prev=page.getPageNumber()-1;
+                String prevUrl=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
+                table=table+"<br><a href=\""+prevUrl+"\">Prev</a>";
+                if(!page.isLastPage()) {
+                    int next=page.getPageNumber()+1;
+                    String nextUrl=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                    table=table+"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\""+nextUrl+"\">&nbsp;Next</a>";
+                }
+            }
+        }
+        return table;
+    }
 	
 	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
 	    HashMap<String,String> copy=new HashMap<>();

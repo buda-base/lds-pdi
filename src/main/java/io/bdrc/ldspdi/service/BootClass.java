@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.service;
 import javax.servlet.ServletContextEvent;
 
 import java.util.HashMap;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

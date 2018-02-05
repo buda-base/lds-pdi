@@ -65,4 +65,20 @@ public class InjectionTracker {
         }
         return queryStr.toString();
     }
+    
+    public static String getValidURLQuery(String query,String param,String type) {
+        
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
+        String first=Character.toString(type.charAt(0)).toUpperCase();
+        try {
+            param=param.replace("+", " ");
+            param=param.replace("/", "\"/");
+            queryStr.setLiteral("URL", param);
+            queryStr.setIri("TYPE", "http://purl.bdrc.io/ontology/core/"+first+type.substring(1));
+        }catch(Exception ex) {
+            return "ERROR --> path param :"+param+" is invalid in Injection Tracker";
+        }
+        
+        return queryStr.toString();
+    }
 }

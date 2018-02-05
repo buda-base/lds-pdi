@@ -32,7 +32,12 @@ public class QueryConstants {
     public static String JSON_OUT="jsonOut";
     public static String REQ_METHOD="method";
     public static String REQ_URI="reqUri";
-	
+    
+    //****** URL QUERY TEMPLATE****************/
+    public static String URL_TEMPLATE="urlTemplate";
+    public static String URL_TEMPLATE_EXACT="urlTemplateExact";
+    
+    
     public static String QUERY_ERROR="ERROR";
     public static String QUERY_PATH="queryPath";
 	
@@ -47,10 +52,7 @@ public class QueryConstants {
 	public static String INT_ARGS_PARAMPREFIX="I_";
 	public static String LITERAL_ARGS_PARAMPREFIX="L_";
 	public static String LITERAL_LG_ARGS_PARAMPREFIX="LG_";
-	public static String RES_ARGS_PARAMPREFIX="R_";
-	
-	//public static String QUERY_LIMIT="LIM";
-	//public static String QUERY_RESOURCE="RES";
+	public static String RES_ARGS_PARAMPREFIX="R_";	
 	
 	public static final String WORK="Work";
 	public static final String PERSON="Person";
