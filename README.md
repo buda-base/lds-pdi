@@ -312,15 +312,14 @@ GET or POST: http://localhost:8080/queries/{template_name}
 returns JSON queryTemplate object :
 ```
 { 
-  "name" : "Lineage_list", 
-  "queryScope" : "Lineage", 
-  "queryResults" : "the list (Id, name) of all lineages",
+  "id" : "PersonNames_byNameLang", 
+  "domain" : "public", 
+  "queryScope" : "Person", 
+  "queryResults" : "A table containing the Id, primary_name, name_type and name_type value for people whose any name matches the NAME with the LANG tag", 
   "queryReturn" : "Table", 
-  "queryParams" : "NONE", 
-  "queryString" : "?searchType=Lineage_list", 
-  "template" : " SELECT DISTINCT ?lineage ?lineage_name WHERE { ?lineage a :Lineage . ?lineage skos:prefLabel ?lineage_name . }", 
-  "demoLink" : "http://localhost:8080/resource/templates?searchType=Lineage_list" 
-}
+  "queryParams" : "L_NAME,LG_NAME", 
+  "template" : " select distinct ?Person ?Primary_Name ?Name_Type ?Name WHERE { (?Person ?sc1 ?Primary_Name) text:query ( ?L_NAME ) . ?Person a :Person . ?Person :personName ?p_name . (?p_name ?sc2 ?Name) text:query (rdfs:label ?L_NAME) . ?p_name rdf:type ?Name_Type . OPTIONAL {?p_name ?title ?Name} . FILTER (?Name_Type != :PersonName) }", 
+  "demoLink" : "/resource/templates?searchType=PersonNames_byNameLang&L_NAME=%22%27od+zer%22&LG_NAME=bo-x-ewts" }
 ```
 # Quick search support
 
