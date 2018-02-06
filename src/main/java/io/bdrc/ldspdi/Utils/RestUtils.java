@@ -152,14 +152,17 @@ public class RestUtils {
     }
     
     public static String renderHtmlResultPage(ResultPage page,String URL) {
-        String table="<br><span><b> Returned "+page.numResults+" results in "+page.getExecTime()+" ms</b></span><br>";
+        String table=getHtmlResultsHeader();
+        table=table+"<br><span><b> Returned "+page.numResults+" results in "+page.getExecTime()+" ms</b></span><br>";
         table=table+"<span><b> Page number : "+page.getPageNumber()+"</b></span><br>";
         table=table+"<span><b> Total pages : "+page.getNumberOfPages()+"</b></span><br>";
         table=table+"<span><b> ResultSet Hash="+page.getHash()+"</b></span><br>";
+        table=table+"<span><b> Template name="+page.getId()+"  </b><a href=\"javascript:showHide()\">(view/hide query)"+"</a></span>";
+        table=table+"<div id=\"query\" style=\"display:none\">"+page.getQuery()+"</div><br>";
         if( page.numberOfPages>1) {
             if(page.getPageNumber()==1 ) {
                 if(!URL.contains("&pageNumber=")) {
-                table=table+"<br><a href=\""+URL+"&pageNumber=2&hash="+page.getHash()+"\">Next</a><br><br>";
+                table=table+"<br><a href=\""+URL+"&pageNumber=2&hash="+page.getHash()+"\">Next</a><br>";
                 }
                 else {
                     int next=page.getPageNumber()+1;
@@ -220,12 +223,13 @@ public class RestUtils {
                 }
             }
         }
+        table=table+getHtmlResultsFooter();
         return table;
     }
     
     public static String renderSingleHtmlResultPage(ResultPage page,String URL) {
-        String table="<br><span><b> Returned "+page.numResults+" results in "+page.getExecTime()+" ms</b></span><br>";
-        
+        String table=getHtmlResultsHeader();
+        table=table+"<br><span><b> Returned "+page.numResults+" results in "+page.getExecTime()+" ms</b></span><br>";
         table=table+"<br><br><table style=\"width: 80%\" border=\"0\"><tr >";
         List<String> headers=page.getHeaders();
         ArrayList<QuerySolutionItem> rows=page.getRows();
@@ -269,7 +273,33 @@ public class RestUtils {
                 }
             }
         }
+        table=table+getHtmlResultsFooter();
         return table;
+    }
+    
+    public static String getHtmlResultsHeader() {
+        return "<!DOCTYPE html>\n" + 
+                "<html>\n" + 
+                "<head>\n" + 
+                "<meta charset=\"UTF-8\">\n" + 
+                "<script type=\"text/javascript\"> \n" + 
+                "function showHide() {" + 
+                "    var x = document.getElementById(\"query\");" + 
+                "    if (x.style.display === \"none\") {" + 
+                "        x.style.display = \"block\";" + 
+                "    } else {\n" + 
+                "        x.style.display = \"none\";" + 
+                "    }" + 
+                "}   \n" + 
+                "</script>\n" + 
+                "<title>BDRC Public data results</title>\n" + 
+                "</head>\n" + 
+                "<body>";
+        
+    }
+    public static String getHtmlResultsFooter() {
+        
+        return "</body></html>";
     }
     
     public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){

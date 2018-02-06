@@ -6,7 +6,6 @@
 GitService.update(request.getServletContext().getInitParameter("queryPath"));
 String content=DocFileBuilder.getContent(new String("/resource/templates"));
 
-
 %>
 <!DOCTYPE html>
 <html>

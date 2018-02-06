@@ -99,6 +99,7 @@ public class PublicTemplatesResource {
         
         qfp=new QueryFileParser(filename);
         String q=qfp.getQuery();
+        hm.put("query", qfp.getQueryHtml());
         String check=qfp.checkQueryArgsSyntax();
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+"; ERROR: "+check);

@@ -25,6 +25,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.sparql.QueryConstants;
+
 public class ResultPage {
     
     public int pageNumber;
@@ -32,6 +34,8 @@ public class ResultPage {
     public int pageSize;
     public int numResults;
     public long execTime;
+    public String id;
+    public String query;
     public int hash;
     public boolean isLastPage;
     public boolean isFirstPage;    
@@ -49,6 +53,8 @@ public class ResultPage {
         hash=res.getHash();
         headers=res.getHeaders();
         numberOfPages=res.getNumberOfPages();
+        id=hm.get(QueryConstants.SEARCH_TYPE);
+        query=hm.get("query");
         int offset=(pageNumber-1)*pageSize;               
         rows=new ArrayList<>();
         ArrayList<QuerySolutionItem> allRows=res.getRows();
@@ -120,4 +126,13 @@ public class ResultPage {
     public ResultPageLinks getpLinks() {
         return pLinks;
     }
+
+    public String getId() {
+        return id;
+    }
+    public String getQuery() {
+        return query;
+    }
+    
+    
 }

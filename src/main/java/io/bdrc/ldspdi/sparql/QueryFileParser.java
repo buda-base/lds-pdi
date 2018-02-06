@@ -38,6 +38,7 @@ public class QueryFileParser {
 	private File queryFile;	
 	private HashMap<String,String> metaInf;
 	private String query;
+	private String queryHtml;
 	private String queryName;
 	private HashMap<String,String> litLangParams=new HashMap<>();
 	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
@@ -72,6 +73,7 @@ public class QueryFileParser {
     		BufferedReader br = new BufferedReader(new FileReader(queryFile));		
     		String readLine = "";	
     		query=""; 
+    		queryHtml=""; 
     	    while ((readLine = br.readLine()) != null) {	            
     	            readLine=readLine.trim();
     	            if(readLine.startsWith("#")) {
@@ -85,6 +87,7 @@ public class QueryFileParser {
     	            }
     	            else {
     	            	query=query+" "+readLine;
+    	            	queryHtml=queryHtml+"<br>"+" "+readLine;
     	            }
     	            	
     	   }
@@ -145,6 +148,10 @@ public class QueryFileParser {
 
     public static Logger getLog() {
         return log;
+    }
+
+    public String getQueryHtml() {
+        return queryHtml;
     }
 	
 	
