@@ -6,7 +6,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +24,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -83,18 +81,8 @@ public class JsonAPIResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
                 QueryFileParser qfp=new QueryFileParser(name+".arq");
-                HashMap<String, String> meta=qfp.getMetaInf();
-                QueryTemplate qt= new QueryTemplate(
-                        qfp.getTemplateName(),
-                        QueryConstants.QUERY_PUBLIC_DOMAIN,
-                        Helpers.bdrcEncode("/resource/templates"+meta.get(QueryConstants.QUERY_URL)),
-                        meta.get(QueryConstants.QUERY_SCOPE),
-                        meta.get(QueryConstants.QUERY_RESULTS),
-                        meta.get(QueryConstants.QUERY_RETURN_TYPE),
-                        meta.get(QueryConstants.QUERY_PARAMS),                        
-                        qfp.getQuery());
                 ObjectMapper mapper = new ObjectMapper();
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , qt);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(os , qfp.getTemplate());
             }
         };
         return Response.ok(stream).build();        
@@ -105,19 +93,8 @@ public class JsonAPIResource {
     @Produces(MediaType.APPLICATION_JSON)    
     public QueryTemplate queryDescPost(@PathParam("template") String name) {
         log.info("Call to queriesListGet()");               
-        QueryFileParser qfp=new QueryFileParser(name+".arq");
-        HashMap<String, String> meta=qfp.getMetaInf();
-        QueryTemplate qt= new QueryTemplate(
-                qfp.getTemplateName(),
-                QueryConstants.QUERY_PUBLIC_DOMAIN,
-                "/resource/templates"+meta.get(QueryConstants.QUERY_URL),
-                meta.get(QueryConstants.QUERY_SCOPE),
-                meta.get(QueryConstants.QUERY_RESULTS),
-                meta.get(QueryConstants.QUERY_RETURN_TYPE),
-                meta.get(QueryConstants.QUERY_PARAMS),                
-                qfp.getQuery());
-                
-        return qt;        
+        QueryFileParser qfp=new QueryFileParser(name+".arq"); 
+        return qfp.getTemplate();        
     }
     
     private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList){

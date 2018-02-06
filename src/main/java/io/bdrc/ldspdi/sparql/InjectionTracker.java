@@ -35,6 +35,7 @@ public class InjectionTracker {
     public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) {
+        log.info("Query before injection tracking :"+query);
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
         Set<String> s = converted.keySet(); 
         Set<String> lit = litParams.keySet();        

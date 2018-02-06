@@ -45,12 +45,7 @@ function onto(){
 </head>
 <body>
 <h1>BDRC Public Data Interface</h1>
-        <p>This resource provides direct data access to the BDRC Library</p>
-        <p>The data is provided under a Creative Commons CC-BY license.</p>
-        <p>This work is licensed under the Creative Commons Attribution 3.0 Unported License.<br> 
-    To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to 
-    Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
-    </p>
+        <p>This resource provides direct data access to the BDRC Library</p>        
     
 <h2>Navigate through BDRC Ontology</h2>
 <p>You can use this service to access the current BDRC ontology and discover the data model:</p>

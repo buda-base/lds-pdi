@@ -12,7 +12,6 @@ public class QueryTemplate {
     String demoLink;
     
     
-    
     public QueryTemplate(String id, String domain, String demoLink, String queryScope, String queryResults, String queryReturn, String queryParams,
             String template) {
         super();

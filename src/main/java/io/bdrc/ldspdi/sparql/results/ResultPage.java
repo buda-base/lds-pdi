@@ -20,14 +20,20 @@ package io.bdrc.ldspdi.sparql.results;
  ******************************************************************************/
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ResultPage {
+    
+    public static Logger log=Logger.getLogger(ResultPage.class.getName());
     
     public int pageNumber;
     public int numberOfPages;
@@ -40,11 +46,11 @@ public class ResultPage {
     public boolean isLastPage;
     public boolean isFirstPage;    
     public ResultPageLinks pLinks;
-    public List<String> headers;
+    public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
-    
+    private QueryTemplate temp;
 
-    public ResultPage(Results res,int pageNumber,HashMap<String,String> hm) throws JsonProcessingException{
+    public ResultPage(Results res,int pageNumber,HashMap<String,String> hm,QueryTemplate temp) throws JsonProcessingException{
         
         this.pageNumber=pageNumber;
         pageSize=res.getPageSize();
@@ -55,7 +61,8 @@ public class ResultPage {
         numberOfPages=res.getNumberOfPages();
         id=hm.get(QueryConstants.SEARCH_TYPE);
         query=hm.get("query");
-        int offset=(pageNumber-1)*pageSize;               
+        int offset=(pageNumber-1)*pageSize; 
+        this.temp=temp;
         rows=new ArrayList<>();
         ArrayList<QuerySolutionItem> allRows=res.getRows();
         if(pageNumber<=numberOfPages) {
@@ -82,7 +89,7 @@ public class ResultPage {
         }
         pLinks=new ResultPageLinks(this,hm);
     }
-
+    
     public ArrayList<QuerySolutionItem> getRows() {
         return rows;
     }
@@ -133,6 +140,20 @@ public class ResultPage {
     public String getQuery() {
         return query;
     }
-    
+        
+    public void setQuery(String query) {
+        this.query = query;
+        log.info("Setting query:"+query);
+    }
+
+    public List<String> getParamList(){
+        log.info("Param :"+temp.getQueryParams());
+        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
+        if(list.size()==1 && list.get(0).equals(QueryConstants.QUERY_NO_ARGS)){
+            return new ArrayList<String>();
+        }
+        log.info("Param list:"+list);
+        return list;
+    }
     
 }

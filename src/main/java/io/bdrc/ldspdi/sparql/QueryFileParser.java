@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import io.bdrc.ldspdi.Utils.Helpers;
+import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryFileParser {
@@ -41,6 +43,8 @@ public class QueryFileParser {
 	private String queryHtml;
 	private String queryName;
 	private HashMap<String,String> litLangParams=new HashMap<>();
+	private QueryTemplate template;
+	
 	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
 	
 	
@@ -49,7 +53,16 @@ public class QueryFileParser {
 		metaInf= new HashMap<>();
 		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
 		queryName=filename.substring(0,filename.lastIndexOf("."));
-		parseFile();		
+		parseFile();
+		template= new QueryTemplate(
+                getTemplateName(),
+                QueryConstants.QUERY_PUBLIC_DOMAIN,
+                Helpers.bdrcEncode("/resource/templates"+metaInf.get(QueryConstants.QUERY_URL)),
+                metaInf.get(QueryConstants.QUERY_SCOPE),
+                metaInf.get(QueryConstants.QUERY_RESULTS),
+                metaInf.get(QueryConstants.QUERY_RETURN_TYPE),
+                metaInf.get(QueryConstants.QUERY_PARAMS),                        
+                getQuery());
 	}
 	
 	//For testing purpose only - to be removed//
@@ -91,6 +104,7 @@ public class QueryFileParser {
     	            }
     	            	
     	   }
+    	    queryHtml=queryHtml.substring(4);
     	   br.close();
 	   }
 	   catch(IOException ex){
@@ -152,6 +166,10 @@ public class QueryFileParser {
 
     public String getQueryHtml() {
         return queryHtml;
+    }
+
+    public QueryTemplate getTemplate() {
+        return template;
     }
 	
 	

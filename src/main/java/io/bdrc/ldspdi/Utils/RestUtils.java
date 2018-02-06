@@ -1,8 +1,5 @@
 package io.bdrc.ldspdi.Utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -108,28 +104,8 @@ public class RestUtils {
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 12);
         RDFWriter w = RDFWriter.create().source(m.getGraph()).context(ctx).lang(sttl).build();
         return w;
-    }
-    
-    public static String getQuery(File file) {
-        String query=""; 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));      
-            String readLine = "";
-            while ((readLine = br.readLine()) != null) {                
-                readLine=readLine.trim();
-                if(!readLine.startsWith("#")) {
-                    query=query+" "+readLine;
-                }  
-            }
-            br.close();
-       }
-       catch(IOException ex){
-           log.log(Level.FINEST, "QueryFile parsing error", ex);
-           ex.printStackTrace();
-       }
-       return query;      
-    }
-    
+    }    
+       
     public static Results getResults(String query, String fuseki, int hash, int pageSize) {
         Results res;
         if(hash ==-1) {
@@ -180,7 +156,7 @@ public class RestUtils {
                 }
             }
         }
-        table=table+"<br><br><table style=\"width: 80%\" border=\"0\"><tr >";
+        table=table+"<br><br><table style=\"width: 80%\" border=\"0\"><tr>";
         List<String> headers=page.getHeaders();
         ArrayList<QuerySolutionItem> rows=page.getRows();
         for(String st:headers) {

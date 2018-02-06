@@ -23,7 +23,6 @@ package io.bdrc.ldspdi.rest.resources;
  * limitations under the License.
  ******************************************************************************/
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -61,6 +60,7 @@ import io.bdrc.ldspdi.Utils.RestUtils;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
@@ -168,13 +168,12 @@ public class PublicDataResource {
         int pageSize =RestUtils.getPageSize(hm.get(QueryConstants.PAGE_SIZE));
         int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
         int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
-        boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
-        
-        File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+
-                "public/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
-        String query=ServiceConfig.getPrefixes()+RestUtils.getQuery(file);
-        String q=InjectionTracker.getValidURLQuery(query, res,type);   
-        
+        boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));        
+       
+        QueryFileParser qfp=new QueryFileParser(
+                "/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
+        String query=ServiceConfig.getPrefixes()+qfp.getQuery();
+        String q=InjectionTracker.getValidURLQuery(query, res,type);
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 if(q.startsWith(QueryConstants.QUERY_ERROR)) {
@@ -182,7 +181,7 @@ public class PublicDataResource {
                 }
                 else {
                     Results res = RestUtils.getResults(q, fuseki, hash, pageSize); 
-                    ResultPage rp=new ResultPage(res,pageNumber,hm);
+                    ResultPage rp=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
                     if(jsonOutput) {
                         mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
                     }else {
@@ -221,10 +220,9 @@ public class PublicDataResource {
         boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
         String quotedForLucene="\""+res+"\"";
         
-        File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+
-                "public/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));
-        String query=RestUtils.getQuery(file);
-        String q=InjectionTracker.getValidURLQuery(query, quotedForLucene,type);   
+        QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));
+        String query=ServiceConfig.getPrefixes()+qfp.getQuery();
+        String q=InjectionTracker.getValidURLQuery(query, quotedForLucene,type);  
         
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -233,7 +231,7 @@ public class PublicDataResource {
                 }
                 else {
                     Results res = RestUtils.getResults(q, fuseki, -1, pageSize); 
-                    ResultPage rp=new ResultPage(res,1,hm);
+                    ResultPage rp=new ResultPage(res,1,hm,qfp.getTemplate());
                     if(jsonOutput) {
                         mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
                     }else {

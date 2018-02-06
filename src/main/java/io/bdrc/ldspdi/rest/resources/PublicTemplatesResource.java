@@ -31,6 +31,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +41,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.mvc.Viewable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,7 +69,8 @@ public class PublicTemplatesResource {
     
     @GET
     @Path("/resource/templates")
-    public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
+    @Produces("text/html")
+    public Viewable getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
         
         log.info("Call to getQueryTemplateResults()"); 
         log.info("URL :"+info.getRequestUri());
@@ -77,8 +80,7 @@ public class PublicTemplatesResource {
         else 
             {fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);}
         
-        //Settings
-        MediaType media=new MediaType("text","html","utf-8");
+        //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
         HashMap<String,String> hm=RestUtils.convertMulti(mp);
@@ -104,27 +106,21 @@ public class PublicTemplatesResource {
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+"; ERROR: "+check);
         }
-        log.info("Query before Injection Tracking -->"+filename+".arq"+System.lineSeparator()+q);
-        query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());            
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-                    os.write(query.getBytes());
-                }
-                else {
-                    Results res = RestUtils.getResults(query, fuseki, hash, pageSize); 
-                    ResultPage rp=new ResultPage(res,pageNumber,hm);
-                    if(jsonOutput) {
-                        mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
-                    }else {
-                        os.write(RestUtils.renderHtmlResultPage(rp,relativeUri).getBytes());
-                    }
-                }
-            }
-        };
-        return Response.ok(stream,media).build();
-    } 
-    
+        query=InjectionTracker.getValidQuery(q, hm,qfp.getLitLangParams());
+        boolean error=query.startsWith(QueryConstants.QUERY_ERROR);
+        String msg =query;
+        if(error) {
+            return new Viewable("/error.jsp",msg);
+        }
+        Results res = RestUtils.getResults(query, fuseki, hash, pageSize); 
+        ResultPage model=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
+        if(jsonOutput) {
+            model.setQuery(q);
+            String it=mapper.writeValueAsString(model);
+            return new Viewable("/json.jsp",it);
+        }
+        return new Viewable("/resPage.jsp",model);
+    }
        
     @POST 
     @Path("/resource/templates")
@@ -164,7 +160,7 @@ public class PublicTemplatesResource {
                     Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
                     hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
-                    ResultPage rp=new ResultPage(res,pageNumber,hm);
+                    ResultPage rp=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }
@@ -192,10 +188,8 @@ public class PublicTemplatesResource {
         int pageNumber=RestUtils.getPageNumber(map.get(QueryConstants.PAGE_NUMBER));
         int hash=RestUtils.getHash(map.get(QueryConstants.RESULT_HASH));
         
-        QueryFileParser qfp;
+        QueryFileParser qfp=new QueryFileParser(filename);;
         final String query;
-        
-        qfp=new QueryFileParser(filename);
         String q=qfp.getQuery();
         String check=qfp.checkQueryArgsSyntax();
         if(check.length()>0) {
@@ -210,12 +204,14 @@ public class PublicTemplatesResource {
                     Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
                     map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                    ResultPage rp=new ResultPage(res,pageNumber,map);
+                    ResultPage rp=new ResultPage(res,pageNumber,map,qfp.getTemplate());
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }
         };
         return Response.ok(stream).build();
     }
+    
+     
     
 }
