@@ -85,7 +85,7 @@ You can view/download the ontology file at the following url:
 http://localhost:8080/ontology.{ext}
 ```
 
-where can be any of the supported mime types and file extensions shown below, "jsonld" excepted.
+where {ext} can be any of the supported mime types and file extensions shown below, "jsonld" excepted.
 
 # Json Context of lds-pdi
 ```
