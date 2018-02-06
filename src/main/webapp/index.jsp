@@ -35,6 +35,12 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
     color: white;
 }
 </style>
+<script type="text/javascript">
+function onto(){
+	var x = "ontology."+document.getElementById("format").value;
+	window.location.assign(x);
+}
+</script>
 <title>BDRC Public data Interface</title>
 </head>
 <body>
@@ -49,6 +55,15 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
 <h2>Navigate through BDRC Ontology</h2>
 <p>You can use this service to access the current BDRC ontology and discover the data model:</p>
 <p><a href="/demo/ontOverview.jsp">Ontology service</a></p>
+<div> View/download the ontology file: <select id="format">
+  <option value="ttl">text/turtle=ttl</option>
+  <option value="rdf">application/rdf+xml=rdf</option>
+  <option value="owl">application/owl+xml=owl</option>
+  <option value="json">application/json=json</option>
+  <option value="nt">application/n-triples=nt</option>
+  <option value="trix">application/trix+xml=trix</option>
+</select> <button onclick="javascript:onto();" type="button"> View </button>
+</div>
 
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 

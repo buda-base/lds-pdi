@@ -64,10 +64,28 @@ mvn jetty:run
 http://localhost:8080/index.jsp
 ```
 
-# Ontology browsing service demo page
+# Ontology browsing service
 ```
 http://localhost:8080/demo/ontOverview.jsp
 ```
+
+OR (by classes)
+
+```
+http://localhost:8080/ontology/admin/Product
+
+http://localhost:8080/ontology/core/Work
+```
+
+#### View the ontology file 
+
+You can view/download the ontology file at the following url:
+
+```
+http://localhost:8080/ontology.{ext}
+```
+
+where can be any of the supported mime types and file extensions shown below, "jsonld" excepted.
 
 # Json Context of lds-pdi
 ```

@@ -64,6 +64,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ontology.service.core.OntAccess;
 import io.bdrc.ontology.service.core.OntClassModel;
 
 
@@ -409,6 +410,38 @@ public class PublicDataResource {
         String uri="http://purl.bdrc.io/ontology/admin/"+cl;
         map.put("model", new OntClassModel(uri)); 
         return new Viewable("/ontRes.jsp", map);        
+    }
+    
+    @GET
+    @Path("/ontology.{ext}")
+    //@Produces(MediaType.TEXT_PLAIN) 
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {
+        log.info("getOntology()");        
+        MediaType media=new MediaType("text","turtle");
+        if(RestUtils.isValidExtension(ext)){
+            String mime=ServiceConfig.getProperty("m"+ext);
+            String[] parts=mime.split(Pattern.quote("/"));
+            media =new MediaType(parts[0],parts[1]);
+        }
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                // when prefix is null, QueryProcessor default prefix is used*/
+                Model model=OntAccess.MODEL;
+                if(RestUtils.isValidExtension(ext)&& !ext.equalsIgnoreCase("ttl")){
+                    if(ext.equalsIgnoreCase("jsonld")) {
+                        //Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
+                        //JSONLDFormatter.jsonObjectToOutputStream(model, os);
+                        model.write(os,ServiceConfig.getProperty("json"));
+                    }else {
+                        model.write(os,ServiceConfig.getProperty(ext));
+                    }
+                }else{
+                    RDFWriter writer=RestUtils.getSTTLRDFWriter(model);                   
+                    writer.output(os);                                      
+                }                
+            }
+        };
+        return Response.ok(stream,media).build();        
     }
     
 }
