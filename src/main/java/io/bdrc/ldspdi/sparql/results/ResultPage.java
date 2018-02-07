@@ -63,7 +63,7 @@ public class ResultPage {
         id=hm.get(QueryConstants.SEARCH_TYPE);
         query=hm.get("query");
         String tmp=hm.get(QueryConstants.QUERY_TYPE);
-        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}
+        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}        
         int offset=(pageNumber-1)*pageSize; 
         this.temp=temp;
         rows=new ArrayList<>();
@@ -158,17 +158,14 @@ public class ResultPage {
     }
 
     public void setQuery(String query) {
-        this.query = query;
-        log.info("Setting query:"+query);
+        this.query = query;        
     }
 
-    public List<String> getParamList(){
-        log.info("Param :"+temp.getQueryParams());
+    public List<String> getParamList(){        
         List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
         if(list.size()==1 && list.get(0).equals(QueryConstants.QUERY_NO_ARGS)){
             return new ArrayList<String>();
-        }
-        log.info("Param list:"+list);
+        }        
         return list;
     }
     

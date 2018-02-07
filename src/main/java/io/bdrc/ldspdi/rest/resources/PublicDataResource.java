@@ -62,6 +62,7 @@ import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.sparql.results.JsonResult;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ontology.service.core.OntAccess;
@@ -158,9 +159,8 @@ public class PublicDataResource {
         //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);
-        hm.put(QueryConstants.REQ_METHOD, "GET");
-        hm.put(QueryConstants.REQ_URI, relativeUri);        
+        HashMap<String,String> hm=RestUtils.convertMulti(mp);             
+        hm.put(QueryConstants.REQ_URI, relativeUri); 
         ObjectMapper mapper = new ObjectMapper();
         
         //params              
@@ -171,9 +171,7 @@ public class PublicDataResource {
        
         QueryFileParser qfp=new QueryFileParser(
                 "/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
-        hm.put("query", qfp.getQueryHtml());
-        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-        String query=ServiceConfig.getPrefixes()+qfp.getQuery();
+        String query=qfp.getQuery();
         String q=InjectionTracker.getValidURLQuery(query, res,type);
         
         boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
@@ -181,14 +179,18 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);
-        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);        
         if(jsonOutput) {
-            model.setQuery(q);
-            String it=mapper.writeValueAsString(model);
+            JsonResult model=new JsonResult(rs,pageNumber,hm);
+            String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
+        }else {
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
+            ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+            return new Viewable("/resPage.jsp",model);
         }
-        return new Viewable("/resPage.jsp",model);
     }
     
     @GET
@@ -208,8 +210,7 @@ public class PublicDataResource {
         MediaType media=new MediaType("text","html","utf-8");
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);
-        hm.put(QueryConstants.REQ_METHOD, "GET");
+        HashMap<String,String> hm=RestUtils.convertMulti(mp);        
         hm.put(QueryConstants.REQ_URI, relativeUri);        
         ObjectMapper mapper = new ObjectMapper();
         
@@ -220,10 +221,8 @@ public class PublicDataResource {
         boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
         String quotedForLucene="\""+res+"\"";
         
-        QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));
-        hm.put("query", qfp.getQueryHtml());
-        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-        String query=ServiceConfig.getPrefixes()+qfp.getQuery();
+        QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));        
+        String query=qfp.getQuery();
         String q=InjectionTracker.getValidURLQuery(query, quotedForLucene,type);  
         
         boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
@@ -231,14 +230,18 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);
-        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);        
         if(jsonOutput) {
-            model.setQuery(q);
-            String it=mapper.writeValueAsString(model);
+            JsonResult model=new JsonResult(rs,pageNumber,hm);
+            String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
+        }else {
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
+            ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+            return new Viewable("/resPage.jsp",model);
         }
-        return new Viewable("/resPage.jsp",model);
     }
        
     @POST

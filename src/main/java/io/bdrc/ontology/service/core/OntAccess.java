@@ -36,8 +36,6 @@ public class OntAccess {
         try {
         	OWL_URL=ServiceConfig.getProperty("owlURL");
         	InputStream stream = HttpFile.stream(OWL_URL);
-
-            log.info("got stream for " + OWL_URL);
             
             Model m = ModelFactory.createDefaultModel();
             m.read(stream, "", "RDF/XML");
@@ -45,8 +43,6 @@ public class OntAccess {
             ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             Utils.removeIndividuals(ontModel);
             Utils.rdf10tordf11(ontModel);
-            
-            log.info("got OntModel for " + OWL_URL);
 
         } catch (IOException io) {
             log.log(Level.FINEST, "Error initializing OntModel", io);            

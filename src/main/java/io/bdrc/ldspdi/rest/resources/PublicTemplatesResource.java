@@ -50,6 +50,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.results.JsonResult;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
 
@@ -72,9 +73,7 @@ public class PublicTemplatesResource {
     @Produces("text/html")
     public Viewable getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
         
-        log.info("Call to getQueryTemplateResults()"); 
-        log.info("URL :"+info.getRequestUri());
-        
+        log.info("Call to getQueryTemplateResults()");
         if(fuseki !=null)
             {fusekiUrl=fuseki;}
         else 
@@ -83,8 +82,7 @@ public class PublicTemplatesResource {
         //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);
-        hm.put(QueryConstants.REQ_METHOD, "GET");
+        HashMap<String,String> hm=RestUtils.convertMulti(mp);        
         hm.put(QueryConstants.REQ_URI, relativeUri);        
         ObjectMapper mapper = new ObjectMapper();
         
@@ -100,8 +98,7 @@ public class PublicTemplatesResource {
         final String query;
         
         qfp=new QueryFileParser(filename);
-        String q=qfp.getQuery();
-        hm.put("query", qfp.getQueryHtml());
+        String q=qfp.getQuery();        
         String check=qfp.checkQueryArgsSyntax();
         if(check.length()>0) {
             throw new Exception("Exception : File->"+ filename+"; ERROR: "+check);
@@ -112,14 +109,19 @@ public class PublicTemplatesResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results res = RestUtils.getResults(query, fuseki, hash, pageSize); 
-        ResultPage model=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
+        Results res = RestUtils.getResults(query, fuseki, hash, pageSize);
+        
         if(jsonOutput) {
-            model.setQuery(q);
-            String it=mapper.writeValueAsString(model);
+            JsonResult model=new JsonResult(res,pageNumber,hm);
+            hm.remove("query");
+            String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
+        }else {
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            ResultPage model=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
+            return new Viewable("/resPage.jsp",model);
         }
-        return new Viewable("/resPage.jsp",model);
     }
        
     @POST 
@@ -160,7 +162,7 @@ public class PublicTemplatesResource {
                     Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
                     hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
-                    ResultPage rp=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
+                    JsonResult rp=new JsonResult(res,pageNumber,hm);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }
@@ -204,7 +206,7 @@ public class PublicTemplatesResource {
                     Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
                     map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                    ResultPage rp=new ResultPage(res,pageNumber,map,qfp.getTemplate());
+                    JsonResult rp=new JsonResult(res,pageNumber,map);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }

@@ -45,8 +45,7 @@ public class OntClassModel {
         log.addHandler(new ConsoleHandler());
         this.uri = uri;
         clazz = OntAccess.MODEL.getOntClass(uri);
-        if (clazz == null) {
-            log.info("***********>>  OntClassModel( " + uri + " )");
+        if (clazz == null) {            
             clazz = OntClassNotPresent.INSTANCE;
         }
     }

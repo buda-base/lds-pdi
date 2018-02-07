@@ -53,8 +53,7 @@ public class JsonAPIResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
-                log.info(queryList.toString());                
+                ArrayList<QueryListItem> queryList=getQueryListItems(fileList);                                
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , queryList);
             }

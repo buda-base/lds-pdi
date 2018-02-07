@@ -55,12 +55,10 @@ public class InjectionTracker {
                     }catch(IllformedLocaleException ex) {
                         return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag";
                     }
-                    queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));
-                    log.info("Setting literal st:"+st+ " with value:"+converted.get(st)+" lang:"+converted.get(litParams.get(st)));
+                    queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));                    
                 }else {
                     //Some literals do not have a lang associated with them
-                    queryStr.setLiteral(st, converted.get(st));
-                    log.info("Setting literal without specified lang: st="+st+ " with value:"+converted.get(st));
+                    queryStr.setLiteral(st, converted.get(st));                    
                 }
             }
         }

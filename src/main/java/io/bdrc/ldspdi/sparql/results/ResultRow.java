@@ -38,14 +38,8 @@ public class ResultRow implements Serializable{
     ArrayList<QuerySolutionItem> items;
     
     public ResultRow(QuerySolution qs, List<String> headers) {
-        items=new ArrayList<>();
-        //for(String key:headers) {
-            //RDFNode node=qs.get(key);
-            //log.info("Key ="+key+" Node="+node);
-            //if(node !=null) {                
-                items.add(new QuerySolutionItem(qs,headers));
-            //}
-        //}        
+        items=new ArrayList<>();                      
+        items.add(new QuerySolutionItem(qs,headers));               
     }
 
     public ArrayList<QuerySolutionItem> getItems() {
