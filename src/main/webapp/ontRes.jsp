@@ -2,7 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
 <%@page import="io.bdrc.ldspdi.composer.*"%>
-<%@page import="io.bdrc.ldspdi.Utils.RestUtils"%>
+<%@page import="io.bdrc.ldspdi.Utils.Helpers"%>
 <%@page import="java.util.*"%>
 <%
 HashMap t=(HashMap)request.getAttribute("model");
@@ -15,10 +15,10 @@ OntClassModel model = (OntClassModel)t.get("model");
 <title>Ontology Class - <%= model.getId()%></title>
 </head>
 <body>
-<h2>Ontology Class - <a href="<%= RestUtils.relativizeURL(model.getUri())%>"><%= model.getId()%></a></h2>
+<h2>Ontology Class - <a href="<%= Helpers.relativizeURL(model.getUri())%>"><%= model.getId()%></a></h2>
 <% if (model.isPresent()) {
     if (model.hasParent()){%>
-        <h4>Parent class: <a href="<%=RestUtils.relativizeURL(model.getParent().getUri())%>"><%=model.getParent().getId()%></a></h4>
+        <h4>Parent class: <a href="<%=Helpers.relativizeURL(model.getParent().getUri())%>"><%=model.getParent().getId()%></a></h4>
         <% } 
         List<String> labels = model.getLabels() ;       
         if(labels.size()!=0){%>
@@ -91,7 +91,7 @@ OntClassModel model = (OntClassModel)t.get("model");
                 <h4>Subclasses:</h4>
             
                 <%for(OntClassModel sub:subclasses){%>
-                <ul><li><a href="<%=RestUtils.relativizeURL(sub.getUri())%>"><%=sub.getId() %></a></li></ul>
+                <ul><li><a href="<%=Helpers.relativizeURL(sub.getUri())%>"><%=sub.getId() %></a></li></ul>
             <%}}%>              
 <% } else {%>
 <p>This class is defined external to this ontology.</p>

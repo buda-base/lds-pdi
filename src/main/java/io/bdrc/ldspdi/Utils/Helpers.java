@@ -64,4 +64,9 @@ public class Helpers {
         }
         return copy;
     }
+	
+	public static String relativizeURL(String uri) {
+        uri=uri.substring(8);
+        return uri.substring(uri.indexOf("/"));
+    }
 }

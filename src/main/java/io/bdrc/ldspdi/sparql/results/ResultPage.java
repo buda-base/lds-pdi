@@ -49,6 +49,7 @@ public class ResultPage {
     public ResultPageLinks pLinks;
     public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
+    HashMap<String,String> hm;
     private QueryTemplate temp;
 
     public ResultPage(Results res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
@@ -58,6 +59,7 @@ public class ResultPage {
         }else {
             this.pageNumber=1;
         }
+        this.hm=hm;
         pageSize=res.getPageSize();
         numResults=res.getNumResults();
         execTime=res.getExecTime();
@@ -171,6 +173,14 @@ public class ResultPage {
             return new ArrayList<>();
         }        
         return list;
+    }
+    
+    public String getParamValue(String param) {
+        String val=hm.get(param);
+        if(val!=null) {
+            return val;
+        }
+        return "";
     }
     
 }
