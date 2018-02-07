@@ -1,5 +1,6 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
+<%@page import="io.bdrc.ldspdi.sparql.QueryConstants"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -67,7 +68,10 @@ input[type=submit]:hover {
 <span><b> Page number : ${model.getPageNumber()}</b></span><br>
 <span><b> Total pages : ${model.getNumberOfPages()}</b></span><br>
 <span><b> ResultSet Hash=${model.getHash()}</b></span><br>
-<span><b> Template name=${model.getId()}  </b><a href="javascript:showHide()">(view/hide query)</a></span>
+<c:if test="${!model.isUrlQuery()}">
+<span><b> Template name=${model.getId()}  </b>
+<a href="javascript:showHide()">(view/hide query)</a>
+</span>
 <div id="query" style="display:none">
 <br>
 <table>
@@ -81,14 +85,17 @@ input[type=submit]:hover {
 	            <input type="text" id="${p}" name="${p}" placeholder="..."><br>
 			</c:forEach>
 			<br>
-		    <input type="hidden" id="searchType" name="searchType" value="${model.getId()}">				  
+			
+		    <input type="hidden" id="searchType" name="searchType" value="${model.getId()}">		    		  
 		    <input type="submit" value="Submit">
 		</form>
 	</c:if>	
 	</td>
 </tr>
 </table>
-</div><br><br>
+</div>
+</c:if>
+<br><br>
 <c:if test="${!model.isFirstPage()}"><a href="${model.getpLinks().getPrevGet()}">Prev</a></c:if>
 <c:if test="${!model.isLastPage()}"><a href="${model.getpLinks().getNextGet()}">Next</a></c:if>
 <br><br>

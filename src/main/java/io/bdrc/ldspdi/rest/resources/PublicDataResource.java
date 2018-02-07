@@ -144,10 +144,10 @@ public class PublicDataResource {
     
     @GET
     @Path("/resource/{type}/exact/{res}") 
-    public Response getExactPersonURLResources(@PathParam("res") final String res,
+    public /*Response*/ Viewable getExactPersonURLResources(@PathParam("res") final String res,
         @PathParam("type") final String type,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) {
+        @Context UriInfo info) throws Exception {
         log.info("Call to getResourceGraph()");
         
         if(fuseki !=null){
@@ -155,8 +155,7 @@ public class PublicDataResource {
         }else {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }
-        //Settings
-        MediaType media=new MediaType("text","html","utf-8");
+        //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
         HashMap<String,String> hm=RestUtils.convertMulti(mp);
@@ -172,33 +171,32 @@ public class PublicDataResource {
        
         QueryFileParser qfp=new QueryFileParser(
                 "/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
+        hm.put("query", qfp.getQueryHtml());
+        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
         String query=ServiceConfig.getPrefixes()+qfp.getQuery();
         String q=InjectionTracker.getValidURLQuery(query, res,type);
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if(q.startsWith(QueryConstants.QUERY_ERROR)) {
-                    os.write(q.getBytes());
-                }
-                else {
-                    Results res = RestUtils.getResults(q, fuseki, hash, pageSize); 
-                    ResultPage rp=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
-                    if(jsonOutput) {
-                        mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
-                    }else {
-                        os.write(RestUtils.renderHtmlResultPage(rp,relativeUri).getBytes());
-                    }
-                }                  
-            }
-        };
-        return Response.ok(stream,media).build();       
+        
+        boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
+        String msg =q;
+        if(error) {
+            return new Viewable("/error.jsp",msg);
+        }
+        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);
+        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        if(jsonOutput) {
+            model.setQuery(q);
+            String it=mapper.writeValueAsString(model);
+            return new Viewable("/json.jsp",it);
+        }
+        return new Viewable("/resPage.jsp",model);
     }
     
     @GET
     @Path("/resource/{type}/{res}") 
-    public Response getPersonURLResources(@PathParam("res") final String res,
+    public Viewable getPersonURLResources(@PathParam("res") final String res,
         @PathParam("type") final String type,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) {
+        @Context UriInfo info) throws Exception{
         log.info("Call to getResourceGraph()");
         
         if(fuseki !=null){
@@ -217,30 +215,30 @@ public class PublicDataResource {
         
         //params              
         int pageSize =100;
+        int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
+        int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
         boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
         String quotedForLucene="\""+res+"\"";
         
         QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));
+        hm.put("query", qfp.getQueryHtml());
+        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
         String query=ServiceConfig.getPrefixes()+qfp.getQuery();
         String q=InjectionTracker.getValidURLQuery(query, quotedForLucene,type);  
         
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if(q.startsWith(QueryConstants.QUERY_ERROR)) {
-                    os.write(q.getBytes());
-                }
-                else {
-                    Results res = RestUtils.getResults(q, fuseki, -1, pageSize); 
-                    ResultPage rp=new ResultPage(res,1,hm,qfp.getTemplate());
-                    if(jsonOutput) {
-                        mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp);
-                    }else {
-                        os.write(RestUtils.renderSingleHtmlResultPage(rp,relativeUri).getBytes());
-                    }
-                }                  
-            }
-        };
-        return Response.ok(stream,media).build();       
+        boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
+        String msg =q;
+        if(error) {
+            return new Viewable("/error.jsp",msg);
+        }
+        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);
+        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        if(jsonOutput) {
+            model.setQuery(q);
+            String it=mapper.writeValueAsString(model);
+            return new Viewable("/json.jsp",it);
+        }
+        return new Viewable("/resPage.jsp",model);
     }
        
     @POST

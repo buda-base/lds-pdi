@@ -74,7 +74,7 @@ public class InjectionTracker {
         try {
             param=param.replace("+", " ");
             param=param.replace("/", "\"/");
-            queryStr.setLiteral("URL", param);
+            queryStr.setLiteral("NAME", param);
             queryStr.setIri("TYPE", "http://purl.bdrc.io/ontology/core/"+first+type.substring(1));
         }catch(Exception ex) {
             return "ERROR --> path param :"+param+" is invalid in Injection Tracker";

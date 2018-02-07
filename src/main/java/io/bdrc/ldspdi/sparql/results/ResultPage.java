@@ -44,7 +44,8 @@ public class ResultPage {
     public String query;
     public int hash;
     public boolean isLastPage;
-    public boolean isFirstPage;    
+    public boolean isFirstPage; 
+    public boolean isUrlQuery=false;
     public ResultPageLinks pLinks;
     public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
@@ -61,6 +62,8 @@ public class ResultPage {
         numberOfPages=res.getNumberOfPages();
         id=hm.get(QueryConstants.SEARCH_TYPE);
         query=hm.get("query");
+        String tmp=hm.get(QueryConstants.QUERY_TYPE);
+        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}
         int offset=(pageNumber-1)*pageSize; 
         this.temp=temp;
         rows=new ArrayList<>();
@@ -140,7 +143,20 @@ public class ResultPage {
     public String getQuery() {
         return query;
     }
-        
+    
+    public static Logger getLog() {
+        return log;
+    }
+    
+    
+    public boolean isUrlQuery() {
+        return isUrlQuery;
+    }
+
+    public QueryTemplate getTemp() {
+        return temp;
+    }
+
     public void setQuery(String query) {
         this.query = query;
         log.info("Setting query:"+query);

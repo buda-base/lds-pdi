@@ -32,10 +32,12 @@ public class QueryConstants {
     public static String JSON_OUT="jsonOut";
     public static String REQ_METHOD="method";
     public static String REQ_URI="reqUri";
+    public static String QUERY_TYPE="queryType";
     
     //****** URL QUERY TEMPLATE****************/
     public static String URL_TEMPLATE="urlTemplate";
     public static String URL_TEMPLATE_EXACT="urlTemplateExact";
+    public static String URL_QUERY="urlQuery";
     
     
     public static String QUERY_ERROR="ERROR";
