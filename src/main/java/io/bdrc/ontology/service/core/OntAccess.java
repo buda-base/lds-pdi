@@ -48,7 +48,7 @@ public class OntAccess {
             log.log(Level.FINEST, "Error initializing OntModel", io);            
         }        
         MODEL = ontModel;
-        ontData=new HashMap<String,ClassProperties>();
+        ontData=new HashMap<>();
         List<OntClass> list=MODEL.listClasses().toList();
 		for(OntClass clazz:list) {			
 			List<OntProperty> props=clazz.listDeclaredProperties(true).toList();
@@ -199,7 +199,7 @@ public class OntAccess {
      */    
     public static List<OntClass> getSimpleRootClasses() {
         List<OntClass> classes = MODEL.listHierarchyRootClasses().toList();
-        List<OntClass> rez = new ArrayList<OntClass>();
+        List<OntClass> rez = new ArrayList<>();
         for (OntClass oc : classes) {
             if (oc.getURI() != null) {
                 rez.add(oc);
@@ -211,7 +211,7 @@ public class OntAccess {
     
     public static List<OntClassModel> getOntRootClasses() {
         List<OntClass> roots = getSimpleRootClasses();
-        List<OntClassModel> models = new ArrayList<OntClassModel>();
+        List<OntClassModel> models = new ArrayList<>();
        
         for (OntClass root : roots) {
             if(!root.isAnon()) {

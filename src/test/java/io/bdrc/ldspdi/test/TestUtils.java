@@ -61,7 +61,7 @@ public class TestUtils {
 	}
 	
 	static HashMap<String,String> getContentTypes(){
-		HashMap<String,String> map=new HashMap<String,String>();
+		HashMap<String,String> map=new HashMap<>();
 		map.put("ttl", "text/turtle");
 		map.put("nt", "application/n-triples");
 		map.put("nq", "application/n-quads");
@@ -78,7 +78,7 @@ public class TestUtils {
 	}
 	
 	static ArrayList<String> getResourcesList(){
-		ArrayList<String> res=new ArrayList<String>();
+		ArrayList<String> res=new ArrayList<>();
 		res.add("R8LS12819");
 		res.add("C68");
 		

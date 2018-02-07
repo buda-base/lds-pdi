@@ -26,7 +26,9 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -38,7 +40,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -48,15 +49,20 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.vocabulary.SKOS;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
-import io.bdrc.ldspdi.Utils.RestUtils;
+import io.bdrc.jena.sttl.CompareComplex;
+import io.bdrc.jena.sttl.ComparePredicates;
+import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
@@ -72,13 +78,11 @@ import io.bdrc.ontology.service.core.OntClassModel;
 @Path("/")
 public class PublicDataResource {   
     
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());    
     
-    QueryProcessor processor=new QueryProcessor();
-    public String fusekiUrl="";
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     
-    
-    
+        
     public PublicDataResource() {
         super();
         ResourceConfig config=new ResourceConfig(PublicDataResource.class);
@@ -88,7 +92,7 @@ public class PublicDataResource {
     @GET 
     @Path("/context.jsonld")
     @Produces(MediaType.TEXT_HTML)    
-    public Response getJsonContext() throws IOException{
+    public Response getJsonContext(){
         log.info("Call to getJsonContext()"); 
         //return ServiceConfig.JSONLD_CONTEXT_HTML; 
         StreamingOutput stream = new StreamingOutput() {
@@ -103,7 +107,7 @@ public class PublicDataResource {
     @POST 
     @Path("/context.jsonld")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postJsonContext() throws JsonProcessingException{
+    public Response postJsonContext() {
         log.info("Call to getJsonContext()");    
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -118,25 +122,22 @@ public class PublicDataResource {
     @Path("/resource/{res}") 
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @QueryParam("classUri") final String uri) {
+        @HeaderParam("fusekiUrl") final String fuseki) {
         log.info("Call to getResourceGraph()");
-        
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }
-        
         MediaType media=new MediaType("text","turtle","utf-8");     
         if(ServiceConfig.isValidMime(format)){
-            media=RestUtils.getMediaType(format);
+            String[] parts=format.split(Pattern.quote("/"));
+            media = new MediaType(parts[0],parts[1]);    
+            
         }
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                Model model=processor.getResourceGraph(res,fusekiUrl);  
-                RDFWriter writer=RestUtils.getSTTLRDFWriter(model); 
+                Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);  
+                RDFWriter writer=getSTTLRDFWriter(model); 
                 writer.output(os);                  
             }
         };
@@ -153,21 +154,19 @@ public class PublicDataResource {
         
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }
         //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);             
+        HashMap<String,String> hm=Helpers.convertMulti(mp);             
         hm.put(QueryConstants.REQ_URI, relativeUri); 
         ObjectMapper mapper = new ObjectMapper();
         
         //params              
-        int pageSize =RestUtils.getPageSize(hm.get(QueryConstants.PAGE_SIZE));
-        int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
-        int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
-        boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));        
+        String pageSize =hm.get(QueryConstants.PAGE_SIZE);
+        String pageNumber=hm.get(QueryConstants.PAGE_NUMBER);
+        String hash=hm.get(QueryConstants.RESULT_HASH);
+        boolean jsonOutput=(hm.get(QueryConstants.JSON_OUT)!=null);        
        
         QueryFileParser qfp=new QueryFileParser(
                 "/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
@@ -179,18 +178,18 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);        
+        Results rs = QueryProcessor.getResults(q, fuseki, hash, pageSize);        
         if(jsonOutput) {
-            JsonResult model=new JsonResult(rs,pageNumber,hm);
+            JsonResult model=new JsonResult(rs,hm);
             String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
-        }else {
-            hm.put(QueryConstants.REQ_METHOD, "GET");             
-            hm.put("query", qfp.getQueryHtml());
-            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-            ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
-            return new Viewable("/resPage.jsp",model);
         }
+        hm.put(QueryConstants.REQ_METHOD, "GET");             
+        hm.put("query", qfp.getQueryHtml());
+        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
+        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        return new Viewable("/resPage.jsp",model);    
+        
     }
     
     @GET
@@ -200,25 +199,21 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info) throws Exception{
         log.info("Call to getResourceGraph()");
-        
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }
-        //Settings
-        MediaType media=new MediaType("text","html","utf-8");
+        //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);        
+        HashMap<String,String> hm=Helpers.convertMulti(mp);        
         hm.put(QueryConstants.REQ_URI, relativeUri);        
         ObjectMapper mapper = new ObjectMapper();
         
         //params              
-        int pageSize =100;
-        int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
-        int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
-        boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
+        String pageSize ="100";
+        String pageNumber=hm.get(QueryConstants.PAGE_NUMBER);
+        String hash=hm.get(QueryConstants.RESULT_HASH);
+        boolean jsonOutput=(hm.get(QueryConstants.JSON_OUT)!=null);
         String quotedForLucene="\""+res+"\"";
         
         QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));        
@@ -230,18 +225,18 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = RestUtils.getResults(q, fuseki, hash, pageSize);        
+        Results rs = QueryProcessor.getResults(q, fuseki, hash, pageSize);        
         if(jsonOutput) {
-            JsonResult model=new JsonResult(rs,pageNumber,hm);
+            JsonResult model=new JsonResult(rs,hm);
             String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
-        }else {
-            hm.put(QueryConstants.REQ_METHOD, "GET");             
-            hm.put("query", qfp.getQueryHtml());
-            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-            ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
-            return new Viewable("/resPage.jsp",model);
         }
+        hm.put(QueryConstants.REQ_METHOD, "GET");             
+        hm.put("query", qfp.getQueryHtml());
+        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
+        ResultPage model=new ResultPage(rs,pageNumber,hm,qfp.getTemplate());
+        return new Viewable("/resPage.jsp",model);   
+        
     }
        
     @POST
@@ -249,24 +244,21 @@ public class PublicDataResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @QueryParam("classUri") final String uri) {
+        @HeaderParam("fusekiUrl") final String fuseki) {
            
         log.info("Call to getResourceGraphPost");
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }
-        
         MediaType media=new MediaType("text","turtle","utf-8");     
         if(ServiceConfig.isValidMime(format)){
-            media=RestUtils.getMediaType(format);
+            String[] parts=format.split(Pattern.quote("/"));
+            media = new MediaType(parts[0],parts[1]); 
         }
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used
-                Model model=processor.getResourceGraph(res,fusekiUrl);  
+                Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);  
                 Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                 JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);                                 
             }
@@ -279,16 +271,13 @@ public class PublicDataResource {
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            @HeaderParam("prefix") final String prefix) {
+            @HeaderParam("fusekiUrl") final String fuseki) {
         log.info("Call to getFormattedResourceGraph()");
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         MediaType media=new MediaType("text","turtle");
-        if(RestUtils.isValidExtension(format)){
+        if(ServiceConfig.getProperty(format)!=null){
             String mime=ServiceConfig.getProperty("m"+format);
             String[] parts=mime.split(Pattern.quote("/"));
             media =new MediaType(parts[0],parts[1]);
@@ -296,8 +285,8 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResourceGraph(res,fusekiUrl); 
-                if(RestUtils.isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
+                Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
+                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                         JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);
@@ -305,7 +294,7 @@ public class PublicDataResource {
                         model.write(os,ServiceConfig.getProperty(format));
                     }
                 }else{
-                    RDFWriter writer=RestUtils.getSTTLRDFWriter(model);                   
+                    RDFWriter writer=getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
             }
@@ -319,16 +308,13 @@ public class PublicDataResource {
     public Response getFormattedResourceGraphPost(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            @HeaderParam("prefix") final String prefix) {
+            @HeaderParam("fusekiUrl") final String fuseki) {
         log.info("getFormattedResourceGraphPost");
         if(fuseki !=null){
             fusekiUrl=fuseki;
-        }else {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         MediaType media=new MediaType("text","turtle");
-        if(RestUtils.isValidExtension(format)){
+        if(ServiceConfig.getProperty(format)!=null){
             String mime=ServiceConfig.getProperty("m"+format);
             String[] parts=mime.split(Pattern.quote("/"));
             media =new MediaType(parts[0],parts[1]);
@@ -336,8 +322,8 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResourceGraph(res,fusekiUrl); 
-                if(RestUtils.isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
+                Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
+                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                         JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);
@@ -345,7 +331,7 @@ public class PublicDataResource {
                         model.write(os,ServiceConfig.getProperty(format));
                     }
                 }else{
-                    RDFWriter writer=RestUtils.getSTTLRDFWriter(model);                   
+                    RDFWriter writer=getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
             }
@@ -360,11 +346,13 @@ public class PublicDataResource {
             HashMap<String,String> map,
             @HeaderParam("fusekiUrl") final String fuseki) {
         log.info("getFormattedResourceGraphPost");
-        fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        if(fuseki!=null) {
+            fusekiUrl=fuseki;
+        }
         String format=map.get("ext");
         String res=map.get("res");
         MediaType media=new MediaType("text","turtle");
-        if(RestUtils.isValidExtension(format)){
+        if(ServiceConfig.getProperty(format)!=null){
             String mime=ServiceConfig.getProperty("m"+format);
             String[] parts=mime.split(Pattern.quote("/"));
             media =new MediaType(parts[0],parts[1]);
@@ -372,8 +360,8 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
-                Model model=processor.getResourceGraph(res,fusekiUrl); 
-                if(RestUtils.isValidExtension(format)&& !format.equalsIgnoreCase("ttl")){
+                Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
+                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {
                         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                         JSONLDFormatter.jsonObjectToOutputStream(jsonObject, os);
@@ -381,7 +369,7 @@ public class PublicDataResource {
                         model.write(os,ServiceConfig.getProperty(format));
                     }
                 }else{
-                    RDFWriter writer=RestUtils.getSTTLRDFWriter(model);                   
+                    RDFWriter writer=getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
             }
@@ -394,7 +382,7 @@ public class PublicDataResource {
     @Produces("text/html")
     public Viewable getCoreOntologyClassView(@PathParam("class") String cl) {
         log.info("getCoreOntologyClassView()");          
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         String uri="http://purl.bdrc.io/ontology/core/"+cl;
         map.put("model", new OntClassModel(uri)); 
         return new Viewable("/ontRes.jsp", map);        
@@ -405,7 +393,7 @@ public class PublicDataResource {
     @Produces("text/html")
     public Viewable getAdminOntologyClassView(@PathParam("class") String cl) {
         log.info("getAdminOntologyClassView()");          
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         String uri="http://purl.bdrc.io/ontology/admin/"+cl;
         map.put("model", new OntClassModel(uri)); 
         return new Viewable("/ontRes.jsp", map);        
@@ -417,7 +405,7 @@ public class PublicDataResource {
     public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {
         log.info("getOntology()");        
         MediaType media=new MediaType("text","turtle");
-        if(RestUtils.isValidExtension(ext)){
+        if(ServiceConfig.getProperty(ext)!=null){
             String mime=ServiceConfig.getProperty("m"+ext);
             String[] parts=mime.split(Pattern.quote("/"));
             media =new MediaType(parts[0],parts[1]);
@@ -426,7 +414,7 @@ public class PublicDataResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 // when prefix is null, QueryProcessor default prefix is used*/
                 Model model=OntAccess.MODEL;
-                if(RestUtils.isValidExtension(ext)&& !ext.equalsIgnoreCase("ttl")){
+                if(ServiceConfig.getProperty(ext)!=null && !ext.equalsIgnoreCase("ttl")){
                     if(ext.equalsIgnoreCase("jsonld")) {
                         //Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);
                         //JSONLDFormatter.jsonObjectToOutputStream(model, os);
@@ -435,12 +423,32 @@ public class PublicDataResource {
                         model.write(os,ServiceConfig.getProperty(ext));
                     }
                 }else{
-                    RDFWriter writer=RestUtils.getSTTLRDFWriter(model);                   
+                    RDFWriter writer=getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
             }
         };
         return Response.ok(stream,media).build();        
     }
+    
+    public static RDFWriter getSTTLRDFWriter(Model m){
+        Lang sttl = STTLWriter.registerWriter();
+        SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
+        nsPrio.put(SKOS.getURI(), 1);
+        nsPrio.put("http://purl.bdrc.io/ontology/admin/", 5);
+        nsPrio.put("http://purl.bdrc.io/ontology/toberemoved/", 6);
+        List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
+        predicatesPrio.add("http://purl.bdrc.io/ontology/admin/logWhen");
+        predicatesPrio.add("http://purl.bdrc.io/ontology/onOrAbout");
+        predicatesPrio.add("http://purl.bdrc.io/ontology/noteText");
+        org.apache.jena.sparql.util.Context ctx = new org.apache.jena.sparql.util.Context();
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsPriorities"), nsPrio);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsDefaultPriority"), 2);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "complexPredicatesPriorities"), predicatesPrio);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "indentBase"), 3);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 12);
+        RDFWriter w = RDFWriter.create().source(m.getGraph()).context(ctx).lang(sttl).build();
+        return w;
+    }    
     
 }

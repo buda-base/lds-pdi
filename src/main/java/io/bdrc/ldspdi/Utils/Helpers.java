@@ -22,6 +22,10 @@ package io.bdrc.ldspdi.Utils;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 
@@ -51,4 +55,13 @@ public class Helpers {
 		encoded=encoded.replace("\'", "%27");
 		return encoded;
 	}
+	
+	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
+        HashMap<String,String> copy=new HashMap<>();
+        Set<String> set=map.keySet();
+        for(String key:set) {
+            copy.put(key, map.getFirst(key));
+        }
+        return copy;
+    }
 }

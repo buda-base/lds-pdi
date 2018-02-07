@@ -126,7 +126,7 @@ public class Wylie {
 	// *** Wylie to Unicode mappings ***
 
 	// list of wylie consonant => unicode
-	m_consonant = new HashMap<String, String>();
+	m_consonant = new HashMap<>();
 	m_consonant.put("k", 	"\u0f40");
 	m_consonant.put("kh", 	"\u0f41");
 	m_consonant.put("g", 	"\u0f42");
@@ -187,7 +187,7 @@ public class Wylie {
 	m_consonant.put("v", 	"\u0f56\u0f39");
 
 	// subjoined letters
-	m_subjoined = new HashMap<String, String>();
+	m_subjoined = new HashMap<>();
 	m_subjoined.put("k", 	"\u0f90");
 	m_subjoined.put("kh", 	"\u0f91");
 	m_subjoined.put("g", 	"\u0f92");
@@ -247,7 +247,7 @@ public class Wylie {
 	m_subjoined.put("R", 	"\u0fbc");
 
 	// vowels
-	m_vowel = new HashMap<String, String>();
+	m_vowel = new HashMap<>();
 	m_vowel.put("a", 	"\u0f68");
 	m_vowel.put("A", 	"\u0f71");
 	m_vowel.put("i", 	"\u0f72");
@@ -262,7 +262,7 @@ public class Wylie {
 	m_vowel.put("-I", 	"\u0f71\u0f80");
 
 	// final symbols to unicode
-	m_final_uni = new HashMap<String, String>();
+	m_final_uni = new HashMap<>();
 	m_final_uni.put("M", 	"\u0f7e");
 	m_final_uni.put("~M`", 	"\u0f82");
 	m_final_uni.put("~M", 	"\u0f83");
@@ -273,7 +273,7 @@ public class Wylie {
 	m_final_uni.put("^", 	"\u0f39");
 
 	// final symbols organized by class
-	m_final_class = new HashMap<String, String>();
+	m_final_class = new HashMap<>();
 	m_final_class.put("M", 	"M");
 	m_final_class.put("~M`", "M");
 	m_final_class.put("~M",  "M");
@@ -284,7 +284,7 @@ public class Wylie {
 	m_final_class.put("^", 	"^");
 
 	// other stand-alone symbols
-	m_other = new HashMap<String, String>();
+	m_other = new HashMap<>();
 	m_other.put("0", 	"\u0f20");
 	m_other.put("1", 	"\u0f21");
 	m_other.put("2", 	"\u0f22");
@@ -315,7 +315,7 @@ public class Wylie {
 	m_other.put("%", 	"\u0f07");
 
 	// special characters: flag those if they occur out of context
-	m_special = new HashSet<String>();
+	m_special = new HashSet<>();
 	m_special.add(".");
 	m_special.add("+");
 	m_special.add("-");
@@ -326,8 +326,8 @@ public class Wylie {
 	m_special.add("]");
 
 	// superscripts: hashmap of superscript => set of letters or stacks below
-	m_superscripts = new HashMap<String, HashSet<String>>();
-	tmpSet = new HashSet<String>();
+	m_superscripts = new HashMap<>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -348,7 +348,7 @@ public class Wylie {
 	tmpSet.add("g+w");
 	m_superscripts.put("r", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -361,7 +361,7 @@ public class Wylie {
 	tmpSet.add("h");
 	m_superscripts.put("l", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -387,8 +387,8 @@ public class Wylie {
 	m_superscripts.put("s", tmpSet);
 
 	// subscripts => set of letters above
-	m_subscripts = new HashMap<String, HashSet<String>>();
-	tmpSet = new HashSet<String>();
+	m_subscripts = new HashMap<>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -406,7 +406,7 @@ public class Wylie {
 	tmpSet.add("s+m");
 	m_subscripts.put("y", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -430,7 +430,7 @@ public class Wylie {
 	tmpSet.add("s+n");
 	m_subscripts.put("r", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("b");
@@ -439,7 +439,7 @@ public class Wylie {
 	tmpSet.add("z");
 	m_subscripts.put("l", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -464,8 +464,8 @@ public class Wylie {
 	m_subscripts.put("w", tmpSet);
 
 	// prefixes => set of consonants or stacks after
-	m_prefixes = new HashMap<String, HashSet<String>>();
-	tmpSet = new HashSet<String>();
+	m_prefixes = new HashMap<>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("c");
 	tmpSet.add("ny");
 	tmpSet.add("t");
@@ -479,7 +479,7 @@ public class Wylie {
 	tmpSet.add("s");
 	m_prefixes.put("g", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -497,7 +497,7 @@ public class Wylie {
 	tmpSet.add("b+r");
 	m_prefixes.put("d", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("c");
@@ -548,7 +548,7 @@ public class Wylie {
 	tmpSet.add("s+w");
 	m_prefixes.put("b", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("kh");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -566,7 +566,7 @@ public class Wylie {
 	tmpSet.add("g+r");
 	m_prefixes.put("m", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("kh");
 	tmpSet.add("g");
 	tmpSet.add("ch");
@@ -592,7 +592,7 @@ public class Wylie {
 
 	// set of suffix letters
 	// also included are some Skt letters b/c they occur often in suffix position in Skt words
-	m_suffixes = new HashSet<String>();
+	m_suffixes = new HashSet<>();
 	m_suffixes.add("'");
 	m_suffixes.add("\u2018");
 	m_suffixes.add("\u2019");
@@ -611,22 +611,22 @@ public class Wylie {
 	m_suffixes.add("-t");
 
 	// suffix2 => set of letters before
-	m_suff2 = new HashMap<String, HashSet<String>>();
-	tmpSet = new HashSet<String>();
+	m_suff2 = new HashMap<>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("g");
 	tmpSet.add("ng");
 	tmpSet.add("b");
 	tmpSet.add("m");
 	m_suff2.put("s", tmpSet);
 
-	tmpSet = new HashSet<String>();
+	tmpSet = new HashSet<>();
 	tmpSet.add("n");
 	tmpSet.add("r");
 	tmpSet.add("l");
 	m_suff2.put("d", tmpSet);
 
 	// root letter index for very ambiguous three-stack syllables
-	m_ambiguous_key = new HashMap<String, Integer>();
+	m_ambiguous_key = new HashMap<>();
 	m_ambiguous_key.put("dgs", 	1);
 	m_ambiguous_key.put("dms", 	1);
 	m_ambiguous_key.put("'gs", 	1);
@@ -634,7 +634,7 @@ public class Wylie {
 	m_ambiguous_key.put("bgs", 	0);
 	m_ambiguous_key.put("dbs", 	1);
 
-	m_ambiguous_wylie = new HashMap<String, String>();
+	m_ambiguous_wylie = new HashMap<>();
 	m_ambiguous_wylie.put("dgs", 	"dgas");
 	m_ambiguous_wylie.put("dms", 	"dmas");
 	m_ambiguous_wylie.put("'gs", 	"'gas");
@@ -645,7 +645,7 @@ public class Wylie {
 	// *** Unicode to Wylie mappings ***
 
 	// top letters
-	m_tib_top = new HashMap<Character, String>();
+	m_tib_top = new HashMap<>();
 	m_tib_top.put('\u0f40', 	"k");
 	m_tib_top.put('\u0f41', 	"kh");
 	m_tib_top.put('\u0f42', 	"g");
@@ -690,7 +690,7 @@ public class Wylie {
 	m_tib_top.put('\u0f6a', 	"R");
 
 	// subjoined letters
-	m_tib_subjoined = new HashMap<Character, String>();
+	m_tib_subjoined = new HashMap<>();
 	m_tib_subjoined.put('\u0f90', 	"k");
 	m_tib_subjoined.put('\u0f91', 	"kh");
 	m_tib_subjoined.put('\u0f92', 	"g");
@@ -741,7 +741,7 @@ public class Wylie {
 	// pre-composed "I" and "U" are dealt here; other pre-composed Skt vowels are more
 	// easily handled by a global replace in toWylie(), b/c they turn into subjoined "r"/"l".
 
-	m_tib_vowel = new HashMap<Character, String>();
+	m_tib_vowel = new HashMap<>();
 	m_tib_vowel.put('\u0f71', 	"A");
 	m_tib_vowel.put('\u0f72', 	"i");
 	m_tib_vowel.put('\u0f73', 	"I");
@@ -754,13 +754,13 @@ public class Wylie {
 	m_tib_vowel.put('\u0f80', 	"-i");
 
 	// long (Skt) vowels
-	m_tib_vowel_long = new HashMap<String, String>();
+	m_tib_vowel_long = new HashMap<>();
 	m_tib_vowel_long.put("i", 	"I");
 	m_tib_vowel_long.put("u", 	"U");
 	m_tib_vowel_long.put("-i", 	"-I");
 
 	// final symbols => wylie
-	m_tib_final_wylie = new HashMap<Character, String>();
+	m_tib_final_wylie = new HashMap<>();
 	m_tib_final_wylie.put('\u0f7e', 	"M");
 	m_tib_final_wylie.put('\u0f82', 	"~M`");
 	m_tib_final_wylie.put('\u0f83', 	"~M");
@@ -771,7 +771,7 @@ public class Wylie {
 	m_tib_final_wylie.put('\u0f84', 	"?");
 
 	// final symbols by class
-	m_tib_final_class = new HashMap<Character, String>();
+	m_tib_final_class = new HashMap<>();
 	m_tib_final_class.put('\u0f7e', 	"M");
 	m_tib_final_class.put('\u0f82', 	"M");
 	m_tib_final_class.put('\u0f83', 	"M");
@@ -782,12 +782,12 @@ public class Wylie {
 	m_tib_final_class.put('\u0f84', 	"?");
 	
 	// special characters introduced by ^
-	m_tib_caret = new HashMap<String, String>();
+	m_tib_caret = new HashMap<>();
 	m_tib_caret.put("ph", 	"f");
 	m_tib_caret.put("b", 	"v");
 
 	// other stand-alone characters
-	m_tib_other = new HashMap<Character, String>();
+	m_tib_other = new HashMap<>();
 	m_tib_other.put(' ', 		"_");
 	m_tib_other.put('\u0f04', 	"@");
 	m_tib_other.put('\u0f05', 	"#");
@@ -818,7 +818,7 @@ public class Wylie {
 	m_tib_other.put('\u0f3d', 	")");
 
 	// all these stacked consonant combinations don't need "+"s in them
-	m_tib_stacks = new HashSet<String>();
+	m_tib_stacks = new HashSet<>();
 	m_tib_stacks.add("b+l");
 	m_tib_stacks.add("b+r");
 	m_tib_stacks.add("b+y");
@@ -919,7 +919,7 @@ public class Wylie {
 	// a map used to split the input string into tokens for fromWylie().
 	// all letters which start tokens longer than one letter are mapped to the max length of
 	// tokens starting with that letter.  
-	m_tokens_start = new HashMap<Character, Integer>();
+	m_tokens_start = new HashMap<>();
 	m_tokens_start.put('S', 2);
 	m_tokens_start.put('/', 2);
 	m_tokens_start.put('d', 4);
@@ -940,7 +940,7 @@ public class Wylie {
 	m_tokens_start.put('\r', 2);
 
 	// also for tokenization - a set of tokens longer than one letter
-	m_tokens = new HashSet<String>();
+	m_tokens = new HashSet<>();
 	m_tokens.add("-d+h");
 	m_tokens.add("dz+h");
 	m_tokens.add("-dh");
@@ -1394,7 +1394,7 @@ public class Wylie {
 	int orig_i = i;
 	String t, t2, o;
 	StringBuilder out = new StringBuilder();
-	ArrayList<String> warns = new ArrayList<String>();
+	ArrayList<String> warns = new ArrayList<>();
 
 	int consonants = 0;		// how many consonants found
 	String vowel_found = null; 	// any vowels (including a-chen)
@@ -1402,7 +1402,7 @@ public class Wylie {
 	String single_consonant = null; // did we find just a single consonant?
 	boolean plus = false;		// any explicit subjoining via '+'?
 	int caret = 0;			// find any '^'?
-	HashMap<String, String> final_found = new HashMap<String, String>(); // keep track of finals (H, M, etc) by class
+	HashMap<String, String> final_found = new HashMap<>(); // keep track of finals (H, M, etc) by class
 
 	// do we have a superscript?
 	t = tokens[i];
@@ -1633,11 +1633,11 @@ public class Wylie {
 	// variables for checking the root letter, after parsing a whole tsekbar made of only single
 	// consonants and one consonant with "a" vowel
 	boolean check_root = true;
-	ArrayList<String> consonants = new ArrayList<String>();
+	ArrayList<String> consonants = new ArrayList<>();
 	int root_idx = -1;
 
 	StringBuilder out = new StringBuilder();
-	ArrayList<String> warns = new ArrayList<String>();
+	ArrayList<String> warns = new ArrayList<>();
 
 	// the type of token that we are expecting next in the input stream
 	//   - PREFIX : expect a prefix consonant, or a main stack
@@ -1780,7 +1780,7 @@ public class Wylie {
  // up to and not including the next vowel or punctuation.  Skips the caret "^".
  // Returns: a string of consonants joined by "+" signs.
  private String consonantString(String[] tokens, int i) {
-	ArrayList<String> out = new ArrayList<String>();
+	ArrayList<String> out = new ArrayList<>();
 	String t;
 
 	while (tokens[i] != null) {
@@ -1798,7 +1798,7 @@ public class Wylie {
  // punctuation.  Skips the caret "^".
  // Returns: a string of consonants (in forward order) joined by "+" signs.
  private String consonantStringBackwards(String[] tokens, int i, int orig_i) {
-	LinkedList<String> out = new LinkedList<String>();
+	LinkedList<String> out = new LinkedList<>();
 	String t;
 
 	while (i >= orig_i && tokens[i] != null) {
@@ -1953,7 +1953,7 @@ public class Wylie {
 
 	StringBuilder sb = new StringBuilder();
 	sb.append("\\u");
-	String s = Integer.toHexString((int)t);
+	String s = Integer.toHexString(t);
 	for (int i = s.length(); i < 4; i++) {
 	    sb.append('0');
 	}
@@ -1999,8 +1999,8 @@ public class Wylie {
  // Convert Unicode to Wylie: one tsekbar
  private ToWylieTsekbar toWylieOneTsekbar(String str, int len, int i) {
 	int orig_i = i;
-	ArrayList<String> warns = new ArrayList<String>();
-	ArrayList<ToWylieStack> stacks = new ArrayList<ToWylieStack>();
+	ArrayList<String> warns = new ArrayList<>();
+	ArrayList<ToWylieStack> stacks = new ArrayList<>();
 
  ITER: 
 	while (true) {
@@ -2317,11 +2317,11 @@ public class Wylie {
 
 	// constructor - initialize a few arrays
 	public ToWylieStack() {
-	    this.stack = new LinkedList<String>();
-	    this.vowels = new LinkedList<String>();
-	    this.finals = new ArrayList<String>();
-	    this.finals_found = new HashMap<String, String>();
-	    this.warns = new ArrayList<String>();
+	    this.stack = new LinkedList<>();
+	    this.vowels = new LinkedList<>();
+	    this.finals = new ArrayList<>();
+	    this.finals_found = new HashMap<>();
+	    this.warns = new ArrayList<>();
 	}
  }
 

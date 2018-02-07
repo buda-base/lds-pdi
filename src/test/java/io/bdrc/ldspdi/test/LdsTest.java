@@ -113,7 +113,7 @@ public class LdsTest extends JerseyTest {
 	
 	
 	@Test
-	public void testQueryProcessorModel() throws IOException{
+	public void testQueryProcessorModel(){
 		// Makes sure that requested model is actually returned
 		// by the query processor
 		
@@ -158,7 +158,7 @@ public class LdsTest extends JerseyTest {
                 to_delete.delete();
                 // Checking Model against QueryProcessor                              
                 QueryProcessor processor=new QueryProcessor();
-                Model mq=processor.getResourceGraph(res,fusekiUrl);
+                Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl);
                 assertTrue(mq.isIsomorphicWith(json));
             }
         }
@@ -183,7 +183,7 @@ public class LdsTest extends JerseyTest {
 	
 	
 	@Test
-	public void testResponseOtherContentType() throws IOException{
+	public void testResponseOtherContentType() {
 		// Browser-like query with extension without accept header 
 		// Tests all content Types produced by the API
 		// except for sttl and jsonld
@@ -227,16 +227,14 @@ public class LdsTest extends JerseyTest {
 		}
 	}	 
 		
-	private Model[] prepareAssertModel(String res) throws IOException{
+	private Model[] prepareAssertModel(String res){
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
 		// Get resource model from embedded fuseki via QueryProcessor
 		// returns both models to be compared by testQueryProcessorModel()
 		
-		QueryProcessor processor=new QueryProcessor();
-		
 		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
-		Model mq=processor.getResourceGraph(res,fusekiUrl);			
+		Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl);			
 		Model[] ret={m,mq};		
 		return ret;
 	}
@@ -329,7 +327,7 @@ public class LdsTest extends JerseyTest {
         }
     }	
 		
-	public RDFWriter getSttlRDFWriter(Model m) throws IOException{
+	public RDFWriter getSttlRDFWriter(Model m){
 		Lang sttl = STTLWriter.registerWriter();
 		SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
 		nsPrio.put(SKOS.getURI(), 1);

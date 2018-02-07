@@ -287,7 +287,7 @@ public class OntClassNotPresent implements OntClass {
 
     @Override
     public ExtendedIterator<RDFNode> listLabels(String lang) {
-        List<RDFNode> foo = new ArrayList<RDFNode>();
+        List<RDFNode> foo = new ArrayList<>();
         return WrappedIterator.create(foo.iterator());
     }
 
@@ -341,7 +341,7 @@ public class OntClassNotPresent implements OntClass {
 
     @Override
     public ExtendedIterator<RDFNode> listComments(String lang) {
-        List<RDFNode> foo = new ArrayList<RDFNode>();
+        List<RDFNode> foo = new ArrayList<>();
         return WrappedIterator.create(foo.iterator());
     }
 
@@ -629,19 +629,19 @@ public class OntClassNotPresent implements OntClass {
 
     @Override
     public StmtIterator listProperties(Property p) {
-        List<Statement> foo = new ArrayList<Statement>();
+        List<Statement> foo = new ArrayList<>();
         return new StmtIteratorImpl(foo.iterator());
     }
 
     @Override
     public StmtIterator listProperties(Property p, String lang) {
-        List<Statement> foo = new ArrayList<Statement>();
+        List<Statement> foo = new ArrayList<>();
         return new StmtIteratorImpl(foo.iterator());
     }
 
     @Override
     public StmtIterator listProperties() {
-        List<Statement> foo = new ArrayList<Statement>();
+        List<Statement> foo = new ArrayList<>();
         return new StmtIteratorImpl(foo.iterator());
     }
 
@@ -947,13 +947,13 @@ public class OntClassNotPresent implements OntClass {
 
     @Override
     public ExtendedIterator<OntClass> listSubClasses() {
-        List<OntClass> foo = new ArrayList<OntClass>();
+        List<OntClass> foo = new ArrayList<>();
         return WrappedIterator.create(foo.iterator());
     }
 
     @Override
     public ExtendedIterator<OntClass> listSubClasses(boolean direct) {
-        List<OntClass> foo = new ArrayList<OntClass>();
+        List<OntClass> foo = new ArrayList<>();
         return WrappedIterator.create(foo.iterator());
     }
 

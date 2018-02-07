@@ -45,11 +45,12 @@ import org.glassfish.jersey.server.mvc.Viewable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.bdrc.ldspdi.Utils.RestUtils;
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.JsonResult;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
@@ -82,16 +83,14 @@ public class PublicTemplatesResource {
         //Settings        
         String relativeUri=info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/");
         MultivaluedMap<String,String> mp=info.getQueryParameters();
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);        
+        HashMap<String,String> hm=Helpers.convertMulti(mp);        
         hm.put(QueryConstants.REQ_URI, relativeUri);        
         ObjectMapper mapper = new ObjectMapper();
         
         //params
         String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";        
-        int pageSize =RestUtils.getPageSize(hm.get(QueryConstants.PAGE_SIZE));
-        int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
-        int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
-        boolean jsonOutput=RestUtils.getJsonOutput(hm.get(QueryConstants.JSON_OUT));
+        String hash=hm.get(QueryConstants.RESULT_HASH);
+        boolean jsonOutput=(hm.get(QueryConstants.JSON_OUT)!=null);
         
         //process
         QueryFileParser qfp;
@@ -109,25 +108,24 @@ public class PublicTemplatesResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results res = RestUtils.getResults(query, fuseki, hash, pageSize);
+        Results res = QueryProcessor.getResults(query, fuseki, hash, hm.get(QueryConstants.PAGE_SIZE));
         
         if(jsonOutput) {
-            JsonResult model=new JsonResult(res,pageNumber,hm);
+            JsonResult model=new JsonResult(res,hm);
             hm.remove("query");
             String it=mapper.writeValueAsString(model);            
             return new Viewable("/json.jsp",it);
-        }else {
-            hm.put(QueryConstants.REQ_METHOD, "GET");             
-            hm.put("query", qfp.getQueryHtml());
-            ResultPage model=new ResultPage(res,pageNumber,hm,qfp.getTemplate());
-            return new Viewable("/resPage.jsp",model);
         }
+        hm.put(QueryConstants.REQ_METHOD, "GET");             
+        hm.put("query", qfp.getQueryHtml());
+        ResultPage model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
+        return new Viewable("/resPage.jsp",model);
     }
        
     @POST 
     @Path("/resource/templates")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getQueryTemplateResultsPost(@Context UriInfo info, 
+    public Response getQueryTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
             MultivaluedMap<String,String> mp) throws Exception{ 
         log.info("Call to getQueryTemplateResultsPost()");              
@@ -136,13 +134,12 @@ public class PublicTemplatesResource {
         }else {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         } 
-        HashMap<String,String> hm=RestUtils.convertMulti(mp);
+        HashMap<String,String> hm=Helpers.convertMulti(mp);
         ObjectMapper mapper = new ObjectMapper();
         String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";
         
-        int pageSize =RestUtils.getPageSize(hm.get(QueryConstants.PAGE_SIZE));
-        int pageNumber=RestUtils.getPageNumber(hm.get(QueryConstants.PAGE_NUMBER));
-        int hash=RestUtils.getHash(hm.get(QueryConstants.RESULT_HASH));
+        String pageSize =hm.get(QueryConstants.PAGE_SIZE);
+        String hash=hm.get(QueryConstants.RESULT_HASH);
         QueryFileParser qfp; 
         final String query;
         
@@ -159,10 +156,10 @@ public class PublicTemplatesResource {
                 if(query.startsWith(QueryConstants.QUERY_ERROR)) {
                     os.write(query.getBytes());
                 }else {
-                    Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
+                    Results res = QueryProcessor.getResults(query, fuseki, hash, pageSize);                
                     hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
-                    JsonResult rp=new JsonResult(res,pageNumber,hm);
+                    JsonResult rp=new JsonResult(res,hm);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }
@@ -173,7 +170,7 @@ public class PublicTemplatesResource {
     @POST 
     @Path("/resource/templates")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getQueryTemplateResultsJsonPost(@Context UriInfo info, 
+    public Response getQueryTemplateResultsJsonPost( 
             @HeaderParam("fusekiUrl") final String fuseki,
             HashMap<String,String> map) throws Exception{     
         log.info("Call to getQueryTemplateResultsJsonPost()");
@@ -185,10 +182,8 @@ public class PublicTemplatesResource {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);  
         }        
         String filename= map.get(QueryConstants.SEARCH_TYPE)+".arq"; 
-        
-        int pageSize =RestUtils.getPageSize(map.get(QueryConstants.PAGE_SIZE));
-        int pageNumber=RestUtils.getPageNumber(map.get(QueryConstants.PAGE_NUMBER));
-        int hash=RestUtils.getHash(map.get(QueryConstants.RESULT_HASH));
+        String pageSize =map.get(QueryConstants.PAGE_SIZE);        
+        String hash=map.get(QueryConstants.RESULT_HASH);
         
         QueryFileParser qfp=new QueryFileParser(filename);;
         final String query;
@@ -203,10 +198,10 @@ public class PublicTemplatesResource {
                 if(query.startsWith(QueryConstants.QUERY_ERROR)) {
                     os.write(query.getBytes());
                 }else {
-                    Results res = RestUtils.getResults(query, fuseki, hash, pageSize);                
+                    Results res = QueryProcessor.getResults(query, fuseki, hash, pageSize);                
                     map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                     map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                    JsonResult rp=new JsonResult(res,pageNumber,map);
+                    JsonResult rp=new JsonResult(res,map);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
                 }
             }

@@ -38,10 +38,9 @@ public SanskritBasicFilter() { super() ; }
 		if(v11.indexOf(v2)>=0) {
 			String test=v2+"-āīūṛṝḷḹṃḥ'ṭḍṅñṇśṣ";			
 			return NodeValue.makeBoolean(StringUtils.containsAny(v1,test));
-		}
-		else {
-			return NodeValue.makeBoolean(false);
-		}
+		}		
+		return NodeValue.makeBoolean(false);
+		
     }
 	
 	public static void main(String[] args) {

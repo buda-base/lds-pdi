@@ -66,7 +66,7 @@ public class QueryFileParser {
 	}
 	
 	//For testing purpose only - to be removed//
-	public QueryFileParser(String queryPath, String filename) throws IOException{        
+	public QueryFileParser(String queryPath, String filename) {        
         metaInf= new HashMap<>();
         this.queryFile = new File(queryPath+filename);
         queryName=filename.substring(0,filename.lastIndexOf("."));
@@ -138,10 +138,9 @@ public class QueryFileParser {
     		            check="Arg syntax is incorrect : query does not have a literal variable "+
     		                   expectedLiteralParam+" corresponding to lang "+arg+" variable";
     		            return check;
-    		        }
-    		        else {
-    		            litLangParams.put(expectedLiteralParam, arg); 
-    		        }
+    		        }    		        
+    		        litLangParams.put(expectedLiteralParam, arg); 
+    		        
 		        }
 		    }
 		}

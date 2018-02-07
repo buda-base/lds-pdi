@@ -184,7 +184,7 @@ Ex GET: http://localhost:8080/resource/templates?searchType=Res_byName&L_NAME=("
 Ex POST: curl --data "searchType=Res_byName&L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/resource/templates
 ```
 
-**NOTE:** You can get this json output format using GET requests by adding &jsonOut=true to your URL request.
+**NOTE:** You can get this json output format using GET requests by adding &jsonOut or ?jsonOut to your URL request.
 
 Ex Testing POST JSON : 
 

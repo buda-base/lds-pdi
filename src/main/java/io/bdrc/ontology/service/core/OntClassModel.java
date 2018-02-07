@@ -82,14 +82,14 @@ public class OntClassModel {
         OntClass sup3r = clazz.getSuperClass();
         if (sup3r != null) {
             return new OntClassModel(sup3r);
-        } else {
-            return null;
         }
+        return null;
+        
     }
     
     public List<OntClassModel> getSubclasses() {
         List<OntClass> subs = clazz.listSubClasses(true).toList();
-        List<OntClassModel> models = new ArrayList<OntClassModel>();
+        List<OntClassModel> models = new ArrayList<>();
         
         for (OntClass c : subs) {
             if(!c.isAnon()) {                
@@ -101,7 +101,7 @@ public class OntClassModel {
     }
     
     public List<String> getLabels() {
-        List<String> labels = new ArrayList<String>();
+        List<String> labels = new ArrayList<>();
         
         for (RDFNode node : clazz.listLabels(null).toList()) {
             labels.add(node.toString());
@@ -111,7 +111,7 @@ public class OntClassModel {
     }
     
     public List<String> getComments() {
-        List<String> comments = new ArrayList<String>();
+        List<String> comments = new ArrayList<>();
         
         for (RDFNode node : clazz.listComments(null).toList()) {
             comments.add(node.toString());
@@ -121,7 +121,7 @@ public class OntClassModel {
     }
     
     public List<StmtModel> getProperties() {
-        List<StmtModel> properties = new ArrayList<StmtModel>();
+        List<StmtModel> properties = new ArrayList<>();
         
         for (Statement stmt : clazz.listProperties().toList()) {
             properties.add(new StmtModel(stmt));
@@ -131,7 +131,7 @@ public class OntClassModel {
     }
     
     public List<StmtModel> getOtherProperties() {
-        List<StmtModel> properties = new ArrayList<StmtModel>();
+        List<StmtModel> properties = new ArrayList<>();
         
         for (Statement stmt : clazz.listProperties().toList()) {
             String local = stmt.getPredicate().getLocalName();

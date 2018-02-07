@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -39,7 +38,7 @@ public class DemoResources {
     
     @GET 
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getJsonContext() throws IOException{
+    public Viewable getJsonContext() {
         log.info("Call to getJsonContext()"); 
         //return ServiceConfig.JSONLD_CONTEXT_HTML; 
         return new Viewable("/index.jsp"); 
@@ -58,7 +57,7 @@ public class DemoResources {
     @Produces("text/html")
     public Viewable getOntologyClassView(@QueryParam("classUri") String uri) {
         log.info("Call to getOntologyClassView()");          
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("model", new OntClassModel(uri)); 
         return new Viewable("/ontClass.jsp", map);        
     }

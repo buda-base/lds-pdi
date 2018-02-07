@@ -51,9 +51,13 @@ public class ResultPage {
     public ArrayList<QuerySolutionItem> rows;
     private QueryTemplate temp;
 
-    public ResultPage(Results res,int pageNumber,HashMap<String,String> hm,QueryTemplate temp) throws JsonProcessingException{
-        
-        this.pageNumber=pageNumber;
+    public ResultPage(Results res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
+            throws JsonProcessingException,NumberFormatException{
+        if(pageNum!=null) {
+            this.pageNumber=Integer.parseInt(pageNum);
+        }else {
+            this.pageNumber=1;
+        }
         pageSize=res.getPageSize();
         numResults=res.getNumResults();
         execTime=res.getExecTime();
@@ -164,7 +168,7 @@ public class ResultPage {
     public List<String> getParamList(){        
         List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
         if(list.size()==1 && list.get(0).equals(QueryConstants.QUERY_NO_ARGS)){
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }        
         return list;
     }

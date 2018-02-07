@@ -98,7 +98,7 @@ public class JsonAPIResource {
     
     private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList){
         ArrayList<QueryListItem> items=new ArrayList<>();        
-        for(String file:fileList) {
+        for(String file:filesList) {
             QueryListItem qli=new QueryListItem(file,"/queries/"+file);
             items.add(qli);
         }

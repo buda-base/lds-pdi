@@ -51,18 +51,17 @@ public class StmtModel {
         RDFNode obj = stmt.getObject();
         if (obj.isURIResource()) {
             return OntAccess.MODEL.shortForm(obj.asResource().getURI());
-        } else {
-            return obj.toString();
-        }
+        } 
+        return obj.toString();
+        
     }
     
     public String getObjectUri() {
         RDFNode obj = stmt.getObject();
         if (obj.isURIResource()) {
             return obj.asResource().getURI();
-        } else {
-            return "";
-        }
+        } 
+        return "";        
     }
     
        

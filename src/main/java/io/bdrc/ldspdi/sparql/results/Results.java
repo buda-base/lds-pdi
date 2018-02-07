@@ -59,7 +59,7 @@ public class Results implements Serializable{
             rows.add(row);
             numResults++;
         }
-        numberOfPages=(int)(numResults/pageSize);
+        numberOfPages=(numResults/pageSize);
         if(numberOfPages*pageSize<numResults) {numberOfPages++;}
     }
     

@@ -53,7 +53,7 @@ public class InjectionTracker {
                     try {
                         new Locale.Builder().setLanguageTag(lang).build();
                     }catch(IllformedLocaleException ex) {
-                        return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag";
+                        return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag"+ex.getMessage();
                     }
                     queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));                    
                 }else {
@@ -75,7 +75,7 @@ public class InjectionTracker {
             queryStr.setLiteral("NAME", param);
             queryStr.setIri("TYPE", "http://purl.bdrc.io/ontology/core/"+first+type.substring(1));
         }catch(Exception ex) {
-            return "ERROR --> path param :"+param+" is invalid in Injection Tracker";
+            return "ERROR --> path param :"+param+" is invalid in Injection Tracker "+ex.getMessage();
         }
         
         return queryStr.toString();

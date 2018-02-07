@@ -51,9 +51,8 @@ public class HttpFile {
                 log.log(Level.FINEST, "HttpFile reader error", ex);
                 return null;
             }
-        } else {
-            return null;
-        }
+        } 
+        return null;        
     }
 
     public static InputStream stream(String link) 

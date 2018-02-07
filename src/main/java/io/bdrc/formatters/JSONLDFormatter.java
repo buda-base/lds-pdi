@@ -123,7 +123,7 @@ public class JSONLDFormatter {
         boolean needsId = (type == DocType.WORK || type == DocType.TEST);  
         if (!needsId && typeToFrameObject.containsKey(type))
             return typeToFrameObject.get(type);
-        Map<String,Object> jsonObject = new HashMap<String,Object>(); 
+        Map<String,Object> jsonObject = new HashMap<>(); 
         if (needsId) {
             jsonObject.put("@id", BDR+mainResourceName);
         } else {
@@ -184,7 +184,7 @@ public class JSONLDFormatter {
      // reorder list
      protected static Map<String,Object> orderEntries(Map<String,Object> input) throws IllegalArgumentException
      {
-         SortedMap<String,Object> res = new TreeMap<String,Object>(new MigrationComparator());
+         SortedMap<String,Object> res = new TreeMap<>(new MigrationComparator());
          // TODO: maybe it should be recursive? at least for outlines...
          input.forEach( (k,v) ->  insertRec(k, v, res) );
          return res; 

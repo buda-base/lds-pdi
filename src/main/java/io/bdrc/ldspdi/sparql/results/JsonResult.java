@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
-
 public class JsonResult {
     
 public static Logger log=Logger.getLogger(ResultPage.class.getName());
@@ -26,8 +25,14 @@ public static Logger log=Logger.getLogger(ResultPage.class.getName());
     public List<String> headers;
     public ArrayList<QuerySolutionItem> rows;
     
-    public JsonResult(Results res,int pageNumber,HashMap<String,String> hm) throws JsonProcessingException{
-        this.pageNumber=pageNumber;
+    public JsonResult(Results res,HashMap<String,String> hm) 
+            throws JsonProcessingException,NumberFormatException{
+        String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
+        if(pageNum!=null) {
+            this.pageNumber=Integer.parseInt(pageNum);
+        }else {
+            this.pageNumber=1;
+        }
         pageSize=res.getPageSize();
         numResults=res.getNumResults();
         execTime=res.getExecTime();
@@ -42,8 +47,7 @@ public static Logger log=Logger.getLogger(ResultPage.class.getName());
                 try {
                 rows.add(allRows.get(x));
                 }
-                catch(Exception ex) {
-                    //For building the last page
+                catch(Exception ex) {                    
                     break;
                 }
             }

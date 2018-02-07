@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.sparql;
 
+import java.util.Objects;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -28,11 +30,13 @@ import org.apache.jena.rdf.model.Model;
 
 
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ldspdi.sparql.results.ResultsCache;
 
 public class QueryProcessor {	
 	
 	
-	public Model getResourceGraph(String resID,String fusekiUrl){			
+	public static Model getResourceGraph(String resID,String fusekiUrl){			
 		
 	    String prefixes=ServiceConfig.getPrefixes();
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
@@ -43,7 +47,7 @@ public class QueryProcessor {
 		return model;		
 	}
 		
-	public ResultSet getResultSet(String query,String fusekiUrl){
+	public static ResultSet getResultSet(String query,String fusekiUrl){
         System.out.println("Processor Json query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -53,5 +57,28 @@ public class QueryProcessor {
         ResultSet rs = qe.execSelect();
         return rs;           
     }
+	
+	public static Results getResults(String query, String fuseki, String hash, String pageSize) {
+        Results res;
+        if(hash==null) {
+            long start=System.currentTimeMillis();            
+            ResultSet jrs=getResultSet(query, fuseki);
+            long end=System.currentTimeMillis();
+            long elapsed=end-start;
+            int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));  
+            if(pageSize!=null) {
+                psz=Integer.parseInt(pageSize);
+            }
+            res=new Results(jrs,elapsed,psz);                    
+            int new_hash=Objects.hashCode(res);                    
+            res.setHash(new_hash);                    
+            ResultsCache.addToCache(res, Objects.hashCode(res));            
+        }
+        else {
+            res=ResultsCache.getResultsFromCache(Integer.parseInt(hash));            
+        }
+        return res;
+    }
+
 
 }
