@@ -27,6 +27,7 @@ public class QueryConstants {
     /********* Results Objects Constants ****************/
     public static String RES_URI="URI";
     public static String PAGE_SIZE="pageSize";
+    public static String QS_PAGE_SIZE="qs_pageSize";
     public static String PAGE_NUMBER="pageNumber";
     public static String RESULT_HASH="hash";
     public static String JSON_OUT="jsonOut";

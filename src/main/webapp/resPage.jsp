@@ -86,7 +86,6 @@ input[type=submit]:hover {
 	            <input type="text" id="${p}" name="${p}" value="${model.getParamValue(val)}"><br>
 			</c:forEach>
 			<br>
-			
 		    <input type="hidden" id="searchType" name="searchType" value="${model.getId()}">		    		  
 		    <input type="submit" value="Submit">
 		</form>

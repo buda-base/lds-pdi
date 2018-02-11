@@ -140,11 +140,10 @@ public class QueryFileParser {
     		            return check;
     		        }    		        
     		        litLangParams.put(expectedLiteralParam, arg); 
-    		        
 		        }
 		    }
 		}
-		return check;
+		return "";
 	}
 
     public File getQueryFile() {

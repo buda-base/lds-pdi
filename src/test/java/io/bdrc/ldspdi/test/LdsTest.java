@@ -31,10 +31,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 
 import javax.ws.rs.core.Application;
@@ -182,51 +180,7 @@ public class LdsTest extends JerseyTest {
 		
 	
 	
-	@Test
-	public void testResponseOtherContentType() {
-		// Browser-like query with extension without accept header 
-		// Tests all content Types produced by the API
-		// except for sttl and jsonld
-		
-		ArrayList<String> resList=TestUtils.getResourcesList();
-		Set<String> formats=TestUtils.getContentTypes().keySet();
-		//Browser-like query with extension without accept header
-		for(String res : resList){				
-			for(String fmt:formats){				
-				if(!fmt.equals("ttl") && !fmt.equals("jsonld") ){							
-					
-					String ct1=TestUtils.getContentTypes().get(fmt);			
-					Response output = target("/resource/"+res+"."+fmt)
-							.request()
-							.header("fusekiUrl", fusekiUrl)
-							.get();
-					String ct2=output.getHeaderString("content-type");					
-					output.close();
-					assertEquals(ct1.trim(),ct2.trim());
-				}
-			}		
-		}
-		// Like curl queries : without extension, with accept header 
-		// Tests the contentType produced by the API
-		
-		Collection<String> cts=TestUtils.getContentTypes().values();
-		for(String res : resList){
-			for(String ct: cts){
-				if(!ct.equals("text/turtle") && !ct.equals("application/ld+json")) {
-					Response output = target("/resource/"+res)
-							.request()
-							.header("fusekiUrl", fusekiUrl)
-							.header("Accept", ct)
-							.get();
-					String ct1=output.getHeaderString("content-type");	
-					output.close();
-					assertEquals(ct.trim(),ct1.trim());
-				}
-			}
-				
-		}
-	}	 
-		
+			
 	private Model[] prepareAssertModel(String res){
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
@@ -241,7 +195,6 @@ public class LdsTest extends JerseyTest {
 	
 	private Model[] prepareGetAssertModel(String res) throws IOException{
 		// Loads resource model from .ttl file
-		// Adjusts prefix mapping
 		// Gets resource model from rest API
 		// and returns them for comparison by testGetModel() 
 		

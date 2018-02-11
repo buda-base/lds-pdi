@@ -80,14 +80,13 @@ public class TestUtils {
 	static ArrayList<String> getResourcesList(){
 		ArrayList<String> res=new ArrayList<>();
 		res.add("R8LS12819");
-		res.add("C68");
-		
+		res.add("C68");		
 		res.add("I00KG01506_I001");
 		res.add("L1RKL907");
 		res.add("P1AG29");
 		res.add("G1KR1355");
 		res.add("W1FPL3356");
-		//res.add("UT23637_006_0000");
+		
 		return res;
 	}
 
