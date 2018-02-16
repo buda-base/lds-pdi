@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
@@ -45,11 +45,11 @@ public class QueryFileParser {
 	private HashMap<String,String> litLangParams=new HashMap<>();
 	private QueryTemplate template;
 	
-	public static Logger log=Logger.getLogger(QueryFileParser.class.getName());
+	public static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
 	
 	
 	public QueryFileParser(String filename) {
-	    log.addHandler(new ConsoleHandler());
+	    
 		metaInf= new HashMap<>();
 		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
 		queryName=filename.substring(0,filename.lastIndexOf("."));
@@ -108,7 +108,7 @@ public class QueryFileParser {
     	   br.close();
 	   }
 	   catch(IOException ex){
-	       log.log(Level.FINEST, "QueryFile parsing error", ex);
+	       log.error("QueryFile parsing error", ex);
 	       ex.printStackTrace();
 	   }
 	    

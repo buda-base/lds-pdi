@@ -28,19 +28,22 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
-
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ldspdi.sparql.results.ResultsCache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class QueryProcessor {	
 	
-	
+    public static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
+    
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
 		
 	    String prefixes=ServiceConfig.getPrefixes();
 		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
-		System.out.println("Processor query describe:" +q);
+		log.info("Processor query describe:" +q);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
 		Model model = qe.execDescribe();
 		
@@ -48,7 +51,7 @@ public class QueryProcessor {
 	}
 		
 	public static ResultSet getResultSet(String query,String fusekiUrl){
-        System.out.println("Processor Json query select:" +query);        
+        log.info("Processor Json query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }        

@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
@@ -39,7 +38,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
@@ -51,6 +49,8 @@ import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -74,7 +74,7 @@ import io.bdrc.ontology.service.core.OntClassModel;
 @Path("/")
 public class PublicDataResource {   
     
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());    
+    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     MediaType default_media=new MediaType("text","turtle","utf-8");

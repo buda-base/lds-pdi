@@ -21,12 +21,13 @@ package io.bdrc.ontology.service.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Logger;
+
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,13 +37,14 @@ import org.apache.jena.rdf.model.Statement;
  *
  */
 public class OntClassModel {
-    static Logger log = Logger.getLogger(OntClassModel.class.getName());
+    
+    static Logger log = LoggerFactory.getLogger(OntClassModel.class.getName());
 
     protected String uri;
     protected OntClass clazz;
     
     public OntClassModel(String uri) {
-        log.addHandler(new ConsoleHandler());
+        
         this.uri = uri;
         clazz = OntAccess.MODEL.getOntClass(uri);
         if (clazz == null) {            
@@ -51,7 +53,7 @@ public class OntClassModel {
     }
     
     public OntClassModel(OntClass c) {
-        log.addHandler(new ConsoleHandler());
+        
         this.uri = c.getURI();        
         clazz = c;
    }

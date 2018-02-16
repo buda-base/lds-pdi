@@ -23,7 +23,6 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -42,6 +41,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -59,7 +60,7 @@ import io.bdrc.ldspdi.sparql.results.Results;
 @Path("/")
 public class PublicTemplatesResource {
     
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     

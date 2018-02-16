@@ -28,7 +28,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Utils {
+    
+    static Logger log = LoggerFactory.getLogger(Utils.class.getName());
     
     public static void removeIndividuals(OntModel o) {
         ExtendedIterator<Individual> it = o.listIndividuals();

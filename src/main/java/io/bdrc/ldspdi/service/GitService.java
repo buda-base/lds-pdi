@@ -22,8 +22,6 @@ package io.bdrc.ldspdi.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -31,6 +29,8 @@ import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.FS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -41,10 +41,10 @@ public class GitService {
     private static Repository localRepo;
    
     
-    static Logger log = Logger.getLogger(GitService.class.getName());
+    static Logger log = LoggerFactory.getLogger(GitService.class.getName());
     
     public static void update(String localPath) {
-        log.addHandler(new ConsoleHandler());
+        
         GIT_LOCAL_PATH=localPath;
         FileRepositoryBuilder builder=new FileRepositoryBuilder();
         File localGit=new File(GitService.GIT_LOCAL_PATH+"/.git");
@@ -64,7 +64,7 @@ public class GitService {
                
             }
             catch(IOException ex) {
-                log.log(Level.FINEST, "Git was unable to setup repository at "+localGit.getPath()+" directory ", ex.getMessage());
+                log.error("Git was unable to setup repository at "+localGit.getPath()+" directory ", ex.getMessage());
                 
             }
             updateRepo();            
@@ -84,7 +84,7 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.log(Level.FINEST, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex.getMessage());
+            log.error(" Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory ", ex.getMessage());
             
         }
     }
@@ -98,7 +98,7 @@ public class GitService {
 
         }
         catch(Exception ex) {
-            log.log(Level.WARNING, " Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory "+ex.getMessage());
+            log.error(" Git was unable to pull repository : "+GitService.GIT_REMOTE_URL+" directory "+ex.getMessage());
             
         }
     }

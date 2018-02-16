@@ -23,7 +23,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -36,7 +38,7 @@ public class Results implements Serializable{
      */
     private static final long serialVersionUID = 1L;
 
-    public static Logger log=Logger.getLogger(Results.class.getName());
+    public static Logger log=LoggerFactory.getLogger(Results.class.getName());
     
     public long execTime;
     public int numResults;
@@ -102,8 +104,5 @@ public class Results implements Serializable{
     public void setHash(int hash) {
         this.hash = hash;
     }
-    
-    
-    
     
 }

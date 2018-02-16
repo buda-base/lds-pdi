@@ -25,12 +25,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 
 
 public class Helpers {
+    
+    public static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
 	
 	public static String removeAccents(String text) {		
 		String f=text;

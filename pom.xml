@@ -46,16 +46,7 @@
 	    <version>4.0.0</version>
 	    <!-- scope>provided</scope-->
 	</dependency>
-	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc-jsp -->
-	<dependency>
-	    <groupId>org.glassfish.jersey.ext</groupId>
-	    <artifactId>jersey-mvc-jsp</artifactId>	       
-	</dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
-    <dependency>
-        <groupId>org.glassfish.jersey.test-framework</groupId>
-        <artifactId>jersey-test-framework-core</artifactId>    
-    </dependency>
+	
 	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
 	<dependency>
 	    <groupId>org.apache.jena</groupId>
@@ -68,7 +59,6 @@
         </exclusion>
       	</exclusions>
 	</dependency>
-	
 	<dependency>
       <groupId>com.github.jsonld-java</groupId>
       <artifactId>jsonld-java</artifactId>
@@ -87,27 +77,38 @@
 	    <artifactId>jena-rdfconnection</artifactId>
 	    <version>3.6.0</version>
 	</dependency>
-		
-	<dependency>
-    <groupId>io.bdrc</groupId>
-    <artifactId>jena-stable-turtle</artifactId>
-    <version>0.5.0</version>
+	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
+    <dependency>
+        <groupId>org.apache.jena</groupId>
+        <artifactId>jena-fuseki-embedded</artifactId>
+        <version>3.6.0</version>
+        <scope>test</scope>
+    </dependency>	
+    <!-- https://mvnrepository.com/artifact/io.bdrc/jena-stable-turtle -->
+    <dependency>
+        <groupId>io.bdrc</groupId>
+        <artifactId>jena-stable-turtle</artifactId>
+        <version>0.5.0</version>
     </dependency>
+
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
+    </dependency>    
+
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc-jsp -->
+    <dependency>
+        <groupId>org.glassfish.jersey.ext</groupId>
+        <artifactId>jersey-mvc-jsp</artifactId>        
     </dependency>
-    
-    <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
-	<dependency>
-	    <groupId>org.apache.jena</groupId>
-	    <artifactId>jena-fuseki-embedded</artifactId>
-	    <version>3.6.0</version>
-	    <scope>test</scope>
-	</dependency>
-	
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
+    <dependency>
+        <groupId>org.glassfish.jersey.test-framework</groupId>
+        <artifactId>jersey-test-framework-core</artifactId>    
+    </dependency>
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework.providers/jersey-test-framework-provider-jetty -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.test-framework.providers</groupId>
@@ -129,6 +130,7 @@
 	    <groupId>org.glassfish.jersey.media</groupId>
 	    <artifactId>jersey-media-json-jackson</artifactId>	        
 	</dependency>
+    
 	<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
 	<dependency>
 	    <groupId>org.eclipse.jetty</groupId>
@@ -174,19 +176,22 @@
         <artifactId>commons-jcs-jcache</artifactId>
         <version>2.2</version>
         <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+    </dependency> 
+          
+    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
     <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.2</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/jstl-api -->
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.25</version>
+        <!-- scope>test</scope-->
+    </dependency> 
+    
+    <!-- https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/jstl-api -->   
     <dependency>
         <groupId>jstl</groupId>
         <artifactId>jstl</artifactId>
     <version>1.2</version>
-</dependency>    
+    </dependency>    
  </dependencies>
   <build>
     <finalName>lds-pdi</finalName>

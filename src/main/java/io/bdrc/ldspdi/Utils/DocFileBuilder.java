@@ -27,9 +27,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -41,12 +41,11 @@ public class DocFileBuilder {
 	
 	public static String content="";
 	public static HashMap<String,String> specs;
-	public static Logger log=Logger.getLogger(DocFileBuilder.class.getName());
+	public static Logger log=LoggerFactory.getLogger(DocFileBuilder.class.getName());
 	
 	
-	public static String getContent(String base){	
+	public static String getContent(String base){	    
 	    
-	    log.addHandler(new ConsoleHandler());
 	    ArrayList<String> files=getQueryTemplates();
 		String contents="";
 		specs=new HashMap<>();
@@ -114,7 +113,7 @@ public class DocFileBuilder {
                     }
                 }
             } catch (IOException e) {
-                log.log(Level.FINEST, "Error while getting query templates", e);
+                log.error("Error while getting query templates", e);
                 e.printStackTrace();
             }
         }

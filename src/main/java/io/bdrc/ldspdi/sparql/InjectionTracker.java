@@ -23,16 +23,16 @@ import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class InjectionTracker {    
     
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) {
         log.info("Query before injection tracking :"+query);

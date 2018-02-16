@@ -21,9 +21,11 @@ package io.bdrc.ldspdi.service;
 
 import javax.servlet.ServletContextEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ontology.service.core.OntAccess;
@@ -32,7 +34,7 @@ import io.bdrc.ontology.service.core.OntAccess;
 
 public class BootClass implements javax.servlet.ServletContextListener{
 	
-    public static Logger log=Logger.getLogger(BootClass.class.getName());
+    public static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
     
     public void contextDestroyed(ServletContextEvent arg0) {
         //Do nothing;
@@ -51,7 +53,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
             OntAccess.init();            
         } 
         catch (IllegalArgumentException e) {
-            log.log(Level.FINEST, "BootClass init error", e);
+            log.error("BootClass init error", e);
             e.printStackTrace();
         }
         

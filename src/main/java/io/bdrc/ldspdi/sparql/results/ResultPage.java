@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -33,7 +35,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ResultPage {
     
-    public static Logger log=Logger.getLogger(ResultPage.class.getName());
+    public static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
     
     public int pageNumber;
     public int numberOfPages;

@@ -19,25 +19,24 @@ package io.bdrc.ldspdi.sparql.results;
  * limitations under the License.
  ******************************************************************************/
 
-import java.util.logging.Logger;
-
 import org.apache.commons.jcs.JCS;
 import org.apache.commons.jcs.access.CacheAccess;
 import org.apache.commons.jcs.access.exception.CacheException;
 
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
     
     private static CacheAccess<Integer,Results> CACHE = JCS.getInstance( "default" );
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
     
     public static void addToCache(Results res, int hash) {        
         try{
             CACHE.put( new Integer(hash), res );
         }
         catch ( CacheException e ){
-            log.finest("Problem putting Results -->"+res+" in the cache, for key -->"+hash+ " Exception:"+e.getMessage());
+            log.error("Problem putting Results -->"+res+" in the cache, for key -->"+hash+ " Exception:"+e.getMessage());
         }
     }
     

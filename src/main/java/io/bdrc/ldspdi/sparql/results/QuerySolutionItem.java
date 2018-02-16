@@ -23,11 +23,12 @@ package io.bdrc.ldspdi.sparql.results;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class QuerySolutionItem implements Serializable{
@@ -37,7 +38,7 @@ public class QuerySolutionItem implements Serializable{
      */
     private static final long serialVersionUID = 1L;
     
-    public static Logger log=Logger.getLogger(QuerySolutionItem.class.getName());    
+    public static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
     public HashMap<String,String> dataRow;
     
     public QuerySolutionItem(QuerySolution qs,List<String> headers) {

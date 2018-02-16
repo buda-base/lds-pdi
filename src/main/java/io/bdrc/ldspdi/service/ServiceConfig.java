@@ -35,8 +35,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
@@ -47,14 +48,14 @@ public class ServiceConfig {
 	public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
-	public static Logger log=Logger.getLogger(ServiceConfig.class.getName());
+	public static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 	public static String JSONLD_CONTEXT_HTML;
 	public static String JSONLD_CONTEXT;
 	
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
-	    log.addHandler(new ConsoleHandler());
+	    
 	    try {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			// load a properties file
@@ -74,7 +75,7 @@ public class ServiceConfig {
 			JSONLD_CONTEXT=setJsonLDContext(false);
 			
 	    } catch (IOException ex) {
-		    log.log(Level.FINEST, "ServiceConfig init error", ex);
+		    log.error("ServiceConfig init error", ex);
 			ex.printStackTrace();
 		}
 	}

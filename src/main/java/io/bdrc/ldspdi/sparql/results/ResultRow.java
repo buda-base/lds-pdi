@@ -22,9 +22,10 @@ package io.bdrc.ldspdi.sparql.results;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.jena.query.QuerySolution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ResultRow implements Serializable{
@@ -34,7 +35,7 @@ public class ResultRow implements Serializable{
      */
     private static final long serialVersionUID = 1L;
     
-    public static Logger log=Logger.getLogger(ResultRow.class.getName());
+    public static Logger log=LoggerFactory.getLogger(ResultRow.class.getName());
     ArrayList<QuerySolutionItem> items;
     
     public ResultRow(QuerySolution qs, List<String> headers) {

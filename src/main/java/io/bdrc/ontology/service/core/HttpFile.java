@@ -30,25 +30,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 public class HttpFile {
     
-    public static Logger log=Logger.getLogger(HttpFile.class.getName());
+    public static Logger log=LoggerFactory.getLogger(HttpFile.class.getName());
 
     public static Reader reader(String link) 
             throws MalformedURLException, IOException
     {
-        log.addHandler(new ConsoleHandler());
         InputStream stream = stream(link);
         if (stream != null) {
             try {
                 return new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             } catch (UnsupportedEncodingException ex) {
-                log.log(Level.FINEST, "HttpFile reader error", ex);
+                log.error("HttpFile reader error", ex);
                 return null;
             }
         } 

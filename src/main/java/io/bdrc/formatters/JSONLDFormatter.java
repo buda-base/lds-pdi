@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.atlas.lib.Chars;
@@ -28,6 +26,8 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +61,7 @@ public class JSONLDFormatter {
     public static final Map<String,Object> jsonldcontext = getJsonLdContext(); // todo: read the thingy
     public static final String BDR = "http://purl.bdrc.io/resource/";
     //public static Writer logWriter = new PrintWriter(new OutputStreamWriter(System.err));	
-    public static Logger log=Logger.getLogger(JSONLDFormatter.class.getName());
+    public static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
     
     public static enum DocType {
 	    CORPORATION,
@@ -111,7 +111,7 @@ public class JSONLDFormatter {
             URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
             map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});                       
         } catch (Exception e) {
-            log.log(Level.FINEST,"Error reading context file :"+ e);
+            log.error("Error reading context file :"+ e);
             e.printStackTrace();
             return null;
         }

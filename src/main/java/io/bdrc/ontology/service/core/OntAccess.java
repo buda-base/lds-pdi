@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
@@ -15,6 +13,8 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.composer.ClassProperties;
 import io.bdrc.ldspdi.composer.ClassProperty;
@@ -27,10 +27,10 @@ public class OntAccess {
     private static String OWL_URL;
     public static HashMap<String,ClassProperties> ontData;
     private static ArrayList<String> rootClassesUris;
-    public static Logger log=Logger.getLogger(PublicDataResource.class.getName());
+    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
 
     public static void init() {
-        log.addHandler(new ConsoleHandler());
+        
         OntModel ontModel = null;        
         
         try {
@@ -45,7 +45,7 @@ public class OntAccess {
             Utils.rdf10tordf11(ontModel);
 
         } catch (IOException io) {
-            log.log(Level.FINEST, "Error initializing OntModel", io);            
+            log.error("Error initializing OntModel", io);            
         }        
         MODEL = ontModel;
         ontData=new HashMap<>();
