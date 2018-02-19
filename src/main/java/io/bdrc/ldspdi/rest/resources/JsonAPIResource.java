@@ -18,6 +18,7 @@ package io.bdrc.ldspdi.rest.resources;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
@@ -31,9 +32,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -46,6 +49,8 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.restapi.exceptions.RestException;
+import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 
 @Path("/")
@@ -58,39 +63,42 @@ public class JsonAPIResource {
         super();
         ResourceConfig config=new ResourceConfig( JsonAPIResource.class);
         config.register(CorsFilter.class);
+        config.register(RestExceptionMapper.class);
         fileList=getQueryTemplates();
     }
     
-    @GET 
-    @Path("/queries")
-    @Produces(MediaType.TEXT_HTML)    
-    public Response queriesListGet() {
-        log.info("Call to queriesListGet()");               
+   @GET 
+   @Path("/queries")
+   public Response queriesListGet() throws RestException{        
+        log.info("Call to queriesListGet()"); 
+        ArrayList<QueryListItem> queryList=getQueryListItems(fileList);        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                // when prefix is null, QueryProcessor default prefix is used
-                ArrayList<QueryListItem> queryList=getQueryListItems(fileList);                                
                 ObjectMapper mapper = new ObjectMapper();
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , queryList);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(os , queryList);                    
             }
         };
-        return Response.ok(stream).build();        
+        return Response.ok(stream).build();            
     }
     
-    @POST 
+    @POST
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)    
-    public ArrayList<QueryListItem> queriesListPost() {
+    public ArrayList<QueryListItem> queriesListPost() throws RestException{
+        boolean test=true;
         log.info("Call to queriesListPost()"); 
         ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
         log.info(queryList.toString());
-        return queryList;
+        if(test) {
+            throw new RestException();
+        }else {
+            return queryList;
+        }
     }
     
     @GET 
     @Path("/queries/{template}")
-    @Produces(MediaType.TEXT_HTML)    
-    public Response queryDescGet(@PathParam("template") String name) {
+    public Response queryDescGet(@PathParam("template") String name) throws RestException {
         log.info("Call to queriesListGet()");               
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -100,13 +108,13 @@ public class JsonAPIResource {
                 mapper.writerWithDefaultPrettyPrinter().writeValue(os , qfp.getTemplate());
             }
         };
-        return Response.ok(stream).build();        
+        return Response.ok(stream,MediaType.APPLICATION_JSON_TYPE).build();        
     }
     
     @POST 
     @Path("/queries/{template}")
     @Produces(MediaType.APPLICATION_JSON)    
-    public QueryTemplate queryDescPost(@PathParam("template") String name) {
+    public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException{
         log.info("Call to queriesListGet()");               
         QueryFileParser qfp=new QueryFileParser(name+".arq"); 
         return qfp.getTemplate();        
@@ -118,7 +126,7 @@ public class JsonAPIResource {
             QueryListItem qli=new QueryListItem(file,"/queries/"+file);
             items.add(qli);
         }
-        return items;
+        return items;        
     }
     
     private ArrayList<String> getQueryTemplates() {
@@ -128,7 +136,6 @@ public class JsonAPIResource {
             try (DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(dpath)) {
                 for (java.nio.file.Path path : stream) {
                     String tmp=path.toString();
-                    //Filtering arq files
                     if(tmp.endsWith(".arq")) {
                         files.add(tmp.substring(tmp.lastIndexOf("/")+1));
                     }
@@ -140,7 +147,5 @@ public class JsonAPIResource {
         }
         return files;       
     }
-    
-    
 
 }

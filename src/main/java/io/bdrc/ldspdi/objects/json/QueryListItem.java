@@ -21,11 +21,10 @@ package io.bdrc.ldspdi.objects.json;
 
 public class QueryListItem {
     
-    public String name;
+    public String name;    
     public String descLink;        
        
-    public QueryListItem(String name, String descLink) {
-        super();
+    public QueryListItem(String name, String descLink) {        
         this.name = name.substring(0,name.lastIndexOf("."));
         this.descLink = descLink;        
     }

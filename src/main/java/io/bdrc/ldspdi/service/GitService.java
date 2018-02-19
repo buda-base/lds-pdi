@@ -21,7 +21,6 @@ package io.bdrc.ldspdi.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.ConsoleHandler;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;

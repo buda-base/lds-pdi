@@ -154,8 +154,7 @@ public class LdsTest extends JerseyTest {
                 assertTrue(m.isIsomorphicWith(json));
                 File to_delete=new File(TestUtils.TESTDIR+res+".jsonld");
                 to_delete.delete();
-                // Checking Model against QueryProcessor                              
-                QueryProcessor processor=new QueryProcessor();
+                // Checking Model against QueryProcessor 
                 Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl);
                 assertTrue(mq.isIsomorphicWith(json));
             }

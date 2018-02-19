@@ -56,9 +56,8 @@ public class DemoResources {
     
     @GET 
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getJsonContext() {
-        log.info("Call to getJsonContext()"); 
-        //return ServiceConfig.JSONLD_CONTEXT_HTML; 
+    public Viewable getHomePage() {
+        log.info("Call to getHomePage()"); 
         return new Viewable("/index.jsp"); 
     } 
        
