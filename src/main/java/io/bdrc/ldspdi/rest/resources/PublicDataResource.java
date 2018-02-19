@@ -52,6 +52,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
@@ -69,6 +70,7 @@ import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ontology.service.core.OntAccess;
 import io.bdrc.ontology.service.core.OntClassModel;
+import io.bdrc.restapi.exceptions.RestException;
 
 
 @Path("/")
@@ -89,7 +91,7 @@ public class PublicDataResource {
     @GET 
     @Path("/context.jsonld")
     @Produces(MediaType.TEXT_HTML)    
-    public Response getJsonContext(){
+    public Response getJsonContext() throws RestException{
         log.info("Call to getJsonContext()"); 
         
         StreamingOutput stream = new StreamingOutput() {
@@ -103,7 +105,7 @@ public class PublicDataResource {
     @POST 
     @Path("/context.jsonld")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postJsonContext() {
+    public Response postJsonContext() throws RestException {
         log.info("Call to getJsonContext()");    
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -117,7 +119,7 @@ public class PublicDataResource {
     @Path("/resource/{res}") 
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki) {
+        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         log.info("Call to getResourceGraph()");
         
         if(fuseki !=null){ fusekiUrl=fuseki;}
@@ -138,7 +140,7 @@ public class PublicDataResource {
     public Viewable getExactPersonURLResources(@PathParam("res") final String res,
         @PathParam("type") final String type,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws Exception {
+        @Context UriInfo info) throws RestException {
         log.info("Call to getResourceGraph()");
         
         //Settings  
@@ -160,16 +162,22 @@ public class PublicDataResource {
                 q, 
                 fuseki, 
                 hm.get(QueryConstants.RESULT_HASH), 
-                hm.get(QueryConstants.PAGE_SIZE));        
-        if(hm.get(QueryConstants.JSON_OUT)!=null) {
-            JsonResult model=new JsonResult(rs,hm);
-            String it=mapper.writeValueAsString(model);            
-            return new Viewable("/json.jsp",it);
+                hm.get(QueryConstants.PAGE_SIZE));
+        ResultPage model=null;
+        try {
+            if(hm.get(QueryConstants.JSON_OUT)!=null) {
+                JsonResult mod=new JsonResult(rs,hm);
+                String it=mapper.writeValueAsString(mod);            
+                return new Viewable("/json.jsp",it);
+            }
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
+            model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
         }
-        hm.put(QueryConstants.REQ_METHOD, "GET");             
-        hm.put("query", qfp.getQueryHtml());
-        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-        ResultPage model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
+        catch (JsonProcessingException jx) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
+        }
         return new Viewable("/resPage.jsp",model);    
         
     }
@@ -179,7 +187,7 @@ public class PublicDataResource {
     public Viewable getPersonURLResources(@PathParam("res") final String res,
         @PathParam("type") final String type,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws Exception{
+        @Context UriInfo info) throws RestException{
         log.info("Call to getResourceGraph()");
         if(fuseki !=null){
             fusekiUrl=fuseki;
@@ -204,15 +212,21 @@ public class PublicDataResource {
                 , hm.get(QueryConstants.RESULT_HASH)
                 , ServiceConfig.getProperty(QueryConstants.QS_PAGE_SIZE));        
         //Json output requested
-        if(hm.get(QueryConstants.JSON_OUT)!=null) {
-            JsonResult model=new JsonResult(rs,hm);
-            String it=mapper.writeValueAsString(model);            
-            return new Viewable("/json.jsp",it);
+        ResultPage model=null;
+        try {
+            if(hm.get(QueryConstants.JSON_OUT)!=null) {
+                JsonResult mod=new JsonResult(rs,hm);
+                String it=mapper.writeValueAsString(mod);            
+                return new Viewable("/json.jsp",it);
+            }
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);        
+            model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
         }
-        hm.put(QueryConstants.REQ_METHOD, "GET");             
-        hm.put("query", qfp.getQueryHtml());
-        hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-        ResultPage model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
+        catch (JsonProcessingException jx) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
+        }
         return new Viewable("/resPage.jsp",model);   
         
     }
@@ -222,7 +236,7 @@ public class PublicDataResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki) {
+        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
            
         log.info("Call to getResourceGraphPost");
         if(fuseki !=null){fusekiUrl=fuseki;}
@@ -244,7 +258,7 @@ public class PublicDataResource {
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki) {
+            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         log.info("Call to getFormattedResourceGraph()");
         if(fuseki !=null){fusekiUrl=fuseki;}
         MediaType media=getMediaType(format);
@@ -275,7 +289,7 @@ public class PublicDataResource {
     public Response getFormattedResourceGraphPost(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki) {
+            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         log.info("getFormattedResourceGraphPost");
         if(fuseki !=null){fusekiUrl=fuseki;}
         MediaType media=getMediaType(format);
@@ -305,7 +319,7 @@ public class PublicDataResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getFormattedResourceGraphJsonPost(            
             HashMap<String,String> map,
-            @HeaderParam("fusekiUrl") final String fuseki) {
+            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         log.info("getFormattedResourceGraphPost");
         if(fuseki!=null) {fusekiUrl=fuseki;}
         String format=map.get("ext");
@@ -335,7 +349,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology/core/{class}")
     @Produces("text/html")
-    public Viewable getCoreOntologyClassView(@PathParam("class") String cl) {
+    public Viewable getCoreOntologyClassView(@PathParam("class") String cl) throws RestException{
         log.info("getCoreOntologyClassView()");          
         Map<String, Object> map = new HashMap<>();
         String uri="http://purl.bdrc.io/ontology/core/"+cl;
@@ -346,7 +360,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology/admin/{class}")
     @Produces("text/html")
-    public Viewable getAdminOntologyClassView(@PathParam("class") String cl) {
+    public Viewable getAdminOntologyClassView(@PathParam("class") String cl) throws RestException{
         log.info("getAdminOntologyClassView()");          
         Map<String, Object> map = new HashMap<>();
         String uri="http://purl.bdrc.io/ontology/admin/"+cl;
@@ -357,7 +371,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology.{ext}")
      
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) throws RestException{
         log.info("getOntology()");        
         MediaType media=getMediaType(ext);
         
@@ -392,7 +406,7 @@ public class PublicDataResource {
         return media;
     }
     
-    public static RDFWriter getSTTLRDFWriter(Model m){
+    public static RDFWriter getSTTLRDFWriter(Model m) {
         Lang sttl = STTLWriter.registerWriter();
         SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
         nsPrio.put(SKOS.getURI(), 1);

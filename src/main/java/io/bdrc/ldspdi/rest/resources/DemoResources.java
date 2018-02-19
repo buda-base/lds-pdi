@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ontology.service.core.OntClassModel;
+import io.bdrc.restapi.exceptions.RestException;
 
 @Path("/")
 @Template
@@ -56,15 +57,15 @@ public class DemoResources {
     
     @GET 
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getHomePage() {
+    public Viewable getHomePage() throws RestException{
         log.info("Call to getHomePage()"); 
-        return new Viewable("/index.jsp"); 
+        return new Viewable("/indx.jsp"); 
     } 
        
     @GET 
     @Path("/demo/{file}")
     @Produces(MediaType.TEXT_HTML)
-    public Viewable templateRelative(@PathParam("file") String file) {
+    public Viewable templateRelative(@PathParam("file") String file) throws RestException{
         log.info("Call to templateRelative()");
         return new Viewable("/"+file);         
     }
@@ -72,7 +73,7 @@ public class DemoResources {
     @GET
     @Path("demo/ontology")
     @Produces("text/html")
-    public Viewable getOntologyClassView(@QueryParam("classUri") String uri) {
+    public Viewable getOntologyClassView(@QueryParam("classUri") String uri) throws RestException{
         log.info("Call to getOntologyClassView()");          
         Map<String, Object> map = new HashMap<>();
         map.put("model", new OntClassModel(uri)); 

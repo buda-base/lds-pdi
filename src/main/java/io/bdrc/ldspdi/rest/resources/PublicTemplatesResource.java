@@ -44,6 +44,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.Utils.Helpers;
@@ -55,6 +56,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.JsonResult;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.restapi.exceptions.RestException;
 
 
 @Path("/")
@@ -73,7 +75,8 @@ public class PublicTemplatesResource {
     @GET
     @Path("/resource/templates")
     @Produces("text/html")
-    public Viewable getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki) throws Exception{     
+    public Viewable getQueryTemplateResults(@Context UriInfo info, 
+            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{     
         
         log.info("Call to getQueryTemplateResults()");
         if(fuseki !=null){fusekiUrl=fuseki;}        
@@ -90,7 +93,7 @@ public class PublicTemplatesResource {
         final String query;
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new Exception("Exception : File->"+ filename+"; ERROR: "+check);
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
         }
         query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());
         boolean error=query.startsWith(QueryConstants.QUERY_ERROR);
@@ -103,16 +106,21 @@ public class PublicTemplatesResource {
                 fuseki, 
                 hm.get(QueryConstants.RESULT_HASH), 
                 hm.get(QueryConstants.PAGE_SIZE));
-        
-        if(hm.get(QueryConstants.JSON_OUT)!=null) {
-            JsonResult model=new JsonResult(res,hm);
-            hm.remove("query");            
-            String it=new ObjectMapper().writeValueAsString(model);            
-            return new Viewable("/json.jsp",it);
+        ResultPage model=null;
+        try {
+            if(hm.get(QueryConstants.JSON_OUT)!=null) {
+                JsonResult mod=new JsonResult(res,hm);
+                hm.remove("query");            
+                String it=new ObjectMapper().writeValueAsString(mod);            
+                return new Viewable("/json.jsp",it);
+            }
+            hm.put(QueryConstants.REQ_METHOD, "GET");             
+            hm.put("query", qfp.getQueryHtml());
+            model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
         }
-        hm.put(QueryConstants.REQ_METHOD, "GET");             
-        hm.put("query", qfp.getQueryHtml());
-        ResultPage model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
+        catch (JsonProcessingException jx) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
+        }
         return new Viewable("/resPage.jsp",model);
     }
        
@@ -121,7 +129,7 @@ public class PublicTemplatesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getQueryTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
-            MultivaluedMap<String,String> mp) throws Exception{ 
+            MultivaluedMap<String,String> mp) throws RestException{ 
         log.info("Call to getQueryTemplateResultsPost()");              
         
         if(fuseki !=null){fusekiUrl=fuseki;}
@@ -133,7 +141,7 @@ public class PublicTemplatesResource {
         final String query;        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
         }
         query=InjectionTracker.getValidQuery(
                 qfp.getQuery(), 
@@ -165,7 +173,7 @@ public class PublicTemplatesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getQueryTemplateResultsJsonPost( 
             @HeaderParam("fusekiUrl") final String fuseki,
-            HashMap<String,String> map) throws Exception{     
+            HashMap<String,String> map) throws RestException{     
         log.info("Call to getQueryTemplateResultsJsonPost()");
         ObjectMapper mapper = new ObjectMapper();
         
@@ -176,7 +184,7 @@ public class PublicTemplatesResource {
         final String query;        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new Exception("Exception : File->"+ filename+".arq; ERROR: "+check);
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
         }
         query=InjectionTracker.getValidQuery(
                 qfp.getQuery(), 
@@ -201,7 +209,4 @@ public class PublicTemplatesResource {
         };
         return Response.ok(stream).build();
     }
-    
-     
-    
 }
