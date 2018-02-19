@@ -59,7 +59,7 @@ public class DemoResources {
     @Produces(MediaType.TEXT_HTML)    
     public Viewable getHomePage() throws RestException{
         log.info("Call to getHomePage()"); 
-        return new Viewable("/indx.jsp"); 
+        return new Viewable("/index.jsp"); 
     } 
        
     @GET 

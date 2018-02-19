@@ -20,7 +20,6 @@ package io.bdrc.ldspdi.rest.resources;
  ******************************************************************************/
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,19 +30,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import io.bdrc.ldspdi.Utils.ResponseOutputStream;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -70,61 +65,40 @@ public class JsonAPIResource {
    @GET 
    @Path("/queries")
    public Response queriesListGet() throws RestException{        
-        log.info("Call to queriesListGet()"); 
-        ArrayList<QueryListItem> queryList=getQueryListItems(fileList);        
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , queryList);                    
-            }
-        };
-        return Response.ok(stream).build();            
+        log.info("Call to queriesListGet()");
+        return Response.ok(
+                ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();            
     }
     
     @POST
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)    
     public ArrayList<QueryListItem> queriesListPost() throws RestException{
-        boolean test=true;
-        log.info("Call to queriesListPost()"); 
-        ArrayList<QueryListItem> queryList=getQueryListItems(fileList);
-        log.info(queryList.toString());
-        if(test) {
-            throw new RestException();
-        }else {
-            return queryList;
-        }
+        log.info("Call to queriesListPost()");
+        return getQueryListItems(fileList);        
     }
     
     @GET 
     @Path("/queries/{template}")
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
-        log.info("Call to queriesListGet()");               
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                // when prefix is null, QueryProcessor default prefix is used
-                QueryFileParser qfp=new QueryFileParser(name+".arq");
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , qfp.getTemplate());
-            }
-        };
-        return Response.ok(stream,MediaType.APPLICATION_JSON_TYPE).build();        
+        log.info("Call to queriesListGet()");
+        QueryFileParser qfp=new QueryFileParser(name+".arq");         
+        return Response.ok(
+                ResponseOutputStream.getJsonResponseStream(qfp.getTemplate())).build();
     }
     
     @POST 
     @Path("/queries/{template}")
     @Produces(MediaType.APPLICATION_JSON)    
     public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException{
-        log.info("Call to queriesListGet()");               
-        QueryFileParser qfp=new QueryFileParser(name+".arq"); 
-        return qfp.getTemplate();        
+        log.info("Call to queriesListGet()"); 
+        return new QueryFileParser(name+".arq").getTemplate();        
     }
     
     private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList){
         ArrayList<QueryListItem> items=new ArrayList<>();        
-        for(String file:filesList) {
-            QueryListItem qli=new QueryListItem(file,"/queries/"+file);
-            items.add(qli);
+        for(String file:filesList) {            
+            items.add(new QueryListItem(file,"/queries/"+file));
         }
         return items;        
     }

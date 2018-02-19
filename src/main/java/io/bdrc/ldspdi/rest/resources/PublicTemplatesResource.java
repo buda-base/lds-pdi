@@ -20,8 +20,6 @@ package io.bdrc.ldspdi.rest.resources;
  ******************************************************************************/
 
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
@@ -31,12 +29,10 @@ import javax.ws.rs.POST;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -48,6 +44,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.Utils.Helpers;
+import io.bdrc.ldspdi.Utils.ResponseOutputStream;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
@@ -85,27 +82,20 @@ public class PublicTemplatesResource {
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
                 
-        //params
-        String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";
-        
         //process
-        QueryFileParser qfp=new QueryFileParser(filename);;
-        final String query;
+        QueryFileParser qfp=new QueryFileParser(hm.get(QueryConstants.SEARCH_TYPE)+".arq");
+        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());
-        boolean error=query.startsWith(QueryConstants.QUERY_ERROR);
-        String msg =query;
-        if(error) {
-            return new Viewable("/error.jsp",msg);
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            return new Viewable("/error.jsp",query);
         }
-        Results res = QueryProcessor.getResults(
-                query, 
-                fuseki, 
-                hm.get(QueryConstants.RESULT_HASH), 
-                hm.get(QueryConstants.PAGE_SIZE));
+        Results res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;
         try {
             if(hm.get(QueryConstants.JSON_OUT)!=null) {
@@ -133,39 +123,38 @@ public class PublicTemplatesResource {
         log.info("Call to getQueryTemplateResultsPost()");              
         
         if(fuseki !=null){fusekiUrl=fuseki;}
-        HashMap<String,String> hm=Helpers.convertMulti(mp);        
-        String filename= hm.get(QueryConstants.SEARCH_TYPE)+".arq";
+        HashMap<String,String> hm=Helpers.convertMulti(mp);
         
-        
-        QueryFileParser qfp=new QueryFileParser(filename); 
-        final String query;        
+        QueryFileParser qfp=new QueryFileParser(hm.get(QueryConstants.SEARCH_TYPE)+".arq");                
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(
-                qfp.getQuery(), 
-                hm,
-                qfp.getLitLangParams());
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(),hm,qfp.getLitLangParams());
         
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException { 
-                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-                    os.write(query.getBytes());
-                }else {
-                    Results res = QueryProcessor.getResults(
-                            query, 
-                            fuseki, 
-                            hm.get(QueryConstants.RESULT_HASH), 
-                            hm.get(QueryConstants.PAGE_SIZE));                
-                    hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                    hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));                
-                    JsonResult rp=new JsonResult(res,hm);
-                    new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(os , rp); 
-                }
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
+        }
+        else {
+            JsonResult rp=null;
+            Results res = QueryProcessor.getResults(
+                    query, 
+                    fuseki, 
+                    hm.get(QueryConstants.RESULT_HASH), 
+                    hm.get(QueryConstants.PAGE_SIZE));                
+            hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+            hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+            try {
+                rp=new JsonResult(res,hm);
+            }catch(JsonProcessingException jx) {
+                throw new RestException(500,
+                        RestException.GENERIC_APP_ERROR_CODE,
+                        "JsonProcessingException :"+ jx.getMessage());                
             }
-        };
-        return Response.ok(stream).build();
+            return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
+        }
     }
     
     @POST 
@@ -174,39 +163,32 @@ public class PublicTemplatesResource {
     public Response getQueryTemplateResultsJsonPost( 
             @HeaderParam("fusekiUrl") final String fuseki,
             HashMap<String,String> map) throws RestException{     
-        log.info("Call to getQueryTemplateResultsJsonPost()");
-        ObjectMapper mapper = new ObjectMapper();
+        log.info("Call to getQueryTemplateResultsJsonPost()");        
         
-        if(fuseki !=null){fusekiUrl=fuseki;}        
-        String filename= map.get(QueryConstants.SEARCH_TYPE)+".arq"; 
-        
-        QueryFileParser qfp=new QueryFileParser(filename);;
-        final String query;        
+        if(fuseki !=null){fusekiUrl=fuseki;}         
+        QueryFileParser qfp=new QueryFileParser(map.get(QueryConstants.SEARCH_TYPE)+".arq");             
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Exception : File->"+ filename+"; ERROR: "+check);
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ map.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        query=InjectionTracker.getValidQuery(
-                qfp.getQuery(), 
-                map,
-                qfp.getLitLangParams());        
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-                    os.write(query.getBytes());
-                }else {
-                    Results res = QueryProcessor.getResults(
-                            query, 
-                            fuseki, 
-                            map.get(QueryConstants.RESULT_HASH), 
-                            map.get(QueryConstants.PAGE_SIZE));                
-                    map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-                    map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-                    JsonResult rp=new JsonResult(res,map);
-                    mapper.writerWithDefaultPrettyPrinter().writeValue(os , rp); 
-                }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(),map,qfp.getLitLangParams());        
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
+        }else {
+            JsonResult rp=null;
+            Results res = QueryProcessor.getResults(query,fuseki,map.get(QueryConstants.RESULT_HASH),map.get(QueryConstants.PAGE_SIZE));                
+            map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
+            map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+            try {
+                rp=new JsonResult(res,map);
+            }catch(JsonProcessingException jx) {
+                throw new RestException(500,
+                        RestException.GENERIC_APP_ERROR_CODE,
+                        "JsonProcessingException :"+ jx.getMessage());                
             }
-        };
-        return Response.ok(stream).build();
+            return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();            
+        }
     }
 }
