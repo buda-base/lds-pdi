@@ -1,11 +1,10 @@
-<%@page import="io.bdrc.ldspdi.Utils.DocFileBuilder"%>
 <%@page import="io.bdrc.ldspdi.service.GitService"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <% 
 GitService.update(request.getServletContext().getInitParameter("queryPath"));
-String content=DocFileBuilder.getContent(new String("/resource/templates"));
-
 %>
 <!DOCTYPE html>
 <html>
@@ -15,7 +14,7 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
 #specs {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
-    width: 90%;
+    width: 95%;
 }
 
 #specs td, #customers th {
@@ -37,8 +36,8 @@ String content=DocFileBuilder.getContent(new String("/resource/templates"));
 </style>
 <script type="text/javascript">
 function onto(){
-	var x = "ontology."+document.getElementById("format").value;
-	window.location.assign(x);
+    var x = "ontology."+document.getElementById("format").value;
+    window.location.assign(x);
 }
 </script>
 <title>BDRC Public data Interface</title>
@@ -66,7 +65,33 @@ using this general url format:</p>
 <p><a href="/resource/P1583">http://serverName:portNumber/resource/P1583</a></p>
 <p>where P1583 is a BDRC resource ID</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
-<div align="center"><%= content %></div>
+<div align="center">
+
+<c:forEach items="${model.keys}" var="k">
+    <c:set var="val" value="${k}"/>
+	<div align="center">
+	   <h2>${k}</h2>
+	   <table id="specs">		
+			<tr>
+				<th>Search type</th>
+				<th>Return type</th>
+				<th style="width:400px;">Result set</th>
+				<th>Parameter(s)</th>
+				<th>Url format</th>
+			</tr>			
+			<c:forEach items="${model.getTemplates(val)}" var="tmpl">
+			<tr>
+				<td><b>${tmpl.id}</b></td>
+				<td>${tmpl.queryReturn}</td>
+				<td style="width:400px;">${tmpl.queryResults}</td>
+				<td>${tmpl.queryParams}</td>
+				<td><a href="${tmpl.demoLink}">${tmpl.demoLink}</a></td>
+			</tr>						   
+	        </c:forEach>
+	   </table>
+	</div>
+</c:forEach>
+</div>
 <br><br><hr><br>
 </body>
 </html>

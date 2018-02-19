@@ -83,10 +83,10 @@ input[type=submit]:hover {
 			<c:forEach items="${model.getParamList()}" var="p">
 			    ${p}<br>
 			    <c:set var="val" value="${p}"/>					    
-	            <input type="text" id="${p}" name="${p}" value="${model.getParamValue(val)}"><br>
+	            <input type="text" id="${p}" name="${p}" value='${model.getParamValue(val)}'><br>
 			</c:forEach>
 			<br>
-		    <input type="hidden" id="searchType" name="searchType" value="${model.getId()}">		    		  
+		    <input type="hidden" id="searchType" name="searchType" value='${model.getId()}'>		    		  
 		    <input type="submit" value="Submit">
 		</form>
 	</c:if>	

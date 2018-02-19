@@ -178,7 +178,7 @@ public class ResultPage {
     }
     
     public String getParamValue(String param) {
-        String val=hm.get(param);
+        String val=hm.get(param);        
         if(val!=null) {
             return val;
         }
