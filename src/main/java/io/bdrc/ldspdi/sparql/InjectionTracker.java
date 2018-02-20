@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.slf4j.Logger;
@@ -45,7 +46,14 @@ public class InjectionTracker {
                 queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));                
             }
             if(st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
-                queryStr.setIri(st, "http://purl.bdrc.io/resource/"+converted.get(st));                
+                String param=converted.get(st);
+                if(param.contains(":") && !param.contains("http://")) {
+                    String[] parts=param.split(Pattern.compile(":").toString());
+                    if(parts[0]==null) {parts[0]="";}
+                    queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
+                }else {
+                    queryStr.setIri(st, param);
+                }
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
                 if(lit.contains(st)) {
