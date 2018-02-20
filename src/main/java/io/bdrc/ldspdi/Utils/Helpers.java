@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,12 @@ public class Helpers {
 		return encoded;
 	}
 	
+	public static boolean isValidURI(String uri) {
+	    String[] schemes = {"http","https"};
+	    UrlValidator urlValidator = new UrlValidator(schemes);
+	    return urlValidator.isValid(uri);                
+    }
+	
 	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
         HashMap<String,String> copy=new HashMap<>();
         Set<String> set=map.keySet();
@@ -74,4 +81,5 @@ public class Helpers {
         uri=uri.substring(8);
         return uri.substring(uri.indexOf("/"));
     }
+	
 }

@@ -29,13 +29,16 @@ import org.apache.jena.query.ParameterizedSparqlString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class InjectionTracker {    
     
     public static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
-    public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) {
+    public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) 
+                throws RestException{
         log.info("Query before injection tracking :"+query);
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
         Set<String> s = converted.keySet(); 
@@ -47,13 +50,29 @@ public class InjectionTracker {
             }
             if(st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
                 String param=converted.get(st);
-                if(param.contains(":") && !param.contains("http://")) {
-                    String[] parts=param.split(Pattern.compile(":").toString());
-                    if(parts[0]==null) {parts[0]="";}
-                    queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
-                }else {
-                    queryStr.setIri(st, param);
+                if(param.contains(":")) {
+                    if(Helpers.isValidURI(param)) {
+                        queryStr.setIri(st,param);
+                    }
+                    else {
+                        String[] parts=param.split(Pattern.compile(":").toString());
+                        if(parts[0]==null) {
+                            parts[0]="";
+                        }
+                        String xlms=Prefixes.getFullIRI(parts[0]+":");
+                        if(xlms!=null) {
+                            queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
+                        }else {
+                            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                                    "Unknown prefix","");
+                        }
+                    }
                 }
+                else {
+                    throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                            "This parameter must be of the form prefix:resource or spaceNameUri/resource","");
+                }
+                    
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
                 if(lit.contains(st)) {
@@ -88,4 +107,6 @@ public class InjectionTracker {
         
         return queryStr.toString();
     }
+    
+    
 }
