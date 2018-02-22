@@ -47,17 +47,39 @@ public class QueryConstants {
 	public static String QUERY_SCOPE="QueryScope";
 	public static String QUERY_PUBLIC_DOMAIN="public";
 	public static String QUERY_RETURN_TYPE="QueryReturnType";
-	public static String QUERY_RESULTS="QueryResults";
-	public static String QUERY_PARAMS="QueryParams";	
+	public static String QUERY_RESULTS="QueryResults";	
+    public static String QUERY_PARAMS="QueryParams";
 	public static String QUERY_URL="QueryUrl";
 	public static String SEARCH_TYPE="searchType";
 	
-	public static String QUERY_NO_ARGS="NONE";
+	//Query Outputs
+	public static String OUTPUT="output";
+    public static String OUTPUT_NAME="name";
+    public static String OUTPUT_TYPE="type";
+    public static String OUTPUT_DESC="desc";
+	
+	//Query Params
+	public static String PARAM="param";
+	public static String PARAM_NAME="name";
+	public static String PARAM_TYPE="type";
+	public static String PARAM_LANGTAG="langTag";
+	public static String PARAM_LUCENE="isLucene";
+	public static String PARAM_EXAMPLE="example";
+	public static String PARAM_DESC="desc";
+	public static String PARAM_SUBTYPE="subtype";
+		
+	//Query Params prefixes
 	public static String INT_ARGS_PARAMPREFIX="I_";
 	public static String LITERAL_ARGS_PARAMPREFIX="L_";
 	public static String LITERAL_LG_ARGS_PARAMPREFIX="LG_";
-	public static String RES_ARGS_PARAMPREFIX="R_";	
+	public static String RES_ARGS_PARAMPREFIX="R_";
 	
+	//Query Params types
+	public static final String INT_PARAM="int";
+	public static final String RES_PARAM="resource";
+	public static final String STRING_PARAM="string";
+	
+	//Resources types
 	public static final String WORK="Work";
 	public static final String PERSON="Person";
 	public static final String PLACE="Place";
@@ -68,9 +90,15 @@ public class QueryConstants {
 	public static final String GENERAL="General";
 	
 	public static ArrayList<String> queryTypes = new ArrayList<>();;
+	public static ArrayList<String> outputs = new ArrayList<>();;
 	public static HashMap<String,Boolean> infoTypes = new HashMap<>();
 	
 	static {
+	    
+	    outputs.add(OUTPUT_NAME);
+	    outputs.add(OUTPUT_TYPE);
+	    outputs.add(OUTPUT_DESC);
+	    
 		queryTypes.add(WORK);
 		queryTypes.add(PERSON);
 		queryTypes.add(PLACE);
@@ -82,9 +110,16 @@ public class QueryConstants {
 		
 		infoTypes.put(QUERY_SCOPE,true);
 		infoTypes.put(QUERY_RETURN_TYPE,true);
-		infoTypes.put(QUERY_RESULTS,true);
-		infoTypes.put(QUERY_PARAMS,true);		
+		infoTypes.put(QUERY_RESULTS,true);				
 		infoTypes.put(QUERY_URL,true);
+		infoTypes.put(PARAM,true);
+		infoTypes.put(PARAM_NAME,true);
+		infoTypes.put(PARAM_TYPE,true);
+		infoTypes.put(PARAM_LANGTAG,true);
+		infoTypes.put(PARAM_LUCENE,true);
+		infoTypes.put(PARAM_EXAMPLE,true);
+		infoTypes.put(PARAM_DESC,true);
+		infoTypes.put(PARAM_SUBTYPE,true);
 	}
 	
 	public static boolean isRequired(String info) {
@@ -94,6 +129,9 @@ public class QueryConstants {
 	public static boolean isValidInfoType(String info) {
 		return infoTypes.keySet().contains(info);
 	}
+	public static boolean isValidOutput(String info) {
+        return outputs.contains(info);
+    }
 	
 	public static boolean isValidQueryType(String type) {
 		return queryTypes.contains(type);

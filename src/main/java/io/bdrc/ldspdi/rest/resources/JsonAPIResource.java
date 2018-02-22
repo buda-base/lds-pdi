@@ -62,9 +62,9 @@ public class JsonAPIResource {
         fileList=getQueryTemplates();
     }
     
-   @GET 
-   @Path("/queries")
-   public Response queriesListGet() throws RestException{        
+    @GET 
+    @Path("/queries")
+    public Response queriesListGet() throws RestException{        
         log.info("Call to queriesListGet()");
         return Response.ok(
                 ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();            

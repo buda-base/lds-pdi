@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.objects.json.Param;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
@@ -79,7 +80,7 @@ public class ResultPage {
         if(pageNumber<=numberOfPages) {
             for (int x=(offset); x<(offset+pageSize);x++) {
                 try {
-                rows.add(allRows.get(x));
+                    rows.add(allRows.get(x));
                 }
                 catch(Exception ex) {
                     //For building the last page
@@ -156,7 +157,6 @@ public class ResultPage {
         return log;
     }
     
-    
     public boolean isUrlQuery() {
         return isUrlQuery;
     }
@@ -168,12 +168,9 @@ public class ResultPage {
     public void setQuery(String query) {
         this.query = query;        
     }
-
-    public List<String> getParamList(){        
-        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
-        if(list.size()==1 && list.get(0).equals(QueryConstants.QUERY_NO_ARGS)){
-            return new ArrayList<>();
-        }        
+    
+    public List<String> getParamList(){
+        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));             
         return list;
     }
     

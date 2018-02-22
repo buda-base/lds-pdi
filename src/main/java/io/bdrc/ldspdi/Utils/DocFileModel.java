@@ -16,6 +16,7 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class DocFileModel {    
     
@@ -24,12 +25,12 @@ public class DocFileModel {
     public Set<String> keys;
     HashMap<String,ArrayList<QueryTemplate>> templ;
     
-    public DocFileModel() {
+    public DocFileModel() throws RestException{
         this.files=getQueryTemplates();
         setContentModel();        
     }
     
-    public void setContentModel(){
+    public void setContentModel() throws RestException{
                 
         templ=new HashMap<>();        
         
