@@ -18,7 +18,7 @@ public class StringParam extends Param {
         this.isLuceneParam=isLuceneParam;
         this.example=example;
     }
-
+    
     public String getLangTag() {
         return langTag;
     }
@@ -45,7 +45,7 @@ public class StringParam extends Param {
 
     @Override
     public String toString() {
-        return "StringParam [langTag=" + langTag + ", isLuceneParam=" + isLuceneParam + ", example=" + example + "]";
+        return " <b>langTag</b>=" + langTag + ", <b>isLuceneParam</b>=" + isLuceneParam + ", <b>example</b>=" + example;
     }
     
     

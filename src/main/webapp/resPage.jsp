@@ -21,13 +21,13 @@ function showHide() {
 table {
     border-collapse: collapse;
     border-spacing: 0;
-    margin-left: 20px;
-    width: 80%;
+    margin-left: 20px;    
     border: 1px solid #ddd;
 }
 
 th, td {
     text-align: left;
+    vertical-align:top;
     padding: 16px;
 }
 
@@ -74,9 +74,21 @@ input[type=submit]:hover {
 </span>
 <div id="query" style="display:none">
 <br>
-<table>
+<table style="width: 90%;">
 <tr>
-	<td>${model.getQuery().trim()}</td>
+	<td style="width: 60%;">${model.getQuery().trim()}<br>
+	
+	<table style="width: 100%;">
+	<tr><td></td><td style="text-align: center;"><b>PARAMS</b></td></tr>
+	   <c:forEach items="${model.getParams()}" var="par">	       
+	       <tr><td><b>${par.name} </b></td><td>${par}<br></td></tr>
+	   </c:forEach>
+	   <tr><td></td><td style="text-align: center;"><b>OUTPUT</b></td></tr>
+	   <c:forEach items="${model.getOutputs()}" var="otp">
+           <tr><td><b>${otp.name} </b></td><td>${otp}<br></td></tr>
+       </c:forEach>
+    </table>
+	</td>
 	<td>
 	<c:if test="${model.getParamList().size()>0}">
 		<form action="/resource/templates">
@@ -92,7 +104,7 @@ input[type=submit]:hover {
 		    <input type="submit" value="Submit">
 		</form>
 	</c:if>	
-	</td>
+	</td>	
 </tr>
 </table>
 </div>

@@ -20,7 +20,7 @@ public class IntParam extends Param {
 
     @Override
     public String toString() {
-        return "IntParam [description=" + description + "]";
+        return " <b>description : </b>" + description;
     } 
     
     

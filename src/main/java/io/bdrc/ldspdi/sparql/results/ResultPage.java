@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.objects.json.Output;
+import io.bdrc.ldspdi.objects.json.Param;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
@@ -52,7 +54,7 @@ public class ResultPage {
     public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
     HashMap<String,String> hm;
-    private QueryTemplate temp;
+    private QueryTemplate temp;    
 
     public ResultPage(Results res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
             throws JsonProcessingException,NumberFormatException{
@@ -180,5 +182,15 @@ public class ResultPage {
         }
         return "";
     }
+
+    public ArrayList<Param> getParams() {
+        return temp.getParams();
+    }
+
+    public ArrayList<Output> getOutputs() {
+        return temp.getOutputs();
+    }
+    
+    
     
 }

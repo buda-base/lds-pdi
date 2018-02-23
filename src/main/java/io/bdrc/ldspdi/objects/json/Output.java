@@ -13,6 +13,11 @@ public class Output {
         this.description = description;
     }
     
+    @Override
+    public String toString() {
+        return " <b>type : </b>" + type + ", <b>description : </b>" + description;
+    }
+
     public String getName() {
         return name;
     }

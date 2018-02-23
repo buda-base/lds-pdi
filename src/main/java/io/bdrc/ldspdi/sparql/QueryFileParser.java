@@ -139,11 +139,11 @@ public class QueryFileParser {
                 }
                 else {
                     query=query+" "+readLine;
-                    queryHtml=queryHtml+"<br>"+" "+readLine;
+                    queryHtml=queryHtml+" "+readLine+"<br>";
                 }
             }
             br.close();
-            queryHtml=queryHtml.substring(4);            
+            queryHtml=queryHtml.substring(15);            
             params=buildParams(p_map);
             outputs=buildOutputs(o_map);            
     	}
