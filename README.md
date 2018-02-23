@@ -212,18 +212,36 @@ This framework will automatically add new sparql query templates to the index pa
 New query files must have the .arq extension and are formatted as follows :
 
 ```
-#QueryScope=Place
+#QueryScope=General
 #QueryReturnType=Table
-#QueryResults=A table containing the Id and the name of the place whose name contains the L_NAME param value
-#QueryParams=L_NAME
-#QueryUrl=?searchType=Place_byName&L_NAME=dgon gsar
+#QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
+#QueryParams=L_NAME,LG_NAME,I_LIM
+#QueryUrl=?searchType=Res_withFacet&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
 
-select ?Place_ID ?Place_Name
-where {
-  ?Place_ID a :Place;
-   skos:prefLabel ?Place_Name .
-  Filter(contains(?Place_Name, ?L_NAME))
+#param.L_NAME.type=string
+#param.L_NAME.langTag=LG_NAME
+#param.L_NAME.isLucene=true
+#param.L_NAME.example=("'od zer" OR "ye shes")
+#param.I_LIM.type=int
+#param.I_LIM.desc=the maximum number of results
+
+#output.?s.type=URI
+#output.?s.desc=the resource URI
+#output.?f.type=URI
+#output.?f.desc=the resourceType URI of the resource
+#output.?lit.type=string
+#output.?lit.desc=the label/pref. label of the resource
+
+select distinct ?s ?f ?lit
+WHERE {
+  { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . }
+  union
+  { (?s ?sc ?lit) text:query ( skos:altLabel ?L_NAME ) . }
+  union
+  { (?t ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . ?s ?p ?t } .
+  ?s a ?f  .
 }
+limit ?I_LIM
 ```
 Note : the parameter placeholder of the query must match the value of QueryParams.
 
@@ -308,6 +326,56 @@ where {
   }
 }
 ```
+#### Query templates metadata
+
+Templates metadata is available as json at the following url:
+```
+http:/localhost:8080/queries/{template name} (without .arq extension)
+```
+In addition to general metadata (QueryScope, Id, domain, etc...), there two types of metadata : **param** and **output**
+
+an example of param metadata is as follows:
+```
+#param.L_NAME.type=string
+#param.L_NAME.langTag=LG_NAME
+#param.L_NAME.isLucene=true
+#param.L_NAME.example=("'od zer" OR "ye shes")
+```
+
+**param** and **output** have the same syntax : 
+```
+#{metadataType}.{variable_name}.{data_name}
+```
+
+#### param metadata specs
+
+For a Literal param (prefixed by L_): only {type}{langTag}{isLucene}{example} are valid data_name.
+
+For a Integer param (prefixed by I_): only {type}{desc} are valid data_name.
+
+For a Resource param (prefixed by R_): only {type}{subType}{desc} are valid data_name. the subtype indicates whether this param is a resource ID(bdr:P1583) or a resource type (:Work)
+
+#### output metadata specs
+
+For all output metadata, only only {type}{desc} are valid data_name.
+
+#### metadata declaration complete model example
+```
+#param.L_NAME.type=
+#param.L_NAME.langTag=
+#param.L_NAME.isLucene=
+#param.L_NAME.example=
+
+#param.I_LIM.type=
+#param.I_LIM.desc=
+
+#param.R_RES.type=
+#param.R_RES.subtype=
+#param.R_RES.desc=
+
+#output.?s.type=
+#output.?s.desc=
+```
 
 # JSON API
 
@@ -329,15 +397,42 @@ GET or POST: http://localhost:8080/queries/{template_name}
 ```
 returns JSON queryTemplate object :
 ```
-{ 
-  "id" : "PersonNames_byNameLang", 
-  "domain" : "public", 
-  "queryScope" : "Person", 
-  "queryResults" : "A table containing the Id, primary_name, name_type and name_type value for people whose any name matches the NAME with the LANG tag", 
-  "queryReturn" : "Table", 
-  "queryParams" : "L_NAME,LG_NAME", 
-  "template" : " select distinct ?Person ?Primary_Name ?Name_Type ?Name WHERE { (?Person ?sc1 ?Primary_Name) text:query ( ?L_NAME ) . ?Person a :Person . ?Person :personName ?p_name . (?p_name ?sc2 ?Name) text:query (rdfs:label ?L_NAME) . ?p_name rdf:type ?Name_Type . OPTIONAL {?p_name ?title ?Name} . FILTER (?Name_Type != :PersonName) }", 
-  "demoLink" : "/resource/templates?searchType=PersonNames_byNameLang&L_NAME=%22%27od+zer%22&LG_NAME=bo-x-ewts" }
+{
+id: "Res_byName",
+domain: "public",
+queryScope: "General",
+queryResults: "A table containing the Id and matching literal for the given query and language tag with the given limit",
+queryReturn: "Table",
+queryParams: "L_NAME,LG_NAME,I_LIM",
+params: [
+{
+type: "string",
+name: "L_NAME",
+langTag: "LG_NAME",
+isLuceneParam: "true",
+example: "("'od zer" OR "ye shes")"
+},
+{
+type: "int",
+name: "I_LIM",
+description: "the maximum number of results"
+}
+],
+outputs: [
+{
+name: "?s",
+type: "URI",
+description: "the resource URI"
+},
+{
+name: "?lit",
+type: "string",
+description: "the label/pref. label of the resource"
+}
+],
+template: " select distinct ?s ?lit WHERE { { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . } union { (?b ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . ?s ?t ?b . } } limit ?I_LIM",
+demoLink: "/resource/templates?searchType=Res_byName&L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
+}
 ```
 # Quick search support
 

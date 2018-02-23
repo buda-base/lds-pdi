@@ -49,6 +49,7 @@ public class QueryConstants {
 	public static String QUERY_RETURN_TYPE="QueryReturnType";
 	public static String QUERY_RESULTS="QueryResults";	
     public static String QUERY_PARAMS="QueryParams";
+    public static String QUERY_NO_ARGS="NONE";
 	public static String QUERY_URL="QueryUrl";
 	public static String SEARCH_TYPE="searchType";
 	

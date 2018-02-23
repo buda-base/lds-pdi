@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.bdrc.ldspdi.objects.json.Param;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
