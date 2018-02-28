@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.Utils;
+package io.bdrc.ldspdi.utils;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

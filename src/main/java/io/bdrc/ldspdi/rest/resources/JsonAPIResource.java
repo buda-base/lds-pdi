@@ -38,12 +38,12 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.Utils.ResponseOutputStream;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
@@ -95,10 +95,12 @@ public class JsonAPIResource {
         return new QueryFileParser(name+".arq").getTemplate();        
     }
     
-    private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList){
+    private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList) throws RestException{
         ArrayList<QueryListItem> items=new ArrayList<>();        
         for(String file:filesList) {            
-            items.add(new QueryListItem(file,"/queries/"+file));
+            QueryFileParser qfp=new QueryFileParser(file);              
+            QueryTemplate qt=qfp.getTemplate();
+            items.add(new QueryListItem(qt.getId(),"/queries/"+qt.getId(),qt.getQueryResults()));
         }
         return items;        
     }

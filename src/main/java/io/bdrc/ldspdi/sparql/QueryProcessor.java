@@ -29,7 +29,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.results.ResultsCache;
 
 import org.slf4j.Logger;
@@ -61,8 +61,8 @@ public class QueryProcessor {
         return rs;           
     }
 	
-	public static Results getResults(String query, String fuseki, String hash, String pageSize) {
-        Results res;
+	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
+        ResultSetWrapper res;
         if(hash==null) {
             long start=System.currentTimeMillis();            
             ResultSet jrs=getResultSet(query, fuseki);
@@ -72,7 +72,7 @@ public class QueryProcessor {
             if(pageSize!=null) {
                 psz=Integer.parseInt(pageSize);
             }
-            res=new Results(jrs,elapsed,psz);                    
+            res=new ResultSetWrapper(jrs,elapsed,psz);                    
             int new_hash=Objects.hashCode(res);                    
             res.setHash(new_hash);                    
             ResultsCache.addToCache(res, Objects.hashCode(res));            

@@ -76,7 +76,7 @@ public class ResultPageLinks {
         }
     }
     
-    public ResultPageLinks(JsonResult page, HashMap<String,String> hm) throws JsonProcessingException{
+    public ResultPageLinks(Results page, HashMap<String,String> hm) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         String method=hm.get(QueryConstants.REQ_METHOD);
         if(method !=null) {

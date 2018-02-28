@@ -24,7 +24,7 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.function.FunctionBase2;
 
-import io.bdrc.ldspdi.Utils.Helpers;
+import io.bdrc.ldspdi.utils.Helpers;
 
 public class SanskritBasicFilter extends FunctionBase2{
 	

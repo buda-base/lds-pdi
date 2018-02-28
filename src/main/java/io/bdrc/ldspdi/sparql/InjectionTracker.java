@@ -29,8 +29,8 @@ import org.apache.jena.query.ParameterizedSparqlString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.Utils.Helpers;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class InjectionTracker {    
@@ -38,7 +38,7 @@ public class InjectionTracker {
     public static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) 
-                throws RestException{
+                /*throws RestException*/{
         log.info("Query before injection tracking :"+query);
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
         Set<String> s = converted.keySet(); 
@@ -63,14 +63,14 @@ public class InjectionTracker {
                         if(xlms!=null) {
                             queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
                         }else {
-                            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
-                                    "Unknown prefix","");
+                            /*throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                                    "Unknown prefix","");*/
                         }
                     }
                 }
                 else {
-                    throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
-                            "This parameter must be of the form prefix:resource or spaceNameUri/resource","");
+                    /*throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                            "This parameter must be of the form prefix:resource or spaceNameUri/resource","");*/
                 }
                     
             }

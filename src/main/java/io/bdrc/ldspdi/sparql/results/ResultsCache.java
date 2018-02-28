@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
     
-    private static CacheAccess<Integer,Results> CACHE = JCS.getInstance( "default" );
+    private static CacheAccess<Integer,ResultSetWrapper> CACHE = JCS.getInstance( "default" );
     public static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
     
-    public static void addToCache(Results res, int hash) {        
+    public static void addToCache(ResultSetWrapper res, int hash) {        
         try{
             CACHE.put( new Integer(hash), res );
         }
@@ -40,7 +40,7 @@ public class ResultsCache {
         }
     }
     
-    public static Results getResultsFromCache(int hash) {
+    public static ResultSetWrapper getResultsFromCache(int hash) {
         return CACHE.get( new Integer(hash));
     }
     

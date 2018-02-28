@@ -39,24 +39,17 @@ public class ResultPage {
     
     public static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
     
-    public int pageNumber;
-    public int numberOfPages;
-    public int pageSize;
-    public int numResults;
+    public int pageNumber,numberOfPages,pageSize,numResults, hash;
     public long execTime;
-    public String id;
-    public String query;
-    public int hash;
-    public boolean isLastPage;
-    public boolean isFirstPage; 
-    public boolean isUrlQuery=false;
+    public String id,query;    
+    public boolean isLastPage,isFirstPage,isUrlQuery=false;
     public ResultPageLinks pLinks;
     public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
     HashMap<String,String> hm;
     private QueryTemplate temp;    
 
-    public ResultPage(Results res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
+    public ResultPage(ResultSetWrapper res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
             throws JsonProcessingException,NumberFormatException{
         if(pageNum!=null) {
             this.pageNumber=Integer.parseInt(pageNum);
@@ -70,7 +63,7 @@ public class ResultPage {
         hash=res.getHash();
         headers=res.getHeaders();
         numberOfPages=res.getNumberOfPages();
-        id=hm.get(QueryConstants.SEARCH_TYPE);
+        id=temp.getId();
         query=hm.get("query");
         String tmp=hm.get(QueryConstants.QUERY_TYPE);
         if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}        

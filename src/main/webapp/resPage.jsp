@@ -91,7 +91,7 @@ input[type=submit]:hover {
 	</td>
 	<td>
 	<c:if test="${model.getParamList().size()>0}">
-		<form action="/resource/templates">
+		<form action="/query/${model.getId()}">
 			<c:forEach items="${model.getParamList()}" var="p">
 			    <c:set var="val" value="${p}"/>
                 <c:if test="${!p.equals(\"NONE\")}">

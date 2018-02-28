@@ -52,16 +52,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
-import io.bdrc.ldspdi.Utils.Helpers;
-import io.bdrc.ldspdi.Utils.ResponseOutputStream;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.results.JsonResult;
-import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ldspdi.sparql.results.ResultPage;
+import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
+import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.ontology.service.core.OntAccess;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.restapi.exceptions.RestException;
@@ -147,11 +147,11 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = QueryProcessor.getResults(q,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+        ResultSetWrapper rs = QueryProcessor.getResults(q,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;
         try {
             if(hm.get(QueryConstants.JSON_OUT)!=null) {
-                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new JsonResult(rs,hm)));
+                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new Results(rs,hm)));
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");             
             hm.put("query", qfp.getQueryHtml());
@@ -188,12 +188,12 @@ public class PublicDataResource {
         if(error) {
             return new Viewable("/error.jsp",msg);
         }
-        Results rs = QueryProcessor.getResults(q, fuseki, hm.get(QueryConstants.RESULT_HASH), ServiceConfig.getProperty(QueryConstants.QS_PAGE_SIZE));        
+        ResultSetWrapper rs = QueryProcessor.getResults(q, fuseki, hm.get(QueryConstants.RESULT_HASH), ServiceConfig.getProperty(QueryConstants.QS_PAGE_SIZE));        
         //Json output requested
         ResultPage model=null;
         try {
             if(hm.get(QueryConstants.JSON_OUT)!=null) {                                         
-                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new JsonResult(rs,hm)));
+                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new Results(rs,hm)));
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");             
             hm.put("query", qfp.getQueryHtml());

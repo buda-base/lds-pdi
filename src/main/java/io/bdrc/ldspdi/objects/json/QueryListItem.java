@@ -21,25 +21,38 @@ package io.bdrc.ldspdi.objects.json;
 
 public class QueryListItem {
     
-    public String name;    
-    public String descLink;        
+    public String id;    
+    public String href; 
+    public String description;
        
-    public QueryListItem(String name, String descLink) {        
-        this.name = name.substring(0,name.lastIndexOf("."));
-        this.descLink = descLink;        
+    public QueryListItem(String name, String href, String desc) {        
+        this.id = name;
+        this.href = href; 
+        this.description = desc;
     }
-    
-    public String getName() {
-        return name;
+
+    public String getId() {
+        return id;
     }
-    public void setName(String name) {
-        this.name = name;
+
+    public void setId(String id) {
+        this.id = id;
     }
-    public String getDescLink() {
-        return descLink;
+
+    public String getHref() {
+        return href;
     }
-    public void setDescLink(String descLink) {
-        this.descLink = descLink;
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

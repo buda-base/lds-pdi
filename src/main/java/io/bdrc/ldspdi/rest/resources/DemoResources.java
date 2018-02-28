@@ -38,7 +38,7 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.Utils.DocFileModel;
+import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.restapi.exceptions.RestException;
 

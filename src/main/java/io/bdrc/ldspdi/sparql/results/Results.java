@@ -19,7 +19,6 @@ package io.bdrc.ldspdi.sparql.results;
  * limitations under the License.
  ******************************************************************************/
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,82 +26,109 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.sparql.QueryConstants;
 
-public class Results implements Serializable{
+public class Results {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public static Logger log=LoggerFactory.getLogger(Results.class.getName());
+public static Logger log=LoggerFactory.getLogger(Results.class.getName());
     
-    public long execTime;
-    public int numResults;
-    public int pageSize;
+    public int pageNumber;
     public int numberOfPages;
+    public int pageSize;
+    public int numResults;
+    public long execTime;
     public int hash;
+    public boolean lastPage;
+    public boolean firstPage;    
+    public ResultPageLinks pLinks;
     public List<String> headers;
-    public ArrayList<QuerySolutionItem> rows;    
-    public HashMap<Integer,String> pagesUrls;
+    public ArrayList<QuerySolutionItem> rows;
     
-    public Results(ResultSet rs, long execTime,int pageSize) {
-        this.pageSize=pageSize;
-        headers =rs.getResultVars();
-        this.execTime=execTime;
-        numResults=0;
-        rows=new ArrayList<>();
-        while(rs.hasNext()) {            
-            QuerySolution qs=rs.next();            
-            QuerySolutionItem row=new QuerySolutionItem(qs,headers);
-            rows.add(row);
-            numResults++;
+    public Results(ResultSetWrapper res,HashMap<String,String> hm) 
+            throws JsonProcessingException,NumberFormatException{
+        String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
+        if(pageNum!=null) {
+            this.pageNumber=Integer.parseInt(pageNum);
+        }else {
+            this.pageNumber=1;
         }
-        numberOfPages=(numResults/pageSize);
-        if(numberOfPages*pageSize<numResults) {numberOfPages++;}
-    }
-    
-    public List<String> getHeaders() {
-        return headers;
+        pageSize=res.getPageSize();
+        numResults=res.getNumResults();
+        execTime=res.getExecTime();
+        hash=res.getHash();
+        headers=res.getHeaders();
+        numberOfPages=res.getNumberOfPages();        
+        int offset=(pageNumber-1)*pageSize; 
+        rows=new ArrayList<>();
+        ArrayList<QuerySolutionItem> allRows=res.getRows();        
+        if(pageNumber<=numberOfPages) {
+            for (int x=(offset); x<(offset+pageSize);x++) {
+                try {
+                rows.add(allRows.get(x));
+                }
+                catch(Exception ex) {                    
+                    break;
+                }
+            }
+        }
+        if(pageNumber==1) {
+            firstPage=true;
+        }
+        else {
+            firstPage=false;
+        }
+        if(pageNumber==res.numberOfPages) {
+            lastPage=true;
+        }else {
+            lastPage=false;
+        }
+        pLinks=new ResultPageLinks(this,hm);
     }
 
-    public long getExecTime() {
-        return execTime;
-    }
-
-    public int getNumResults() {
-        return numResults;
-    }
-
-    public ArrayList<QuerySolutionItem> getRows() {
-        return rows;
-    }
-
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
-    public static Logger getLog() {
-        return log;
-    }
-
-    public int getPageSize() {
-        return pageSize;
+    public int getPageNumber() {
+        return pageNumber;
     }
 
     public int getNumberOfPages() {
         return numberOfPages;
     }
 
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public int getNumResults() {
+        return numResults;
+    }
+
+    public long getExecTime() {
+        return execTime;
+    }
+
     public int getHash() {
         return hash;
     }
 
-    public void setHash(int hash) {
-        this.hash = hash;
+    public boolean lastPage() {
+        return lastPage;
+    }
+
+    public boolean firstPage() {
+        return firstPage;
+    }
+
+    public ResultPageLinks getpLinks() {
+        return pLinks;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    public ArrayList<QuerySolutionItem> getRows() {
+        return rows;
     }
     
 }
