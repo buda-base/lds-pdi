@@ -142,7 +142,7 @@ application/trix+xml=trix
 
 lds-pdi serves paginated results based on several parameters values.
 
-/templates : POST requests return the following JSON format :
+/query/{template id} : POST requests return the following JSON format :
 ```
 {
   "pageNumber" : 1,
@@ -180,8 +180,8 @@ lds-pdi serves paginated results based on several parameters values.
 pLinks is an object giving prev and next pages for GET request (prevGet & nextGet) along with post json request params of the current, next and previous pages (For request posting json)
 
 ```
-Ex GET: http://localhost:8080/resource/templates?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
-Ex POST: curl --data "searchType=Res_byName&L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/resource/templates
+Ex GET: http://localhost:8080/query/Res_byName?L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/Res_byName
 ```
 
 **NOTE:** You can get this json output format using GET requests by adding &jsonOut or ?jsonOut to your URL request.
@@ -193,7 +193,6 @@ Ex Testing POST JSON :
 
 ```
 {
-  "searchType": "Res_byName",
   "L_NAME": "(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))",
   "LG_NAME": "bo-x-ewts",
   "I_LIM":"100"
@@ -202,7 +201,7 @@ Ex Testing POST JSON :
 
 2) running curl :
 ```
-curl -H "Content-Type: application/json" -X POST -d @test.json http://localhost:8080/resource/templates
+curl -H "Content-Type: application/json" -X POST -d @test.json http://localhost:8080/query/{template id}
 ```
 
 # Query templates format specifications
@@ -216,7 +215,7 @@ New query files must have the .arq extension and are formatted as follows :
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
 #QueryParams=L_NAME,LG_NAME,I_LIM
-#QueryUrl=?searchType=Res_withFacet&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
+#QueryUrl=/Res_withFacet?L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
 
 #param.L_NAME.type=string
 #param.L_NAME.langTag=LG_NAME
@@ -283,7 +282,7 @@ will go through without any issue.
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
 #QueryParams=L_NAME,LG_NAME,I_LIM
-#QueryUrl=?searchType=Res_byName&L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
+#QueryUrl=/Res_byName?L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&LG_NAME=bo-x-ewts&I_LIM=100
 
 select distinct ?s ?lit
 WHERE {
@@ -300,7 +299,7 @@ WHERE {
 #QueryReturnType=Table
 #QueryResults=All the detailed admin info (notes, status, log entries) about the person data
 #QueryParams=R_RES
-#QueryUrl=?searchType=Person_adminDetails&R_RES=P1583
+#QueryUrl=/Person_adminDetails?R_RES=P1583
 
 
 select distinct
@@ -387,7 +386,11 @@ GET or POST: http://localhost:8080/queries
 
 returns JSON objects of the form
 ```
-{"name":"Lineage_list","descLink":"http://localhost:8080/queries/Lineage_list"}
+{
+id: "Etexts_contents",
+href: "/queries/Etexts_contents",
+description: "A table containing the Resource ID, etext contents and score for the given query and language tag with the given limit"
+},
 ```
 Where descLink is a link to the JSON query template representation.
 
@@ -431,7 +434,7 @@ description: "the label/pref. label of the resource"
 }
 ],
 template: " select distinct ?s ?lit WHERE { { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . } union { (?b ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . ?s ?t ?b . } } limit ?I_LIM",
-demoLink: "/resource/templates?searchType=Res_byName&L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
+demoLink: "/query/Res_byName?L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
 }
 ```
 # Quick search support
