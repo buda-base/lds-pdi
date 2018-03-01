@@ -91,12 +91,12 @@ public class QueryFileParser {
 	private void parseTemplate() throws RestException{
     	try { 
     	    HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
-    	    HashMap<String,HashMap<String,String>> o_map=new HashMap<>();
-    	    BufferedReader br = new BufferedReader(new FileReader(queryFile));     
+    	    HashMap<String,HashMap<String,String>> o_map=new HashMap<>();    	       
             String readLine = "";   
             query=""; 
             queryHtml=""; 
-            while ((readLine = br.readLine()) != null) {                
+            BufferedReader brd = new BufferedReader(new FileReader(queryFile)); 
+            while ((readLine = brd.readLine()) != null) {                
                 readLine=readLine.trim();
                 boolean processed=false;
                 if(readLine.startsWith("#")) {
@@ -142,7 +142,7 @@ public class QueryFileParser {
                     queryHtml=queryHtml+" "+readLine+"<br>";
                 }
             }
-            br.close();
+            brd.close();
             queryHtml=queryHtml.substring(15);            
             params=buildParams(p_map);
             outputs=buildOutputs(o_map);            

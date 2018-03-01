@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -255,10 +256,7 @@ public class OntAccess {
     public static Comparator<OntClass> OntClassComparator = new Comparator<OntClass>() {
 
         public int compare(OntClass class1, OntClass class2) {
-
-            String cl1name = class1.getLocalName();
-            String cl2name = class2.getLocalName();
-            return cl1name.compareTo(cl2name);
+            return class1.getLocalName().compareTo(class2.getLocalName());
         }
 
     };
@@ -267,6 +265,14 @@ public class OntAccess {
 
         public int compare(OntClassModel class1, OntClassModel class2) {
             return OntClassComparator.compare(class1.clazz,class2.clazz);
+        }
+
+    };
+    
+    public static Comparator<Individual> IndividualComparator = new Comparator<Individual>() {
+
+        public int compare(Individual class1, Individual class2) {
+            return class1.getLocalName().compareTo(class2.getLocalName());
         }
 
     };

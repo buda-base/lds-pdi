@@ -1,6 +1,7 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
+<%@page import="org.apache.jena.ontology.Individual"%>
 <%@page import="io.bdrc.ldspdi.composer.*"%>
 <%@page import="io.bdrc.ldspdi.utils.Helpers"%>
 <%@page import="java.util.*"%>
@@ -34,6 +35,12 @@ OntClassModel model = (OntClassModel)t.get("model");
         <div style="white-space: pre-wrap;"><%=comment%></div><hr/>
         <%}}else { %><p>No comments found.</p>
         <%} %>
+        <% List<Individual> individuals =model.getIndividuals(); %>
+            <%if(individuals.size()!=0) {%>
+                <h4>Individuals:</h4>
+                            <%for(Individual ind:individuals){%>
+                <ul><li><a href="<%=ind.getURI()%>"><%=ind.getLocalName()%></a></li></ul>
+        <%}}%>
         <%if (!OntAccess.isRootClass(model.getUri())) {%>
         <h4>&#9658;Object properties:</h4>
         <%ArrayList<ClassProperty> object_Props= OntAccess.listObjectProps(model.getUri()) ; 
@@ -92,9 +99,11 @@ OntClassModel model = (OntClassModel)t.get("model");
             
                 <%for(OntClassModel sub:subclasses){%>
                 <ul><li><a href="<%=Helpers.relativizeURL(sub.getUri())%>"><%=sub.getId() %></a></li></ul>
-            <%}}%>              
+            <%}}%>
+                        
 <% } else {%>
 <p>This class is defined external to this ontology.</p>
 <%} %>
+   
 </body>
 </html>

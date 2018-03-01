@@ -1,7 +1,7 @@
 package io.bdrc.ontology.service.core;
 
 /*******************************************************************************
- * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
  * If this file is a derivation of another work the license header will appear below; 
  * otherwise, this work is licensed under the Apache License, Version 2.0 
@@ -23,18 +23,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
  * 
- * @author chris
+ * @author chris, marc
  *
  */
 public class OntClassModel {
@@ -45,7 +47,7 @@ public class OntClassModel {
     protected OntClass clazz;
     
     public OntClassModel(String uri) {
-        
+        log.info("Instanciated  OntClassModel >> "+uri);
         this.uri = uri;
         clazz = OntAccess.MODEL.getOntClass(uri);
         if (clazz == null) {            
@@ -101,6 +103,15 @@ public class OntClassModel {
         }
         Collections.sort(models,OntAccess.OntClassModelComparator);
         return models;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Individual> getIndividuals() {
+        ExtendedIterator<Individual> it=(ExtendedIterator<Individual>)clazz.listInstances(true);
+        
+        List<Individual> inds = it.toList();        
+        Collections.sort(inds,OntAccess.IndividualComparator);
+        return inds;
     }
     
     public List<String> getLabels() {

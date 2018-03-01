@@ -8,5 +8,5 @@ jcs.default.cacheattributes.MaxMemoryIdleTimeSeconds=3600
 jcs.default.cacheattributes.ShrinkerIntervalSeconds=60
 jcs.default.elementattributes=org.apache.commons.jcs.engine.ElementAttributes
 jcs.default.elementattributes.IsEternal=false
-jcs.default.elementattributes.MaxLife=21600
-jcs.default.elementattributes.IdleTime=1800
+jcs.default.elementattributes.MaxLife=1200
+jcs.default.elementattributes.IdleTime=300
