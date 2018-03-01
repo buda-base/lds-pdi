@@ -2,7 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
 <%@page import="io.bdrc.ldspdi.composer.*"%>
-<%@page import="io.bdrc.ldspdi.Utils.Helpers"%>
+<%@page import="io.bdrc.ldspdi.utils.Helpers"%>
 <%@page import="java.util.*"%>
 <%
 HashMap t=(HashMap)request.getAttribute("model");
