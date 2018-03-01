@@ -47,7 +47,8 @@ public class ResultSetWrapper implements Serializable{
     public int hash;
     public List<String> headers;
     public HashMap<String,String> prefixes;
-    public ArrayList<QuerySolutionItem> rows;    
+    public ArrayList<QuerySolutionItem> rows; 
+    public ArrayList<QueryMvcSolutionItem> mvc_rows;
     public HashMap<Integer,String> pagesUrls;
     
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
@@ -56,10 +57,13 @@ public class ResultSetWrapper implements Serializable{
         this.execTime=execTime;
         numResults=0;
         rows=new ArrayList<>();
+        mvc_rows=new ArrayList<>();
         while(rs.hasNext()) {            
             QuerySolution qs=rs.next();            
             QuerySolutionItem row=new QuerySolutionItem(qs,headers);
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,headers);
             rows.add(row);
+            mvc_rows.add(mvc_row);
             numResults++;
         }
         numberOfPages=(numResults/pageSize);
@@ -104,6 +108,10 @@ public class ResultSetWrapper implements Serializable{
 
     public void setHash(int hash) {
         this.hash = hash;
+    }
+
+    public ArrayList<QueryMvcSolutionItem> getMvc_rows() {
+        return mvc_rows;
     }
     
 }

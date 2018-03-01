@@ -45,7 +45,7 @@ public class ResultPage {
     public boolean isLastPage,isFirstPage,isUrlQuery=false;
     public ResultPageLinks pLinks;
     public List<String> headers;    
-    public ArrayList<QuerySolutionItem> rows;
+    public ArrayList<QueryMvcSolutionItem> mvc_rows;
     HashMap<String,String> hm;
     private QueryTemplate temp;    
 
@@ -69,12 +69,12 @@ public class ResultPage {
         if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}        
         int offset=(pageNumber-1)*pageSize; 
         this.temp=temp;
-        rows=new ArrayList<>();
-        ArrayList<QuerySolutionItem> allRows=res.getRows();
+        mvc_rows=new ArrayList<>();
+        ArrayList<QueryMvcSolutionItem> allRows=res.getMvc_rows();        
         if(pageNumber<=numberOfPages) {
             for (int x=(offset); x<(offset+pageSize);x++) {
                 try {
-                    rows.add(allRows.get(x));
+                    mvc_rows.add(allRows.get(x));
                 }
                 catch(Exception ex) {
                     //For building the last page
@@ -95,9 +95,9 @@ public class ResultPage {
         }
         pLinks=new ResultPageLinks(this,hm);
     }
-    
-    public ArrayList<QuerySolutionItem> getRows() {
-        return rows;
+
+    public ArrayList<QueryMvcSolutionItem> getMvc_rows() {
+        return mvc_rows;
     }
 
     public int getPageNumber() {

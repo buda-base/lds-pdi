@@ -56,12 +56,12 @@ public class DemoResources {
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     } 
     
-    @GET 
+    @GET    
     @Produces(MediaType.TEXT_HTML)    
     public Viewable getHomePage() throws RestException{
         log.info("Call to getHomePage()");         
         return new Viewable("/index.jsp",new DocFileModel()); 
-    } 
+    }
        
     @GET 
     @Path("/demo/{file}")

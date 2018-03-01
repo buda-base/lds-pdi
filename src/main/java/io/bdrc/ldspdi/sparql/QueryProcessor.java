@@ -40,44 +40,54 @@ public class QueryProcessor {
     public static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
-		
+	    Model model=null;
 	    String prefixes=ServiceConfig.getPrefixes();
-		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
-		log.info("Processor query describe:" +q);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
-		Model model = qe.execDescribe();		
+	    int hash=Objects.hashCode(resID);
+	    if(ResultsCache.getObjectFromCache(hash)==null) {
+    		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+    		log.info("Processor query describe:" +q);
+    		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+    		model = qe.execDescribe();
+    		qe.close();
+    		ResultsCache.addToCache(model, hash);
+	    }else {
+	        model=(Model)ResultsCache.getObjectFromCache(hash); 
+	    }
 		return model;		
 	}
 		
-	public static ResultSet getResultSet(String query,String fusekiUrl){
+	public static QueryExecution getResultSet(String query,String fusekiUrl){
         log.info("Processor Json query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }        
         Query q=QueryFactory.create(query);        
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
-        ResultSet rs = qe.execSelect();
-        return rs;           
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);        
+        return qe;           
     }
 	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
         ResultSetWrapper res;
-        if(hash==null) {
-            long start=System.currentTimeMillis();            
-            ResultSet jrs=getResultSet(query, fuseki);
+        
+        if(hash==null) {            
+            long start=System.currentTimeMillis(); 
+            QueryExecution qe=getResultSet(query, fuseki);
+            ResultSet jrs=qe.execSelect();
             long end=System.currentTimeMillis();
             long elapsed=end-start;
             int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));  
             if(pageSize!=null) {
                 psz=Integer.parseInt(pageSize);
             }
-            res=new ResultSetWrapper(jrs,elapsed,psz);                    
+            res=new ResultSetWrapper(jrs,elapsed,psz); 
+            qe.close();
             int new_hash=Objects.hashCode(res);                    
             res.setHash(new_hash);                    
             ResultsCache.addToCache(res, Objects.hashCode(res));            
         }
         else {
-            res=ResultsCache.getResultsFromCache(Integer.parseInt(hash));            
+            
+            res=(ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
         }
         return res;
     }

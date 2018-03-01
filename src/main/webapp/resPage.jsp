@@ -99,8 +99,7 @@ input[type=submit]:hover {
 	            <input type="text" id="${p}" name="${p}" value='${model.getParamValue(val)}'><br>
 	            </c:if>
 			</c:forEach>
-			<br>
-		    <input type="hidden" id="searchType" name="searchType" value='${model.getId()}'>		    		  
+			<br>		    		    		  
 		    <input type="submit" value="Submit">
 		</form>
 	</c:if>	
@@ -119,7 +118,7 @@ input[type=submit]:hover {
 <th>${h}</th>
 </c:forEach>
 </tr>
-<c:forEach items="${model.rows}" var="qsi">
+<c:forEach items="${model.mvc_rows}" var="qsi">
 <tr>
 	<c:forEach items="${model.headers}" var="h">
 	<td>${qsi.getValue(h)}</td>
