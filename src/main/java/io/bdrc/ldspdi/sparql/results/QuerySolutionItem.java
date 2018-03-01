@@ -39,7 +39,7 @@ public class QuerySolutionItem implements Serializable{
     private static final long serialVersionUID = 1L;
     
     public static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
-    public HashMap<String,String> dataRow;
+    public HashMap<String,Field> dataRow;
     
     public QuerySolutionItem(QuerySolution qs,List<String> headers) {
         
@@ -63,25 +63,30 @@ public class QuerySolutionItem implements Serializable{
                             tmp="<a href=/demo/ontology?classUri="+Uri+"> "+res.getLocalName()+"</a>"; 
                         }
                     }
-                    dataRow.put(key, tmp);                    
+                    Field f=new Field("resource",Uri);
+                    dataRow.put(key, f);                    
                 } 
                 if(node.isLiteral()) {
-                    dataRow.put(key, node.asLiteral().toString());                    
+                    String lang = node.asNode().getLiteralLanguage();
+                    LiteralField lf=new LiteralField("Literal",lang,node.asLiteral().getLexicalForm());
+                    dataRow.put(key, lf);                    
                 }
                 if(node.isAnon()) {
-                    dataRow.put(key, node.toString());                    
+                    Field f=new Field("Anonym node",node.toString());
+                    dataRow.put(key, f);                    
                 }                
             }else {
-                dataRow.put(key, "");
+                Field f=new Field("Null node","");
+                dataRow.put(key, f);
             }
         }        
     }
         
-    public HashMap<String, String> getDataRow() {
+    public HashMap<String, Field> getDataRow() {
         return dataRow;
     }
     
-    public String getValue(String key) {
+    public Field getValue(String key) {
         return dataRow.get(key);
     }
 
