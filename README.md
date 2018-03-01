@@ -1,5 +1,7 @@
 # LDS-PDI
 
+(Linked Data Server - Public Data Interface)
+
 Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
 
 Moreover, each query file contains its own description that is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  

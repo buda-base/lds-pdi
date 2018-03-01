@@ -46,6 +46,7 @@ public class ResultSetWrapper implements Serializable{
     public int numberOfPages;
     public int hash;
     public List<String> headers;
+    public HashMap<String,String> prefixes;
     public ArrayList<QuerySolutionItem> rows;    
     public HashMap<Integer,String> pagesUrls;
     

@@ -108,6 +108,9 @@ public class PublicDataResource {
         log.info("Call to getResourceGraph()");
         if(fuseki !=null){ fusekiUrl=fuseki;}            
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
+        }
         return Response.ok(ResponseOutputStream.getModelStream(model),getMediaType(format)).build();       
     }
     
@@ -121,6 +124,9 @@ public class PublicDataResource {
         log.info("Call to getResourceGraphPost");
         if(fuseki !=null){fusekiUrl=fuseki;}           
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
+        }
         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),getMediaType(format)).build();       
     }
@@ -219,6 +225,9 @@ public class PublicDataResource {
         if(fuseki !=null){fusekiUrl=fuseki;}
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
+        }
         Object json=JSONLDFormatter.modelToJsonObject(model, res);        
         return Response.ok(ResponseOutputStream.getModelStream(model, format, json),media).build();       
     }
@@ -235,6 +244,9 @@ public class PublicDataResource {
         if(fuseki !=null){fusekiUrl=fuseki;}
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
+        }
         Object json=JSONLDFormatter.modelToJsonObject(model, res);       
         return Response.ok(ResponseOutputStream.getModelStream(model, format, json),media).build();      
     }
