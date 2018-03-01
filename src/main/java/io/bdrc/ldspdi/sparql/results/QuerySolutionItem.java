@@ -52,23 +52,12 @@ public class QuerySolutionItem implements Serializable{
                 if(node.isResource()) {
                     Resource res=node.asResource();
                     String Uri=res.getURI();
-                    String tmp="";
-                    if(node.asNode().isBlank()) {
-                        tmp=res.getLocalName();
-                    }
-                    else {
-                        if(Uri.startsWith("http://purl.bdrc.io/resource")) {
-                            tmp="<a href=/resource/"+res.getLocalName()+"> "+res.getLocalName()+"</a>";
-                        }else if(Uri.startsWith("http://purl.bdrc.io/ontology/core/")){
-                            tmp="<a href=/demo/ontology?classUri="+Uri+"> "+res.getLocalName()+"</a>"; 
-                        }
-                    }
                     Field f=new Field("resource",Uri);
                     dataRow.put(key, f);                    
                 } 
                 if(node.isLiteral()) {
                     String lang = node.asNode().getLiteralLanguage();
-                    LiteralField lf=new LiteralField("Literal",lang,node.asLiteral().getLexicalForm());
+                    LiteralField lf=new LiteralField(node.asLiteral().getDatatypeURI(),lang,node.asLiteral().getLexicalForm());
                     dataRow.put(key, lf);                    
                 }
                 if(node.isAnon()) {

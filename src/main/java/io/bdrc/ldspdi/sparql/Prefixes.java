@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.omg.CORBA.NameValuePair;
+
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.results.Field;
 
 
 public class Prefixes {
@@ -40,6 +44,5 @@ public class Prefixes {
     public static String getPrefix(String IRI) {
         return prefixesByIRI.get(IRI);
     }
-    
     
 }

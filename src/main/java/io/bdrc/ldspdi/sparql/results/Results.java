@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class Results {
@@ -43,7 +44,7 @@ public static Logger log=LoggerFactory.getLogger(Results.class.getName());
     public boolean lastPage;
     public boolean firstPage;    
     public ResultPageLinks pLinks;
-    public List<String> headers;
+    public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows;
     
     public Results(ResultSetWrapper res,HashMap<String,String> hm) 
@@ -130,5 +131,6 @@ public static Logger log=LoggerFactory.getLogger(Results.class.getName());
     public ArrayList<QuerySolutionItem> getRows() {
         return rows;
     }
+    
     
 }
