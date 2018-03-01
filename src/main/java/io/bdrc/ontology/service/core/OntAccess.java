@@ -3,6 +3,8 @@ package io.bdrc.ontology.service.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class OntAccess {
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-            Utils.removeIndividuals(ontModel);
+            //Utils.removeIndividuals(ontModel);
             Utils.rdf10tordf11(ontModel);
 
         } catch (IOException io) {
@@ -187,6 +189,7 @@ public class OntAccess {
      */
     public static List<OntClass> getRootClasses() {
         List<OntClass> classes = MODEL.listHierarchyRootClasses().toList();
+        Collections.sort(classes, OntClassComparator);
         return classes;
     }
     
@@ -204,7 +207,7 @@ public class OntAccess {
                 rez.add(oc);
             }
         }
-        
+        Collections.sort(rez, OntClassComparator);
         return rez;
     }
     
@@ -217,7 +220,7 @@ public class OntAccess {
                 models.add(new OntClassModel(root));
             }
         }
-        
+        Collections.sort(models,OntClassModelComparator);
         return models;
     }
     
@@ -248,6 +251,25 @@ public class OntAccess {
     public static int getNumRootClasses() {
         return getSimpleRootClasses().size();
     }
+    
+    public static Comparator<OntClass> OntClassComparator = new Comparator<OntClass>() {
+
+        public int compare(OntClass class1, OntClass class2) {
+
+            String cl1name = class1.getLocalName();
+            String cl2name = class2.getLocalName();
+            return cl1name.compareTo(cl2name);
+        }
+
+    };
+    
+    public static Comparator<OntClassModel> OntClassModelComparator = new Comparator<OntClassModel>() {
+
+        public int compare(OntClassModel class1, OntClassModel class2) {
+            return OntClassComparator.compare(class1.clazz,class2.clazz);
+        }
+
+    };
    
 }
 

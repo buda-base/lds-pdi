@@ -20,6 +20,7 @@ package io.bdrc.ontology.service.core;
  ******************************************************************************/
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -98,7 +99,7 @@ public class OntClassModel {
                 models.add(new OntClassModel(c));
             }
         }
-        
+        Collections.sort(models,OntAccess.OntClassModelComparator);
         return models;
     }
     
