@@ -22,6 +22,7 @@ import io.bdrc.ldspdi.composer.ClassProperties;
 import io.bdrc.ldspdi.composer.ClassProperty;
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.Prefixes;
 
 public class OntAccess {
 	
@@ -255,8 +256,13 @@ public class OntAccess {
     
     public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
 
-        public int compare(OntClass class1, OntClass class2) {
-            return class1.getLocalName().compareTo(class2.getLocalName());
+        public int compare(OntClass class1, OntClass class2) {            
+            if(Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
+                return class1.getLocalName().compareTo(class2.getLocalName());
+            }
+            else {
+                return Prefixes.getPrefix(class1.getNameSpace()).compareTo(Prefixes.getPrefix(class2.getNameSpace()));
+            }
         }
 
     };

@@ -73,7 +73,7 @@ public class QueryFileParser {
                 metaInf.get(QueryConstants.QUERY_PARAMS),
                 params, 
                 outputs,
-                getQuery());
+                getQuery());		
 	}
 	
 	//For testing purpose only - to be removed//
@@ -226,20 +226,8 @@ public class QueryFileParser {
 		return "";
 	}
 
-    public File getQueryFile() {
-        return queryFile;
-    }
-
-    public String getQueryName() {
-        return queryName;
-    }
-
     public HashMap<String, String> getLitLangParams() {
         return litLangParams;
-    }
-
-    public static Logger getLog() {
-        return log;
     }
 
     public String getQueryHtml() {

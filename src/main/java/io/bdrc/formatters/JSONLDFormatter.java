@@ -60,7 +60,6 @@ public class JSONLDFormatter {
     static final ObjectMapper mapper = new ObjectMapper();
     public static final Map<String,Object> jsonldcontext = getJsonLdContext(); // todo: read the thingy
     public static final String BDR = "http://purl.bdrc.io/resource/";
-    //public static Writer logWriter = new PrintWriter(new OutputStreamWriter(System.err));	
     public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
     
     public static enum DocType {
