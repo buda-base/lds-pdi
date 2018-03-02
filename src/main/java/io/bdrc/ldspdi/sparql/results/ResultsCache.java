@@ -39,6 +39,7 @@ public class ResultsCache {
     public static void addToCache(Object res, int hash) {        
         try{
             CACHE.put( Integer.valueOf(hash), res );
+            res=null;
         }
         catch ( CacheException e ){
             log.error("Problem putting Results -->"+res+" in the cache, for key -->"+hash+ " Exception:"+e.getMessage());

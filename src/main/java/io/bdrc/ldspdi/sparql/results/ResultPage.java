@@ -94,6 +94,7 @@ public class ResultPage {
             isLastPage=false;
         }
         pLinks=new ResultPageLinks(this,hm);
+        res=null;
     }
 
     public ArrayList<QueryMvcSolutionItem> getMvc_rows() {
