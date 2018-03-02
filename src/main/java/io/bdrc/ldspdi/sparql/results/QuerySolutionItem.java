@@ -31,14 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class QuerySolutionItem implements Serializable{
+public class QuerySolutionItem {
+        
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-    
-    public static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
+    public final static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
     public HashMap<String,Field> dataRow;
     
     public QuerySolutionItem(QuerySolution qs,List<String> headers) {

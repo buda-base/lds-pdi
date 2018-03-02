@@ -37,7 +37,7 @@ public class ResultPageLinks {
     public String prevJsonParams;
     public String nextJsonParams;    
     
-    public static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());
     
     public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
@@ -48,7 +48,11 @@ public class ResultPageLinks {
                 if( page.numberOfPages>1) {
                     if(page.getPageNumber()==1 ) {
                         if(!URL.contains("&pageNumber=")) {
-                        nextGet=URL+"&pageNumber=2&hash="+page.getHash();
+                            if(URL.indexOf("?")!=-1) {
+                                nextGet=URL+"&pageNumber=2&hash="+page.getHash();
+                            }else {
+                                nextGet=URL+"?pageNumber=2&hash="+page.getHash();
+                            }
                         }
                         else {
                             int next=page.getPageNumber()+1;

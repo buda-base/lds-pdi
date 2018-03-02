@@ -27,9 +27,9 @@ public class OntAccess {
 	
 	public static OntModel MODEL;
     private static String OWL_URL;
-    public static HashMap<String,ClassProperties> ontData;
+    protected static HashMap<String,ClassProperties> ontData;
     private static ArrayList<String> rootClassesUris;
-    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
 
     public static void init() {
         
@@ -190,7 +190,7 @@ public class OntAccess {
      */
     public static List<OntClass> getRootClasses() {
         List<OntClass> classes = MODEL.listHierarchyRootClasses().toList();
-        Collections.sort(classes, OntClassComparator);
+        Collections.sort(classes, ontClassComparator);
         return classes;
     }
     
@@ -208,7 +208,7 @@ public class OntAccess {
                 rez.add(oc);
             }
         }
-        Collections.sort(rez, OntClassComparator);
+        Collections.sort(rez, ontClassComparator);
         return rez;
     }
     
@@ -221,7 +221,7 @@ public class OntAccess {
                 models.add(new OntClassModel(root));
             }
         }
-        Collections.sort(models,OntClassModelComparator);
+        Collections.sort(models,ontClassModelComparator);
         return models;
     }
     
@@ -253,7 +253,7 @@ public class OntAccess {
         return getSimpleRootClasses().size();
     }
     
-    public static Comparator<OntClass> OntClassComparator = new Comparator<OntClass>() {
+    public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
 
         public int compare(OntClass class1, OntClass class2) {
             return class1.getLocalName().compareTo(class2.getLocalName());
@@ -261,15 +261,15 @@ public class OntAccess {
 
     };
     
-    public static Comparator<OntClassModel> OntClassModelComparator = new Comparator<OntClassModel>() {
+    public final static Comparator<OntClassModel> ontClassModelComparator = new Comparator<OntClassModel>() {
 
         public int compare(OntClassModel class1, OntClassModel class2) {
-            return OntClassComparator.compare(class1.clazz,class2.clazz);
+            return ontClassComparator.compare(class1.clazz,class2.clazz);
         }
 
     };
     
-    public static Comparator<Individual> IndividualComparator = new Comparator<Individual>() {
+    public final static Comparator<Individual> individualComparator = new Comparator<Individual>() {
 
         public int compare(Individual class1, Individual class2) {
             return class1.getLocalName().compareTo(class2.getLocalName());

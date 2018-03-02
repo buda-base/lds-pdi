@@ -40,7 +40,7 @@ public class GitService {
     private static Repository localRepo;
    
     
-    static Logger log = LoggerFactory.getLogger(GitService.class.getName());
+    final static Logger log = LoggerFactory.getLogger(GitService.class.getName());
     
     public static void update(String localPath) {
         

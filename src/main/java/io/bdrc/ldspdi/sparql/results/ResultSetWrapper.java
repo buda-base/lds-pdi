@@ -19,7 +19,6 @@ package io.bdrc.ldspdi.sparql.results;
  * limitations under the License.
  ******************************************************************************/
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +30,10 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
 
-public class ResultSetWrapper implements Serializable{
+public class ResultSetWrapper {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public static Logger log=LoggerFactory.getLogger(ResultSetWrapper.class.getName());
+    
+    public final static Logger log=LoggerFactory.getLogger(ResultSetWrapper.class.getName());
     
     public long execTime;
     public int numResults;
@@ -84,10 +79,6 @@ public class ResultSetWrapper implements Serializable{
 
     public ArrayList<QuerySolutionItem> getRows() {
         return rows;
-    }
-
-    public static long getSerialversionuid() {
-        return serialVersionUID;
     }
 
     public static Logger getLog() {

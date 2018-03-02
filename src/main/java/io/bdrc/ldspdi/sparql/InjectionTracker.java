@@ -35,7 +35,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class InjectionTracker {    
     
-    public static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) 
                 throws RestException{

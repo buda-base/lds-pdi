@@ -46,7 +46,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @Template
 public class DemoResources {
     
-    public static Logger log=LoggerFactory.getLogger(DemoResources.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(DemoResources.class.getName());
     
     public DemoResources() {
         super();        

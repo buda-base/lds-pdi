@@ -36,7 +36,7 @@ import io.bdrc.ldspdi.sparql.functions.Wylie;
 
 public class Helpers {
     
-    public static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
 	
 	public static String removeAccents(String text) {		
 		String f=text;

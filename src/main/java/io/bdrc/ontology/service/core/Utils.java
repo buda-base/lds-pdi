@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class Utils {
     
-    static Logger log = LoggerFactory.getLogger(Utils.class.getName());
+    final static Logger log = LoggerFactory.getLogger(Utils.class.getName());
     
     public static void removeIndividuals(OntModel o) {
         ExtendedIterator<Individual> it = o.listIndividuals();

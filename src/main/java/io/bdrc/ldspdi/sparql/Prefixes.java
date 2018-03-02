@@ -10,16 +10,14 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class Prefixes {
     
-    public static HashMap<String,String> IRIByprefixes;
-    public static HashMap<String,String> prefixesByIRI;
+    private final static HashMap<String,String> IRIByprefixes=new HashMap<>();
+    private final static HashMap<String,String> prefixesByIRI=new HashMap<>();
     
     static {
         try {
             File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");                       
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String readLine = "";
-            IRIByprefixes=new HashMap<>();
-            prefixesByIRI=new HashMap<>();
+            String readLine = ""; 
             while ((readLine = br.readLine()) != null) {
                 String tmp=readLine.trim().substring(6).trim();                
                 String uri= tmp.trim().substring(tmp.indexOf(':')+1).replace(">","").replace("<", "");

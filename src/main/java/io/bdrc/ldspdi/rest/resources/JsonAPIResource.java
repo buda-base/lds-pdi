@@ -51,7 +51,7 @@ import io.bdrc.restapi.exceptions.RestExceptionMapper;
 @Path("/")
 public class JsonAPIResource {
     
-    public static Logger log=LoggerFactory.getLogger(JsonAPIResource.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(JsonAPIResource.class.getName());
     private ArrayList<String> fileList;
     
     public JsonAPIResource() {

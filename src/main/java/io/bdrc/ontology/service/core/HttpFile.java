@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public class HttpFile {
     
-    public static Logger log=LoggerFactory.getLogger(HttpFile.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(HttpFile.class.getName());
 
     public static Reader reader(String link) 
             throws MalformedURLException, IOException

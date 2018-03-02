@@ -47,7 +47,7 @@ public class ServiceConfig {
 	public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
-	public static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
+	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 	public static String JSONLD_CONTEXT_HTML;
 	public static String JSONLD_CONTEXT;
 	
@@ -72,6 +72,7 @@ public class ServiceConfig {
 			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
 			JSONLD_CONTEXT_HTML=setJsonLDContext(true);	
 			JSONLD_CONTEXT=setJsonLDContext(false);
+			input.close();
 			
 	    } catch (IOException ex) {
 		    log.error("ServiceConfig init error", ex);
@@ -90,7 +91,8 @@ public class ServiceConfig {
             StringTokenizer st=new StringTokenizer(mimes,",");
             while(st.hasMoreTokens()){
                 mime.add(st.nextToken());
-            }          
+            } 
+            input.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -104,10 +106,9 @@ public class ServiceConfig {
         String st="";        
         String line="";
         while ((line = in.readLine()) != null) {
+            st=st+line;
             if(html) {
                 st=st+line+"<br>";
-            }else {
-                st=st+line;
             }
         }
         in.close();        

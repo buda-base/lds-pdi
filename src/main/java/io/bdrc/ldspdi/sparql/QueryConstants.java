@@ -25,58 +25,58 @@ import java.util.HashMap;
 public class QueryConstants {
     
     /********* Results Objects Constants ****************/
-    public static String RES_URI="URI";
-    public static String PAGE_SIZE="pageSize";
-    public static String QS_PAGE_SIZE="qs_pageSize";
-    public static String PAGE_NUMBER="pageNumber";
-    public static String RESULT_HASH="hash";
-    public static String JSON_OUT="jsonOut";
-    public static String REQ_METHOD="method";
-    public static String REQ_URI="reqUri";
-    public static String QUERY_TYPE="queryType";
+    public final static String RES_URI="URI";
+    public final static String PAGE_SIZE="pageSize";
+    public final static String QS_PAGE_SIZE="qs_pageSize";
+    public final static String PAGE_NUMBER="pageNumber";
+    public final static String RESULT_HASH="hash";
+    public final static String JSON_OUT="jsonOut";
+    public final static String REQ_METHOD="method";
+    public final static String REQ_URI="reqUri";
+    public final static String QUERY_TYPE="queryType";
     
     //****** URL QUERY TEMPLATE****************/
-    public static String URL_TEMPLATE="urlTemplate";
-    public static String URL_TEMPLATE_EXACT="urlTemplateExact";
-    public static String URL_QUERY="urlQuery";
+    public final static String URL_TEMPLATE="urlTemplate";
+    public final static String URL_TEMPLATE_EXACT="urlTemplateExact";
+    public final static String URL_QUERY="urlQuery";
     
     
-    public static String QUERY_ERROR="ERROR";
-    public static String QUERY_PATH="queryPath";
+    public final static String QUERY_ERROR="ERROR";
+    public final static String QUERY_PATH="queryPath";
 	
-	public static String QUERY_SCOPE="QueryScope";
-	public static String QUERY_PUBLIC_DOMAIN="public";
-	public static String QUERY_RETURN_TYPE="QueryReturnType";
-	public static String QUERY_RESULTS="QueryResults";	
-    public static String QUERY_PARAMS="QueryParams";
-    public static String QUERY_NO_ARGS="NONE";
-	public static String QUERY_URL="QueryUrl";
-	public static String SEARCH_TYPE="searchType";
+    public final static String QUERY_SCOPE="QueryScope";
+    public final static String QUERY_PUBLIC_DOMAIN="public";
+    public final static String QUERY_RETURN_TYPE="QueryReturnType";
+    public final static String QUERY_RESULTS="QueryResults";	
+    public final static String QUERY_PARAMS="QueryParams";
+    public final static String QUERY_NO_ARGS="NONE";
+    public final static String QUERY_URL="QueryUrl";
+    public final static String SEARCH_TYPE="searchType";
 	
 	//Query Outputs
-	public static String OUTPUT="output";
-    public static String OUTPUT_NAME="name";
-    public static String OUTPUT_TYPE="type";
-    public static String OUTPUT_DESC="desc";
+    public final static String OUTPUT="output";
+    public final static String OUTPUT_NAME="name";
+    public final static String OUTPUT_TYPE="type";
+    public final static String OUTPUT_DESC="desc";
 	
 	//Query Params
-	public static String PARAM="param";
-	public static String PARAM_NAME="name";
-	public static String PARAM_TYPE="type";
-	public static String PARAM_LANGTAG="langTag";
-	public static String PARAM_LUCENE="isLucene";
-	public static String PARAM_EXAMPLE="example";
-	public static String PARAM_DESC="desc";
-	public static String PARAM_SUBTYPE="subtype";
+    public final static String PARAM="param";
+    public final static String PARAM_NAME="name";
+    public final static String PARAM_TYPE="type";
+    public final static String PARAM_LANGTAG="langTag";
+    public final static String PARAM_LUCENE="isLucene";
+    public final static String PARAM_EXAMPLE="example";
+    public final static String PARAM_DESC="desc";
+    public final static String PARAM_SUBTYPE="subtype";
 		
 	//Query Params prefixes
-	public static String INT_ARGS_PARAMPREFIX="I_";
-	public static String LITERAL_ARGS_PARAMPREFIX="L_";
-	public static String LITERAL_LG_ARGS_PARAMPREFIX="LG_";
-	public static String RES_ARGS_PARAMPREFIX="R_";
+    public final static String INT_ARGS_PARAMPREFIX="I_";
+    public final static String LITERAL_ARGS_PARAMPREFIX="L_";
+    public final static String LITERAL_LG_ARGS_PARAMPREFIX="LG_";
+    public final static String RES_ARGS_PARAMPREFIX="R_";
 	
 	//Query Params types
-	public static final String INT_PARAM="int";
+    public static final String INT_PARAM="int";
 	public static final String RES_PARAM="resource";
 	public static final String STRING_PARAM="string";
 	
@@ -90,9 +90,9 @@ public class QueryConstants {
 	public static final String TOPIC="Topic";
 	public static final String GENERAL="General";
 	
-	public static ArrayList<String> queryTypes = new ArrayList<>();;
-	public static ArrayList<String> outputs = new ArrayList<>();;
-	public static HashMap<String,Boolean> infoTypes = new HashMap<>();
+	final static ArrayList<String> queryTypes = new ArrayList<>();;
+	final static ArrayList<String> outputs = new ArrayList<>();;
+	final static HashMap<String,Boolean> infoTypes = new HashMap<>();
 	
 	static {
 	    

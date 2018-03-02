@@ -54,7 +54,7 @@ public class QueryFileParser {
 	private ArrayList<Param> params;
 	private ArrayList<Output> outputs;
 	
-	public static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
+	public final static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
 	
 	
 	public QueryFileParser(String filename) throws RestException{

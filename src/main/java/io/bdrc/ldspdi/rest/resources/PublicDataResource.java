@@ -70,7 +70,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @Path("/")
 public class PublicDataResource {   
     
-    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
+    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     MediaType default_media=new MediaType("text","turtle","utf-8");

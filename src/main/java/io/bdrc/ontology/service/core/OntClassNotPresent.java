@@ -57,7 +57,7 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 
 public class OntClassNotPresent implements OntClass {
-    public static OntClassNotPresent INSTANCE = new OntClassNotPresent();
+    public final static OntClassNotPresent INSTANCE = new OntClassNotPresent();
 
     private OntClassNotPresent() {
         // TODO Auto-generated constructor stub

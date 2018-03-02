@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OntClassModel {
     
-    static Logger log = LoggerFactory.getLogger(OntClassModel.class.getName());
+    final static Logger log = LoggerFactory.getLogger(OntClassModel.class.getName());
 
     protected String uri;
     protected OntClass clazz;
@@ -101,7 +101,7 @@ public class OntClassModel {
                 models.add(new OntClassModel(c));
             }
         }
-        Collections.sort(models,OntAccess.OntClassModelComparator);
+        Collections.sort(models,OntAccess.ontClassModelComparator);
         return models;
     }
     
@@ -110,7 +110,7 @@ public class OntClassModel {
         ExtendedIterator<Individual> it=(ExtendedIterator<Individual>)clazz.listInstances(true);
         
         List<Individual> inds = it.toList();        
-        Collections.sort(inds,OntAccess.IndividualComparator);
+        Collections.sort(inds,OntAccess.individualComparator);
         return inds;
     }
     

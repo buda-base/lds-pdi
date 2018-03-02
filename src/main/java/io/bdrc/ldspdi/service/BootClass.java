@@ -34,7 +34,7 @@ import io.bdrc.ontology.service.core.OntAccess;
 
 public class BootClass implements javax.servlet.ServletContextListener{
 	
-    public static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
     
     public void contextDestroyed(ServletContextEvent arg0) {
         //Do nothing;

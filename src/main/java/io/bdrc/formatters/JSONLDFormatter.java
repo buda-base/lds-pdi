@@ -56,12 +56,12 @@ import com.github.jsonldjava.utils.JsonUtils;
 
 public class JSONLDFormatter {
     
-    protected static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
+    protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
     public static final Map<String,Object> jsonldcontext = getJsonLdContext(); // todo: read the thingy
     public static final String BDR = "http://purl.bdrc.io/resource/";
     //public static Writer logWriter = new PrintWriter(new OutputStreamWriter(System.err));	
-    public static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
     
     public static enum DocType {
 	    CORPORATION,
@@ -79,7 +79,7 @@ public class JSONLDFormatter {
 	    ;  
 	  }
     
-    public static final HashMap<String,DocType> initialToDocType = new HashMap<>();
+    protected static final HashMap<String,DocType> initialToDocType = new HashMap<>();
     static {
     	initialToDocType.put("P", DocType.PERSON);
     	initialToDocType.put("W", DocType.WORK);

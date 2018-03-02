@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryMvcSolutionItem {    
         
-    public static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
+    public final static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
     public HashMap<String,String> dataRow;
     
     public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {

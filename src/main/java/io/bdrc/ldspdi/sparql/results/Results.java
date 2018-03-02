@@ -33,7 +33,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class Results {
     
-public static Logger log=LoggerFactory.getLogger(Results.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(Results.class.getName());
     
     public int pageNumber;
     public int numberOfPages;

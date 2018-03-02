@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryProcessor {	
 	
-    public static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
 	    Model model=null;

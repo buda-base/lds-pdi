@@ -21,7 +21,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class DocFileModel {    
     
     ArrayList<String> files;
-    public static Logger log=LoggerFactory.getLogger(DocFileModel.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(DocFileModel.class.getName());
     public Set<String> keys;
     HashMap<String,ArrayList<QueryTemplate>> templ;
     

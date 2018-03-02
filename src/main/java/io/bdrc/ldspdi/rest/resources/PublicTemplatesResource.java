@@ -60,7 +60,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @Path("/")
 public class PublicTemplatesResource {
     
-    public static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     

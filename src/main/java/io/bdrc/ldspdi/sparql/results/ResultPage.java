@@ -37,7 +37,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ResultPage {
     
-    public static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
     
     public int pageNumber,numberOfPages,pageSize,numResults, hash;
     public long execTime;
