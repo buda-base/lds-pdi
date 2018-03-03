@@ -22,23 +22,19 @@ package io.bdrc.ldspdi.sparql.results;
 import org.apache.commons.jcs.JCS;
 import org.apache.commons.jcs.access.CacheAccess;
 import org.apache.commons.jcs.access.exception.CacheException;
-import org.apache.commons.jcs.admin.CacheElementInfo;
-import org.apache.commons.jcs.admin.CacheRegionInfo;
 import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.utils.CacheInfo;
-
 public class ResultsCache {
     
-    private static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "default" );
+    protected static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "default" );
     public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
     public static JCSAdminBean admin = new JCSAdminBean();
     
     public static void addToCache(Object res, int hash) {        
         try{
-            CACHE.put( Integer.valueOf(hash), res );
+            CACHE.put( Integer.valueOf(hash), res );            
             res=null;
         }
         catch ( CacheException e ){

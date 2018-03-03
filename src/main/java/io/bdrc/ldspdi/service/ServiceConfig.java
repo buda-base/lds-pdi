@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

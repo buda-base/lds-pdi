@@ -40,18 +40,17 @@ public class QueryProcessor {
     public final static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
-	    Model model=null;
+	    
 	    String prefixes=ServiceConfig.getPrefixes();
 	    int hash=Objects.hashCode(resID);
-	    if(ResultsCache.getObjectFromCache(hash)==null) {
+	    Model model=(Model)ResultsCache.getObjectFromCache(hash);
+	    if(model==null) {
     		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
     		log.info("Processor query describe:" +q);
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
     		model = qe.execDescribe();
     		qe.close();
     		ResultsCache.addToCache(model, hash);
-	    }else {
-	        model=(Model)ResultsCache.getObjectFromCache(hash); 
 	    }
 		return model;		
 	}

@@ -29,7 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-
+import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Template;
@@ -38,6 +38,7 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.sparql.results.CacheAccessModel;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.restapi.exceptions.RestException;
@@ -47,12 +48,15 @@ import io.bdrc.restapi.exceptions.RestException;
 public class DemoResources {
     
     public final static Logger log=LoggerFactory.getLogger(DemoResources.class.getName());
+    public static JCSAdminBean admin=new JCSAdminBean();
     
     public DemoResources() {
         super();        
         ResourceConfig config=new ResourceConfig(DemoResources.class);
         config.register(LoggingFeature.class);
-        config.register(CorsFilter.class);
+        config.register(CorsFilter.class);        
+        config.register(admin);
+        config.register(JCSAdminBean.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     } 
     
@@ -81,5 +85,12 @@ public class DemoResources {
         return new Viewable("/ontClass.jsp", map);        
     }
     
+    @GET 
+    @Path("cache")
+    @Produces(MediaType.TEXT_HTML)    
+    public Viewable getCacheInfo() throws Exception{
+        log.info("Call to getCacheInfo()");        
+        return new Viewable("/cache.jsp",new CacheAccessModel()); 
+    }
 
 }
