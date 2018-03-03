@@ -74,8 +74,21 @@ input[type=submit]:hover {
 <tr><td><b>Found ram</b></td><td>${model.getHitCountRam()}</td><td>Number of times a requested item was found in the memory cache</td></tr>
 </table>
 <br>
+<h3>MEMORY WATCH</h3>
+<table style="width: 40%;">
+<tr><th colspan="2">Heap memory usage</th><th colspan="2">Non-Heap memory usage</th></tr>
+<tr><td style="text-align: right;">Committed</td><td style="text-align: right;">${model.getHeapCommitted()}</td>
+<td style="text-align: right;">Committed</td><td style="text-align: right;">${model.getNonHeapCommitted()}</td></tr>
+<tr><td style="text-align: right;">Init. requested</td><td style="text-align: right;">${model.getHeapInit()}</td>
+<td style="text-align: right;">Init. requested</td><td style="text-align: right;">${model.getNonHeapInit()}</td></tr>
+<tr><td style="text-align: right;">Max</td><td style="text-align: right;">${model.getHeapMax()}</td>
+<td style="text-align: right;">Max</td><td style="text-align: right;">${model.getNonHeapMax()}</td></tr>
+<tr><td style="text-align: right;">Used</td><td style="text-align: right;">${model.getHeapUsed()}</td>
+<td style="text-align: right;">Used</td><td style="text-align: right;">${model.getNonHeapUsed()}</td></tr>
+</table>
+<br>
 <h3>CACHE</h3>
-<table style="width: 80%;">
+<table style="width: 60%;">
 <tr><th colspan="2">Cache configuration parameters</th></tr>
 <tr><td><b>CacheName</b></td><td>${model.getCacheName()}</td><td>The name of the cache</td></tr>
 <tr><td><b>MemoryCacheName</b></td><td>${model.getMemoryCacheName()}</td><td>The memoryCacheName attribute of the ICompositeCacheAttributes object</td></tr>
@@ -91,5 +104,6 @@ input[type=submit]:hover {
 <tr><td><b>MaxSpoolPerRun</b></td><td>${model.getMaxSpoolPerRun()}</td><td>If UseMemoryShrinker is true the memory cache should auto-expire elements to reclaim space. This is the maximum number of items to spool per run.</td></tr>
 </table>
 <br>
+<span>Committed : ${model.getHeap().getCommitted()}</span>
 </body>
 </html>

@@ -1,5 +1,8 @@
 package io.bdrc.ldspdi.sparql.results;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import org.apache.commons.jcs.engine.CacheStatus;
@@ -119,5 +122,54 @@ public class CacheAccessModel {
         return getCacheControl().getMissCountNotFound();
     }
     
+    /**
+     * Memory stuff
+     */
     
+    public MemoryUsage getHeap() {
+        return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+    }
+    
+    public MemoryUsage getNonHeap() {
+        return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
+    }
+    
+    public String getHeapCommitted() {
+        return format(getHeap().getCommitted());
+    }
+    
+    public String getNonHeapCommitted() {
+        return format(getNonHeap().getCommitted());
+    }
+    
+    public String getHeapInit() {
+        return format(getHeap().getInit());
+    }
+    
+    public String getNonHeapInit() {
+        return format(getNonHeap().getInit());
+    }
+    
+    public String getHeapMax() {
+        return format(getHeap().getMax());
+    }
+    
+    public String getNonHeapMax() {
+        return format(getNonHeap().getMax());
+    }
+    
+    public String getHeapUsed() {
+        return format(getHeap().getUsed());
+    }
+    
+    public String getNonHeapUsed() {
+        return format(getNonHeap().getUsed());
+    }
+    /*
+     * Utilities
+     */
+    
+    public String format(long l) {
+        return new DecimalFormat("#,###,###").format(l);
+    }
 }
