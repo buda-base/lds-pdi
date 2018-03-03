@@ -47,16 +47,13 @@ import io.bdrc.restapi.exceptions.RestException;
 @Template
 public class DemoResources {
     
-    public final static Logger log=LoggerFactory.getLogger(DemoResources.class.getName());
-    public static JCSAdminBean admin=new JCSAdminBean();
+    public final static Logger log=LoggerFactory.getLogger(DemoResources.class.getName());    
     
     public DemoResources() {
         super();        
         ResourceConfig config=new ResourceConfig(DemoResources.class);
         config.register(LoggingFeature.class);
-        config.register(CorsFilter.class);        
-        config.register(admin);
-        config.register(JCSAdminBean.class);
+        config.register(CorsFilter.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     } 
     
