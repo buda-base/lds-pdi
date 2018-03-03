@@ -41,13 +41,12 @@ public class QueryProcessor {
     
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
 	    
-	    String prefixes=ServiceConfig.getPrefixes();
 	    int hash=Objects.hashCode(resID);
 	    Model model=(Model)ResultsCache.getObjectFromCache(hash);
 	    if(model==null) {
-    		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+    		Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
     		log.info("Processor query describe:" +q);
-    		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+    		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);    		
     		model = qe.execDescribe();
     		qe.close();
     		ResultsCache.addToCache(model, hash);
@@ -56,12 +55,11 @@ public class QueryProcessor {
 	}
 		
 	public static QueryExecution getResultSet(String query,String fusekiUrl){
-        log.info("Processor Json query select:" +query);        
+        log.info("Processor query select:" +query);        
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        }        
-        Query q=QueryFactory.create(query);        
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);        
+        }  
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query));        
         return qe;           
     }
 	
@@ -71,9 +69,8 @@ public class QueryProcessor {
         if(hash==null) {            
             long start=System.currentTimeMillis(); 
             QueryExecution qe=getResultSet(query, fuseki);
-            ResultSet jrs=qe.execSelect();
-            long end=System.currentTimeMillis();
-            long elapsed=end-start;
+            ResultSet jrs=qe.execSelect();           
+            long elapsed=System.currentTimeMillis()-start;
             int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));  
             if(pageSize!=null) {
                 psz=Integer.parseInt(pageSize);
@@ -82,13 +79,13 @@ public class QueryProcessor {
             qe.close();
             int new_hash=Objects.hashCode(res);                    
             res.setHash(new_hash);                    
-            ResultsCache.addToCache(res, Objects.hashCode(res));            
+            ResultsCache.addToCache(res, Objects.hashCode(res));
+            return res;
         }
-        else {
-            
-            res=(ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
+        else {            
+            return (ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
         }
-        return res;
+        
     }
 
 

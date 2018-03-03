@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +39,10 @@ public class InjectionTracker {
     public final static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) 
-                throws RestException{
-        log.info("Query before injection tracking :"+query);
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
-        Set<String> s = converted.keySet(); 
-        Set<String> lit = litParams.keySet();        
-        for(String st:s) {
-            
+                throws RestException{        
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query); 
+        
+        for(String st:converted.keySet()) {            
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));                
             }
@@ -58,9 +56,8 @@ public class InjectionTracker {
                         String[] parts=param.split(Pattern.compile(":").toString());
                         if(parts[0]==null) {
                             parts[0]="";
-                        }
-                        String xlms=Prefixes.getFullIRI(parts[0]+":");
-                        if(xlms!=null) {
+                        }                        
+                        if(Prefixes.getFullIRI(parts[0]+":")!=null) {
                             queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
                         }else {
                             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
@@ -75,7 +72,7 @@ public class InjectionTracker {
                     
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
-                if(lit.contains(st)) {
+                if(litParams.keySet().contains(st)) {
                     String lang=converted.get(litParams.get(st));
                     try {
                         new Locale.Builder().setLanguageTag(lang).build();
@@ -89,18 +86,22 @@ public class InjectionTracker {
                 }
             }
         }
-        return queryStr.toString();
+        Query q=queryStr.asQuery();
+        long limit_max=Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
+        if(q.getLimit()>limit_max) {
+            q.setLimit(limit_max);
+        }
+        return q.toString();
     }
     
     public static String getValidURLQuery(String query,String param,String type) {
         
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);
-        String first=Character.toString(type.charAt(0)).toUpperCase();
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);        
         try {
             param=param.replace("+", " ");
             param=param.replace("/", "\"/");
             queryStr.setLiteral("NAME", param);
-            queryStr.setIri("TYPE", "http://purl.bdrc.io/ontology/core/"+first+type.substring(1));
+            queryStr.setIri("TYPE", "http://purl.bdrc.io/ontology/core/"+Character.toString(type.charAt(0)).toUpperCase()+type.substring(1));
         }catch(Exception ex) {
             return "ERROR --> path param :"+param+" is invalid in Injection Tracker "+ex.getMessage();
         }

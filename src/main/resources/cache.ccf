@@ -15,7 +15,11 @@ jcs.default.elementattributes.IsEternal=false
 jcs.default.elementattributes.IsSpool=false
 jcs.default.elementattributes.IsRemote=false
 jcs.default.elementattributes.IsLateral=false
-jcs.default.elementattributes.MaxLife=600
-jcs.default.elementattributes.IdleTime=300
+#Prod jcs.default.elementattributes.MaxLife=600
+#Prod jcs.default.elementattributes.IdleTime=300
+#Test 
+jcs.default.elementattributes.MaxLife=180
+#Test 
+jcs.default.elementattributes.IdleTime=120
 
 

@@ -40,11 +40,9 @@ public class ResultSetWrapper {
     public int pageSize;
     public int numberOfPages;
     public int hash;
-    public List<String> headers;
-    public HashMap<String,String> prefixes;
+    public List<String> headers;    
     public ArrayList<QuerySolutionItem> rows; 
-    public ArrayList<QueryMvcSolutionItem> mvc_rows;
-    public HashMap<Integer,String> pagesUrls;
+    public ArrayList<QueryMvcSolutionItem> mvc_rows;    
     
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
         this.pageSize=pageSize;
@@ -52,7 +50,7 @@ public class ResultSetWrapper {
         this.execTime=execTime;
         numResults=0;
         rows=new ArrayList<>();
-        mvc_rows=new ArrayList<>();
+        mvc_rows=new ArrayList<>();        
         while(rs.hasNext()) {            
             QuerySolution qs=rs.next();            
             QuerySolutionItem row=new QuerySolutionItem(qs,headers);

@@ -30,8 +30,7 @@ public class ResultsCache {
     
     protected static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "default" );
     public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
-    public static JCSAdminBean admin = new JCSAdminBean();
-    
+        
     public static void addToCache(Object res, int hash) {        
         try{
             CACHE.put( Integer.valueOf(hash), res );            

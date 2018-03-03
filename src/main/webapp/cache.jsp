@@ -103,7 +103,5 @@ input[type=submit]:hover {
 <tr><td><b>DiskUsagePatternName</b></td><td>${model.getDiskUsagePattern()}</td><td>SWAP is the default. Under the swap pattern, data is only put to disk when the max memory size is reached. Since items puled from disk are put into memory, if the memory cache is full and you get an item off disk, the lest recently used item will be spooled to disk. If you have a low memory hit ration, you end up thrashing. The UPDATE usage pattern allows items to go to disk on an update. It disables the swap. This allows you to persist all items to disk. If you are using the JDBC disk cache for instance, you can put all the items on disk while using the memory cache for performance, and not worry about losing data from a system crash or improper shutdown. Also, since all items are on disk, there is no need to swap to disk. This prevents the possibility of thrashing.</td></tr>
 <tr><td><b>MaxSpoolPerRun</b></td><td>${model.getMaxSpoolPerRun()}</td><td>If UseMemoryShrinker is true the memory cache should auto-expire elements to reclaim space. This is the maximum number of items to spool per run.</td></tr>
 </table>
-<br>
-<span>Committed : ${model.getHeap().getCommitted()}</span>
 </body>
 </html>

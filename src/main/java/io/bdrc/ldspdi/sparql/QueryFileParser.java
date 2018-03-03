@@ -42,9 +42,8 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class QueryFileParser {
+public class QueryFileParser {	
 	
-	private File queryFile;	
 	private HashMap<String,String> metaInf;
 	private String query;
 	private String queryHtml;
@@ -59,10 +58,9 @@ public class QueryFileParser {
 	
 	public QueryFileParser(String filename) throws RestException{
 	    
-		metaInf= new HashMap<>();
-		this.queryFile = new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
+		metaInf= new HashMap<>();		
 		queryName=filename.substring(0,filename.lastIndexOf("."));
-		parseTemplate();
+		parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
 		template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
@@ -78,24 +76,23 @@ public class QueryFileParser {
 	
 	//For testing purpose only - to be removed//
 	public QueryFileParser(String queryPath, String filename) throws RestException{        
-        metaInf= new HashMap<>();
-        this.queryFile = new File(queryPath+filename);
+        metaInf= new HashMap<>();        
         queryName=filename.substring(0,filename.lastIndexOf("."));
-        parseTemplate();
+        parseTemplate(new File(queryPath+filename));
     }
 	
 	public String getTemplateName() {
 	    return this.queryName;
 	}
 	
-	private void parseTemplate() throws RestException{
+	private void parseTemplate(File file) throws RestException{
     	try { 
     	    HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
     	    HashMap<String,HashMap<String,String>> o_map=new HashMap<>();    	       
             String readLine = "";   
             query=""; 
             queryHtml=""; 
-            BufferedReader brd = new BufferedReader(new FileReader(queryFile)); 
+            BufferedReader brd = new BufferedReader(new FileReader(file)); 
             while ((readLine = brd.readLine()) != null) {                
                 readLine=readLine.trim();
                 boolean processed=false;
