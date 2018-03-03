@@ -45,7 +45,4 @@ public class ResultsCache {
         
         return CACHE.get( Integer.valueOf(hash));
     }
-    
-    
-
 }

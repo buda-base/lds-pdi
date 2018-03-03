@@ -1,9 +1,18 @@
 package io.bdrc.ldspdi.sparql.results;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryManagerMXBean;
+import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import org.apache.commons.jcs.engine.CacheStatus;
 import org.apache.commons.jcs.engine.behavior.ICompositeCacheAttributes;
@@ -12,8 +21,23 @@ import org.apache.commons.jcs.engine.control.CompositeCache;
 
 public class CacheAccessModel {
       
+    static {
+        try {
+            final ObjectName CODE_CACHE=new ObjectName("java.lang:type=MemoryPool,name=Code Cache");
+            final ObjectName METASPACE=new ObjectName("java.lang:type=MemoryPool,name=Metaspace");
+            final ObjectName COMPRESSED=new ObjectName("java.lang:type=MemoryPool,name=Compressed Class Space");
+            final ObjectName EDEN=new ObjectName("java.lang:type=MemoryPool,name=PS Eden Space");
+            final ObjectName SURVIVOR=new ObjectName("java.lang:type=MemoryPool,name=PS Survivor Space");
+            final ObjectName OLD=new ObjectName("java.lang:type=MemoryPool,name=PS Old Gen");
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }    
+    }
+    
     public CacheAccessModel() {
-        super();        
+        super();
+            
     }
 
     /**
@@ -134,6 +158,85 @@ public class CacheAccessModel {
         return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
     }
     
+    private static HashMap<ObjectName,MemoryPoolMXBean> getMemoryPoolBean(){
+        List<MemoryPoolMXBean> l = ManagementFactory.getMemoryPoolMXBeans();        
+        HashMap<ObjectName,MemoryPoolMXBean> map=new HashMap<>();
+        for(MemoryPoolMXBean mx:l) {
+            map.put(mx.getObjectName(), mx);            
+        }
+        return map;
+    }
+    
+    public MemoryUsage getCodeMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Code Cache")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public MemoryUsage getMetaMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Metaspace")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public MemoryUsage getCompressedMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Compressed Class Space")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public MemoryUsage getEdenMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Eden Space")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public MemoryUsage getSurvivorMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Survivor Space")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public MemoryUsage getOldMemoryUsage() {
+        try {
+            
+            return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Old Gen")).getUsage();
+        }
+        catch(MalformedObjectNameException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public int getPending() {
+        return ManagementFactory.getMemoryMXBean().getObjectPendingFinalizationCount();
+    }
+    
     public String getHeapCommitted() {
         return format(getHeap().getCommitted());
     }
@@ -143,6 +246,7 @@ public class CacheAccessModel {
     }
     
     public String getHeapInit() {
+        
         return format(getHeap().getInit());
     }
     
@@ -171,5 +275,10 @@ public class CacheAccessModel {
     
     public String format(long l) {
         return new DecimalFormat("#,###,###").format(l);
+    }
+    
+    public static void main(String[] arg) throws Exception{
+        CacheAccessModel mod=new CacheAccessModel();
+        mod.getCodeMemoryUsage();
     }
 }

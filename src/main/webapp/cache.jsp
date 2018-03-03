@@ -87,6 +87,54 @@ input[type=submit]:hover {
 <td style="text-align: right;">Used</td><td style="text-align: right;">${model.getNonHeapUsed()}</td></tr>
 </table>
 <br>
+<h3>MEMORY POOL DETAILS</h3>
+<table style="width: 60%;">
+<tr><th>Memory Pool</th><th>Init</th><th>Committed</th><th>Max</th><th>Used</th></tr>
+<tr>
+<td>Code Cache</td>
+<td>${model.format(model.getCodeMemoryUsage().getInit())}</td>
+<td>${model.format(model.getCodeMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getCodeMemoryUsage().getMax())}</td>
+<td>${model.format(model.getCodeMemoryUsage().getUsed())}</td>
+</tr>
+<tr>
+<td>Meta Space</td>
+<td>${model.format(model.getMetaMemoryUsage().getInit())}</td>
+<td>${model.format(model.getMetaMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getMetaMemoryUsage().getMax())}</td>
+<td>${model.format(model.getMetaMemoryUsage().getUsed())}</td>
+</tr>
+<tr>
+<td>Compressed Class Space</td>
+<td>${model.format(model.getCompressedMemoryUsage().getInit())}</td>
+<td>${model.format(model.getCompressedMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getCompressedMemoryUsage().getMax())}</td>
+<td>${model.format(model.getCompressedMemoryUsage().getUsed())}</td>
+</tr>
+<tr>
+<td>PS Eden Space</td>
+<td>${model.format(model.getEdenMemoryUsage().getInit())}</td>
+<td>${model.format(model.getEdenMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getEdenMemoryUsage().getMax())}</td>
+<td>${model.format(model.getEdenMemoryUsage().getUsed())}</td>
+</tr>
+<tr>
+<td>PS Survivor Space</td>
+<td>${model.format(model.getSurvivorMemoryUsage().getInit())}</td>
+<td>${model.format(model.getSurvivorMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getSurvivorMemoryUsage().getMax())}</td>
+<td>${model.format(model.getSurvivorMemoryUsage().getUsed())}</td>
+</tr>
+<tr>
+<td>PS Old Gen</td>
+<td>${model.format(model.getOldMemoryUsage().getInit())}</td>
+<td>${model.format(model.getOldMemoryUsage().getCommitted())}</td>
+<td>${model.format(model.getOldMemoryUsage().getMax())}</td>
+<td>${model.format(model.getOldMemoryUsage().getUsed())}</td>
+</tr>
+</table>
+
+<br>
 <h3>CACHE</h3>
 <table style="width: 60%;">
 <tr><th colspan="2">Cache configuration parameters</th></tr>
@@ -103,5 +151,6 @@ input[type=submit]:hover {
 <tr><td><b>DiskUsagePatternName</b></td><td>${model.getDiskUsagePattern()}</td><td>SWAP is the default. Under the swap pattern, data is only put to disk when the max memory size is reached. Since items puled from disk are put into memory, if the memory cache is full and you get an item off disk, the lest recently used item will be spooled to disk. If you have a low memory hit ration, you end up thrashing. The UPDATE usage pattern allows items to go to disk on an update. It disables the swap. This allows you to persist all items to disk. If you are using the JDBC disk cache for instance, you can put all the items on disk while using the memory cache for performance, and not worry about losing data from a system crash or improper shutdown. Also, since all items are on disk, there is no need to swap to disk. This prevents the possibility of thrashing.</td></tr>
 <tr><td><b>MaxSpoolPerRun</b></td><td>${model.getMaxSpoolPerRun()}</td><td>If UseMemoryShrinker is true the memory cache should auto-expire elements to reclaim space. This is the maximum number of items to spool per run.</td></tr>
 </table>
+
 </body>
 </html>
