@@ -16,6 +16,6 @@ jcs.default.elementattributes.IsSpool=false
 jcs.default.elementattributes.IsRemote=false
 jcs.default.elementattributes.IsLateral=false
 jcs.default.elementattributes.MaxLife=600
-jcs.default.elementattributes.IdleTime=30
+jcs.default.elementattributes.IdleTime=300
 
 

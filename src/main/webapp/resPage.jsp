@@ -25,10 +25,18 @@ table {
     border: 1px solid #ddd;
 }
 
-th, td {
+td {
     text-align: left;
     vertical-align:top;
     padding: 16px;
+}
+
+th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #4e7F50;
+    color: white;
 }
 
 tr:nth-child(even) {
