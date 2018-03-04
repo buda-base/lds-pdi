@@ -20,7 +20,6 @@ package io.bdrc.ldspdi.sparql.results;
  ******************************************************************************/
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;

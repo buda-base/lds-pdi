@@ -3,6 +3,7 @@
 <%@page import="org.apache.jena.ontology.Individual"%>
 <%@page import="io.bdrc.ontology.service.core.*"%>
 <%@page import="io.bdrc.ldspdi.composer.*"%>
+<%@page import="io.bdrc.ldspdi.sparql.*"%>
 <%@page import="java.util.*"%>
 <%
 HashMap t=(HashMap)request.getAttribute("model");
@@ -38,7 +39,7 @@ OntClassModel model = (OntClassModel)t.get("model");
             <%if(individuals.size()!=0) {%>
                 <h4>Individuals:</h4>
                  <%for(Individual ind:individuals){%>
-                <ul><li><a href="<%=ind.getURI()%>"><%=ind.getLocalName()%></a></li></ul>
+                <ul><li><a href="<%=ind.getURI()%>"><%=Prefixes.getPrefix(ind.getNameSpace())%><%=ind.getLocalName()%></a></li></ul>
         <%}}%>
 		<%if (!OntAccess.isRootClass(model.getUri())) {%>
 		<h4>&#9658;Object properties:</h4>

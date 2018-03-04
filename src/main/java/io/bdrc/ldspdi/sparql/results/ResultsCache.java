@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.sparql.results;
 import org.apache.commons.jcs.JCS;
 import org.apache.commons.jcs.access.CacheAccess;
 import org.apache.commons.jcs.access.exception.CacheException;
-import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,9 +1,6 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -25,6 +22,9 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,7 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Template;
@@ -45,12 +44,9 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.results.CacheAccessModel;
 import io.bdrc.ldspdi.utils.DocFileModel;
-import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.restapi.exceptions.RestException;
 

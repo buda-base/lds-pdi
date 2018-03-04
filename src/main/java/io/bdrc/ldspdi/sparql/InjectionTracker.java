@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.sparql;
 import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.jena.query.ParameterizedSparqlString;
