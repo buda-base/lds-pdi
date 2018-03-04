@@ -70,7 +70,7 @@ input[type=submit]:hover {
 <tr><td><b>Objects</b></td><td>${model.getSize()}</td><td>The total number of objects held by the cache</td></tr>
 <tr><td><b>Miss expired</b></td><td>${model.getMissCountExpired()}</td><td>Number of times a requested element was found but was expired</td></tr>
 <tr><td><b>Miss not found</b></td><td>${model.getMissCountNotFound()}</td><td>Number of times a requested element was not found</td></tr>
-<tr><td><b>Found aux</b></td><td>${model.getHitCountAux()}</td><td>Number of times a requested item was found in and auxiliary cache</td></tr>
+<tr><td><b>Found aux</b></td><td>${model.getHitCountAux()}</td><td>Number of times a requested item was found in an auxiliary cache</td></tr>
 <tr><td><b>Found ram</b></td><td>${model.getHitCountRam()}</td><td>Number of times a requested item was found in the memory cache</td></tr>
 </table>
 <br>

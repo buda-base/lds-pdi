@@ -50,7 +50,7 @@ public class ServiceConfig {
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 	public static String JSONLD_CONTEXT_HTML;
-	public static String JSONLD_CONTEXT;
+	public static String JSONLD_CONTEXT;	
 	
 		
 	public static void init(HashMap<String,String> params) {
@@ -126,6 +126,10 @@ public class ServiceConfig {
 	
 	public static String getPrefixes(){
 		return sparqlPrefixes;
+	}
+	
+	public static String getRobots() {
+	    return "User-Agent: *"+System.lineSeparator()+"Disallow: /";
 	}
 	
 }

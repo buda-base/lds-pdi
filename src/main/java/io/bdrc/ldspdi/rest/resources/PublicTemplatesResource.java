@@ -52,6 +52,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
+import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
@@ -68,7 +69,7 @@ public class PublicTemplatesResource {
         super();        
         ResourceConfig config=new ResourceConfig(PublicTemplatesResource.class);
         config.register(CorsFilter.class);        
-    } 
+    }
     
     @GET
     @Path("/query/{file}")

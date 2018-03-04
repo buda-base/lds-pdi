@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.sparql.results;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryManagerMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
@@ -9,8 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -21,20 +18,7 @@ import org.apache.commons.jcs.engine.control.CompositeCache;
 
 public class CacheAccessModel {
       
-    static {
-        try {
-            final ObjectName CODE_CACHE=new ObjectName("java.lang:type=MemoryPool,name=Code Cache");
-            final ObjectName METASPACE=new ObjectName("java.lang:type=MemoryPool,name=Metaspace");
-            final ObjectName COMPRESSED=new ObjectName("java.lang:type=MemoryPool,name=Compressed Class Space");
-            final ObjectName EDEN=new ObjectName("java.lang:type=MemoryPool,name=PS Eden Space");
-            final ObjectName SURVIVOR=new ObjectName("java.lang:type=MemoryPool,name=PS Survivor Space");
-            final ObjectName OLD=new ObjectName("java.lang:type=MemoryPool,name=PS Old Gen");
-        }
-        catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
-        }    
-    }
-    
+       
     public CacheAccessModel() {
         super();
             
@@ -277,8 +261,4 @@ public class CacheAccessModel {
         return new DecimalFormat("#,###,###").format(l);
     }
     
-    public static void main(String[] arg) throws Exception{
-        CacheAccessModel mod=new CacheAccessModel();
-        mod.getCodeMemoryUsage();
-    }
 }

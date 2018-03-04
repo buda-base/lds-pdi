@@ -1,5 +1,9 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -27,7 +31,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.glassfish.jersey.logging.LoggingFeature;
@@ -38,8 +45,12 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.results.CacheAccessModel;
 import io.bdrc.ldspdi.utils.DocFileModel;
+import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.ontology.service.core.OntClassModel;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -63,11 +74,24 @@ public class DemoResources {
         log.info("Call to getHomePage()");         
         return new Viewable("/index.jsp",new DocFileModel()); 
     }
+    
+    @GET 
+    @Path("/robots.txt")
+    //@Produces(MediaType.TEXT_HTML)    
+    public Response getRobots() {
+        log.info("Call getRobots()"); 
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                os.write(ServiceConfig.getRobots().getBytes());                    
+            }
+        };
+        return Response.ok(stream,MediaType.TEXT_PLAIN_TYPE).build();  
+    }
        
     @GET 
     @Path("/demo/{file}")
     @Produces(MediaType.TEXT_HTML)
-    public Viewable templateRelative(@PathParam("file") String file) throws RestException{
+    public Viewable templateRelative(@PathParam("file") String file) {
         log.info("Call to templateRelative()");
         return new Viewable("/"+file);         
     }
@@ -75,7 +99,7 @@ public class DemoResources {
     @GET
     @Path("demo/ontology")
     @Produces("text/html")
-    public Viewable getOntologyClassView(@QueryParam("classUri") String uri) throws RestException{
+    public Viewable getOntologyClassView(@QueryParam("classUri") String uri) {
         log.info("Call to getOntologyClassView()");          
         Map<String, Object> map = new HashMap<>();
         map.put("model", new OntClassModel(uri)); 
@@ -85,7 +109,7 @@ public class DemoResources {
     @GET 
     @Path("cache")
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getCacheInfo() throws Exception{
+    public Viewable getCacheInfo() {
         log.info("Call to getCacheInfo()");        
         return new Viewable("/cache.jsp",new CacheAccessModel()); 
     }

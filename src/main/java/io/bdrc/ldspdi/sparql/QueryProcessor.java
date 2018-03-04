@@ -45,8 +45,8 @@ public class QueryProcessor {
 	    Model model=(Model)ResultsCache.getObjectFromCache(hash);
 	    if(model==null) {
     		Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
-    		log.info("Processor query describe:" +q);
-    		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);    		
+    		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+    		qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
     		model = qe.execDescribe();
     		qe.close();
     		ResultsCache.addToCache(model, hash);
@@ -59,7 +59,8 @@ public class QueryProcessor {
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }  
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query));        
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query)); 
+        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;           
     }
 	
@@ -85,7 +86,6 @@ public class QueryProcessor {
         else {            
             return (ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
         }
-        
     }
 
 
