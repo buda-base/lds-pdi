@@ -77,9 +77,9 @@ public class InjectionTracker {
                         new Locale.Builder().setLanguageTag(lang).build();
                     }catch(IllformedLocaleException ex) {
                         return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag"+ex.getMessage();
-                    }
-                    queryStr.setLiteral(st, converted.get(st),converted.get(litParams.get(st)));                    
-                }else {
+                    }                    
+                    queryStr.setLiteral(st, converted.get(st),lang);                    
+                }else {                    
                     //Some literals do not have a lang associated with them
                     queryStr.setLiteral(st, converted.get(st));                    
                 }
@@ -87,10 +87,15 @@ public class InjectionTracker {
         }
         Query q=queryStr.asQuery();
         long limit_max=Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
-        if(q.getLimit()>limit_max) {
+        if(q.hasLimit()) {
+            if(q.getLimit()>limit_max) {
+                q.setLimit(limit_max);
+            }
+        }else {
             q.setLimit(limit_max);
         }
         return q.toString();
+        
     }
     
     public static String getValidURLQuery(String query,String param,String type) {

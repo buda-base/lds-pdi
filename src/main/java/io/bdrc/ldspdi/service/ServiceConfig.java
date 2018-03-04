@@ -128,7 +128,7 @@ public class ServiceConfig {
 	}
 	
 	public static String getRobots() {
-	    return "User-Agent: *"+System.lineSeparator()+"Disallow: /";
+	    return "User-agent: *"+System.lineSeparator()+"Disallow: /";
 	}
 	
 }
