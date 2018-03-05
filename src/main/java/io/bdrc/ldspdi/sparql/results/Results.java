@@ -43,8 +43,8 @@ public class Results {
     public boolean lastPage;
     public boolean firstPage;    
     public ResultPageLinks pLinks;
-    public List<String> headers;    
-    public ArrayList<QuerySolutionItem> rows;
+    public List<String> head;    
+    public ArrayList<QuerySolutionItem> results;
     
     public Results(ResultSetWrapper res,HashMap<String,String> hm) 
             throws JsonProcessingException,NumberFormatException{
@@ -58,15 +58,15 @@ public class Results {
         numResults=res.getNumResults();
         execTime=res.getExecTime();
         hash=res.getHash();
-        headers=res.getHeaders();
+        head=res.getHead();
         numberOfPages=res.getNumberOfPages();        
         int offset=(pageNumber-1)*pageSize; 
-        rows=new ArrayList<>();
-        ArrayList<QuerySolutionItem> allRows=res.getRows();        
+        results=new ArrayList<>();
+        ArrayList<QuerySolutionItem> allRows=res.getResults();        
         if(pageNumber<=numberOfPages) {
             for (int x=(offset); x<(offset+pageSize);x++) {
                 try {
-                rows.add(allRows.get(x));
+                    results.add(allRows.get(x));
                 }
                 catch(Exception ex) {                    
                     break;
@@ -124,12 +124,12 @@ public class Results {
         return pLinks;
     }
 
-    public List<String> getHeaders() {
-        return headers;
+    public List<String> getHead() {
+        return head;
     }
 
-    public ArrayList<QuerySolutionItem> getRows() {
-        return rows;
+    public ArrayList<QuerySolutionItem> getResults() {
+        return results;
     }
     
     

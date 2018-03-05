@@ -39,22 +39,22 @@ public class ResultSetWrapper {
     public int pageSize;
     public int numberOfPages;
     public int hash;
-    public List<String> headers;    
-    public ArrayList<QuerySolutionItem> rows; 
+    public List<String> head;    
+    public ArrayList<QuerySolutionItem> results; 
     public ArrayList<QueryMvcSolutionItem> mvc_rows;    
     
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
         this.pageSize=pageSize;
-        headers =rs.getResultVars();
+        head =rs.getResultVars();
         this.execTime=execTime;
         numResults=0;
-        rows=new ArrayList<>();
+        results=new ArrayList<>();
         mvc_rows=new ArrayList<>();        
         while(rs.hasNext()) {            
             QuerySolution qs=rs.next();            
-            QuerySolutionItem row=new QuerySolutionItem(qs,headers);
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,headers);
-            rows.add(row);
+            QuerySolutionItem row=new QuerySolutionItem(qs,head);
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);
+            results.add(row);
             mvc_rows.add(mvc_row);
             numResults++;
         }
@@ -62,8 +62,8 @@ public class ResultSetWrapper {
         if(numberOfPages*pageSize<numResults) {numberOfPages++;}
     }
     
-    public List<String> getHeaders() {
-        return headers;
+    public List<String> getHead() {
+        return head;
     }
 
     public long getExecTime() {
@@ -74,8 +74,8 @@ public class ResultSetWrapper {
         return numResults;
     }
 
-    public ArrayList<QuerySolutionItem> getRows() {
-        return rows;
+    public ArrayList<QuerySolutionItem> getResults() {
+        return results;
     }
 
     public static Logger getLog() {

@@ -86,7 +86,7 @@ public class PublicTemplatesResource {
                 
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");
-        
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,

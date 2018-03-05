@@ -23,14 +23,9 @@ package io.bdrc.ldspdi.sparql.results;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.jena.datatypes.BaseDatatype;
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.impl.RDFLangString;
-import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,51 +34,43 @@ public class QuerySolutionItem {
         
     
     public final static Logger log=LoggerFactory.getLogger(QuerySolutionItem.class.getName());    
-    public HashMap<String,Field> dataRow;
+    public HashMap<String,Field> bindings;
     
     public QuerySolutionItem(QuerySolution qs,List<String> headers) {
         
-        dataRow=new HashMap<>();
+        bindings=new HashMap<>();
         for(String key:headers) {
             RDFNode node=qs.get(key);            
             if(node !=null) {
                 if(node.isResource()) {
-                    dataRow.put(key, new Field("resource",node.asResource().getURI()));                    
+                    bindings.put(key, new Field("uri",node.asResource().getURI()));                    
                 } 
                 if(node.isLiteral()) {                    
                     if(node.asNode().getLiteralDatatype().equals(RDFLangString.rdfLangString)) {
-                        dataRow.put(key, new LiteralStringField("literal",
+                        bindings.put(key, new LiteralStringField("literal",
                                                           node.asLiteral().getDatatypeURI(),
                                                           node.asNode().getLiteralLanguage(),
                                                           node.asLiteral().getLexicalForm()));
-                    }
-                    else if (node.asNode().getLiteralDatatype().equals(XMLLiteralType.theXMLLiteralType)) {
-                        dataRow.put(key, new LiteralStringField("literal",
-                                                          node.asLiteral().getDatatypeURI(),
-                                                          node.asNode().getLiteralLanguage(),
-                                                          node.asLiteral().getLexicalForm()));
-                    }
+                    }                    
                     else {
-                        dataRow.put(key, new LiteralOtherField("literal",
+                        bindings.put(key, new LiteralOtherField("literal",
                                 node.asLiteral().getDatatypeURI(),                                
                                 node.asLiteral().getValue().toString()));
                     }
                 }
                 if(node.isAnon()) {                    
-                    dataRow.put(key, new Field("Anonym node",node.toString()));                    
+                    bindings.put(key, new Field("bnode",node.toString()));                    
                 }                
-            }else {                
-                dataRow.put(key, new Field("Null node",""));
             }
         }        
     }
         
-    public HashMap<String, Field> getDataRow() {
-        return dataRow;
+    public HashMap<String, Field> getBindings() {
+        return bindings;
     }
     
     public Field getValue(String key) {
-        return dataRow.get(key);
+        return bindings.get(key);
     }
 
 }

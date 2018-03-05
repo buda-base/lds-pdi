@@ -55,6 +55,11 @@ public class QueryConstants {
     public final static String QUERY_URL="QueryUrl";
     public final static String SEARCH_TYPE="searchType";
 	
+    //Query return types
+    public final static String TABLE="Table";
+    public final static String VALUE="Value";
+    public final static String GRAPH="Graph";    
+    
 	//Query Outputs
     public final static String OUTPUT="output";
     public final static String OUTPUT_NAME="name";
@@ -92,7 +97,8 @@ public class QueryConstants {
 	public static final String TOPIC="Topic";
 	public static final String GENERAL="General";
 	
-	final static ArrayList<String> queryTypes = new ArrayList<>();;
+	final static ArrayList<String> queryTypes = new ArrayList<>();
+	final static ArrayList<String> returnTypes = new ArrayList<>();
 	final static ArrayList<String> outputs = new ArrayList<>();;
 	final static HashMap<String,Boolean> infoTypes = new HashMap<>();
 	
@@ -123,6 +129,10 @@ public class QueryConstants {
 		infoTypes.put(PARAM_EXAMPLE,true);
 		infoTypes.put(PARAM_DESC,true);
 		infoTypes.put(PARAM_SUBTYPE,true);
+		
+		returnTypes.add(TABLE);
+		returnTypes.add(VALUE);
+		returnTypes.add(GRAPH);
 	}
 	
 	public static boolean isRequired(String info) {

@@ -122,13 +122,13 @@ input[type=submit]:hover {
 <br><br>
 <table>
 <tr>
-<c:forEach items="${model.headers}" var="h">
+<c:forEach items="${model.head}" var="h">
 <th>${h}</th>
 </c:forEach>
 </tr>
 <c:forEach items="${model.mvc_rows}" var="qsi">
 <tr>
-	<c:forEach items="${model.headers}" var="h">
+	<c:forEach items="${model.head}" var="h">
 	<td>${qsi.getValue(h)}</td>
 	</c:forEach>
 </tr>
