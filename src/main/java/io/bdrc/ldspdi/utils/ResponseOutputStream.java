@@ -78,7 +78,27 @@ public class ResponseOutputStream {
         return stream;
     }
     
-public static StreamingOutput getModelStream(Model model) {
+    public static StreamingOutput getModelStream(Model model, String format) {
+        
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {                
+                 
+                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
+                    if(format.equalsIgnoreCase("jsonld")) {                        
+                        JSONLDFormatter.writeModel(model, os);
+                    }else {
+                        model.write(os,ServiceConfig.getProperty(format));
+                    }
+                }else{
+                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
+                    writer.output(os);                                      
+                }                
+            }
+        };
+        return stream;
+    }
+    
+    public static StreamingOutput getModelStream(Model model) {
         
         StreamingOutput stream = new StreamingOutput() {
             

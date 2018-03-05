@@ -26,6 +26,7 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.util.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
+
+import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -244,6 +248,19 @@ public class JSONLDFormatter {
          }
          IO.flush(wr) ;
      } 
+     
+     public static JsonLDWriteContext getJenaLDContext() {
+         JsonLDWriteContext context=new JsonLDWriteContext();
+         context.setFrame(jsonldcontext);
+         return context;
+     }
+     
+     public static void writeModel(Model m,OutputStream out) {         
+         JsonLDWriter ldw=new JsonLDWriter(RDFFormat.JSONLD_COMPACT_PRETTY);
+         Context ctx=new Context();
+         ctx.set(JsonLDWriter.JSONLD_CONTEXT, ServiceConfig.JSONLD_CONTEXT);
+         ldw.write(out, DatasetFactory.create(m).asDatasetGraph(), null, null, getJenaLDContext());
+     }
      
 }
 

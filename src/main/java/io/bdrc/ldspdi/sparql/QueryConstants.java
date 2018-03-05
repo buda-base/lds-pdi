@@ -135,6 +135,10 @@ public class QueryConstants {
 		returnTypes.add(GRAPH);
 	}
 	
+	public static boolean isValidReturnType(String info) {
+        return returnTypes.contains(info);
+    }
+	
 	public static boolean isRequired(String info) {
 		return infoTypes.get(info);
 	}
@@ -142,6 +146,7 @@ public class QueryConstants {
 	public static boolean isValidInfoType(String info) {
 		return infoTypes.keySet().contains(info);
 	}
+	
 	public static boolean isValidOutput(String info) {
         return outputs.contains(info);
     }

@@ -21,8 +21,10 @@ package io.bdrc.ldspdi.rest.resources;
 
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -30,12 +32,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.jena.rdf.model.Model;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
@@ -203,5 +207,50 @@ public class PublicTemplatesResource {
             }
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();            
         }
+    }
+    
+    @GET
+    @Path("/graph/{file}")    
+    public Response getGraphTemplateResults(@Context UriInfo info, 
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @DefaultValue("json") @QueryParam("format") final String format,
+            @PathParam("file") String file) throws RestException{     
+        
+        log.info("Call to getQueryTemplateResults() with format >>"+format);
+        if(fuseki !=null){fusekiUrl=fuseki;}        
+        
+        //Settings       
+        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
+        hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
+                
+        //process
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
+        }
+        return Response.ok(ResponseOutputStream.getModelStream(model,format),getMediaType(format)).build();        
+    }
+    
+    private MediaType getMediaType(String format) {
+        MediaType media=new MediaType("text","turtle","utf-8");        
+        if(ServiceConfig.getProperty(format)!=null){
+            if(ServiceConfig.isValidMime(format)){
+                String[] parts=format.split(Pattern.quote("/"));
+                media = new MediaType(parts[0],parts[1]); 
+            }
+        }
+        return media;
     }
 }

@@ -2,6 +2,10 @@ package io.bdrc.ldspdi.objects.json;
 
 import java.util.ArrayList;
 
+import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.ldspdi.utils.Helpers;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -48,8 +52,12 @@ public class QueryTemplate {
         this.queryParams = queryParams;
         this.params = params;
         this.outputs = outputs;
-        this.template = template;
-        this.demoLink = demoLink;
+        this.template = template;        
+        if(queryReturn.equals(QueryConstants.GRAPH)) {
+            this.demoLink = Helpers.bdrcEncode(ServiceConfig.getProperty("urlGraphPath")+demoLink);
+        }else {
+            this.demoLink = Helpers.bdrcEncode(ServiceConfig.getProperty("urlTemplatePath")+demoLink);
+        }
     }
     
     public String getId() {

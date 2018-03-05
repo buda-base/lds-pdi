@@ -42,7 +42,7 @@ public class QueryProcessor {
 	public static Model getResourceGraph(String resID,String fusekiUrl){			
 	    
 	    int hash=Objects.hashCode(resID);
-	    Model model=(Model)ResultsCache.getObjectFromCache(hash);
+	    Model model=(Model)ResultsCache.getObjectFromCache(hash);	    
 	    if(model==null) {
     		Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
@@ -53,6 +53,21 @@ public class QueryProcessor {
 	    }
 		return model;		
 	}
+	
+	public static Model getGraph(String query,String fusekiUrl){           
+        
+        int hash=Objects.hashCode(query);
+        Model model=(Model)ResultsCache.getObjectFromCache(hash);
+        if(model==null) {
+            Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" "+query);
+            QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+            qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+            model = qe.execDescribe();
+            qe.close();
+            ResultsCache.addToCache(model, hash);
+        }
+        return model;       
+    }
 		
 	public static QueryExecution getResultSet(String query,String fusekiUrl){
         log.info("Processor query select:" +query);        
@@ -87,6 +102,4 @@ public class QueryProcessor {
             return (ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
         }
     }
-
-
 }

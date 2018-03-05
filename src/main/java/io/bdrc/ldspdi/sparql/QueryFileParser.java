@@ -39,7 +39,6 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.objects.json.ResParam;
 import io.bdrc.ldspdi.objects.json.StringParam;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class QueryFileParser {	
@@ -64,7 +63,7 @@ public class QueryFileParser {
 		template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
-                Helpers.bdrcEncode(ServiceConfig.getProperty("urlTemplatePath")+metaInf.get(QueryConstants.QUERY_URL)),
+                metaInf.get(QueryConstants.QUERY_URL),
                 metaInf.get(QueryConstants.QUERY_SCOPE),
                 metaInf.get(QueryConstants.QUERY_RESULTS),
                 metaInf.get(QueryConstants.QUERY_RETURN_TYPE),
@@ -96,8 +95,7 @@ public class QueryFileParser {
             while ((readLine = brd.readLine()) != null) {                
                 readLine=readLine.trim();
                 boolean processed=false;
-                if(readLine.startsWith("#")) {
-                    
+                if(readLine.startsWith("#")) {                    
                     readLine=readLine.substring(1);
                     int index=readLine.indexOf("=");
                     if(index!=-1) {
@@ -138,8 +136,10 @@ public class QueryFileParser {
                     query=query+" "+readLine;
                     queryHtml=queryHtml+" "+readLine+"<br>";
                 }
-            }
+            } 
             brd.close();
+            //Check the validity of the return type
+            checkReturnType();
             queryHtml=queryHtml.substring(15);            
             params=buildParams(p_map);
             outputs=buildOutputs(o_map);            
@@ -148,6 +148,13 @@ public class QueryFileParser {
             log.error("QueryFile parsing error", ex);
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Query template parsing failed :"+ex.getMessage());
         }
+	}
+	
+	private void checkReturnType() throws RestException{
+	    if(! QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
+	        throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Query template parsing failed :"+
+	                metaInf.get(QueryConstants.QUERY_RETURN_TYPE)+" is not a valid query return type");
+	    }
 	}
 	
 	private ArrayList<Param> buildParams(HashMap<String,HashMap<String,String>> p_map) throws RestException{
@@ -192,10 +199,6 @@ public class QueryFileParser {
         return o;
 	}
 	
-	public String getQuery() {
-	    return query;
-	}
-	
 	public String checkQueryArgsSyntax() {
 	    String check="";		
 		String[] args=metaInf.get(QueryConstants.QUERY_PARAMS).split(Pattern.compile(",").toString());
@@ -222,6 +225,10 @@ public class QueryFileParser {
 		}
 		return "";
 	}
+	
+	public String getQuery() {
+        return query;
+    }
 
     public HashMap<String, String> getLitLangParams() {
         return litLangParams;
