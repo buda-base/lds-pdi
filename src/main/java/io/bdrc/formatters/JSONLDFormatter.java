@@ -249,17 +249,11 @@ public class JSONLDFormatter {
          IO.flush(wr) ;
      } 
      
-     public static JsonLDWriteContext getJenaLDContext() {
-         JsonLDWriteContext context=new JsonLDWriteContext();
-         context.setFrame(jsonldcontext);
-         return context;
-     }
-     
      public static void writeModel(Model m,OutputStream out) {         
          JsonLDWriter ldw=new JsonLDWriter(RDFFormat.JSONLD_COMPACT_PRETTY);
-         Context ctx=new Context();
-         ctx.set(JsonLDWriter.JSONLD_CONTEXT, ServiceConfig.JSONLD_CONTEXT);
-         ldw.write(out, DatasetFactory.create(m).asDatasetGraph(), null, null, getJenaLDContext());
+         JsonLDWriteContext context=new JsonLDWriteContext();
+         context.setFrame(jsonldcontext);
+         ldw.write(out, DatasetFactory.create(m).asDatasetGraph(), null, null, context);
      }
      
 }
