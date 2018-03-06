@@ -227,9 +227,8 @@ public class PublicDataResource {
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        Object json=JSONLDFormatter.modelToJsonObject(model, res);        
-        return Response.ok(ResponseOutputStream.getModelStream(model, format, json),media).build();       
+        }       
+        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).build();       
     }
     
     @POST
@@ -246,9 +245,8 @@ public class PublicDataResource {
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        Object json=JSONLDFormatter.modelToJsonObject(model, res);       
-        return Response.ok(ResponseOutputStream.getModelStream(model, format, json),media).build();      
+        }     
+        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).build();      
     }
     
        

@@ -160,7 +160,7 @@ public class PublicTemplatesResource {
             hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
             try {
                 rp=new Results(res,hm);
-            }catch(JsonProcessingException jx) {
+            } catch(JsonProcessingException jx) {
                 throw new RestException(500,
                         RestException.GENERIC_APP_ERROR_CODE,
                         "JsonProcessingException :"+ jx.getMessage());                
@@ -182,18 +182,18 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : request parameters are missing-> in Post json query template request");
         }
-        if(fuseki !=null){fusekiUrl=fuseki;}         
+        if (fuseki !=null) {fusekiUrl=fuseki;}         
         QueryFileParser qfp=new QueryFileParser(file+".arq");             
         String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
+        if (!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ map.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(),map,qfp.getLitLangParams());        
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+        if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
-        }else {
+        } else {
             Results rp=null;
             ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,map.get(QueryConstants.RESULT_HASH),map.get(QueryConstants.PAGE_SIZE));                
             map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));

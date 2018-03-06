@@ -49,7 +49,6 @@ public class ResponseOutputStream {
     }
     
     public static StreamingOutput getJsonLDResponseStream(Object toJson) {
-        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 JSONLDFormatter.jsonObjectToOutputStream(toJson, os);                   
@@ -58,18 +57,18 @@ public class ResponseOutputStream {
         return stream;
     }
     
-    public static StreamingOutput getModelStream(Model model, String format, Object json) {
-        
+    public static StreamingOutput getModelStream(final Model model, String format, final String res) {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {                
                  
                 if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
-                    if(format.equalsIgnoreCase("jsonld")) {                        
+                    if(format.equalsIgnoreCase("jsonld")) {      
+                        Object json = JSONLDFormatter.modelToJsonObject(model, res);
                         JSONLDFormatter.jsonObjectToOutputStream(json, os);
-                    }else {
+                    } else {
                         model.write(os,ServiceConfig.getProperty(format));
                     }
-                }else{
+                } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
@@ -85,11 +84,11 @@ public class ResponseOutputStream {
                  
                 if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {                        
-                        JSONLDFormatter.writeModel(model, os);
-                    }else {
+                        JSONLDFormatter.writeModelAsCompact(model, os);
+                    } else {
                         model.write(os,ServiceConfig.getProperty(format));
                     }
-                }else{
+                } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                

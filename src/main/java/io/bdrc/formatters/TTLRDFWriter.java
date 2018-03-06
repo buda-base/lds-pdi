@@ -25,6 +25,7 @@ import java.util.SortedMap;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 
@@ -34,24 +35,27 @@ import io.bdrc.jena.sttl.STTLWriter;
 
 public class TTLRDFWriter {
     
-    public static RDFWriter getSTTLRDFWriter(Model m) {
-        Lang sttl = STTLWriter.registerWriter();
-        SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
+    static final Lang sttl = STTLWriter.registerWriter();
+    static final SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
+    static final List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
+    static final Context ctx = new Context();
+
+    static {
         nsPrio.put(SKOS.getURI(), 1);
         nsPrio.put("http://purl.bdrc.io/ontology/admin/", 5);
         nsPrio.put("http://purl.bdrc.io/ontology/toberemoved/", 6);
-        List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
         predicatesPrio.add("http://purl.bdrc.io/ontology/admin/logWhen");
         predicatesPrio.add("http://purl.bdrc.io/ontology/onOrAbout");
         predicatesPrio.add("http://purl.bdrc.io/ontology/noteText");
-        org.apache.jena.sparql.util.Context ctx = new org.apache.jena.sparql.util.Context();
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsPriorities"), nsPrio);
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsDefaultPriority"), 2);
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "complexPredicatesPriorities"), predicatesPrio);
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "indentBase"), 3);
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 12);
-        RDFWriter w = RDFWriter.create().source(m.getGraph()).context(ctx).lang(sttl).build();
-        return w;
+    }
+
+    public static RDFWriter getSTTLRDFWriter(Model m) {
+        return RDFWriter.create().source(m.getGraph()).context(ctx).lang(sttl).build();
     }    
 
 }

@@ -26,7 +26,6 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.util.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +35,8 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
-import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.QueryProcessor;
-
 /*******************************************************************************
- * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
+ * Copyright (c) 2017-2018 Buddhist Digital Resource Center (BDRC)
  * 
  * If this file is a derivation of another work the license header will appear below; 
  * otherwise, this work is licensed under the Apache License, Version 2.0 
@@ -62,7 +58,7 @@ public class JSONLDFormatter {
     
     protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
-    public static final Map<String,Object> jsonldcontext = getJsonLdContext(); // todo: read the thingy
+    public static final Map<String,Object> jsonldcontext = getJsonLdContext();
     public static final String BDR = "http://purl.bdrc.io/resource/";
     public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
     
@@ -73,6 +69,7 @@ public class JSONLDFormatter {
 	    ETEXTCONTENT,
 	    OFFICE,
 	    PERSON,
+	    VOLUME,
 	    PLACE,
 	    TOPIC,
 	    ITEM,
@@ -85,6 +82,7 @@ public class JSONLDFormatter {
     protected static final HashMap<String,DocType> initialToDocType = new HashMap<>();
     static {
     	initialToDocType.put("P", DocType.PERSON);
+    	initialToDocType.put("V", DocType.VOLUME);
     	initialToDocType.put("W", DocType.WORK);
     	initialToDocType.put("G", DocType.PLACE);
     	initialToDocType.put("T", DocType.TOPIC);
@@ -98,6 +96,7 @@ public class JSONLDFormatter {
     public static final Map<DocType,Object> typeToRootShortUri = new EnumMap<>(DocType.class);
     static {
         typeToRootShortUri.put(DocType.PERSON, "Person");
+        typeToRootShortUri.put(DocType.VOLUME, Arrays.asList("Volume", "VolumeImageAsset", "VolumePhysicalAsset"));
         typeToRootShortUri.put(DocType.WORK, "Work");
         typeToRootShortUri.put(DocType.PLACE, "Place");
         typeToRootShortUri.put(DocType.TOPIC, "Topic");
@@ -137,12 +136,14 @@ public class JSONLDFormatter {
         return jsonObject;
     }
     
+    // should be replaced by a proper mapping from the type of a resource,
+    // the URI shouldn't carry semantics...
     public static Object getFrameObject(String mainResourceName) {
-    	DocType type =initialToDocType.get(mainResourceName.substring(0,1));
+    	DocType type = initialToDocType.get(mainResourceName.substring(0,1));
         return getFrameObject(type, mainResourceName);
     }
     
-    static class MigrationComparator implements Comparator<String>
+    static class JsonLDComparator implements Comparator<String>
      {
          public int compare(String s1, String s2)
          {
@@ -187,28 +188,28 @@ public class JSONLDFormatter {
      // reorder list
      protected static Map<String,Object> orderEntries(Map<String,Object> input) throws IllegalArgumentException
      {
-         SortedMap<String,Object> res = new TreeMap<>(new MigrationComparator());
+         SortedMap<String,Object> res = new TreeMap<>(new JsonLDComparator());
          // TODO: maybe it should be recursive? at least for outlines...
          input.forEach( (k,v) ->  insertRec(k, v, res) );
          return res; 
      }
      
      public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName) {
-         return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY);
+         return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY, true);
      }
      
-     public static Map<String,Object> modelToJsonObject(Model m, String mainResourceName) {
+     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceName) {
     	 DocType type;
-    	 if(mainResourceName.startsWith("PR")) {
-    		 type =initialToDocType.get("PR");
-    	 }else {
-    		 type =initialToDocType.get(mainResourceName.substring(0,1));
+    	 if (mainResourceName.startsWith("PR")) {
+    		 type = initialToDocType.get("PR");
+    	 } else {
+    		 type = initialToDocType.get(mainResourceName.substring(0,1));
     	 }    	 
-    	 return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY);
+    	 return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY, true);
      }
-     
+
      @SuppressWarnings("unchecked")
-    public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format) {
+    public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format, boolean reorder) {
          JsonLDWriteContext ctx = new JsonLDWriteContext();
          JSONLDVariant variant;
          if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) { 
@@ -229,8 +230,9 @@ public class JSONLDFormatter {
          try {
              tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, base, ctx);
              // replacing context with URI
-             //tm.replace("@context", "http://purl.bdrc.io/context.jsonld");
-             tm = orderEntries(tm);
+             tm.replace("@context", "http://purl.bdrc.io/context.jsonld");
+             if (reorder)
+                 tm = orderEntries(tm);
          } catch (JsonLdError | IOException e) {
              e.printStackTrace();
              return null;
@@ -249,12 +251,9 @@ public class JSONLDFormatter {
          IO.flush(wr) ;
      } 
      
-     public static void writeModel(Model m,OutputStream out) {         
-         JsonLDWriter ldw=new JsonLDWriter(RDFFormat.JSONLD_COMPACT_PRETTY);
-         JsonLDWriteContext context=new JsonLDWriteContext();
-         context.setFrame(jsonldcontext);
-         ldw.write(out, DatasetFactory.create(m).asDatasetGraph(), null, null, context);
+     public static void writeModelAsCompact(Model m, OutputStream out) {
+         Object jsonO = modelToJsonObject(m, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
+         jsonObjectToOutputStream(jsonO, out);
      }
-     
 }
 
