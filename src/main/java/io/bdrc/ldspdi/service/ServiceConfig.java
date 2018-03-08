@@ -48,7 +48,6 @@ public class ServiceConfig {
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
-	public static String JSONLD_CONTEXT_HTML;
 	public static String JSONLD_CONTEXT;	
 	
 		
@@ -70,8 +69,7 @@ public class ServiceConfig {
 				mime.add(st.nextToken());
 			}			
 			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
-			JSONLD_CONTEXT_HTML=setJsonLDContext(true);	
-			JSONLD_CONTEXT=setJsonLDContext(false);
+			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
 	    } catch (IOException ex) {
@@ -98,21 +96,18 @@ public class ServiceConfig {
         }
     }
 	
-	private static String setJsonLDContext(boolean html) throws MalformedURLException, IOException {
+	private static String readGithubJsonLDContext() throws MalformedURLException, IOException {
         
 	    URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();        
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String st="";        
-        String line="";
+        StringBuilder st = new StringBuilder();        
+        String line;
         while ((line = in.readLine()) != null) {
-            st=st+line;
-            if(html) {
-                st=st+line+"<br>";
-            }
+            st.append(line);
         }
         in.close();        
-        return st;
+        return st.toString();
     }
 	
 	public static boolean isValidMime(String mimeString){

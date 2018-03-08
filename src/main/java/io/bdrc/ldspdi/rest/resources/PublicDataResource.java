@@ -85,18 +85,26 @@ public class PublicDataResource {
     @GET 
     @Path("/context.jsonld")
     @Produces(MediaType.TEXT_HTML)    
-    public Response getJsonContext() throws RestException{
-        log.info("Call to getJsonContext()"); 
-        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(ServiceConfig.JSONLD_CONTEXT)).build(); 
+    public Response getJsonContextHtml() throws RestException{
+        log.info("Call to getJsonContextHtml()"); 
+        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build(); 
     } 
     
-    @POST 
+    @GET
     @Path("/context.jsonld")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postJsonContext() throws RestException {
-        log.info("Call to getJsonContext()");
-        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(ServiceConfig.JSONLD_CONTEXT)).build();
-                  
+    public Response getJsonContextJson() throws RestException {
+        log.info("Call to getJsonContextJson()");
+        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build();
+    }
+    
+    
+    @GET
+    @Path("/context.jsonld")
+    @Produces("application/ld+json")
+    public Response getJsonContextJsonLD() throws RestException {
+        log.info("Call to getJsonContextJsonLD()");
+        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build();
     }
 
     @GET
