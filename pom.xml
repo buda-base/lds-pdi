@@ -9,7 +9,9 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jersey.version>2.26</jersey.version>        
+    <jersey.version>2.26</jersey.version>
+    <jena.version>3.6.0</jena.version>
+    <jetty.version>9.4.8.v20171121</jetty.version>
   </properties>
   <dependencyManagement>
         <dependencies>
@@ -47,50 +49,38 @@
 	    <!-- scope>provided</scope-->
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
-	<dependency>
+	  <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
+	  <dependency>
 	    <groupId>org.apache.jena</groupId>
 	    <artifactId>jena-arq</artifactId>
-	    <version>3.6.0</version>
-	    <exclusions>
-        <exclusion>
-          <artifactId>jsonld-java</artifactId>
-          <groupId>com.github.jsonld-java</groupId>
-        </exclusion>
-      	</exclusions>
-	</dependency>
-	<dependency>
-      <groupId>com.github.jsonld-java</groupId>
-      <artifactId>jsonld-java</artifactId>
-      <version>0.11.1</version>      
-    </dependency>
+	    <version>${jena.version}</version>
+	  </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
+    <dependency>
+        <groupId>org.apache.jena</groupId>
+        <artifactId>jena-fuseki-embedded</artifactId>
+        <version>${jena.version}</version>
+        <scope>test</scope>
+    </dependency>    
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
         <version>2.9.0</version>
     </dependency>
-    
-	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-rdfconnection -->
-	<dependency>
+
+	  <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-rdfconnection -->
+	  <dependency>
 	    <groupId>org.apache.jena</groupId>
 	    <artifactId>jena-rdfconnection</artifactId>
-	    <version>3.6.0</version>
-	</dependency>
-	<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
-    <dependency>
-        <groupId>org.apache.jena</groupId>
-        <artifactId>jena-fuseki-embedded</artifactId>
-        <version>3.6.0</version>
-        <scope>test</scope>
-    </dependency>	
+	    <version>${jena.version}</version>
+	  </dependency>
     <!-- https://mvnrepository.com/artifact/io.bdrc/jena-stable-turtle -->
     <dependency>
         <groupId>io.bdrc</groupId>
         <artifactId>jena-stable-turtle</artifactId>
         <version>0.5.0</version>
     </dependency>
-
     
     <dependency>
       <groupId>junit</groupId>
@@ -102,28 +92,34 @@
     <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc-jsp -->
     <dependency>
         <groupId>org.glassfish.jersey.ext</groupId>
-        <artifactId>jersey-mvc-jsp</artifactId>        
+        <artifactId>jersey-mvc-jsp</artifactId>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
     <dependency>
         <groupId>org.glassfish.jersey.test-framework</groupId>
-        <artifactId>jersey-test-framework-core</artifactId>    
+        <artifactId>jersey-test-framework-core</artifactId>
     </dependency>
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework.providers/jersey-test-framework-provider-jetty -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-	    <artifactId>jersey-test-framework-provider-jetty</artifactId>	    	    
+	    <artifactId>jersey-test-framework-provider-jetty</artifactId>
 	    <scope>test</scope>
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2 -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.inject</groupId>
-	    <artifactId>jersey-hk2</artifactId>	       
+	    <artifactId>jersey-hk2</artifactId>
 	</dependency>	
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-jetty-servlet -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.containers</groupId>
-	    <artifactId>jersey-container-jetty-servlet</artifactId>	        
+	    <artifactId>jersey-container-jetty-servlet</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-webapp</artifactId>
+        </exclusion>
+      </exclusions>
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson -->
 	<dependency>
@@ -135,13 +131,18 @@
 	<dependency>
 	    <groupId>org.eclipse.jetty</groupId>
 	    <artifactId>jetty-util</artifactId>
-	    <version>9.4.8.v20171121</version>
+	    <version>${jetty.version}</version>
 	</dependency>
+  <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>${jetty.version}</version>
+  </dependency>
 	<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-http -->
 	<dependency>
 	    <groupId>org.eclipse.jetty</groupId>
 	    <artifactId>jetty-http</artifactId>
-	    <version>9.4.8.v20171121</version>
+	    <version>${jetty.version}</version>
 	</dependency>
     	
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
@@ -216,7 +217,7 @@
     	<plugin>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
-            <version>9.4.7.RC0</version>
+            <version>${jetty.version}</version>
             <configuration>
 	            <webApp>
                     <context-path>/</context-path>	            	                
