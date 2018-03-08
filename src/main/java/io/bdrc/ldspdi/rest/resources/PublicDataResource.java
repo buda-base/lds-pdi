@@ -82,29 +82,11 @@ public class PublicDataResource {
         config.register(CorsFilter.class);        
     }
     
-    @GET 
-    @Path("/context.jsonld")
-    @Produces(MediaType.TEXT_HTML)    
-    public Response getJsonContextHtml() throws RestException{
-        log.info("Call to getJsonContextHtml()"); 
-        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build(); 
-    } 
-    
     @GET
     @Path("/context.jsonld")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getJsonContextJson() throws RestException {
+    public Response getJsonContext() throws RestException {
         log.info("Call to getJsonContextJson()");
-        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build();
-    }
-    
-    
-    @GET
-    @Path("/context.jsonld")
-    @Produces("application/ld+json")
-    public Response getJsonContextJsonLD() throws RestException {
-        log.info("Call to getJsonContextJsonLD()");
-        return Response.ok(ServiceConfig.JSONLD_CONTEXT).build();
+        return Response.ok(ServiceConfig.JSONLD_CONTEXT, "application/ld+json").build();
     }
 
     @GET

@@ -104,7 +104,7 @@ public class ServiceConfig {
         StringBuilder st = new StringBuilder();        
         String line;
         while ((line = in.readLine()) != null) {
-            st.append(line);
+            st.append(line+"\n");
         }
         in.close();        
         return st.toString();
