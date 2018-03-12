@@ -378,6 +378,19 @@ For all output metadata, only only {type}{desc} are valid data_name.
 #output.?s.desc=
 ```
 
+# Graph templates
+
+graph templates are templates producing a graph instead of a value or a table-like set of results. Graph templates use the CONSTRUCT sparql keyword.
+They follow the same rules as query templates regarding self description features except for output fields descriptions which don't make any sense in the case of a graphed result.
+
+**The root for the endpoint is /graph (/query being used by query templates)**
+
+Example:
+```
+/graph/graphTest?R_RES=bdr:W22084
+```
+
+
 # JSON API
 
 ## Available query templates

@@ -62,7 +62,7 @@ public class QueryProcessor {
             Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" "+query);
             QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-            model = qe.execDescribe();
+            model = qe.execConstruct();
             qe.close();
             ResultsCache.addToCache(model, hash);
         }

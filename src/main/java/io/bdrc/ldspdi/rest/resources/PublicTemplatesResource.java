@@ -221,7 +221,37 @@ public class PublicTemplatesResource {
         
         //Settings       
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
-        hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
+                 
+        //process
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
+        }
+        return Response.ok(ResponseOutputStream.getModelStream(model,format),getMediaType(format)).build();        
+    }
+    
+    @POST
+    @Path("/graph/{file}") 
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
+            @DefaultValue("jsonld") @QueryParam("format") final String format,
+            @PathParam("file") String file,
+            HashMap<String,String> map) throws RestException{     
+        
+        log.info("Call to getQueryTemplateResultsPost() with format >>"+format);
+        if(fuseki !=null){fusekiUrl=fuseki;} 
                 
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -230,9 +260,42 @@ public class PublicTemplatesResource {
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
+                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams()); 
+        log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        if(model.size()==0) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
+        }
+        return Response.ok(ResponseOutputStream.getModelStream(model,format),getMediaType(format)).build();        
+    }
+    
+    @POST
+    @Path("/graph/{file}") 
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
+            @DefaultValue("jsonld") @QueryParam("format") final String format,
+            @PathParam("file") String file,
+            MultivaluedMap<String,String> mp) throws RestException{     
+        
+        log.info("Call to getQueryTemplateResultsPost() with format >>"+format);
+        if(fuseki !=null){fusekiUrl=fuseki;} 
+        HashMap<String,String> map=Helpers.convertMulti(mp);        
+        //process
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams()); 
+        log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
