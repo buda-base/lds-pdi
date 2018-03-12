@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
  * 

@@ -33,6 +33,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -285,6 +286,14 @@ public class PublicDataResource {
             }
         };
         return Response.ok(stream,getMediaType(ext)).build();        
+    }
+    
+    @GET
+    @Path("/ontology")
+    @Produces("text/html")
+    public Viewable getOntologyHomePage() {
+        log.info("Call to getOntologyHomePage()");          
+        return new Viewable("/ontologyHome.jsp",OntAccess.MODEL);        
     }
     
     private MediaType getMediaType(String format) {

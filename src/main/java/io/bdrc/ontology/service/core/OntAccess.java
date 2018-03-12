@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -15,6 +16,7 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,6 +228,37 @@ public class OntAccess {
         return models;
     }
     
+    public static ArrayList<OntClass> getAllClasses(){
+        ExtendedIterator<OntClass> it=MODEL.listClasses();
+        ArrayList<OntClass> classes=new ArrayList<>();
+        while(it.hasNext()) {
+            OntClass ocl=it.next();
+            if(ocl !=null && !ocl.isAnon()) {
+                classes.add(ocl);
+            }
+            ocl=null;
+        }
+        Collections.sort(classes, ontClassComparator);
+        return classes;
+    }
+    
+    public static ArrayList<OntProperty> getAllProps(){
+        ExtendedIterator<OntProperty> it=MODEL.listAllOntProperties();
+        ArrayList<OntProperty> list=new ArrayList<>();
+        while(it.hasNext()) {
+            OntProperty pr=it.next();
+            if(pr!=null && pr.isProperty()) {
+                list.add(pr);
+            }
+        }
+        Collections.sort(list, propComparator);
+        return list;
+    }
+    
+    public static Map<String,String> getPrefixMap(){
+        return MODEL.getNsPrefixMap();
+    }
+    
     public static int getNumPrefixes() {
         return MODEL.numPrefixes();
     }
@@ -256,13 +289,12 @@ public class OntAccess {
     
     public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
 
-        public int compare(OntClass class1, OntClass class2) {            
+        public int compare(OntClass class1, OntClass class2) { 
             if(Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
                 return class1.getLocalName().compareTo(class2.getLocalName());
             }
-            else {
-                return Prefixes.getPrefix(class1.getNameSpace()).compareTo(Prefixes.getPrefix(class2.getNameSpace()));
-            }
+            return Prefixes.getPrefix(class1.getNameSpace()).compareTo(Prefixes.getPrefix(class2.getNameSpace()));
+            
         }
 
     };
@@ -279,6 +311,18 @@ public class OntAccess {
 
         public int compare(Individual class1, Individual class2) {
             return class1.getLocalName().compareTo(class2.getLocalName());
+        }
+
+    };
+    
+    public final static Comparator<OntProperty> propComparator = new Comparator<OntProperty>() {
+
+        public int compare(OntProperty prop1, OntProperty prop2) {
+            
+            if(Prefixes.getPrefix(prop1.getNameSpace()).equals(Prefixes.getPrefix(prop2.getNameSpace()))) {
+                return prop1.getLocalName().compareTo(prop2.getLocalName());
+            }
+            return Prefixes.getPrefix(prop1.getNameSpace()).compareTo(Prefixes.getPrefix(prop2.getNameSpace()));
         }
 
     };
