@@ -1,4 +1,4 @@
-package io.bdrc.ontology.service.core;
+package io.bdrc.ldspdi.test;
 
 import java.io.IOException;
 import java.io.InputStream;
