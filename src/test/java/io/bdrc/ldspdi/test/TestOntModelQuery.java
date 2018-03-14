@@ -5,8 +5,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -30,6 +34,7 @@ public class TestOntModelQuery {
         stream.close();
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
         InfModel infMod = ModelFactory.createInfModel(reasoner, m);
+        OntModel ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
         
         /** Querying the model **/
         String query=" select distinct ?s where {\n" + 
@@ -37,12 +42,24 @@ public class TestOntModelQuery {
                 "} order by ?s";
         long start=System.currentTimeMillis();
         QueryExecution qexec = QueryExecutionFactory.create(query, m);
-        qexec.execSelect() ;
+        ResultSet rs=qexec.execSelect();
         System.out.println("Exec time on simple model: "+(System.currentTimeMillis()-start));
+        System.out.println(ResultSetFormatter.asText(rs));
+        System.out.println("Exec time on simple model for processing result set: "+(System.currentTimeMillis()-start));
+        
         start=System.currentTimeMillis();
         qexec = QueryExecutionFactory.create(query, infMod);
-        qexec.execSelect() ;
+        rs=qexec.execSelect() ;
         System.out.println("Exec time on inferred model: "+(System.currentTimeMillis()-start));
+        System.out.println(ResultSetFormatter.asText(rs));
+        System.out.println("Exec time on inferred model for processing result set: "+(System.currentTimeMillis()-start));
+        
+        start=System.currentTimeMillis();
+        qexec = QueryExecutionFactory.create(query, ontMod);
+        rs=qexec.execSelect() ;
+        System.out.println("Exec time on Ont model: "+(System.currentTimeMillis()-start));
+        System.out.println(ResultSetFormatter.asText(rs));
+        System.out.println("Exec time on Ont model for processing result set: "+(System.currentTimeMillis()-start));
     }
 
 }
