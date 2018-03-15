@@ -32,7 +32,7 @@ public class TestOntModelQuery {
         Model m = ModelFactory.createDefaultModel();
         m.read(stream, null, "RDF/XML");
         stream.close();
-        Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
+        Reasoner reasoner = ReasonerRegistry.getOWLMicroReasoner();
         InfModel infMod = ModelFactory.createInfModel(reasoner, m);
         OntModel ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
         
