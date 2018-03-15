@@ -19,8 +19,7 @@ package io.bdrc.ldspdi.rest.resources;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-import java.util.HashMap;
-import java.util.Map;
+
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,9 +31,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -95,11 +96,11 @@ public class DemoResources {
     @GET
     @Path("demo/ontology")
     @Produces("text/html")
-    public Viewable getOntologyClassView(@QueryParam("classUri") String uri) {
-        log.info("Call to getOntologyClassView()");          
-        Map<String, Object> map = new HashMap<>();
-        map.put("model", new OntClassModel(uri)); 
-        return new Viewable("/ontClass.jsp", map);        
+    public Viewable getOntologyClassView(@QueryParam("classUri") String uri, @Context UriInfo info) {
+        log.info("Call to getOntologyClassView()"+info.getAbsolutePath());          
+        /*Map<String, Object> map = new HashMap<>();
+        map.put("model", new OntClassModel(uri)); */
+        return new Viewable("/ontClassView.jsp", new OntClassModel(uri));        
     }
     
     @GET 

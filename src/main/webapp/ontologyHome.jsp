@@ -40,42 +40,60 @@
 <td style="vertical-align:middle;text-align:center;font-size:28px">Buddhist Digital Resource Center - Ontology homepage<br></td>
 </tr>
 </table>
-<p style="text-align:center;font-size:16px;">Retrieved from <a href="${OntAccess.getOwlURL()}">${OntAccess.getOwlURL()}.html</a></p>
+<p style="text-align:center;font-size:16px;"><a href="#prefixes">Prefixes</a></p>
+<p style="text-align:center;font-size:16px;"><a href="#root">Root classes</a></p>
+<p style="text-align:center;font-size:16px;"><a href="#all">Classes</a></p>
+<p style="text-align:center;font-size:16px;"><a href="#allprops">Properties</a></p>
+<p style="text-align:center;font-size:16px;"><a href="#indiv">Individuals</a></p>
 
 <!-- PREFIXES -->
-<p style="text-align:center;font-size:20px;"><b>${OntAccess.getNumPrefixes()} Prefixes</b></p>
+<a name="prefixes"></a> 
+<p style="text-align:center;font-size:20px;"><b>${OntData.getNumPrefixes()} Prefixes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>prefix</th><th>name space</th></tr>
-<c:forEach items="${OntAccess.getPrefixMap().keySet()}" var="k">
+<c:forEach items="${OntData.getPrefixMap().keySet()}" var="k">
     <c:set var="val" value="${k}"/>
-    <tr><td>${k}:</td><td>${OntAccess.getPrefixMap().get(val)}</td></tr>
+    <tr><td>${k}:</td><td>${OntData.getPrefixMap().get(val)}</td></tr>
 </c:forEach> 
 </table> 
 
 <!-- ROOT CLASSES -->
-<p style="text-align:center;font-size:20px;"><b>${OntAccess.getNumRootClasses()} simple root classes</b></p>
+<a name="root"></a>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getNumRootClasses()} simple root classes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>full URI</th></tr>
-<c:forEach items="${OntAccess.getOntRootClasses()}" var="root">    
+<c:forEach items="${OntData.getOntRootClasses()}" var="root">    
     <tr><td>${root.getId()}</td><td><a href="${root.getUri()}">${root.getUri()}</a></td></tr>
 </c:forEach> 
 </table> 
 
 <!-- ALL CLASSES -->
-<p style="text-align:center;font-size:20px;"><b>${OntAccess.getAllClasses().size()} classes</b></p>
+<a name="all"></a>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllClasses().size()} classes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>full URI</th></tr>
-<c:forEach items="${OntAccess.getAllClasses()}" var="cls">    
+<c:forEach items="${OntData.getAllClasses()}" var="cls">    
     <tr><td>${cls.getLocalName()}</td><td><a href="${cls.getURI()}">${cls.getURI()}</a></td></tr>
 </c:forEach> 
 </table>
 
 <!-- ALL PROPERTIES -->
-<p style="text-align:center;font-size:20px;"><b>${OntAccess.getAllProps().size()} properties</b></p>
+<a name="allprops"></a>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllProps().size()} properties</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>full URI</th></tr>
-<c:forEach items="${OntAccess.getAllProps()}" var="prop">    
+<c:forEach items="${OntData.getAllProps()}" var="prop">    
     <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td></tr>
+</c:forEach> 
+</table>
+
+<!-- ALL INDIVIDUALS -->
+<a name="indiv"></a>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllIndividuals().size()} individuals</b></p>
+<table style="width:55%;margin:auto">
+<tr><th>Local name</th><th>Full URI</th></tr>
+<c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
+    <tr><td>${ind.getLocalName()}</td><td><a href="${ind.getURI()}">${ind.getURI()}</a></td></tr>
 </c:forEach> 
 </table>
 </body>

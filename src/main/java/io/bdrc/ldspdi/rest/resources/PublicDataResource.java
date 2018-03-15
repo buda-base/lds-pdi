@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
@@ -33,7 +32,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -63,8 +61,9 @@ import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
-import io.bdrc.ontology.service.core.OntAccess;
 import io.bdrc.ontology.service.core.OntClassModel;
+import io.bdrc.ontology.service.core.OntData;
+import io.bdrc.ontology.service.core.OntPropModel;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -242,25 +241,21 @@ public class PublicDataResource {
     
        
     @GET
-    @Path("/ontology/core/{class}")
+    @Path("/ontology/{path}/{class}")
     @Produces("text/html")
-    public Viewable getCoreOntologyClassView(@PathParam("class") String cl) throws RestException{
-        
+    public Viewable getCoreOntologyClassView(@PathParam("class") String cl, @PathParam("path") String path) throws RestException{
         log.info("getCoreOntologyClassView()");          
-        
-        Map<String, Object> map = new HashMap<>();        
-        map.put("model", new OntClassModel("http://purl.bdrc.io/ontology/core/"+cl)); 
-        return new Viewable("/ontRes.jsp", map);        
-    }
-    
-    @GET
-    @Path("/ontology/admin/{class}")
-    @Produces("text/html")
-    public Viewable getAdminOntologyClassView(@PathParam("class") String cl) throws RestException{
-        log.info("getAdminOntologyClassView()");          
-        Map<String, Object> map = new HashMap<>();        
-        map.put("model", new OntClassModel("http://purl.bdrc.io/ontology/admin/"+cl)); 
-        return new Viewable("/ontRes.jsp", map);        
+        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
+        if(OntData.ontMod.getOntResource(uri)==null) {
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
+        } 
+        if(OntData.isClass(uri)) {
+            /** class view **/
+            return new Viewable("/ontClassView.jsp", new OntClassModel(uri));
+        }else {
+            /** Properties view **/
+            return new Viewable("/ontPropView.jsp",new OntPropModel(uri));
+        }      
     }
     
     @GET
@@ -272,7 +267,7 @@ public class PublicDataResource {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
-                Model model=OntAccess.MODEL;
+                Model model=OntData.ontMod;
                 if(ServiceConfig.getProperty(ext)!=null && !ext.equalsIgnoreCase("ttl")){
                     if(ext.equalsIgnoreCase("jsonld")) {
                         model.write(os,ServiceConfig.getProperty("json"));
@@ -293,7 +288,7 @@ public class PublicDataResource {
     @Produces("text/html")
     public Viewable getOntologyHomePage() {
         log.info("Call to getOntologyHomePage()");          
-        return new Viewable("/ontologyHome.jsp",OntAccess.MODEL);        
+        return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
     }
     
     private MediaType getMediaType(String format) {

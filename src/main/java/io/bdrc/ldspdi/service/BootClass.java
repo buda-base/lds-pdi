@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ontology.service.core.OntAccess;
+import io.bdrc.ontology.service.core.OntData;
 
 
 
@@ -50,7 +50,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
             params.put("fusekiUrl",fuseki);            
             GitService.update(queryPath);
             ServiceConfig.init(params); 
-            OntAccess.init();            
+            OntData.init();            
         } 
         catch (IllegalArgumentException e) {
             log.error("BootClass init error", e);

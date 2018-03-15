@@ -48,7 +48,7 @@ function onto(){
     
 <h2>Navigate through BDRC Ontology</h2>
 <p>You can use this service to access the current BDRC ontology and discover the data model:</p>
-<p><a href="/demo/ontOverview.jsp">Ontology service</a></p>
+<p><a href="/ontology">Ontology service</a></p>
 <div> View/download the ontology file: <select id="format">
   <option value="ttl">text/turtle=ttl</option>
   <option value="rdf">application/rdf+xml=rdf</option>

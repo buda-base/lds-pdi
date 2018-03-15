@@ -55,6 +55,13 @@ public class TestOntModelQuery {
         System.out.println("Exec time on inferred model for processing result set: "+(System.currentTimeMillis()-start));
         
         start=System.currentTimeMillis();
+        qexec = QueryExecutionFactory.create(query, infMod);
+        rs=qexec.execSelect() ;
+        System.out.println("Exec time on inferred model2: "+(System.currentTimeMillis()-start));
+        System.out.println(ResultSetFormatter.asText(rs));
+        System.out.println("Exec time on inferred model2 for processing result set: "+(System.currentTimeMillis()-start));
+        
+        start=System.currentTimeMillis();
         qexec = QueryExecutionFactory.create(query, ontMod);
         rs=qexec.execSelect() ;
         System.out.println("Exec time on Ont model: "+(System.currentTimeMillis()-start));

@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +47,10 @@ public class OntClassModel {
     public OntClassModel(String uri) {
         log.info("Instanciated  OntClassModel >> "+uri);
         this.uri = uri;
-        clazz = OntAccess.MODEL.getOntClass(uri);
-        if (clazz == null) {            
+        clazz = OntData.ontMod.getOntClass(uri);
+        /*if (clazz == null) {            
             clazz = OntClassNotPresent.INSTANCE;
-        }
+        }*/
     }
     
     public OntClassModel(OntClass c) {
@@ -61,11 +60,12 @@ public class OntClassModel {
    }
     
     public boolean isPresent() {
-        return !(OntClassNotPresent.class.equals(clazz.getClass()));
+        //return !(OntClassNotPresent.class.equals(clazz.getClass()));
+        return clazz!=null;
     }
     
     public boolean isRootClassModel() {
-    	return OntAccess.getOntRootClasses().contains(this);
+    	return OntData.getOntRootClasses().contains(this);
     }
 
     public String getUri() {
@@ -74,7 +74,7 @@ public class OntClassModel {
 
     
     public String getId() {        
-        return OntAccess.MODEL.shortForm(uri);
+        return OntData.ontMod.shortForm(uri);
     }
     
     
@@ -100,7 +100,7 @@ public class OntClassModel {
                 models.add(new OntClassModel(c));
             }
         }
-        Collections.sort(models,OntAccess.ontClassModelComparator);
+        Collections.sort(models,OntData.ontClassModelComparator);
         return models;
     }
     
@@ -109,7 +109,7 @@ public class OntClassModel {
         ExtendedIterator<Individual> it=(ExtendedIterator<Individual>)clazz.listInstances(true);
         
         List<Individual> inds = it.toList();        
-        Collections.sort(inds,OntAccess.individualComparator);
+        Collections.sort(inds,OntData.individualComparator);
         return inds;
     }
     
@@ -133,25 +133,4 @@ public class OntClassModel {
         return comments; 
     }
     
-    public List<StmtModel> getProperties() {
-        List<StmtModel> properties = new ArrayList<>();
-        
-        for (Statement stmt : clazz.listProperties().toList()) {
-            properties.add(new StmtModel(stmt));
-        }
-        
-        return properties;
-    }
-    
-    public List<StmtModel> getOtherProperties() {
-        List<StmtModel> properties = new ArrayList<>();
-        
-        for (Statement stmt : clazz.listProperties().toList()) {
-            String local = stmt.getPredicate().getLocalName();
-            if (!local.equals("label") && !local.equals("comment")) {
-              properties.add(new StmtModel(stmt));
-            }
-        }
-        return properties;
-    }
 }

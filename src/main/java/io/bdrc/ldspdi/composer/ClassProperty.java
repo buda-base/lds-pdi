@@ -37,6 +37,7 @@ public class ClassProperty {
 	public String rdfType;
 	public String label;
 	public String range;
+	public String domain;
 	
 	public ClassProperty(OntProperty prop, String className) {
 		this.className=className;
@@ -48,6 +49,7 @@ public class ClassProperty {
 		}else {
 			this.label=name;
 		}
+		this.domain=prop.getDomain().getLocalName();
 		OntResource ontRes =prop.getRange();
 		if(ontRes!=null) {
 			this.range=ontRes.getLocalName();
