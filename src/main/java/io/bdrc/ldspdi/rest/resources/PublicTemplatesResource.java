@@ -213,7 +213,7 @@ public class PublicTemplatesResource {
     @Path("/graph/{file}")    
     public Response getGraphTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @QueryParam("format") final String format,
+            @DefaultValue("jsonld") @QueryParam("format") final String format,            
             @PathParam("file") String file) throws RestException{     
         
         log.info("Call to getQueryTemplateResults() with format >>"+format);
@@ -246,7 +246,7 @@ public class PublicTemplatesResource {
     @Path("/graph/{file}") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @QueryParam("format") final String format,
+            @DefaultValue("jsonld") @HeaderParam("Accept") String format,
             @PathParam("file") String file,
             HashMap<String,String> map) throws RestException{     
         
