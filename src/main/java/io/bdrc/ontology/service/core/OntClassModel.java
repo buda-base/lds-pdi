@@ -75,18 +75,13 @@ public class OntClassModel {
     }
     
     
-    public boolean hasParent() {
-        if(clazz.getSuperClass() != null) {
-            return !clazz.getSuperClass().isAnon();
-        }else {
-            return false;
-        }
+    public boolean hasParent() {        
+        return clazz.getSuperClass() != null;        
     }
     
-    public OntClassModel getParent() {
-        OntClass sup3r = clazz.getSuperClass();        
-        if (sup3r != null) {                      
-            return new OntClassModel(sup3r);
+    public ArrayList<OntClassModel> getParent() {               
+        if (clazz.getSuperClass() != null) {                      
+            return new OntClassParent(uri).getParents();
         }
         return null;
     }

@@ -2,6 +2,8 @@ package io.bdrc.ontology.service.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,7 +47,8 @@ public class OntData {
         try {
             
             log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
-            InputStream stream = HttpFile.stream(ServiceConfig.getProperty("owlURL"));
+            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+            InputStream stream=connection.getInputStream();
             Model m = ModelFactory.createDefaultModel();
             m.read(stream, "", "RDF/XML");
             stream.close();

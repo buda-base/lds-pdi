@@ -38,9 +38,14 @@
 <h2>Ontology Class - <a href="${model.getUri()}">${model.getId()}</a></h2>
 <c:if test = "${model.isPresent()}">
     <c:set var="uri" value="${model.getUri()}"/>
-    <!-- PARENT CLASS -->
-    <c:if test = "${model.hasParent()}">    
-        <h4>Parent class: <a href="${model.getParent().getUri()}">${model.getParent().getId()}</a></h4>
+    <!-- PARENT CLASS(ES) -->    
+    <c:if test = "${model.hasParent()}">
+        <c:if test = "${model.getParent().size()>0}">
+	        <h4>Parent class(es): </h4>
+	        <c:forEach items="${model.getParent()}" var="par">    
+	            <a href="${par.getUri()}">${par.getId()}</a>
+	        </c:forEach> 
+        </c:if> 
     </c:if>    
        
     <!-- LABELS -->
@@ -102,10 +107,11 @@
     <br>
     <!-- INHERITED DOMAIN PROPERTIES -->
     <c:if test = "${model.hasParent()}">
-    <c:set var="p_uri" value="${model.getParent().getUri()}"/>
+    <c:forEach items="${model.getParent()}" var="par">
+    <c:set var="p_uri" value="${par.getUri()}"/>
         <c:if test = "${OntData.getDomainUsages(p_uri).size()>0}">
 	    <table id="specs">
-	        <tr><th>Inherited domain properties from ${model.getParent().getId()}:</th></tr>
+	        <tr><th>Inherited domain properties from ${par.getId()}:</th></tr>
 	        <tr><td style="font-size:16px;line-height: 1.6;">
 	        <c:forEach items="${OntData.getDomainUsages(p_uri)}" var="dom">                
 	            <a href="${dom.getURI()}">${dom.getLocalName()}</a> /
@@ -113,6 +119,7 @@
 	        </td></tr>
 	     </table>
 	    </c:if>
+	</c:forEach> 
     </c:if>
     <br>
     <!-- RANGE PROPERTIES -->
