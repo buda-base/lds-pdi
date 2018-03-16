@@ -58,7 +58,7 @@ public class JsonAPIResource {
         super();
         ResourceConfig config=new ResourceConfig( JsonAPIResource.class);
         config.register(CorsFilter.class);
-        config.register(RestExceptionMapper.class);
+        config.register(GZIPWriterInterceptor.class);
         fileList=getQueryTemplates();
     }
     

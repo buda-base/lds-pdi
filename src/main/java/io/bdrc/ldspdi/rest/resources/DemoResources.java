@@ -62,6 +62,7 @@ public class DemoResources {
         ResourceConfig config=new ResourceConfig(DemoResources.class);
         config.register(LoggingFeature.class);
         config.register(CorsFilter.class);
+        config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     } 
     

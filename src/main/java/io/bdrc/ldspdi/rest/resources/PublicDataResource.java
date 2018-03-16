@@ -41,7 +41,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +81,8 @@ public class PublicDataResource {
     public PublicDataResource() {
         super();
         ResourceConfig config=new ResourceConfig(PublicDataResource.class);
-        config.register(CorsFilter.class);        
+        config.register(CorsFilter.class); 
+        config.register(GZIPWriterInterceptor.class);
     }
     
     @GET

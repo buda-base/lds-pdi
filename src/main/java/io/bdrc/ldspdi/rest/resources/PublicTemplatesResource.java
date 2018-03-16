@@ -71,7 +71,8 @@ public class PublicTemplatesResource {
     public PublicTemplatesResource() {
         super();        
         ResourceConfig config=new ResourceConfig(PublicTemplatesResource.class);
-        config.register(CorsFilter.class);        
+        config.register(CorsFilter.class); 
+        config.register(GZIPWriterInterceptor.class);
     }
     
     @GET
