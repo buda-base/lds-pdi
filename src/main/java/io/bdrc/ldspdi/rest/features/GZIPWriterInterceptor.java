@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.features;
 
 import java.io.IOException;
 import java.io.OutputStream;

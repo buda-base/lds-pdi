@@ -40,12 +40,13 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
+import io.bdrc.ldspdi.rest.features.CorsFilter;
+import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 
 @Path("/")

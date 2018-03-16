@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.features;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)

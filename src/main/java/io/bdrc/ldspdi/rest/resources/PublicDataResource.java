@@ -41,10 +41,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
-import org.glassfish.jersey.message.GZipEncoder;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.mvc.Viewable;
+import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,14 +53,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.rest.features.CorsFilter;
+import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ldspdi.sparql.results.CacheAccessModel;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
+import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.ontology.service.core.OntClassModel;
@@ -81,8 +85,37 @@ public class PublicDataResource {
     public PublicDataResource() {
         super();
         ResourceConfig config=new ResourceConfig(PublicDataResource.class);
+        config.register(LoggingFeature.class);
         config.register(CorsFilter.class); 
         config.register(GZIPWriterInterceptor.class);
+        config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
+    }
+    
+    @GET    
+    @Produces(MediaType.TEXT_HTML)    
+    public Viewable getHomePage() throws RestException{
+        log.info("Call to getHomePage()");         
+        return new Viewable("/index.jsp",new DocFileModel()); 
+    }
+    
+    @GET 
+    @Path("/robots.txt")       
+    public Response getRobots() {
+        log.info("Call getRobots()"); 
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                os.write(ServiceConfig.getRobots().getBytes());                    
+            }
+        };
+        return Response.ok(stream,MediaType.TEXT_PLAIN_TYPE).build();  
+    }
+    
+    @GET 
+    @Path("cache")
+    @Produces(MediaType.TEXT_HTML)    
+    public Viewable getCacheInfo() {
+        log.info("Call to getCacheInfo()");        
+        return new Viewable("/cache.jsp",new CacheAccessModel()); 
     }
     
     @GET
