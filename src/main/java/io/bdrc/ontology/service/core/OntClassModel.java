@@ -47,10 +47,7 @@ public class OntClassModel {
     public OntClassModel(String uri) {
         log.info("Instanciated  OntClassModel >> "+uri);
         this.uri = uri;
-        clazz = OntData.ontMod.getOntClass(uri);
-        /*if (clazz == null) {            
-            clazz = OntClassNotPresent.INSTANCE;
-        }*/
+        clazz = OntData.ontMod.getOntClass(uri);        
     }
     
     public OntClassModel(OntClass c) {
@@ -79,16 +76,19 @@ public class OntClassModel {
     
     
     public boolean hasParent() {
-        return clazz.getSuperClass() != null;
+        if(clazz.getSuperClass() != null) {
+            return !clazz.getSuperClass().isAnon();
+        }else {
+            return false;
+        }
     }
     
     public OntClassModel getParent() {
-        OntClass sup3r = clazz.getSuperClass();
-        if (sup3r != null) {
+        OntClass sup3r = clazz.getSuperClass();        
+        if (sup3r != null) {                      
             return new OntClassModel(sup3r);
         }
         return null;
-        
     }
     
     public List<OntClassModel> getSubclasses() {
@@ -96,6 +96,18 @@ public class OntClassModel {
         List<OntClassModel> models = new ArrayList<>();
         
         for (OntClass c : subs) {
+            if(!c.isAnon()) {                
+                models.add(new OntClassModel(c));
+            }
+        }
+        Collections.sort(models,OntData.ontClassModelComparator);
+        return models;
+    }
+    
+    public List<OntClassModel> getSuperClasses() {
+        List<OntClass> sups = clazz.listSuperClasses(true).toList();
+        List<OntClassModel> models = new ArrayList<>();        
+        for (OntClass c : sups) {
             if(!c.isAnon()) {                
                 models.add(new OntClassModel(c));
             }

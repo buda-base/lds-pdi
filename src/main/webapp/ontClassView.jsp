@@ -39,10 +39,10 @@
 <c:if test = "${model.isPresent()}">
     <c:set var="uri" value="${model.getUri()}"/>
     <!-- PARENT CLASS -->
-    <c:if test = "${model.hasParent()}">
-    <h4>Parent class: <a href="${model.getParent().getUri()}">${model.getParent().getId()}</a></h4>
-    </c:if>
-    
+    <c:if test = "${model.hasParent()}">    
+        <h4>Parent class: <a href="${model.getParent().getUri()}">${model.getParent().getId()}</a></h4>
+    </c:if>    
+       
     <!-- LABELS -->
     <c:if test = "${model.getLabels().size()>0}">
         <h4>Labels: </h4>
@@ -134,6 +134,7 @@
             <ul><li><a href="${sub.getUri()}">${sub.getId()}</a></li></ul>
         </c:forEach> 
     </c:if>
+    
     
 </c:if>
 <br><br>

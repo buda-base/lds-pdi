@@ -117,6 +117,21 @@ public class OntData {
         return list;
     }
     
+    public static ArrayList<OntResource> getSubClassesOf(String uri) {        
+        String query=ServiceConfig.getPrefixes()+ " select distinct ?s where {\n" + 
+                "   <"+uri+"> rdfs:subClassOf ?s .    \n" + 
+                "} order by ?s";
+        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        ResultSet res = qexec.execSelect() ;
+        ArrayList<OntResource> list=new ArrayList<>();
+        while(res.hasNext()) {
+            QuerySolution qs=res.next();
+            RDFNode node=qs.get("?s");
+            list.add(ontMod.getOntResource(node.asResource().getURI()));            
+        }        
+        return list;
+    }
+    
     public static HashMap<String,ArrayList<OntResource>> getAllSubProps(String uri) {        
         ArrayList<OntResource> props=OntData.getDomainUsages(uri);
         HashMap<String,ArrayList<OntResource>> map=new HashMap<>();
