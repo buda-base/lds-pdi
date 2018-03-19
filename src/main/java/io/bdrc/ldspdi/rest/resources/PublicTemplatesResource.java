@@ -105,7 +105,7 @@ public class PublicTemplatesResource {
             return new Viewable("/error.jsp",query);
         }
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-        ResultPage model=null;
+        ResultPage model=null;        
         try {
             if(hm.get(QueryConstants.JSON_OUT)!=null) {
                 Results mod=new Results(res,hm);
