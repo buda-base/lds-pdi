@@ -204,8 +204,7 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info) throws RestException{
         
-        log.info("Call to getResourceGraph()");
-        
+        log.info("Call to getResourceGraph()");        
         if(fuseki !=null){fusekiUrl=fuseki;}
         //Settings
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
@@ -282,6 +281,7 @@ public class PublicDataResource {
     public Viewable getCoreOntologyClassView(@PathParam("class") String cl, @PathParam("path") String path) throws RestException{
         log.info("getCoreOntologyClassView()");          
         String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
+        OntData.init();
         if(OntData.ontMod.getOntResource(uri)==null) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
         } 
@@ -299,7 +299,7 @@ public class PublicDataResource {
     public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) throws RestException{
         
         log.info("getOntology()");        
-                
+        OntData.init();        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
@@ -323,6 +323,7 @@ public class PublicDataResource {
     @Path("/ontology")
     @Produces("text/html")
     public Viewable getOntologyHomePage() {
+        OntData.init();
         log.info("Call to getOntologyHomePage()");          
         return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
     }

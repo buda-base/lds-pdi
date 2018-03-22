@@ -36,24 +36,34 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.ldspdi.sparql.results.ResultsCache;
 
 public class OntData {
     
     public static InfModel infMod;    
     public static OntModel ontMod;
+    public final static int HASH=999888999;
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
     
     public static void init() {
         try {
+            OntModel tmp=(OntModel)ResultsCache.getObjectFromCache(HASH);
             
-            log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
-            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
-            InputStream stream=connection.getInputStream();
-            Model m = ModelFactory.createDefaultModel();
-            m.read(stream, "", "RDF/XML");
-            stream.close();
-            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
-            rdf10tordf11(ontMod);
+            if(tmp==null) {
+                log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
+                HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+                InputStream stream=connection.getInputStream();
+                Model m = ModelFactory.createDefaultModel();
+                m.read(stream, "", "RDF/XML");
+                stream.close();
+                ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
+                rdf10tordf11(ontMod);
+                ResultsCache.addToCache(ontMod, HASH);
+                log.info("Loaded fresh Ontology Model into cache...");
+            }else {
+                ontMod=tmp;
+                log.info("Retreived Ontology Model from cache...");
+            }
     
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
