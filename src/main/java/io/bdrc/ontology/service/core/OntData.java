@@ -29,6 +29,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 import org.slf4j.Logger;
@@ -36,7 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.ResultsCache;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class OntData {
     
@@ -67,6 +71,25 @@ public class OntData {
     
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
+        }
+    }
+    
+    public static void updateOntologyModel(String fusekiUrl) throws RestException{
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+            InputStream stream=connection.getInputStream();
+            Model m = ModelFactory.createDefaultModel();
+            m.read(stream, "", "RDF/XML");
+            stream.close();
+            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+            log.info("OntModel Size >> "+ontMod.size());
+            Reasoner reasoner = ReasonerRegistry.getRDFSReasoner();
+            InfModel infMod = ModelFactory.createInfModel(reasoner, m);            
+            QueryProcessor.updateOntology(infMod, fusekiUrl);
+        }        
+        catch(Exception ex) {
+            log.error("Error updating OntModel", ex);
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Ontology Model update failed : "+ex.getMessage()); 
         }
     }
     

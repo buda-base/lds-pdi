@@ -296,7 +296,7 @@ public class PublicDataResource {
     
     @GET
     @Path("/ontology.{ext}")     
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) throws RestException{
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {
         
         log.info("getOntology()");        
         OntData.init();        
@@ -337,6 +337,14 @@ public class PublicDataResource {
             }
         }
         return media;
+    }
+    
+    @POST
+    @Path("/payload")   
+    public Response updateOntology() throws RestException{        
+        log.info("updating Ontology model()");
+        OntData.updateOntologyModel(fusekiUrl);        
+        return Response.ok().build();      
     }
     
 }

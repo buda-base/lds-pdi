@@ -2,6 +2,9 @@ package io.bdrc.ldspdi.sparql;
 
 import java.util.Objects;
 
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -78,6 +81,18 @@ public class QueryProcessor {
         qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;           
     }
+	
+	public static void updateOntology(Model mod, String fusekiUrl) {
+	    if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+	    log.info("Service fuseki >> "+fusekiUrl.replace("query","data"));
+	    log.info("OntologyGraph >> "+ServiceConfig.getProperty("ontGraph"));
+	    log.info("InfModel Size >> "+mod.size());	    
+	    DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl.replace("query","data"));
+	    access.deleteModel("bdo:ontologySchema");
+	    access.putModel(ServiceConfig.getProperty("ontGraph"), mod);	    
+	}
 	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
         ResultSetWrapper res;
