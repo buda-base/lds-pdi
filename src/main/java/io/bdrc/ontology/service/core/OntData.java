@@ -29,7 +29,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
@@ -83,8 +82,7 @@ public class OntData {
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             log.info("OntModel Size >> "+ontMod.size());
-            Reasoner reasoner = ReasonerRegistry.getRDFSReasoner();
-            InfModel infMod = ModelFactory.createInfModel(reasoner, m);            
+            InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);            
             QueryProcessor.updateOntology(infMod, fusekiUrl);
         }        
         catch(Exception ex) {

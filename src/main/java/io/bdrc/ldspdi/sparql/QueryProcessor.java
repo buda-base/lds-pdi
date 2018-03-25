@@ -86,11 +86,10 @@ public class QueryProcessor {
 	    if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-	    log.info("Service fuseki >> "+fusekiUrl.replace("query","data"));
+	    log.info("Service fuseki >> "+fusekiUrl);
 	    log.info("OntologyGraph >> "+ServiceConfig.getProperty("ontGraph"));
 	    log.info("InfModel Size >> "+mod.size());	    
-	    DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl.replace("query","data"));
-	    access.deleteModel("bdo:ontologySchema");
+	    DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
 	    access.putModel(ServiceConfig.getProperty("ontGraph"), mod);	    
 	}
 	

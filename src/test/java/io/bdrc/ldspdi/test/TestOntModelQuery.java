@@ -14,7 +14,6 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.junit.Test;
 
@@ -31,9 +30,8 @@ public class TestOntModelQuery {
         InputStream stream=connection.getInputStream();
         Model m = ModelFactory.createDefaultModel();
         m.read(stream, null, "RDF/XML");
-        stream.close();
-        Reasoner reasoner = ReasonerRegistry.getOWLMicroReasoner();
-        InfModel infMod = ModelFactory.createInfModel(reasoner, m);
+        stream.close();        
+        InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getOWLMicroReasoner(), m);
         OntModel ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
         
         /** Querying the model **/

@@ -3,7 +3,6 @@ package io.bdrc.ontology.service.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jena.atlas.logging.Log;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.UnionClass;
 import org.apache.jena.rdf.model.RDFNode;

@@ -79,6 +79,7 @@ public class PublicDataResource {
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    public String fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
     MediaType default_media=new MediaType("text","turtle","utf-8");
     
         
@@ -132,7 +133,10 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         
         log.info("Call to getResourceGraph()");
-        if(fuseki !=null){ fusekiUrl=fuseki;}            
+        if(fuseki !=null){ 
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }            
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
@@ -148,7 +152,10 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
            
         log.info("Call to getResourceGraphPost");
-        if(fuseki !=null){fusekiUrl=fuseki;}           
+        if(fuseki !=null){
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }           
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
@@ -167,7 +174,10 @@ public class PublicDataResource {
         log.info("Call to getResourceGraph()");
         
         //Settings  
-        if(fuseki !=null){ fusekiUrl=fuseki;}
+        if(fuseki !=null){ 
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());             
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/")); 
                       
@@ -205,7 +215,10 @@ public class PublicDataResource {
         @Context UriInfo info) throws RestException{
         
         log.info("Call to getResourceGraph()");        
-        if(fuseki !=null){fusekiUrl=fuseki;}
+        if(fuseki !=null){
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }
         //Settings
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
@@ -247,7 +260,10 @@ public class PublicDataResource {
         
         log.info("Call to getFormattedResourceGraph()");
         
-        if(fuseki !=null){fusekiUrl=fuseki;}
+        if(fuseki !=null){
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
@@ -265,7 +281,10 @@ public class PublicDataResource {
         
         log.info("Call to getFormattedResourceGraphPost()");
         
-        if(fuseki !=null){fusekiUrl=fuseki;}
+        if(fuseki !=null){
+            fusekiUrl=fuseki;
+            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+        }
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
@@ -343,7 +362,7 @@ public class PublicDataResource {
     @Path("/payload")   
     public Response updateOntology() throws RestException{        
         log.info("updating Ontology model()");
-        OntData.updateOntologyModel(fusekiUrl);        
+        OntData.updateOntologyModel(fusekiBaseUrl+"/data");        
         return Response.ok().build();      
     }
     
