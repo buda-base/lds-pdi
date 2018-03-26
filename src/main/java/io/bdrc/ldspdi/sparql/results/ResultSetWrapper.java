@@ -39,8 +39,8 @@ public class ResultSetWrapper {
     public int pageSize;
     public int numberOfPages;
     public int hash;
-    public List<String> head;    
-    public ArrayList<QuerySolutionItem> results; 
+    public List<String> head;
+    public ArrayList<Row> rows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;    
     
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
@@ -48,13 +48,13 @@ public class ResultSetWrapper {
         head =rs.getResultVars();
         this.execTime=execTime;
         numResults=0;
-        results=new ArrayList<>();
-        mvc_rows=new ArrayList<>();        
+        //results=new ArrayList<>();
+        mvc_rows=new ArrayList<>();
+        rows=new ArrayList<>();
         while(rs.hasNext()) {            
-            QuerySolution qs=rs.next();            
-            QuerySolutionItem row=new QuerySolutionItem(qs,head);
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);
-            results.add(row);
+            QuerySolution qs=rs.next();
+            rows.add(new Row(head,qs));            
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);            
             mvc_rows.add(mvc_row);
             numResults++;
         }
@@ -72,10 +72,6 @@ public class ResultSetWrapper {
 
     public int getNumResults() {
         return numResults;
-    }
-
-    public ArrayList<QuerySolutionItem> getResults() {
-        return results;
     }
 
     public static Logger getLog() {
@@ -100,6 +96,10 @@ public class ResultSetWrapper {
 
     public ArrayList<QueryMvcSolutionItem> getMvc_rows() {
         return mvc_rows;
+    }
+
+    public ArrayList<Row> getRows() {
+        return rows;
     }
     
 }

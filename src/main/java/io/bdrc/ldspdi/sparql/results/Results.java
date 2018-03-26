@@ -21,7 +21,6 @@ package io.bdrc.ldspdi.sparql.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +38,12 @@ public class Results {
     public int pageSize;
     public int numResults;
     public long execTime;
-    public int hash;
+    public int hash;    
     public boolean lastPage;
     public boolean firstPage;    
     public ResultPageLinks pLinks;
-    public List<String> head;    
-    public ArrayList<QuerySolutionItem> results;
+    public Head head;
+    public HashMap<String,ArrayList<Row>> results;
     
     public Results(ResultSetWrapper res,HashMap<String,String> hm) 
             throws JsonProcessingException,NumberFormatException{
@@ -57,22 +56,24 @@ public class Results {
         pageSize=res.getPageSize();
         numResults=res.getNumResults();
         execTime=res.getExecTime();
-        hash=res.getHash();
-        head=res.getHead();
+        hash=res.getHash(); 
+        head=new Head(res.getHead());        
         numberOfPages=res.getNumberOfPages();        
         int offset=(pageNumber-1)*pageSize; 
-        results=new ArrayList<>();
-        ArrayList<QuerySolutionItem> allRows=res.getResults();        
+        results=new HashMap<>();         
+        ArrayList<Row> rows=res.getRows();
+        ArrayList<Row> bindings=new ArrayList<>();;
         if(pageNumber<=numberOfPages) {
             for (int x=(offset); x<(offset+pageSize);x++) {
                 try {
-                    results.add(allRows.get(x));
+                    bindings.add(rows.get(x));
                 }
                 catch(Exception ex) {                    
                     break;
                 }
             }
         }
+        results.put("bindings", bindings);
         if(pageNumber==1) {
             firstPage=true;
         }
@@ -124,11 +125,11 @@ public class Results {
         return pLinks;
     }
 
-    public List<String> getHead() {
+    public Head getHead() {
         return head;
     }
-
-    public ArrayList<QuerySolutionItem> getResults() {
+    
+    public HashMap<String, ArrayList<Row>> getResults() {
         return results;
     }
     

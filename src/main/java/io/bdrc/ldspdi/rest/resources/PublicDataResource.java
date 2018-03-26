@@ -359,7 +359,7 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/payload")   
+    @Path("/callbacks/github/owl-api")   
     public Response updateOntology() throws RestException{        
         log.info("updating Ontology model()");
         OntData.updateOntologyModel(fusekiBaseUrl+"/data");        
