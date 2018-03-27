@@ -10,7 +10,7 @@ public class LiteralOtherField extends Field{
     
     public LiteralOtherField(String type,String datatype, String value) {
         super(type, value);
-        this.put("datatype",datatype);               
+        this.put("\"datatype\"",datatype);               
     }
     
 }

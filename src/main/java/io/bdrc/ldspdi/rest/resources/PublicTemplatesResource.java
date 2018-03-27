@@ -56,6 +56,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.Results;
+import io.bdrc.ldspdi.sparql.results.FusekiResultSet;
 import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -121,6 +122,40 @@ public class PublicTemplatesResource {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
         }
         return new Viewable("/resPage.jsp",model);
+    }
+    
+    @GET
+    @Path("/test/{file}")
+    @Produces("text/html")
+    public Response testTemplateResults(@Context UriInfo info, 
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @PathParam("file") String file) throws RestException{     
+        
+        log.info("Call to getQueryTemplateResults()");
+        if(fuseki !=null){fusekiUrl=fuseki;}        
+        
+        //Settings       
+        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
+        hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
+                
+        //process
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "template ->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+query);
+        }
+        ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+        FusekiResultSet model=new FusekiResultSet(res);        
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build();
     }
        
     @POST 
