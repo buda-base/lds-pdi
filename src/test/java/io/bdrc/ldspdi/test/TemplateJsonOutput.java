@@ -52,7 +52,8 @@ public class TemplateJsonOutput {
         System.out.println(json);
         ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes()); 
         ResultSet rs=ResultSetFactory.fromJSON(is);
-        System.out.println("ResultSet >>" +rs);        
+        System.out.println("ResultSet >>" +rs);
+        is.close();
     }
     
 }
