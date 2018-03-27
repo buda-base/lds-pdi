@@ -1,0 +1,222 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix f:     <java:io.bdrc.ldspdi.sparql.functions.> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix mb:    <http://mbingenheimer.net/tools/bibls/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+bdr:W1KG13765  a                      bdo:Work ;
+        adm:access                    bdr:AccessOpen ;
+        adm:gitRevision               "18844847bb96e7925ae4c9b19da924cf55386dc9" ;
+        adm:license                   bdr:LicensePublicDomain ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:status                    bdr:StatusReleased ;
+        bdo:itemBDRCHoldingStatement  "tbrc holds digitally scanned images tiffs and pdf files" ;
+        bdo:note                      []  ;
+        bdo:workAuthorshipStatement   "snga 'gyur rig mdzod rtsom sgrig lhan tshogs/"@bo-x-ewts ;
+        bdo:workCatalogInfo           "Collection of poetry praise to the glorious copper-colored mountain (zangs mdog dpal ri)"@en ;
+        bdo:workExtentStatement       "v, 97 p." ;
+        bdo:workGenre                 bdr:T67 ;
+        bdo:workHasItem               bdr:I1KG13765 ;
+        bdo:workHasItemImageAsset     bdr:I1KG13765 ;
+        bdo:workIllustrations         "ill." ;
+        bdo:workIsAbout               bdr:G4724 ;
+        bdo:workLangScript            bdr:BoTibt ;
+        bdo:workLccn                  "2005312343" ;
+        bdo:workNumberOfVolumes       1 ;
+        bdo:workPublisherLocation     "bylakuppe, karnataka"@en ;
+        bdo:workPublisherName         "skyabs rje pad+ma nor bu rin po che'i bla brang /"@bo-x-ewts ;
+        bdo:workScanInfo              "Scanned at Tibetan Buddhist Resource Center, 1430 Massachusetts Avenue, Cambridge, MA 02138, USA. Comments: 8/2013"@en ;
+        bdo:workSeeHarvard            "010255655-5" ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        skos:prefLabel                "zangs mdog dpal ri'i pho brang la bstod pa bde legs dpal yon 'byung ba'i gzhi/"@bo-x-ewts .
+
+bdr:W20095  a                         bdo:Work ;
+        adm:access                    bdr:AccessOpen ;
+        adm:gitRevision               "18844847bb96e7925ae4c9b19da924cf55386dc9" ;
+        adm:license                   bdr:LicensePublicDomain ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:status                    bdr:StatusReleased ;
+        bdo:itemBDRCHoldingStatement  "tbrc holds digitally scanned images, tiffs and pdf files" ;
+        bdo:workAuthorshipStatement   "mtsho sngon zhing chen dmangs khrod rig rtsal zhib 'jug tshogs pas 'tshol bsdu byas/"@bo-x-ewts ;
+        bdo:workCatalogInfo           "An episode from the epic of Gesar."@en ;
+        bdo:workExtentStatement       "109 p." ;
+        bdo:workHasItem               bdr:I20095 ;
+        bdo:workHasItemImageAsset     bdr:I20095 ;
+        bdo:workHollis                "014258040" ;
+        bdo:workIsAbout               bdr:T248 ;
+        bdo:workIsbn                  "7542002775" ;
+        bdo:workLangScript            bdr:BoTibt ;
+        bdo:workLcCallNumber          "pl3748.g425 .d55 1992" ;
+        bdo:workLccn                  "96915534" ;
+        bdo:workNumberOfVolumes       1 ;
+        bdo:workObjectType            bdr:ObjectTypeTypeSet ;
+        bdo:workPublisherDate         "1983, 1992 printing" ;
+        bdo:workPublisherLocation     "zi ling /"@bo-x-ewts ;
+        bdo:workPublisherName         "mtsho sngon mi rigs dpe skrun khang /"@bo-x-ewts ;
+        bdo:workScanInfo              "Scanned at Tibetan Buddhist Resource Center, 1430 Massachusetts Avenue, Cambridge, MA 02138, USA. Comments: 5/2014"@en ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        skos:prefLabel                "dmyal gling mun pa rang gsal/"@bo-x-ewts .
+
+bdr:W00KG03885  a                     bdo:Work ;
+        adm:access                    bdr:AccessOpen ;
+        adm:gitRevision               "18844847bb96e7925ae4c9b19da924cf55386dc9" ;
+        adm:license                   bdr:LicensePublicDomain ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:status                    bdr:StatusReleased ;
+        bdo:creatorMainAuthor         bdr:P743 ;
+        bdo:itemBDRCHoldingStatement  "tbrc holds digitally scanned images, tiffs and pdf files" ;
+        bdo:workAuthorshipStatement   "shar phyogs dwags po'i rgyud du byung ba shAkya'i dge slong mdo sngags bstan pa'i nyi mas dpal chos kyi dbang po'i sgrub gnas rdza dkar chung ri khrod du sbyar ba rdzogs so/"@bo-x-ewts ;
+        bdo:workBiblioNote            "reproduced from prints from the eastern tibetan blocks from the library of the ven. lama sangye tenzin of junbesi serlo monastery"@en ;
+        bdo:workCatalogInfo           "Commentary on the monumental systematization of Prajnaparamita philosophy, Maitreyanatha's Abhisamayalankara. Written by the Nyingma scholar Dokngak Tenpai Nyima (1895-1959)."@en ;
+        bdo:workCreator               bdr:P743 ;
+        bdo:workExtentStatement       "v. 2., pp. 1-265 (133 ff.)" ;
+        bdo:workGenre                 bdr:T61 ;
+        bdo:workHasItem               bdr:I00KG03885 ;
+        bdo:workHasItemImageAsset     bdr:I00KG03885 ;
+        bdo:workHasSourcePrintery     bdr:G3JT12499 ;
+        bdo:workHollis                "014254437" ;
+        bdo:workIsAbout               bdr:W19716 , bdr:T2005 ;
+        bdo:workLangScript            bdr:BoTibt ;
+        bdo:workLcCallNumber          "bq1955.a83 m38 1978" ;
+        bdo:workLccn                  "78902060" ;
+        bdo:workNumberOfVolumes       1 ;
+        bdo:workObjectType            bdr:ObjectTypeBlockprint ;
+        bdo:workPublisherDate         "1978" ;
+        bdo:workPublisherLocation     "new delhi"@en ;
+        bdo:workPublisherName         "ngawang topgay"@en ;
+        bdo:workScanInfo              "Scanned at M/S Satluj Infotech Images, E-45, Sector 27 Noida, District Gautam Buddha Nagar, U.P. 201301 via New Delhi, IN for the Tibetan Buddhist Resource Center, 150 17th st., New York, NY 10011, U.S.A 2006. Comments: from (0000 drive) of Dummy 23, ma pham, 133 ff."@en ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        skos:prefLabel                "sher phyin tshig don rnam bshad ma pham zhal lung"@bo-x-ewts .
+
+bdr:W22936  a                         bdo:Work ;
+        adm:access                    bdr:AccessOpen ;
+        adm:gitRevision               "18844847bb96e7925ae4c9b19da924cf55386dc9" ;
+        adm:license                   bdr:LicensePublicDomain ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:status                    bdr:StatusReleased ;
+        bdo:creatorMainAuthor         bdr:P560 ;
+        bdo:itemBDRCHoldingStatement  "tbrc holds digitally scanned images, tiffs and pdf files" ;
+        bdo:workAuthorshipStatement   "by 'jam-dbyangs blo-gter-dbang-po/"@bo-x-ewts ;
+        bdo:workBiblioNote            "reproduced from a rare print from the derge blocks from the library of rai bahadur burmiok athing t.d. densapa"@en ;
+        bdo:workCatalogInfo           "Stories of previous lives of the Buddha."@en ;
+        bdo:workCreator               bdr:P560 ;
+        bdo:workExtentStatement       "344 p." ;
+        bdo:workGenre                 bdr:T1342 ;
+        bdo:workHasItem               bdr:I22936 ;
+        bdo:workHasItemImageAsset     bdr:I22936 ;
+        bdo:workHasSourcePrintery     bdr:G1657 ;
+        bdo:workHollis                "014258790" ;
+        bdo:workIsAbout               bdr:P7326 ;
+        bdo:workLangScript            bdr:BoTibt ;
+        bdo:workLcCallNumber          "bq1463.t5 b58 1980 tib" ;
+        bdo:workLccn                  "829200985" ;
+        bdo:workNumberOfVolumes       1 ;
+        bdo:workObjectType            bdr:ObjectTypeBlockprint ;
+        bdo:workPublisherDate         "1980" ;
+        bdo:workPublisherLocation     "dharamsala, h.p."@en ;
+        bdo:workPublisherName         "library of tibetan works and archives"@en ;
+        bdo:workScanInfo              "Scanned at Tibetan Buddhist Resource Center, 150 West 17th St, New York City, NY 10011, US. Comments: 3/2011"@en ;
+        bdo:workSeeHarvard            "011200751-1" ;
+        bdo:workSeriesName            "burmiok athing collection. series 1"@bo-x-ewts ;
+        bdo:workSeriesNumber          "v. 4" ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workType                  bdr:WorkTypePublishedWork ;
+        skos:prefLabel                "skyes rabs brgya lnga bcu pa/ (sde dge par ma/)"@bo-x-ewts .
+
+bdr:W27309  a                         bdo:Work ;
+        adm:access                    bdr:AccessOpen ;
+        adm:gitRevision               "18844847bb96e7925ae4c9b19da924cf55386dc9" ;
+        adm:license                   bdr:LicensePublicDomain ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:logEntry                  []  ;
+        adm:status                    bdr:StatusReleased ;
+        bdo:creatorMainAuthor         bdr:P805 ;
+        bdo:itemBDRCHoldingStatement  "1" ;
+        bdo:note                      []  ;
+        bdo:workAuthorshipStatement   "kun dga' blo gros kyis brtsams pa ; dpe sgrig 'gan khur pa, dbyangs can sengge"@bo-x-ewts ;
+        bdo:workCreator               bdr:P805 ;
+        bdo:workEditionStatement      "par gzhi1"@bo-x-ewts ;
+        bdo:workExtentStatement       "2, 796 p." ;
+        bdo:workGenre                 bdr:T1673 ;
+        bdo:workHasItem               bdr:I27309 ;
+        bdo:workHasItemImageAsset     bdr:I27309 ;
+        bdo:workHollis                "014259606" ;
+        bdo:workIsAbout               bdr:C69 ;
+        bdo:workIsbn                  "7105011939" ;
+        bdo:workLangScript            bdr:BoTibt ;
+        bdo:workLcCallNumber          "bq7672.9.a2 k86 1981" ;
+        bdo:workLccn                  "95903233" ;
+        bdo:workNumberOfVolumes       1 ;
+        bdo:workPublisherDate         "1991" ;
+        bdo:workPublisherLocation     "pe cin/"@bo-x-ewts ;
+        bdo:workPublisherName         "mi rigs dpe skun khang"@bo-x-ewts ;
+        bdo:workScanInfo              "scanned at m/s satluj infotech images, 63-f sujan singh park, new delhi 110003, india for the tibetan buddhist resource center, 150 17th st., new york city, ny 10011, usa 2004"@en ;
+        bdo:workSeeHarvard            "008079274-X" ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workTitle                 []  ;
+        bdo:workType                  bdr:WorkTypePublishedWork ;
+        skos:prefLabel                "sa skya'i gdung rabs ngo mtshar bang mdzod kyi kha skong"@bo-x-ewts .

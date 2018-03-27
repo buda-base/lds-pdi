@@ -22,6 +22,14 @@ public class DatasetBuilder {
             "  }\n" + 
             "}";
     
+    static String literal1="construct {?s ?p ?o}\n" + 
+            "where { \n" + 
+            "  {?s ?p ?o .\n" + 
+            "   ?s bdo:workLccn ?st .\n" + 
+            "  Filter(strlen(str(?st))>0)\n" + 
+            "  }\n" + 
+            "}limit 200";
+    
     static String prefixes="PREFIX : <http://purl.bdrc.io/ontology/core/>\n" + 
             " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" + 
             " PREFIX adm: <http://purl.bdrc.io/ontology/admin/>\n" + 
@@ -50,6 +58,7 @@ public class DatasetBuilder {
     
     public static void main(String[] args) throws IOException {
         ServiceConfig.initForTests();
-        DatasetBuilder.writeModel(Work_chos_dbyings, "W_Chos_Yin.ttl");
+        //DatasetBuilder.writeModel(Work_chos_dbyings, "W_Chos_Yin.ttl");
+        DatasetBuilder.writeModel(literal1, "literal1.ttl");
     }
 }
