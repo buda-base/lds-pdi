@@ -1,14 +1,17 @@
 package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Set;
 
+import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
@@ -16,21 +19,28 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFParser;
+import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.ResultSetMgr;
+import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.resultset.ResultSetLang;
+import org.apache.jena.riot.system.StreamRDFLib;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.sparql.results.FusekiResultSet;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
-import io.bdrc.ldspdi.sparql.results.ResultsCache;
+
 
 public class TemplateJsonOutput {
     
@@ -51,18 +61,35 @@ public class TemplateJsonOutput {
             " PREFIX dcterms: <http://purl.org/dc/terms/>\n" + 
             " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>";
     
-    String query1=prefixes+" select ?Work_ID ?Work_Name\n" + 
+    String query1=prefixes+"select ?Work_ID ?Work_Name\n" + 
             "where {\n" + 
-            "(?Work_ID ?sc ?Work_Name) text:query \"chos dbyings\" .\n" + 
             "?Work_ID a :Work.\n" + 
-            "} ";
+            "?Work_ID skos:prefLabel ?Work_Name\n" + 
+            "  Filter(contains(?Work_Name,\"chos dbyings\"))\n" + 
+            "}";
     
-    String fusekiUrl="http://buda1.bdrc.io:13180/fuseki/bdrcrw/query";
+    static String fusekiUrl;
     int limit=5;
     
+    private static FusekiServer server ;
+    private static Dataset srvds = DatasetFactory.createTxnMem();
+    static HashMap<String,String> datasets=new HashMap<>();
+    private static Model model = ModelFactory.createDefaultModel();
+    public final static Logger log=LoggerFactory.getLogger(TemplateJsonOutput.class.getName());
+       
     @BeforeClass
     public static void init() {
         ServiceConfig.initForTests();
+        datasets.put("W_chos_yin","W_Chos_Yin.ttl");
+        loadData();     
+        srvds.setDefaultModel(model);
+        //Creating a fuseki server
+        server = FusekiServer.create()
+                .setPort(2244)
+                .add("/bdrcrw", srvds)
+                .build() ;
+        fusekiUrl="http://localhost:2244/bdrcrw";       
+        server.start() ;        
     }
       
     @Test
@@ -135,6 +162,31 @@ public class TemplateJsonOutput {
             qe.close();            
             return res;
        
+    }
+    
+    static void loadData(){
+        //Loads the test dataset/
+        Set<String> list=datasets.keySet();
+        for(String data : list){
+            Model m=getModelFromFileName(TestUtils.TESTDIR+datasets.get(data), Lang.TURTLE);
+            model.add(m);
+        }       
+    }
+    
+    static Model getModelFromFileName(String fname, Lang lang) {
+        Model m = ModelFactory.createDefaultModel();
+        Graph g = m.getGraph();
+        try {
+            RDFParserBuilder pb = RDFParser.create()
+                     .source(fname)
+                     .lang(lang);                    
+            pb.parse(StreamRDFLib.graph(g));
+        } catch (RiotException e) {
+            log.error("error reading "+fname, e);
+            e.printStackTrace();
+            return null;
+        }       
+        return m;
     }
     
     
