@@ -1,0 +1,76 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix f:     <java:io.bdrc.ldspdi.sparql.functions.> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix mb:    <http://mbingenheimer.net/tools/bibls/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+bdr:V1PD105855_I1PD105857
+        a                         bdo:VolumeImageAsset ;
+        rdfs:comment              "Volume 1 of gangs 'dab kyi re smon" ;
+        adm:legacyImageGroupRID   "I1PD105857" ;
+        bdo:imageCount            2 ;
+        bdo:imageList             "I1PD1058570003.jpg|I1PD1058570194.jpg" ;
+        bdo:imagesMissing         "4-193" ;
+        bdo:volumeNumber          1 ;
+        bdo:volumePagesTbrcIntro  2 ;
+        bdo:volumePagesTotal      2 .
+
+bdr:V00EGS1016299_I1CZ5001
+        a                         bdo:VolumeImageAsset ;
+        rdfs:comment              "Volume 1 of gsung 'bum / dri med 'od zer" ;
+        adm:legacyImageGroupRID   "I1CZ5001" ;
+        bdo:imageCount            2 ;
+        bdo:imageList             "I1CZ50010001.tif:2" ;
+        bdo:volumeNumber          1 ;
+        bdo:volumePagesTbrcIntro  2 ;
+        bdo:volumePagesTotal      2 .
+
+bdr:V30532_I6446  a               bdo:VolumeImageAsset ;
+        adm:legacyImageGroupRID   "I6446" ;
+        bdo:imageCount            0 ;
+        bdo:imageList             "" ;
+        bdo:volumeNumber          99 ;
+        bdo:volumePagesIntro      0 ;
+        bdo:volumePagesTbrcIntro  0 ;
+        bdo:volumePagesText       0 ;
+        bdo:volumePagesTotal      0 .
+
+bdr:V2519_I5855  a                bdo:VolumeImageAsset ;
+        adm:legacyImageGroupRID   "I5855" ;
+        bdo:imageCount            0 ;
+        bdo:imageList             "" ;
+        bdo:volumeNumber          6 ;
+        bdo:volumePagesIntro      0 ;
+        bdo:volumePagesTbrcIntro  0 ;
+        bdo:volumePagesText       0 ;
+        bdo:volumePagesTotal      0 .
+
+bdr:V1AC16_I2PD18488  a           bdo:VolumeImageAsset ;
+        rdfs:comment              "Volume 1 of klong chen mdzod bdun/" ;
+        adm:legacyImageGroupRID   "I2PD18488" ;
+        bdo:imageCount            2 ;
+        bdo:imageList             "I2PD184880001.tif:2" ;
+        bdo:volumeNumber          1 ;
+        bdo:volumePagesTbrcIntro  2 ;
+        bdo:volumePagesTotal      2 .
+
+bdr:V21508_I1KG8713  a            bdo:VolumeImageAsset ;
+        rdfs:comment              "Volume 106 of bka' ma shin tu rgyas pa/" ;
+        adm:legacyImageGroupRID   "I1KG8713" ;
+        bdo:imageCount            2 ;
+        bdo:volumeNumber          106 ;
+        bdo:volumePagesTbrcIntro  2 ;
+        bdo:volumePagesTotal      2 .

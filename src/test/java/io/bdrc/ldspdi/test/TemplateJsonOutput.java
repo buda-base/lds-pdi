@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +75,12 @@ public class TemplateJsonOutput {
             "  Filter(strlen(str(?lccn))>0)\n" + 
             "}";
     
+    String literal3=prefixes+" select ?s ?ct\n" + 
+            "where {\n" + 
+            "  ?s bdo:imageCount ?ct .\n" + 
+            "  Filter(strlen(str(?ct))>0)\n" + 
+            "}";
+    
     static String fusekiUrl;
     int limit=4;
     
@@ -91,6 +96,7 @@ public class TemplateJsonOutput {
         ServiceConfig.initForTests();
         datasets.put("W_chos_yin","W_Chos_Yin.ttl");
         datasets.put("literal1","literal1.ttl");
+        datasets.put("literal3","literal3.ttl");
         loadData();     
         srvds.setDefaultModel(model);
         //Creating a fuseki server
@@ -181,6 +187,22 @@ public class TemplateJsonOutput {
     }
     
     @Test
+    public void testJsonLiteral3() throws IOException {
+        ResultSetWrapper rsw=getResults(literal3+" limit "+limit, fusekiUrl);
+        FusekiResultSet frs=new FusekiResultSet(rsw);
+        ObjectMapper mapper = new ObjectMapper();
+        String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(frs); 
+        ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(literal3+" limit "+limit)).execSelect(); 
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        ResultSetFormatter.outputAsJSON(baos, rs2);
+        String json2=new String(baos.toByteArray());        
+        JsonNode node1=mapper.readTree(json1);
+        JsonNode node2=mapper.readTree(json2);
+        baos.close();
+        assertEquals(node1, node2);
+    }
+    
+    @Test
     public void testJsonLiteral1() throws IOException {
         ResultSetWrapper rsw=getResults(literal1+" limit "+limit, fusekiUrl);
         FusekiResultSet frs=new FusekiResultSet(rsw);
@@ -194,6 +216,7 @@ public class TemplateJsonOutput {
         
         JsonNode node1=mapper.readTree(json1);
         JsonNode node2=mapper.readTree(json2);
+        baos.close();
         assertEquals(node1, node2);
     }
     
@@ -233,8 +256,5 @@ public class TemplateJsonOutput {
             return null;
         }       
         return m;
-    }   
-    
-    
-    
+    } 
 }
