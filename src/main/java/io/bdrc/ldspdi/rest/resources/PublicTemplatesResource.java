@@ -1,5 +1,8 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -33,12 +36,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
@@ -48,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -126,7 +135,7 @@ public class PublicTemplatesResource {
     
     @GET
     @Path("/test/{file}")
-    @Produces("text/html")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response testTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
@@ -153,9 +162,20 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "template ->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+query);
         }
+        //The output we build using jackson
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-        FusekiResultSet model=new FusekiResultSet(res);        
+        FusekiResultSet model=new FusekiResultSet(res);  
         return Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build();
+        
+        //The output built by Fuseki and the ResultSetFormatter
+        /*QueryExecution qs=QueryProcessor.getResultSet(query, fuseki);
+        ResultSet jrs=qs.execSelect();
+        StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                ResultSetFormatter.outputAsJSON(os,jrs);                   
+            }
+        };
+        return Response.ok(stream).build(); */       
     }
        
     @POST 

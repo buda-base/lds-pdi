@@ -9,40 +9,36 @@ import org.apache.jena.rdf.model.RDFNode;
 
 public class Row extends HashMap<String,HashMap<String,String>>{
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
+    
     public Row(List<String> headers,QuerySolution qs) {
         //See specs at : https://www.w3.org/TR/sparql11-results-json/ 
         for(String key:headers) {
             RDFNode node=qs.get(key);            
             if(node !=null) {
                 if(node.isResource()) {
-                    this.put("\""+key+"\"", new Field("uri",node.asResource().getURI()));                    
+                    this.put(key, new Field("uri",node.asResource().getURI()));                    
                 }                
                 if(node.isLiteral()) { 
                     if(node.asNode().getLiteralDatatype() !=null) {
                         if(node.asNode().getLiteralDatatype().equals(RDFLangString.rdfLangString)) {
                             //langString datatype xml:lang is defined (2nd literal case in specs)
-                            this.put("\""+key+"\"", new LiteralStringField("literal",                                                          
+                            this.put(key, new LiteralStringField("literal",                                                          
                                                               node.asNode().getLiteralLanguage(),
                                                               node.asLiteral().getLexicalForm()));
                         }                    
                         else {
                             //datatype is found but different from langString (3rd literal case in specs)
-                            this.put("\""+key+"\"", new LiteralOtherField("literal",
+                            this.put(key, new LiteralOtherField("literal",
                                     node.asLiteral().getDatatypeURI(),                                
                                     node.asLiteral().getValue().toString()));
                         }
                     }else {
                         //No datatype ?? (Fist literal case in json results specs (Literal S | {"type": "literal","value": "S"})
-                        this.put("\""+key+"\"",new Field("literal",node.asLiteral().getValue().toString()));
+                        this.put(key,new Field("literal",node.asLiteral().getValue().toString()));
                     }
                 }
                 if(node.isAnon()) {                    
-                    this.put("\""+key+"\"", new Field("bnode",node.toString()));                    
+                    this.put(key, new Field("bnode",node.toString()));                    
                 }                
             }
         }        
