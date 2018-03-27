@@ -53,7 +53,9 @@ import org.apache.jena.riot.system.StreamRDFLib;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -65,6 +67,8 @@ import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.ldspdi.rest.features.CorsFilter;
+import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -106,7 +110,8 @@ public class LdsTest extends JerseyTest {
 	
 	@Override
     protected Application configure() {
-		return new ResourceConfig(PublicDataResource.class);
+	    ResourceConfig config=new ResourceConfig(PublicDataResource.class);        
+		return config;
     }
 	
 	
@@ -125,11 +130,11 @@ public class LdsTest extends JerseyTest {
 	@Test
 	public void testGetModel() throws IOException{
 		// Makes sure that requested model is actually returned
-		// by the rest API
-		
+		// by the rest API		
 		ArrayList<String> resList=TestUtils.getResourcesList();
 		//Browser-like query without extension nor accept header --> returns STTL by default
 		for(String res : resList){
+		    System.out.println(">>>>>>>>>>>>>>>>RES >>>"+res);
 			Model[] md= prepareGetAssertModel(res);	
 			assertTrue(md[0].isIsomorphicWith(md[1]));
 		}		
@@ -202,7 +207,7 @@ public class LdsTest extends JerseyTest {
 		Response output = target("/resource/"+res).request().header("fusekiUrl", fusekiUrl).get();
 		String resp=output.readEntity(String.class).trim();		
 		ByteArrayInputStream is=new ByteArrayInputStream(resp.getBytes());
-		m_rest.read(is,null,"TURTLE");
+		m_rest.read(is,null,Lang.TURTLE.getName());
 		Model[] md={m,m_rest};		
 		is.close();
 		return md;

@@ -40,6 +40,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.results.FusekiResultSet;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
+import io.bdrc.ldspdi.sparql.results.Results;
 
 
 public class TemplateJsonOutput {
@@ -71,11 +72,12 @@ public class TemplateJsonOutput {
     static String fusekiUrl;
     int limit=5;
     
-    private static FusekiServer server ;
-    private static Dataset srvds = DatasetFactory.createTxnMem();
+    static FusekiServer server ;
+    static Dataset srvds = DatasetFactory.createTxnMem();
     static HashMap<String,String> datasets=new HashMap<>();
-    private static Model model = ModelFactory.createDefaultModel();
-    public final static Logger log=LoggerFactory.getLogger(TemplateJsonOutput.class.getName());
+    
+    static Model model = ModelFactory.createDefaultModel();
+    final static Logger log=LoggerFactory.getLogger(TemplateJsonOutput.class.getName());
        
     @BeforeClass
     public static void init() {
@@ -85,10 +87,10 @@ public class TemplateJsonOutput {
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2244)
+                .setPort(2245)
                 .add("/bdrcrw", srvds)
                 .build() ;
-        fusekiUrl="http://localhost:2244/bdrcrw";       
+        fusekiUrl="http://localhost:2245/bdrcrw";       
         server.start() ;        
     }
       
@@ -151,6 +153,27 @@ public class TemplateJsonOutput {
         assertEquals(node1, node2);
     }
     
+    @Test
+    public void testFullResultsParsing() throws NumberFormatException, IOException {
+        HashMap<String,String> params=new HashMap<>();
+        params.put(QueryConstants.PAGE_NUMBER, "1");
+        params.put(QueryConstants.REQ_METHOD, "POST");
+        ResultSetWrapper rsw=getResults(query1+" limit "+limit, fusekiUrl);
+        Results rp=new Results(rsw,params);
+        ObjectMapper mapper = new ObjectMapper();
+        String json=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rp);
+        ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes());
+        ResultSet rs1=ResultSetFactory.fromJSON(is);
+        is=new ByteArrayInputStream(json.getBytes());
+        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.SPARQLResultSetJSON);
+        ResultSetRewindable rwd1=ResultSetFactory.copyResults(rs1);
+        ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);        
+        assertEquals(rwd1.size(),limit);
+        assertEquals(rwd2.size(),limit);
+        assertEquals(rwd1.getResultVars(), rwd2.getResultVars());        
+        is.close();
+    }
+    
     public static ResultSetWrapper getResults(String query, String fuseki) {
             ResultSetWrapper res;
             long start=System.currentTimeMillis(); 
@@ -187,7 +210,8 @@ public class TemplateJsonOutput {
             return null;
         }       
         return m;
-    }
+    }   
+    
     
     
 }

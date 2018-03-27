@@ -7,6 +7,7 @@ import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 
+@SuppressWarnings("serial")
 public class Row extends HashMap<String,HashMap<String,String>>{
     
     

@@ -3,6 +3,7 @@ package io.bdrc.ldspdi.sparql.results;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class Head extends HashMap<String,List<String>>{
     
     

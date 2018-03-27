@@ -3,6 +3,7 @@ package io.bdrc.ldspdi.sparql.results;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@SuppressWarnings("serial")
 public class FusekiResultSet extends HashMap<String,Object>{
     
     

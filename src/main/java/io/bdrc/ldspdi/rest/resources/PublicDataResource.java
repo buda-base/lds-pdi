@@ -78,8 +78,7 @@ public class PublicDataResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-    public String fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);    
     MediaType default_media=new MediaType("text","turtle","utf-8");
     
         
@@ -134,8 +133,7 @@ public class PublicDataResource {
         
         log.info("Call to getResourceGraph()");
         if(fuseki !=null){ 
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }            
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
         if(model.size()==0) {
@@ -153,8 +151,7 @@ public class PublicDataResource {
            
         log.info("Call to getResourceGraphPost");
         if(fuseki !=null){
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }           
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
         if(model.size()==0) {
@@ -175,8 +172,7 @@ public class PublicDataResource {
         
         //Settings  
         if(fuseki !=null){ 
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());             
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/")); 
@@ -216,8 +212,7 @@ public class PublicDataResource {
         
         log.info("Call to getResourceGraph()");        
         if(fuseki !=null){
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }
         //Settings
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
@@ -261,8 +256,7 @@ public class PublicDataResource {
         log.info("Call to getFormattedResourceGraph()");
         
         if(fuseki !=null){
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
@@ -282,8 +276,7 @@ public class PublicDataResource {
         log.info("Call to getFormattedResourceGraphPost()");
         
         if(fuseki !=null){
-            fusekiUrl=fuseki;
-            fusekiBaseUrl=fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'));
+            fusekiUrl=fuseki;            
         }
         MediaType media=getMediaType(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
@@ -362,8 +355,8 @@ public class PublicDataResource {
     @Path("/callbacks/github/owl-api")   
     public Response updateOntology() throws RestException{        
         log.info("updating Ontology model()");
-        OntData.updateOntologyModel(fusekiBaseUrl+"/data");        
-        return Response.ok().build();      
+        OntData.updateOntologyModel(fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");        
+        return Response.ok().build();       
     }
     
 }
