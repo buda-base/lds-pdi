@@ -292,8 +292,7 @@ public class PublicDataResource {
     @Produces("text/html")
     public Viewable getCoreOntologyClassView(@PathParam("class") String cl, @PathParam("path") String path) throws RestException{
         log.info("getCoreOntologyClassView()");          
-        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
-        OntData.init();
+        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;        
         if(OntData.ontMod.getOntResource(uri)==null) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
         } 
@@ -309,8 +308,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology.{ext}")     
     public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {        
-        log.info("getOntology()");        
-        //OntData.init();        
+        log.info("getOntology()");
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
@@ -333,8 +331,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology")
     @Produces("text/html")
-    public Viewable getOntologyHomePage() {
-        //OntData.init();
+    public Viewable getOntologyHomePage() {        
         log.info("Call to getOntologyHomePage()");          
         return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
     }
@@ -351,7 +348,7 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/callbacks/github/owl-api") 
+    @Path("/callbacks/github/owl-schema") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException{        
         log.info("updating Ontology model() >>");
