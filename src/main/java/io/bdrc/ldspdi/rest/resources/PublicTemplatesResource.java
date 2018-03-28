@@ -51,6 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
@@ -62,6 +63,7 @@ import io.bdrc.ldspdi.sparql.results.ResultPage;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.ontology.service.core.OntData;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -334,5 +336,15 @@ public class PublicTemplatesResource {
             }
         }
         return media;
+    }
+    
+    @POST
+    @Path("/callbacks/github/lds-queries") 
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateQueries() throws RestException{        
+        log.info("updating query templates >>");
+        Thread t=new Thread(new GitService());
+        t.start();               
+        return Response.ok().build();       
     }
 }
