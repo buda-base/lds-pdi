@@ -53,9 +53,7 @@ import org.apache.jena.riot.system.StreamRDFLib;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -67,8 +65,6 @@ import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
-import io.bdrc.ldspdi.rest.features.CorsFilter;
-import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -133,8 +129,7 @@ public class LdsTest extends JerseyTest {
 		// by the rest API		
 		ArrayList<String> resList=TestUtils.getResourcesList();
 		//Browser-like query without extension nor accept header --> returns STTL by default
-		for(String res : resList){
-		    System.out.println(">>>>>>>>>>>>>>>>RES >>>"+res);
+		for(String res : resList){		    
 			Model[] md= prepareGetAssertModel(res);	
 			assertTrue(md[0].isIsomorphicWith(md[1]));
 		}		

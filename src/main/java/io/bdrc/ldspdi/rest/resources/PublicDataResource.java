@@ -308,10 +308,9 @@ public class PublicDataResource {
     
     @GET
     @Path("/ontology.{ext}")     
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {
-        
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {        
         log.info("getOntology()");        
-        OntData.init();        
+        //OntData.init();        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
@@ -335,7 +334,7 @@ public class PublicDataResource {
     @Path("/ontology")
     @Produces("text/html")
     public Viewable getOntologyHomePage() {
-        OntData.init();
+        //OntData.init();
         log.info("Call to getOntologyHomePage()");          
         return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
     }
@@ -352,10 +351,12 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/callbacks/github/owl-api")   
+    @Path("/callbacks/github/owl-api") 
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException{        
-        log.info("updating Ontology model()");
-        OntData.updateOntologyModel(fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");        
+        log.info("updating Ontology model() >>");
+        Thread t=new Thread(new OntData());
+        t.start();               
         return Response.ok().build();       
     }
     

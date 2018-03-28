@@ -38,43 +38,33 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.results.ResultsCache;
-import io.bdrc.restapi.exceptions.RestException;
 
-public class OntData {
+public class OntData implements Runnable{
     
     public static InfModel infMod;    
-    public static OntModel ontMod;
-    public final static int HASH=999888999;
+    public static OntModel ontMod;    
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
     
     public static void init() {
         try {
-            OntModel tmp=(OntModel)ResultsCache.getObjectFromCache(HASH);
-            
-            if(tmp==null) {
-                log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
-                HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
-                InputStream stream=connection.getInputStream();
-                Model m = ModelFactory.createDefaultModel();
-                m.read(stream, "", "RDF/XML");
-                stream.close();
-                ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
-                rdf10tordf11(ontMod);
-                ResultsCache.addToCache(ontMod, HASH);
-                log.info("Loaded fresh Ontology Model into cache...");
-            }else {
-                ontMod=tmp;
-                log.info("Retreived Ontology Model from cache...");
-            }
+            log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
+            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+            InputStream stream=connection.getInputStream();
+            Model m = ModelFactory.createDefaultModel();
+            m.read(stream, "", "RDF/XML");
+            stream.close();
+            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
+            rdf10tordf11(ontMod); 
     
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
         }
     }
     
-    public static void updateOntologyModel(String fusekiUrl) throws RestException{
+    @Override
+    public void run(){
         try {
+            String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
             HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
             InputStream stream=connection.getInputStream();
             Model m = ModelFactory.createDefaultModel();
@@ -83,11 +73,10 @@ public class OntData {
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             log.info("OntModel Size >> "+ontMod.size());
             InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);            
-            QueryProcessor.updateOntology(infMod, fusekiUrl);
+            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
         }        
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Ontology Model update failed : "+ex.getMessage()); 
         }
     }
     
@@ -317,6 +306,8 @@ public class OntData {
 
             }
         }
-    } 
+    }
+
+    
 
 }
