@@ -72,7 +72,7 @@ public class InjectionTracker {
             }
             if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
                 if(litParams.keySet().contains(st)) {
-                    String lang=converted.get(litParams.get(st));
+                    String lang=converted.get(litParams.get(st)).toLowerCase();
                     try {
                         new Locale.Builder().setLanguageTag(lang).build();
                     }catch(IllformedLocaleException ex) {
