@@ -26,6 +26,7 @@
 
 #specs th {
     padding-top: 12px;
+    padding-left: 12px;
     padding-bottom: 12px;
     text-align: left;
     background-color: #4e7F50;
@@ -92,9 +93,9 @@
 <a name="indiv"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getAllIndividuals().size()} individuals</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>Local name</th><th>Full URI</th></tr>
+<tr><th>Local name</th><th>Full URI</th><th> Class</th></tr>
 <c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
-    <tr><td>${ind.getLocalName()}</td><td><a href="${ind.getURI()}">${ind.getURI()}</a></td></tr>
+    <tr><td>${ind.getLocalName()}</td><td><a href="${ind.getURI()}">${ind.getURI()}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
 </body>
