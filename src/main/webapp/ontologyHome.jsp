@@ -40,11 +40,12 @@
 <td style="vertical-align:middle;text-align:center;font-size:28px">Buddhist Digital Resource Center - Ontology homepage<br></td>
 </tr>
 </table>
-<p style="text-align:center;font-size:16px;"><a href="#prefixes">Prefixes</a></p>
-<p style="text-align:center;font-size:16px;"><a href="#root">Root classes</a></p>
-<p style="text-align:center;font-size:16px;"><a href="#all">Classes</a></p>
-<p style="text-align:center;font-size:16px;"><a href="#allprops">Properties</a></p>
-<p style="text-align:center;font-size:16px;"><a href="#indiv">Individuals</a></p>
+<p style="text-align:center;font-size:16px;">
+<a href="#prefixes">Prefixes / </a>
+<a href="#root">Root classes / </a>
+<a href="#all">Classes / </a>
+<a href="#allprops">Properties / </a>
+<a href="#indiv">Individuals</a></p>
 
 <!-- PREFIXES -->
 <a name="prefixes"></a> 
@@ -81,9 +82,9 @@
 <a name="allprops"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getAllProps().size()} properties</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>local name</th><th>full URI</th></tr>
+<tr><th>local name</th><th>full URI</th><th>property type</th></tr>
 <c:forEach items="${OntData.getAllProps()}" var="prop">    
-    <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td></tr>
+    <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td><td>${prop.getRDFType().getLocalName()}</td></tr>
 </c:forEach> 
 </table>
 

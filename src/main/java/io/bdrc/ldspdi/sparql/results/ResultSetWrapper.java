@@ -48,7 +48,6 @@ public class ResultSetWrapper {
         head =rs.getResultVars();
         this.execTime=execTime;
         numResults=0;
-        //results=new ArrayList<>();
         mvc_rows=new ArrayList<>();
         rows=new ArrayList<>();
         while(rs.hasNext()) {            
