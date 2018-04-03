@@ -43,7 +43,7 @@ public class TaxModel {
             log.info("Inferred taxonomy size >> "+infMod.size());
     
         } catch (IOException io) {
-            log.error("Error initializing OntModel", io);            
+            log.error("Error initializing TaxModel", io);            
         }
     }
     
