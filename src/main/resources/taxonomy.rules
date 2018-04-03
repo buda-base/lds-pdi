@@ -1,0 +1,4 @@
+@prefix : <http://purl.bdrc.io/ontology/core/> .
+
+#[tax: (?a :taxSubclassOf ?b), (?c :workIsAbout ?a) -> (?c :workIsAbout ?b)]
+[tax2: (?a :taxSubclassOf ?b), (?b :taxSubclassOf ?c) -> (?a :taxSubclassOf ?c)]
