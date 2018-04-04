@@ -37,7 +37,7 @@ public class InjectionTracker {
     
     public final static Logger log=LoggerFactory.getLogger(InjectionTracker.class.getName());
     
-    public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams) 
+    public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams,boolean limit) 
                 throws RestException{        
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query); 
         log.info("HashMap >> "+converted);
@@ -85,14 +85,16 @@ public class InjectionTracker {
                 }
             }
         }
-        Query q=queryStr.asQuery();        
-        long limit_max=Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
-        if(q.hasLimit()) {
-            if(q.getLimit()>limit_max) {
+        Query q=queryStr.asQuery(); 
+        if(limit) {
+            long limit_max=Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));        
+            if(q.hasLimit()) {
+                if(q.getLimit()>limit_max) {
+                    q.setLimit(limit_max);
+                }
+            }else {
                 q.setLimit(limit_max);
             }
-        }else {
-            q.setLimit(limit_max);
         }
         return q.toString();
         

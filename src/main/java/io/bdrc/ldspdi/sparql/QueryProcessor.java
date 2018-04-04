@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.sparql;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 import org.apache.jena.query.DatasetAccessor;
@@ -29,11 +30,13 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.results.ResultsCache;
+import io.bdrc.restapi.exceptions.RestException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,4 +119,20 @@ public class QueryProcessor {
             return (ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));            
         }
     }
+	
+	public static String getResultsFromModel(String query, Model model) throws RestException {
+	    log.info("GetResultsFromModel(); query >> "+query);
+	    try {
+    	    QueryExecution qexec = QueryExecutionFactory.create(query, model);
+            ResultSet res = qexec.execSelect() ;            
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            ResultSetFormatter.outputAsJSON(baos,res);
+            log.info("GetResultsFromModel(); Json >> "+baos.toString());
+            baos.close();
+            return baos.toString();        
+	    }
+	    catch(Exception ex) {
+	        throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Error while getting results from Model using query : \""+query+"\"");
+	    }
+	}
 }

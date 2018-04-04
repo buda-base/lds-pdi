@@ -104,7 +104,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),true);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             return new Viewable("/error.jsp",query);
         }
@@ -150,7 +150,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),true);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
@@ -197,7 +197,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(),hm,qfp.getLitLangParams());
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(),hm,qfp.getLitLangParams(),true);
         
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
@@ -243,7 +243,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ map.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(),map,qfp.getLitLangParams());        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(),map,qfp.getLitLangParams(),true);        
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
         } else {
@@ -284,7 +284,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams());        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),false);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
@@ -315,7 +315,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams()); 
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false); 
         log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
