@@ -3,15 +3,11 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.StringWriter;
 import java.util.HashMap;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -33,7 +29,9 @@ import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
 @Path("/")
@@ -53,11 +51,11 @@ public class LibrarySearchResource {
     
     @POST
     @Path("/lib/rootSearch")     
-    public String getGraphTemplateResultsPost(
+    public Response getGraphTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
-            HashMap<String,String> map) throws RestException, JsonProcessingException {
+            HashMap<String,String> map) throws RestException {
         
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq");
+        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq","library");
         log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
@@ -69,26 +67,26 @@ public class LibrarySearchResource {
         log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        
+        } 
+        System.out.println(">>>>>>>>>>> Starting getting data >>>>>> "+System.currentTimeMillis());
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
         StringWriter sw=new StringWriter();
         model.write(sw,Lang.RDFJSON.getName());
         String q="select ?type (count(?type) as ?ct) where {?res ?type ?lit} group by ?type";
         HashMap<String,String> res=new HashMap<>();
         res.put("metadata", QueryProcessor.getResultsFromModel(q, model));
-        res.put("data",sw.getBuffer().toString());        
-        ObjectMapper mapper=new ObjectMapper();
-        return mapper.writeValueAsString(res);
+        res.put("data",sw.getBuffer().toString()); 
+        System.out.println(">>>>>>>>>>> DONE getting data >>>>>> "+System.currentTimeMillis());
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res)).build();
     }
     
     @GET
     @Path("/lib/rootSearch") 
-    public String getGraphTemplateResultsGet( @Context UriInfo info,
+    public Response getGraphTemplateResultsGet( @Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki
-            ) throws RestException, JsonProcessingException {
+            ) throws RestException {
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq");
+        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq","library");
         log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
@@ -108,9 +106,9 @@ public class LibrarySearchResource {
         String q="select ?type (count(?type) as ?ct) where {?res ?type ?lit} group by ?type";
         HashMap<String,String> res=new HashMap<>();
         res.put("metadata", QueryProcessor.getResultsFromModel(q, model));
-        res.put("data",sw.getBuffer().toString());        
-        ObjectMapper mapper=new ObjectMapper();
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(res);
+        res.put("data",sw.getBuffer().toString()); 
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res)).build();
+        
     }
 
 }

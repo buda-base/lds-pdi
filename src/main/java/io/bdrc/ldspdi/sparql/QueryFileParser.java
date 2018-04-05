@@ -73,11 +73,22 @@ public class QueryFileParser {
                 getQuery());		
 	}
 	
-	//For testing purpose only - to be removed//
-	public QueryFileParser(String queryPath, String filename) throws RestException{        
-        metaInf= new HashMap<>();        
+	public QueryFileParser(String filename,String type) throws RestException{
+        
+        metaInf= new HashMap<>();       
         queryName=filename.substring(0,filename.lastIndexOf("."));
-        parseTemplate(new File(queryPath+filename));
+        parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename));
+        template= new QueryTemplate(
+                getTemplateName(),
+                QueryConstants.QUERY_PUBLIC_DOMAIN,
+                metaInf.get(QueryConstants.QUERY_URL),
+                metaInf.get(QueryConstants.QUERY_SCOPE),
+                metaInf.get(QueryConstants.QUERY_RESULTS),
+                metaInf.get(QueryConstants.QUERY_RETURN_TYPE),
+                metaInf.get(QueryConstants.QUERY_PARAMS),
+                params, 
+                outputs,
+                getQuery());        
     }
 	
 	public String getTemplateName() {
