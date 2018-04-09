@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.results.library.PersonSearchResults;
 import io.bdrc.ldspdi.results.library.RootSearchResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
@@ -95,6 +96,33 @@ public class LibrarySearchResource {
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
         String q="select * where {?s ?p ?o}";        
         HashMap<String,Object> res=RootSearchResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
+        
+    }
+    
+    @GET
+    @Path("/lib/personSearch") 
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPersonGraphGet( @Context UriInfo info,
+            @HeaderParam("fusekiUrl") final String fuseki
+            ) throws RestException {
+        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
+        QueryFileParser qfp=new QueryFileParser("PersonFacetGraph.arq","library");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ "PersonFacetGraph.arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false); 
+        log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        String q="select * where {?s ?p ?o}";        
+        HashMap<String,Object> res=PersonSearchResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
         
     }

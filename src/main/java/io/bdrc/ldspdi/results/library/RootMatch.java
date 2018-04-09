@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.LiteralStringField;
 
-public class ResourceMatch {
+public class RootMatch {
     
     public String type;
-    public LiteralStringField prefLabel;
+    public LiteralStringField label;
     public ArrayList<Field> matching;
     
-    public ResourceMatch() {
+    public RootMatch() {
         type="";
         matching=new ArrayList<>();
     }
@@ -28,12 +28,12 @@ public class ResourceMatch {
         this.type = type;
     }
 
-    public LiteralStringField getPrefLabel() {
-        return prefLabel;
+    public LiteralStringField getLabel() {
+        return label;
     }
 
-    public void setPrefLabel(LiteralStringField prefLabel) {
-        this.prefLabel = prefLabel;
+    public void setLabel(LiteralStringField label) {
+        this.label = label;
     }
 
     public ArrayList<Field> getMatching() {
@@ -46,7 +46,7 @@ public class ResourceMatch {
 
     @Override
     public String toString() {
-        return "ResourceMatch [type=" + type + ", prefLabel=" + prefLabel + ", matching=" + matching + "]";
+        return "ResourceMatch [type=" + type + ", prefLabel=" + label + ", matching=" + matching + "]";
     }
     
     

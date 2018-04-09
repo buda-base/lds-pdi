@@ -8,15 +8,15 @@ import org.apache.jena.query.ResultSet;
 
 import io.bdrc.ldspdi.results.LiteralStringField;
 
-public class RootSearchResults {
+public class PersonSearchResults {
     
-    static final String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";    
+    static final String TYPE="http://purl.bdrc.io/ontology/core/Person";
+    static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
     
     public static HashMap<String,Object> getResultsMap(ResultSet rs){
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,Integer> count=new HashMap<>();
-        HashMap<String,RootMatch> map=new HashMap<>();        
+        HashMap<String,PersonMatch> map=new HashMap<>();        
         while(rs.hasNext()) {            
             QuerySolution qs=rs.next();
             String uri=qs.get("?s").asNode().getURI();
@@ -30,12 +30,13 @@ public class RootSearchResults {
             if(node.isLiteral()) {
                 lf=new LiteralStringField(prop,node.getLiteralLanguage(),node.getLiteral().toString());
             }
-            RootMatch rm=map.get(uri);
-            if(rm == null) {
-                rm=new RootMatch();
+            PersonMatch pm=map.get(uri);            
+            if(pm == null) {
+                pm=new PersonMatch();
             }
-            if(prop.equals(TYPE)) {
-                rm.setType(val);
+            
+            if(prop.equals(PERSONGENDER)) {
+                pm.setGender(val);
                 Integer ct=count.get(val);
                 if(ct!=null) {
                     count.put(val, ct.intValue()+1);
@@ -43,14 +44,11 @@ public class RootSearchResults {
                 else {
                     count.put(val, 1);
                 }
+            }else {
+                pm.addMatch(lf);
             }
-            if(prop.equals(PREFLABEL)) {
-                rm.setLabel(lf);
-            }
-            if(!prop.equals(PREFLABEL) && !prop.equals(TYPE)) {
-                rm.addMatch(lf);
-            }
-            map.put(uri, rm);                
+            
+            map.put(uri, pm);                
                        
         }
         res.put("data",map);
