@@ -53,23 +53,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.results.CacheAccessModel;
+import io.bdrc.ldspdi.results.ResultPage;
+import io.bdrc.ldspdi.results.ResultSetWrapper;
+import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.results.Results;
-import io.bdrc.ldspdi.sparql.results.CacheAccessModel;
-import io.bdrc.ldspdi.sparql.results.ResultPage;
-import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
-import io.bdrc.ontology.service.core.OntClassModel;
-import io.bdrc.ontology.service.core.OntData;
-import io.bdrc.ontology.service.core.OntPropModel;
 import io.bdrc.restapi.exceptions.RestException;
 
 

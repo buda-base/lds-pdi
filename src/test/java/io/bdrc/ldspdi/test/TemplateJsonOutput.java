@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.results.FusekiResultSet;
+import io.bdrc.ldspdi.results.ResultSetWrapper;
+import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.results.FusekiResultSet;
-import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
-import io.bdrc.ldspdi.sparql.results.Results;
 
 
 public class TemplateJsonOutput {

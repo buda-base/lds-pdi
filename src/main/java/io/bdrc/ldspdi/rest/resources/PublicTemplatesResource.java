@@ -51,19 +51,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.results.FusekiResultSet;
+import io.bdrc.ldspdi.results.ResultPage;
+import io.bdrc.ldspdi.results.ResultSetWrapper;
+import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.results.Results;
-import io.bdrc.ldspdi.sparql.results.FusekiResultSet;
-import io.bdrc.ldspdi.sparql.results.ResultPage;
-import io.bdrc.ldspdi.sparql.results.ResultSetWrapper;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
-import io.bdrc.ontology.service.core.OntData;
 import io.bdrc.restapi.exceptions.RestException;
 
 

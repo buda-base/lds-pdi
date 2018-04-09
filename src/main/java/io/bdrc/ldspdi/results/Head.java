@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.sparql.results;
+package io.bdrc.ldspdi.results;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,35 +1,32 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.results.library.RootSearchResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.sparql.results.Results;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
@@ -50,12 +47,13 @@ public class LibrarySearchResource {
     }
     
     @POST
-    @Path("/lib/rootSearch")     
+    @Path("/lib/rootSearch")  
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
             HashMap<String,String> map) throws RestException {
         
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq","library");
+        QueryFileParser qfp=new QueryFileParser("RootSearchGraphComplet.arq","library");
         log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
@@ -67,47 +65,37 @@ public class LibrarySearchResource {
         log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        } 
-        System.out.println(">>>>>>>>>>> Starting getting data >>>>>> "+System.currentTimeMillis());
+        }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        StringWriter sw=new StringWriter();
-        model.write(sw,Lang.RDFJSON.getName());
-        String q="select ?type (count(?type) as ?ct) where {?res ?type ?lit} group by ?type";
-        HashMap<String,String> res=new HashMap<>();
-        res.put("metadata", QueryProcessor.getResultsFromModel(q, model));
-        res.put("data",sw.getBuffer().toString()); 
-        System.out.println(">>>>>>>>>>> DONE getting data >>>>>> "+System.currentTimeMillis());
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res)).build();
+        String q="select * where {?s ?p ?o}";        
+        HashMap<String,Object> res=RootSearchResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
     
     @GET
     @Path("/lib/rootSearch") 
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsGet( @Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki
             ) throws RestException {
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraph.arq","library");
+        QueryFileParser qfp=new QueryFileParser("RootSearchGraphComplet.arq","library");
         log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "RootSearchGraph.arq"+"; ERROR: "+check);
+                    "Exception : File->"+ "RootSearchGraphComplet1.arq"+"; ERROR: "+check);
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false); 
         log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        StringWriter sw=new StringWriter();
-        model.write(sw,Lang.RDFJSON.getName());
-        String q="select ?type (count(?type) as ?ct) where {?res ?type ?lit} group by ?type";
-        HashMap<String,String> res=new HashMap<>();
-        res.put("metadata", QueryProcessor.getResultsFromModel(q, model));
-        res.put("data",sw.getBuffer().toString()); 
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res)).build();
+        String q="select * where {?s ?p ?o}";        
+        HashMap<String,Object> res=RootSearchResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
         
     }
 

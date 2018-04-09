@@ -1,4 +1,4 @@
-package io.bdrc.ontology.service.core;
+package io.bdrc.ldspdi.ontology.service.core;
 
 import java.util.ArrayList;
 

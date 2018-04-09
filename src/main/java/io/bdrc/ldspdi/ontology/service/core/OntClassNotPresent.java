@@ -1,4 +1,4 @@
-package io.bdrc.ontology.service.core;
+package io.bdrc.ldspdi.ontology.service.core;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
