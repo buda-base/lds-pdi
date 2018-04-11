@@ -7,4 +7,6 @@ public class LiteralStringField extends Field {
         super(type, value);        
         this.put("xml:lang", lang);        
     }
+    
+    
 }

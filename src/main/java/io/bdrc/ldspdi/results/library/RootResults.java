@@ -8,10 +8,11 @@ import org.apache.jena.query.ResultSet;
 
 import io.bdrc.ldspdi.results.LiteralStringField;
 
-public class RootSearchResults {
+public class RootResults {
     
     static final String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";    
+    
     
     public static HashMap<String,Object> getResultsMap(ResultSet rs){
         HashMap<String,Object> res=new HashMap<>();

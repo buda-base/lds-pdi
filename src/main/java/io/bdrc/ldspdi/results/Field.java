@@ -11,5 +11,7 @@ public class Field extends HashMap<String,String>{
         this.put("type", type);        
         this.put("value", value);
     }
+    
+    
 
 }

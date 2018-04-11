@@ -8,7 +8,7 @@ import org.apache.jena.query.ResultSet;
 
 import io.bdrc.ldspdi.results.LiteralStringField;
 
-public class PersonSearchResults {
+public class PersonResults {
     
     static final String TYPE="http://purl.bdrc.io/ontology/core/Person";
     static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
