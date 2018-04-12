@@ -3,6 +3,7 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.taxonomy.TaxonomyItem;
 
 public class WorkMatch {
     
@@ -12,6 +13,8 @@ public class WorkMatch {
     public String langScript;
     public String prefLabel;
     public ArrayList<Field> matching;
+    public ArrayList<String> topics;
+    public ArrayList<TaxonomyItem> taxo;
     
     public WorkMatch() {
         access="";
@@ -20,10 +23,20 @@ public class WorkMatch {
         langScript="";
         prefLabel="";
         matching=new ArrayList<>();
+        topics=new ArrayList<>();
+        taxo=new ArrayList<>();
     }
 
     public void addMatch(Field f) {
         matching.add(f);
+    }
+    
+    public void addTopic(String t) {
+        topics.add(t);
+    }
+    
+    public void addTaxo(TaxonomyItem tax) {
+        taxo.add(tax);
     }
 
     public String getAccess() {

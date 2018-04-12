@@ -83,6 +83,16 @@ public class QueryProcessor {
         return qe;           
     }
 	
+	public static ResultSet getData(String query,String fusekiUrl){
+               
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }  
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query)); 
+        //qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+        return qe.execSelect();           
+    }
+	
 	public static void updateOntology(Model mod, String fusekiUrl) {
 	    if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
