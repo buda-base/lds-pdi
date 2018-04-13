@@ -3,9 +3,13 @@ package io.bdrc.ldspdi.results;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.Util;
+import org.apache.jena.riot.system.IRIResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +21,8 @@ public class QueryMvcSolutionItem {
     public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {
         
         dataRow=new HashMap<>();
+        String baseIri="http://www.w3.org/2001/XMLSchema#";
+        IRIResolver resolver=IRIResolver.create(baseIri);
         for(String key:headers) {
             RDFNode node=qs.get(key);
             
@@ -39,7 +45,19 @@ public class QueryMvcSolutionItem {
                     dataRow.put(key, tmp);                    
                 } 
                 if(node.isLiteral()) {
-                    dataRow.put(key, node.asNode().getLiteral().getValue().toString());                    
+                    RDFDatatype type=node.asNode().getLiteral().getDatatype();
+                    String typeIRI=type.getURI();
+                    if ( Util.isSimpleString(node.asNode()) || Util.isLangString(node.asNode()) ) {                                  
+                        dataRow.put(key, node.asNode().getLiteral().toString()); 
+                    }
+                    else {
+                        if(type.equals(XSDDatatype.XSDinteger)) {
+                            dataRow.put(key, node.asNode().getLiteral().getValue().toString()); 
+                        }else {
+                            String relative="^^xsd:"+typeIRI.substring(typeIRI.indexOf("#")+1);
+                            dataRow.put(key, "\""+node.asNode().getLiteral().getValue().toString()+"\""+relative);
+                        }
+                    }
                 }
                 if(node.isAnon()) {
                     dataRow.put(key, node.toString());                    
