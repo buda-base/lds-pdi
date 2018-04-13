@@ -39,7 +39,7 @@ public class QueryMvcSolutionItem {
                     dataRow.put(key, tmp);                    
                 } 
                 if(node.isLiteral()) {
-                    dataRow.put(key, node.asLiteral().toString());                    
+                    dataRow.put(key, node.asNode().getLiteral().getValue().toString());                    
                 }
                 if(node.isAnon()) {
                     dataRow.put(key, node.toString());                    
