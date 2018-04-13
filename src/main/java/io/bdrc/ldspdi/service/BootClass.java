@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 
 
@@ -55,6 +56,10 @@ public class BootClass implements javax.servlet.ServletContextListener{
         } 
         catch (IllegalArgumentException e) {
             log.error("BootClass init error", e);
+            e.printStackTrace();
+        } 
+        catch (RestException e) {
+            log.error("BootClass init error - Tax Model loading failed", e);
             e.printStackTrace();
         }
         

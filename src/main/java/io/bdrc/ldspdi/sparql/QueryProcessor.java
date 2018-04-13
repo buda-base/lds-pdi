@@ -73,8 +73,7 @@ public class QueryProcessor {
         return model;       
     }
 		
-	public static QueryExecution getResultSet(String query,String fusekiUrl){
-        log.info("Processor query select:" +query);        
+	public static QueryExecution getResultSet(String query,String fusekiUrl){               
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }  
@@ -89,7 +88,7 @@ public class QueryProcessor {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }  
         QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query)); 
-        //qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe.execSelect();           
     }
 	
@@ -129,7 +128,7 @@ public class QueryProcessor {
     }
 	
 	public static ResultSet getResultsFromModel(String query, Model model) throws RestException {
-	    log.info("GetResultsFromModel(); query >> "+query);
+	    
 	    try {
     	    QueryExecution qexec = QueryExecutionFactory.create(query, model);
             ResultSet res = qexec.execSelect() ;

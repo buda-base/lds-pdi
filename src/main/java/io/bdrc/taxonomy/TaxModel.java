@@ -28,10 +28,10 @@ public class TaxModel {
        
     static InfModel infMod;
     static Model m;
-    static HashMap<String,TaxonomyItem> items;
+    static HashMap<String,String> items;
     public final static Logger log=LoggerFactory.getLogger(TaxModel.class.getName());
     
-    public static void init() {
+    public static void init() throws RestException {
         try {
             
             InputStream stream = TaxModel.class.getClassLoader().getResourceAsStream("O9TAXTBRC201605.ttl");
@@ -50,40 +50,31 @@ public class TaxModel {
             reasoner.setParameter(ReasonerVocabulary.PROPruleMode, "forward");
             infMod = ModelFactory.createInfModel(reasoner, m);
             log.info("Inferred taxonomy size >> "+infMod.size());
-            items=getRootCategoriesByTopics();
+            items=getRootCatByTopics();
     
         } catch (IOException io) {
             log.error("Error initializing TaxModel", io);            
-        }
+        }        
     }
     
-    private static HashMap<String,TaxonomyItem> getRootCategoriesByTopics(){
-        HashMap<String,TaxonomyItem> items=new HashMap<>();
-        String query="select distinct ?g ?root ?label \n" + 
-                "where {\n" + 
-                "  ?res <http://purl.bdrc.io/ontology/core/workGenre> ?g .\n" + 
-                "  ?g <http://purl.bdrc.io/ontology/core/taxSubclassOf>* ?root .\n" + 
-                "  ?root <http://purl.bdrc.io/ontology/core/taxSubclassOf> <http://purl.bdrc.io/resource/O9TAXTBRC201605> . \n" + 
-                "  ?root <http://www.w3.org/2004/02/skos/core#prefLabel> ?label \n" + 
-                "  Filter(lang(?label)=\"en\")\n" + 
-                "}";
-        ResultSet rs=QueryProcessor.getData(query, null);
+       
+    private static HashMap<String,String> getRootCatByTopics() throws RestException{
+        HashMap<String,String> items=new HashMap<>();
+        String query="select distinct ?g ?root\n" + 
+                "where {\n" +                 
+                "  ?g <http://purl.bdrc.io/ontology/core/taxSubclassOf>+ ?root .\n" +                
+                " FILTER EXISTS {?root <http://purl.bdrc.io/ontology/core/taxSubclassOf> <http://purl.bdrc.io/resource/O9TAXTBRC201605>}"+
+                "} order by ?g";        
+        ResultSet rs=QueryProcessor.getResultsFromModel(query, m);        
         while(rs.hasNext()) {
-            QuerySolution qs=rs.next();
-            String key=qs.get("?g").asNode().getURI();
-            TaxonomyItem ti=new TaxonomyItem(qs.get("?root").asNode().getURI(),qs.get("?label").asLiteral().getString());
-            items.put(key, ti);
+            QuerySolution qs=rs.next();            
+            items.put(qs.get("?g").asNode().getURI(), qs.get("?root").asNode().getURI());
         }
         return items;
     }
     
-    public static TaxonomyItem getTaxonomyItem(String key) {
+    public static String getTaxonomyItem(String key) {
         return items.get(key);
-    }
-    
-    public static void main(String[] args) throws RestException {
-        TaxModel.init();        
-        System.out.println(TaxModel.getRootCategoriesByTopics());
     }
 
 }
