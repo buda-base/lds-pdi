@@ -9,7 +9,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.Util;
-import org.apache.jena.riot.system.IRIResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +19,7 @@ public class QueryMvcSolutionItem {
     
     public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {
         
-        dataRow=new HashMap<>();
-        String baseIri="http://www.w3.org/2001/XMLSchema#";
-        IRIResolver resolver=IRIResolver.create(baseIri);
+        dataRow=new HashMap<>();                
         for(String key:headers) {
             RDFNode node=qs.get(key);
             
