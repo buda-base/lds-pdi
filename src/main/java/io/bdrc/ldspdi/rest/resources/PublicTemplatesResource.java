@@ -95,8 +95,7 @@ public class PublicTemplatesResource {
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
                 
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
@@ -133,7 +132,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to getQueryTemplateResults()");
+        log.info("Call to testTemplateResults()");
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
@@ -141,8 +140,7 @@ public class PublicTemplatesResource {
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
                 
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
@@ -159,17 +157,7 @@ public class PublicTemplatesResource {
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         FusekiResultSet model=new FusekiResultSet(res);  
         return Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build();
-        
-        //The raw response of Fuseki web app (actually built by the ResultSetFormatter)
-        
-        /*QueryExecution qs=QueryProcessor.getResultSet(query, fuseki);
-        ResultSet jrs=qs.execSelect();
-        StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                ResultSetFormatter.outputAsJSON(os,jrs);                   
-            }
-        };
-        return Response.ok(stream).build(); */       
+            
     }
        
     @POST 
@@ -179,8 +167,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file,
             MultivaluedMap<String,String> mp) throws RestException{ 
-        log.info("Call to getQueryTemplateResultsPost()"); 
-        log.info("Map >> "+mp);
+        log.info("Call to getQueryTemplateResultsPost()");
         if(mp.size()==0) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
@@ -268,15 +255,14 @@ public class PublicTemplatesResource {
             @DefaultValue("jsonld") @QueryParam("format") final String format,            
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to getQueryTemplateResults() with format >>"+format);
+        log.info("Call to getGraphTemplateResults with format >>"+format);
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
                  
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
@@ -314,8 +300,7 @@ public class PublicTemplatesResource {
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false); 
-        log.info("Call to getQueryTemplateResultsPost() processed query is >>"+query);
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }

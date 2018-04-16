@@ -121,7 +121,7 @@ public class PublicDataResource {
     @GET
     @Path("/context.jsonld")
     public Response getJsonContext() throws RestException {
-        log.info("Call to getJsonContextJson()");
+        log.info("Call to getJsonContext()");
         return Response.ok(ServiceConfig.JSONLD_CONTEXT, "application/ld+json").build();
     }
 
@@ -168,7 +168,7 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info) throws RestException {
         
-        log.info("Call to getResourceGraph()");
+        log.info("Call to getExactPersonURLResources()");
         
         //Settings  
         if(fuseki !=null){ 
@@ -210,7 +210,7 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info) throws RestException{
         
-        log.info("Call to getResourceGraph()");        
+        log.info("getPersonURLResources()");        
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }

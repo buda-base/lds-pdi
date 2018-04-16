@@ -3,14 +3,15 @@ package io.bdrc.ldspdi.results;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.Util;
+import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.bdrc.ldspdi.sparql.Prefixes;
 
 public class QueryMvcSolutionItem {    
         
@@ -18,13 +19,11 @@ public class QueryMvcSolutionItem {
     public HashMap<String,String> dataRow;
     
     public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {
-        
+        NodeFormatterTTL nf=new NodeFormatterTTL(null,Prefixes.getPrefixMap());
         dataRow=new HashMap<>();                
         for(String key:headers) {
             RDFNode node=qs.get(key);
-            
-            if(node !=null) { 
-                
+            if(node !=null) {
                 if(node.isResource()) {
                     Resource res=node.asResource();
                     String Uri=res.getURI();
@@ -41,23 +40,16 @@ public class QueryMvcSolutionItem {
                     }
                     dataRow.put(key, tmp);                    
                 } 
-                if(node.isLiteral()) {
-                    RDFDatatype type=node.asNode().getLiteral().getDatatype();
-                    String typeIRI=type.getURI();
-                    if ( Util.isSimpleString(node.asNode()) || Util.isLangString(node.asNode()) ) {                                  
-                        dataRow.put(key, node.asNode().getLiteral().toString()); 
-                    }
-                    else {
-                        if(type.equals(XSDDatatype.XSDinteger)) {
-                            dataRow.put(key, node.asNode().getLiteral().getValue().toString()); 
-                        }else {
-                            String relative="^^xsd:"+typeIRI.substring(typeIRI.indexOf("#")+1);
-                            dataRow.put(key, "\""+node.asNode().getLiteral().getValue().toString()+"\""+relative);
-                        }
-                    }
+                if(node.isLiteral()) {                                      
+                    StringWriterI sw=new StringWriterI();
+                    nf.formatLiteral(sw, node.asNode());
+                    sw.flush();
+                    dataRow.put(key, sw.toString());                       
                 }
                 if(node.isAnon()) {
-                    dataRow.put(key, node.toString());                    
+                    StringWriterI sw=new StringWriterI();
+                    nf.formatBNode(sw, node.asNode());
+                    dataRow.put(key, sw.toString());                    
                 }                
             }else {
                 dataRow.put(key, "");

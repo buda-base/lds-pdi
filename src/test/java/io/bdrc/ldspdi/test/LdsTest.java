@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -38,9 +37,10 @@ import java.util.SortedMap;
 
 import javax.ws.rs.core.Application;
 
-import org.apache.jena.atlas.io.AWriter;
 import org.apache.jena.atlas.io.StringWriterI;
+import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
@@ -55,7 +55,6 @@ import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.out.NodeFormatterTTL;
-import org.apache.jena.riot.out.NodeToLabel;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.riot.system.StreamRDFLib;
@@ -136,15 +135,30 @@ public class LdsTest extends JerseyTest {
     public void testHtmlLitFormatter(){
         PrefixMap pm = PrefixMapFactory.create();
         pm.add("xsd", "http://www.w3.org/2001/XMLSchema#");
-        //NodeToLabel ntl = new NodeToLabel();
+        pm.add("owl", "http://www.w3.org/2002/07/owl#");
+        pm.add("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        
         NodeFormatterTTL nfttl = new NodeFormatterTTL(null, pm, null);
         Model m = ModelFactory.createDefaultModel();
         Literal l = m.createTypedLiteral("2009-10-22T18:31:49.12Z", XSDDatatype.XSDdateTime);
+        Literal l1=m.createTypedLiteral(3.141592, new BaseDatatype("http://www.w3.org/2002/07/owl#real"));
+        Literal l2=m.createTypedLiteral("Dharma is beautiful", XMLLiteralType.theXMLLiteralType);
+        
         StringWriterI sw = new StringWriterI();
         nfttl.formatLitDT(sw, l.getLexicalForm(), l.getDatatypeURI());
         sw.flush();
         assertTrue(sw.toString().equals("\"2009-10-22T18:31:49.12Z\"^^xsd:dateTime"));
-        //System.out.println(sw.toString());
+        
+        sw = new StringWriterI();
+        nfttl.formatLitDT(sw, l1.getLexicalForm(), l1.getDatatypeURI());
+        sw.flush();
+        assertTrue(sw.toString().equals("\"3.141592\"^^owl:real"));
+        
+        sw = new StringWriterI();
+        nfttl.formatLitDT(sw, l2.getLexicalForm(), l2.getDatatypeURI());
+        sw.flush();
+        assertTrue(sw.toString().equals("\"Dharma is beautiful\"^^rdf:XMLLiteral"));
+        
     }
 	
 	@Test
@@ -200,9 +214,6 @@ public class LdsTest extends JerseyTest {
 			}
 		}		
 	}
-		
-	
-	
 			
 	private Model[] prepareAssertModel(String res){
 		// Loads resource model from .ttl file

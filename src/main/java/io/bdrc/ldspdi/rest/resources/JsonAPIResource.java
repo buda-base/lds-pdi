@@ -82,7 +82,7 @@ public class JsonAPIResource {
     @GET 
     @Path("/queries/{template}")
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
-        log.info("Call to queriesListGet()");
+        log.info("Call to queryDescGet()");
         QueryFileParser qfp=new QueryFileParser(name+".arq");         
         return Response.ok(
                 ResponseOutputStream.getJsonResponseStream(qfp.getTemplate())).build();
@@ -92,7 +92,7 @@ public class JsonAPIResource {
     @Path("/queries/{template}")
     @Produces(MediaType.APPLICATION_JSON)    
     public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException{
-        log.info("Call to queriesListGet()"); 
+        log.info("Call to queryDescPost()"); 
         return new QueryFileParser(name+".arq").getTemplate();        
     }
     
