@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -37,10 +38,14 @@ import java.util.SortedMap;
 
 import javax.ws.rs.core.Application;
 
+import org.apache.jena.atlas.io.AWriter;
+import org.apache.jena.atlas.io.StringWriterI;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -49,6 +54,10 @@ import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.RiotException;
+import org.apache.jena.riot.out.NodeFormatterTTL;
+import org.apache.jena.riot.out.NodeToLabel;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.riot.system.StreamRDFLib;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
@@ -122,6 +131,21 @@ public class LdsTest extends JerseyTest {
 			assertTrue(md[0].isIsomorphicWith(md[1]));			
 		}	
 	}
+
+    @Test
+    public void testHtmlLitFormatter(){
+        PrefixMap pm = PrefixMapFactory.create();
+        pm.add("xsd", "http://www.w3.org/2001/XMLSchema#");
+        //NodeToLabel ntl = new NodeToLabel();
+        NodeFormatterTTL nfttl = new NodeFormatterTTL(null, pm, null);
+        Model m = ModelFactory.createDefaultModel();
+        Literal l = m.createTypedLiteral("2009-10-22T18:31:49.12Z", XSDDatatype.XSDdateTime);
+        StringWriterI sw = new StringWriterI();
+        nfttl.formatLitDT(sw, l.getLexicalForm(), l.getDatatypeURI());
+        sw.flush();
+        assertTrue(sw.toString().equals("\"2009-10-22T18:31:49.12Z\"^^xsd:dateTime"));
+        //System.out.println(sw.toString());
+    }
 	
 	@Test
 	public void testGetModel() throws IOException{
