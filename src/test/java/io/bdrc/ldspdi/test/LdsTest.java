@@ -40,6 +40,7 @@ import javax.ws.rs.core.Application;
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.graph.Graph;
@@ -143,21 +144,45 @@ public class LdsTest extends JerseyTest {
         Literal l = m.createTypedLiteral("2009-10-22T18:31:49.12Z", XSDDatatype.XSDdateTime);
         Literal l1=m.createTypedLiteral(3.141592, new BaseDatatype("http://www.w3.org/2002/07/owl#real"));
         Literal l2=m.createTypedLiteral("Dharma is beautiful", XMLLiteralType.theXMLLiteralType);
+        Literal l3=m.createTypedLiteral("true", XSDDatatype.XSDboolean);
+        Literal l4=m.createLiteral("rgyud bla ma", "bo-x-ewts");
+        Literal l5=m.createTypedLiteral("buddha is goodness", XSDDatatype.XSDstring);
+        Literal l6=m.createTypedLiteral(-5, XSDDatatype.XSDinteger);        
         
-        StringWriterI sw = new StringWriterI();
-        nfttl.formatLitDT(sw, l.getLexicalForm(), l.getDatatypeURI());
-        sw.flush();
+        StringWriterI sw = new StringWriterI();        
+        nfttl.formatLiteral(sw, l.asNode());
+        sw.flush();        
         assertTrue(sw.toString().equals("\"2009-10-22T18:31:49.12Z\"^^xsd:dateTime"));
         
-        sw = new StringWriterI();
-        nfttl.formatLitDT(sw, l1.getLexicalForm(), l1.getDatatypeURI());
-        sw.flush();
-        assertTrue(sw.toString().equals("\"3.141592\"^^owl:real"));
+        sw = new StringWriterI();        
+        nfttl.formatLiteral(sw, l1.asNode());
+        sw.flush();        
+        assertTrue(sw.toString().equals("\"3.141592\"^^owl:real"));        
+           
+        sw = new StringWriterI();        
+        nfttl.formatLiteral(sw, l2.asNode());
+        sw.flush();        
+        assertTrue(sw.toString().equals("\"Dharma is beautiful\"^^rdf:XMLLiteral"));
         
         sw = new StringWriterI();
-        nfttl.formatLitDT(sw, l2.getLexicalForm(), l2.getDatatypeURI());
+        nfttl.formatLiteral(sw, l3.asNode());
         sw.flush();
-        assertTrue(sw.toString().equals("\"Dharma is beautiful\"^^rdf:XMLLiteral"));
+        assertTrue(sw.toString().equals("true"));
+        
+        sw = new StringWriterI();
+        nfttl.formatLiteral(sw, l4.asNode());
+        sw.flush();
+        assertTrue(sw.toString().equals("\"rgyud bla ma\"@bo-x-ewts"));
+        
+        sw = new StringWriterI();
+        nfttl.formatLiteral(sw, l5.asNode());
+        sw.flush();        
+        assertTrue(sw.toString().equals("\"buddha is goodness\""));
+        
+        sw = new StringWriterI();
+        nfttl.formatLiteral(sw, l6.asNode());
+        sw.flush();        
+        assertTrue(sw.toString().equals("-5"));
         
     }
 	
