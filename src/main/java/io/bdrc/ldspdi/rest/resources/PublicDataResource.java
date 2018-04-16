@@ -21,6 +21,9 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -81,6 +84,8 @@ public class PublicDataResource {
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);    
     MediaType default_media=new MediaType("text","turtle","utf-8");
     
+    public ArrayList<String> validMedia=new ArrayList<>();
+    
         
     public PublicDataResource() {
         super();
@@ -89,6 +94,8 @@ public class PublicDataResource {
         config.register(CorsFilter.class); 
         config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
+        validMedia.add(MediaType.TEXT_HTML);
+        validMedia.add(MediaType.APPLICATION_XHTML_XML);
     }
     
     @GET    
@@ -131,6 +138,16 @@ public class PublicDataResource {
         @HeaderParam("Accept") final String format,
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         
+        String redirect="http://library.bdrc.io/show/bdr:"+res;
+        if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
+                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isRdfMedia(format)) {
+            
+            try {
+                return Response.seeOther(new URI(redirect)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
+            }
+        }
         log.info("Call to getResourceGraph()");
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -205,12 +222,12 @@ public class PublicDataResource {
     
     @GET
     @Path("/resource/{type}/{res}") 
-    public Viewable getPersonURLResources(@PathParam("res") final String res,
+    public Viewable getTypedResource(@PathParam("res") final String res,
         @PathParam("type") final String type,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info) throws RestException{
         
-        log.info("getPersonURLResources()");        
+        log.info("getTypedResource()");        
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
