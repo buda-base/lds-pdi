@@ -22,9 +22,7 @@ public class WorkResults {
     static final String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
     static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     static final String MATCH="http://purl.bdrc.io/ontology/core/labelMatch";
-    static final String TOPICLABEL="http://purl.bdrc.io/ontology/core/topicLabel";
-    static final String TAXLABEL="http://purl.bdrc.io/ontology/core/rootTaxLabel";
-    static final String TAX="http://purl.bdrc.io/ontology/core/rootTax";
+        
     public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());
     
     public static HashMap<String,Object> getResultsMap(ResultSet rs){

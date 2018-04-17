@@ -213,5 +213,59 @@ public class LibrarySearchResource {
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
         
     }
+    
+    @GET
+    @Path("/lib/associatedWorks") 
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAssociatedWorkGraphGet( @Context UriInfo info,
+            @HeaderParam("fusekiUrl") final String fuseki
+            ) throws RestException {
+        log.info("Call to getAssociatedWorkGraphGet()");
+        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
+        QueryFileParser qfp=new QueryFileParser("associatedWorks.arq","library");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        String q="select * where {?s ?p ?o}";        
+        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();        
+        
+    }
+    
+    @POST
+    @Path("/lib/associatedWorks") 
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAssociatedWorkGraphPost( @Context UriInfo info,
+            @HeaderParam("fusekiUrl") final String fuseki,
+            HashMap<String,String> map
+            ) throws RestException {
+        log.info("Call to getAssociatedWorkGraphPost()");
+        QueryFileParser qfp=new QueryFileParser("associatedWorks.arq","library");
+        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        String check=qfp.checkQueryArgsSyntax();
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
+        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        String q="select * where {?s ?p ?o}";        
+        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
+        
+    }
 
 }
