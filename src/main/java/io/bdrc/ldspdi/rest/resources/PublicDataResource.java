@@ -140,8 +140,7 @@ public class PublicDataResource {
         
         String redirect="http://library.bdrc.io/show/bdr:"+res;
         if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
-                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isRdfMedia(format)) {
-            
+                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isRdfMedia(format)) {            
             try {
                 return Response.seeOther(new URI(redirect)).build();
             } catch (URISyntaxException e) {
@@ -156,7 +155,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model),getMediaType(format)).build();       
+        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getJenaFormat(format)),getMediaType(format)).build();       
     }
     
     @POST

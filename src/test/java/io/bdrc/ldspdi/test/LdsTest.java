@@ -40,7 +40,6 @@ import javax.ws.rs.core.Application;
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.graph.Graph;
