@@ -6,6 +6,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -39,6 +40,7 @@ public class LibrarySearchResource {
     public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());   
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     
+       
     public LibrarySearchResource() {
         super();
         ResourceConfig config=new ResourceConfig(PublicDataResource.class);
@@ -48,224 +50,90 @@ public class LibrarySearchResource {
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     }
     
+        
     @POST
-    @Path("/lib/rootSearch")  
+    @Path("/lib/{file}")  
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getRootGraphPost(
+    public Response getLibGraphPost(
             @HeaderParam("fusekiUrl") final String fuseki,
+            @PathParam("file") final String file,
             HashMap<String,String> map) throws RestException {
         
-        log.info("Call to getRootGraphPost()");
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraphComplet.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        log.info("Call to getLibGraphPost() with template name >> "+file);
+        QueryFileParser qfp=new QueryFileParser(file+".arq","library");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "RootSearchGraph.arq"+"; ERROR: "+check);
+                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        HashMap<String,Object> res=null;
+        String q="select * where {?s ?p ?o}";
+        switch (file) {
+            case "rootSearchGraph":
+                res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "personFacetGraph":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "workFacetGraph":
+                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "associatedWorks":
+                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            default:
+                throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
+        }       
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
     
     @GET
-    @Path("/lib/rootSearch") 
+    @Path("/lib/{file}") 
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getRootGraphGet( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki
+    public Response getLibGraphGet( @Context UriInfo info,
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @PathParam("file") String file
             ) throws RestException {
         
-        log.info("Call to getRootGraphGet()");
+        log.info("Call to getLibGraphGet() with template name >> "+file);
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("RootSearchGraphComplet.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
+        QueryFileParser qfp=new QueryFileParser(file+".arq","library");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "RootSearchGraphComplet1.arq"+"; ERROR: "+check);
+                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+        HashMap<String,Object> res=null;
+        String q="select * where {?s ?p ?o}";
+        switch (file) {
+            case "rootSearchGraph":
+                res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "personFacetGraph":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "workFacetGraph":
+                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "associatedWorks":
+                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            default:
+                throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
+        }     
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
         
     }
-    
-    @GET
-    @Path("/lib/personSearch") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPersonGraphGet( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki
-            ) throws RestException {
-        
-        log.info("Call to getPersonGraphGet()");
-        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("PersonFacetGraph.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "PersonFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
-        
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-    
-    @POST
-    @Path("/lib/personSearch") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPersonGraphPost( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            HashMap<String,String> map
-            ) throws RestException {
-        
-        log.info("Call to getPersonGraphPost()");
-        QueryFileParser qfp=new QueryFileParser("PersonFacetGraph.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "PersonFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
-        
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-    
-    @GET
-    @Path("/lib/workSearch") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getWorkGraphGet( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki
-            ) throws RestException {
-        log.info("Call to getWorkGraphGet()");
-        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("WorkFacetGraph.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-    
-    @POST
-    @Path("/lib/workSearch") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getWorkGraphPost( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            HashMap<String,String> map
-            ) throws RestException {
-        log.info("Call to getWorkGraphPost()");
-        QueryFileParser qfp=new QueryFileParser("WorkFacetGraph.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-    
-    @GET
-    @Path("/lib/associatedWorks") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAssociatedWorkGraphGet( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki
-            ) throws RestException {
-        log.info("Call to getAssociatedWorkGraphGet()");
-        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser("associatedWorks.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();        
-        
-    }
-    
-    @POST
-    @Path("/lib/associatedWorks") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAssociatedWorkGraphPost( @Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            HashMap<String,String> map
-            ) throws RestException {
-        log.info("Call to getAssociatedWorkGraphPost()");
-        QueryFileParser qfp=new QueryFileParser("associatedWorks.arq","library");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ "WorkFacetGraph.arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        String q="select * where {?s ?p ?o}";        
-        HashMap<String,Object> res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-
 }
