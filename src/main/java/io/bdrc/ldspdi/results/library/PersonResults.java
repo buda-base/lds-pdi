@@ -6,11 +6,12 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
+import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.LiteralStringField;
 
 public class PersonResults {
     
-    static final String TYPE="http://purl.bdrc.io/ontology/core/Person";
+    static final String CREATOR_TYPE="http://purl.bdrc.io/ontology/tmp/creatorType";
     static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
     
     public static HashMap<String,Object> getResultsMap(ResultSet rs){
@@ -34,7 +35,9 @@ public class PersonResults {
             if(pm == null) {
                 pm=new PersonMatch();
             }
-            
+            if(prop.equals(CREATOR_TYPE)) {
+                pm.addOptions(new Field(prop,val));
+            }
             if(prop.equals(PERSONGENDER)) {
                 pm.setGender(val);
                 Integer ct=count.get(val);
@@ -47,7 +50,6 @@ public class PersonResults {
             }else {
                 pm.addMatch(lf);
             }
-            
             map.put(uri, pm);                
                        
         }

@@ -81,6 +81,9 @@ public class LibrarySearchResource {
             case "personFacetGraph":
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
+            case "workAssocPersons":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
@@ -122,6 +125,9 @@ public class LibrarySearchResource {
                 res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "personFacetGraph":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "workAssocPersons":
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "workFacetGraph":

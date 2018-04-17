@@ -8,14 +8,20 @@ public class PersonMatch {
     
     public String gender;
     public ArrayList<Field> matching;
+    public ArrayList<Field> options;
     
     public PersonMatch() {
         gender="";
         matching=new ArrayList<>();
+        options=new ArrayList<>();
     }
     
     public void addMatch(Field f) {
         matching.add(f);
+    }
+    
+    public void addOptions(Field f) {
+        options.add(f);
     }
 
     public String getGender() {
