@@ -87,6 +87,9 @@ public class LibrarySearchResource {
             case "personAssocPersons":
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
+            case "placeAssocPersons":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
@@ -134,6 +137,9 @@ public class LibrarySearchResource {
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "personAssocPersons":
+                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "placeAssocPersons":
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "workFacetGraph":
