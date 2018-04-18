@@ -11,7 +11,8 @@ import io.bdrc.ldspdi.results.LiteralStringField;
 
 public class PersonResults {
     
-    static final String CREATOR_TYPE="http://purl.bdrc.io/ontology/tmp/creatorType";
+    static final String RELATION_TYPE="http://purl.bdrc.io/ontology/tmp/relationType";
+    static final String WORK_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
     
     public static HashMap<String,Object> getResultsMap(ResultSet rs){
@@ -35,8 +36,16 @@ public class PersonResults {
             if(pm == null) {
                 pm=new PersonMatch();
             }
-            if(prop.equals(CREATOR_TYPE)) {
+            if(prop.equals(RELATION_TYPE)) {
+                System.out.println("Uri="+uri+" prop="+prop+ " val="+val);
                 pm.addOptions(new Field(prop,val));
+            }
+            if(prop.equals(WORK_ABOUT)) {
+                PersonMatch pm1=map.get(val);
+                if(pm1==null) {
+                    pm1=new PersonMatch();
+                }
+                pm1.addOptions(new Field(prop,val));
             }
             if(prop.equals(PERSONGENDER)) {
                 pm.setGender(val);
@@ -48,7 +57,9 @@ public class PersonResults {
                     count.put(val, 1);
                 }
             }else {
-                pm.addMatch(lf);
+                if(lf!=null) {
+                    pm.addMatch(lf);
+                }
             }
             map.put(uri, pm);                
                        

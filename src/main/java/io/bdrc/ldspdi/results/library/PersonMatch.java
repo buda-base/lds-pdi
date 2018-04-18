@@ -8,12 +8,12 @@ public class PersonMatch {
     
     public String gender;
     public ArrayList<Field> matching;
-    public ArrayList<Field> options;
+    public ArrayList<Field> details;
     
     public PersonMatch() {
         gender="";
         matching=new ArrayList<>();
-        options=new ArrayList<>();
+        details=new ArrayList<>();
     }
     
     public void addMatch(Field f) {
@@ -21,7 +21,7 @@ public class PersonMatch {
     }
     
     public void addOptions(Field f) {
-        options.add(f);
+        details.add(f);
     }
 
     public String getGender() {
