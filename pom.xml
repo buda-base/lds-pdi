@@ -9,9 +9,9 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jersey.version>2.26</jersey.version>
+    <jersey.version>2.27</jersey.version>
     <jena.version>3.7.0-SNAPSHOT</jena.version>
-    <jetty.version>9.4.8.v20171121</jetty.version>
+    <jetty.version>9.4.10.RC0</jetty.version>
   </properties>
   <repositories>
     <repository>
@@ -122,6 +122,27 @@
 	    <groupId>org.glassfish.jersey.inject</groupId>
 	    <artifactId>jersey-hk2</artifactId>
 	</dependency>	
+    <!-- https://mvnrepository.com/artifact/org.glassfish.hk2/hk2-api -->
+<!-- https://mvnrepository.com/artifact/org.glassfish.hk2/hk2-api -->
+<dependency>
+    <groupId>org.glassfish.hk2</groupId>
+    <artifactId>hk2-api</artifactId>
+    <version>2.5.0-b61</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.glassfish.hk2/osgi-resource-locator -->
+<dependency>
+    <groupId>org.glassfish.hk2</groupId>
+    <artifactId>osgi-resource-locator</artifactId>
+    <version>2.5.0-b42</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
+<dependency>
+    <groupId>org.javassist</groupId>
+    <artifactId>javassist</artifactId>
+    <version>3.22.0-GA</version>
+</dependency>
+   
 	<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-jetty-servlet -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.containers</groupId>

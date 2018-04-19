@@ -27,7 +27,7 @@ public class Row extends HashMap<String,HashMap<String,String>>{
                         if(node.asNode().getLiteralDatatype().equals(RDFLangString.rdfLangString)) {
                             this.put(key, new LiteralStringField("literal",                                                          
                                     node.asNode().getLiteralLanguage(),
-                                    node.asLiteral().getLexicalForm()));
+                                    node.asLiteral().getValue().toString()));
                         }else {
                             this.put(key,new Field("literal",node.asLiteral().getValue().toString()));
                         }

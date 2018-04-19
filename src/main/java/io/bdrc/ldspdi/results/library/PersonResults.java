@@ -30,7 +30,7 @@ public class PersonResults {
                 val=node.getURI();
             }
             if(node.isLiteral()) {
-                lf=new LiteralStringField(prop,node.getLiteralLanguage(),node.getLiteral().toString());
+                lf=new LiteralStringField(prop,node.getLiteralLanguage(),node.getLiteral().getValue().toString());
             }
             PersonMatch pm=map.get(uri);            
             if(pm == null) {
