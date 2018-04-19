@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.results.library.PersonResults;
+import io.bdrc.ldspdi.results.library.ResourceResults;
 import io.bdrc.ldspdi.results.library.RootResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -96,6 +97,9 @@ public class LibrarySearchResource {
             case "associatedWorks":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
+            case "personAssocResource":
+                res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
         }       
@@ -147,6 +151,9 @@ public class LibrarySearchResource {
                 break;
             case "associatedWorks":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                break;
+            case "personAssocResource":
+                res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);

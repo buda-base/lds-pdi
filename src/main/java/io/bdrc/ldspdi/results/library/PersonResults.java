@@ -8,7 +8,6 @@ import org.apache.jena.query.ResultSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.rest.resources.LibrarySearchResource;
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.LiteralStringField;
 
