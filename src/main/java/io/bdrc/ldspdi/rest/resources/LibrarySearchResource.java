@@ -97,7 +97,7 @@ public class LibrarySearchResource {
             case "associatedWorks":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
-            case "personAssocResource":
+            case "allAssocResource":
                 res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             default:
@@ -152,7 +152,7 @@ public class LibrarySearchResource {
             case "associatedWorks":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
-            case "personAssocResource":
+            case "allAssocResource":
                 res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             default:
