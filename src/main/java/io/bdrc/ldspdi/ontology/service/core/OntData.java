@@ -249,7 +249,7 @@ public class OntData implements Runnable{
     
     public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
 
-        public int compare(OntClass class1, OntClass class2) { 
+        public int compare(OntClass class1, OntClass class2) {            
             if(Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
                 return class1.getLocalName().compareTo(class2.getLocalName());
             }

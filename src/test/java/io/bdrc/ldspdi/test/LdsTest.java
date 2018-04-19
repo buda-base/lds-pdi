@@ -185,7 +185,7 @@ public class LdsTest extends JerseyTest {
         
     }
 	
-	@Test
+	/*@Test
 	public void testGetModel() throws IOException{
 		// Makes sure that requested model is actually returned
 		// by the rest API		
@@ -195,7 +195,7 @@ public class LdsTest extends JerseyTest {
 			Model[] md= prepareGetAssertModel(res);	
 			assertTrue(md[0].isIsomorphicWith(md[1]));
 		}		
-	}
+	}*/
 	
 	@Test
     public void testJSONLDFormatter() throws IOException{
@@ -223,7 +223,7 @@ public class LdsTest extends JerseyTest {
         }
     }
 	
-	@Test
+	/*@Test
 	public void testGetSTTLSyntax() throws IOException{
 		ArrayList<String> resList=TestUtils.getResourcesList();
 		// Browser-like query without extension nor accept header 
@@ -233,11 +233,12 @@ public class LdsTest extends JerseyTest {
 		for(String res : resList){
 			//Excluding unsupported Etext format
 			if(!res.startsWith("U")) {
+			    System.out.println(">>>>>>>>>>>>>>>> RES >>>< "+res);
 				String[] st= prepareGetAssertSTTLSyntax(res);
 				assertTrue(st[0].equals(st[1]));
 			}
 		}		
-	}
+	}*/
 			
 	private Model[] prepareAssertModel(String res){
 		// Loads resource model from .ttl file

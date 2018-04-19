@@ -19,7 +19,7 @@ public class Prefixes {
     
     static {
         try {
-            File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");                         
+            File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");            
             BufferedReader br = new BufferedReader(new FileReader(file));
             String readLine = ""; 
             while ((readLine = br.readLine()) != null) {
