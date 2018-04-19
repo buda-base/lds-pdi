@@ -7,11 +7,13 @@ import io.bdrc.ldspdi.results.Field;
 public class PersonMatch {
     
     public String gender;
+    public ArrayList<Field> prefLabel; 
     public ArrayList<Field> matching;
     public ArrayList<Field> details;
     
     public PersonMatch() {
         gender="";
+        prefLabel=new ArrayList<>();
         matching=new ArrayList<>();
         details=new ArrayList<>();
     }
@@ -22,6 +24,10 @@ public class PersonMatch {
     
     public void addOptions(Field f) {
         details.add(f);
+    }
+    
+    public void addPrefLabel(Field f) {
+        prefLabel.add(f);
     }
 
     public String getGender() {
@@ -38,6 +44,14 @@ public class PersonMatch {
 
     public void setMatching(ArrayList<Field> matching) {
         this.matching = matching;
+    }       
+
+    public ArrayList<Field> getDetails() {
+        return details;
+    }
+
+    public void setDetails(ArrayList<Field> details) {
+        this.details = details;
     }
 
     @Override

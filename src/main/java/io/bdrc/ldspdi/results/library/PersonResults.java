@@ -5,12 +5,19 @@ import java.util.HashMap;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.rest.resources.LibrarySearchResource;
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.LiteralStringField;
 
 public class PersonResults {
     
+    public final static Logger log=LoggerFactory.getLogger(PersonResults.class.getName());
+    
+    static final String LABEL_MATCH="http://purl.bdrc.io/ontology/tmp/prefLabelMatch";
+    static final String PREF_LABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     static final String RELATION_TYPE="http://purl.bdrc.io/ontology/tmp/relationType";
     static final String WORK_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
@@ -36,8 +43,7 @@ public class PersonResults {
             if(pm == null) {
                 pm=new PersonMatch();
             }
-            if(prop.equals(RELATION_TYPE)) {
-                System.out.println("Uri="+uri+" prop="+prop+ " val="+val);
+            if(prop.equals(RELATION_TYPE)) {                
                 pm.addOptions(new Field(prop,val));
             }
             if(prop.equals(WORK_ABOUT)) {
@@ -56,7 +62,12 @@ public class PersonResults {
                 else {
                     count.put(val, 1);
                 }
-            }else {
+            }
+            if(prop.equals(PREF_LABEL)) {
+                log.info("URI >>> "+uri+"  Pref label >> "+node.getLiteral().getValue().toString());
+                pm.addPrefLabel(lf);               
+            }
+            else {
                 if(lf!=null) {
                     pm.addMatch(lf);
                 }
