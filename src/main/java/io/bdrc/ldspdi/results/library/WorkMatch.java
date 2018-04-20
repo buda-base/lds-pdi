@@ -11,7 +11,7 @@ public class WorkMatch {
     public String license;
     public String status;
     public String langScript;
-    public String prefLabel;
+    public ArrayList<Field> prefLabel;
     public ArrayList<Field> matching;
     public ArrayList<String> topics;
     public ArrayList<String> taxonomies;
@@ -21,7 +21,7 @@ public class WorkMatch {
         license="";
         status="";
         langScript="";
-        prefLabel="";
+        prefLabel=new ArrayList<>();
         matching=new ArrayList<>();
         topics=new ArrayList<>();
         taxonomies=new ArrayList<>();
@@ -29,6 +29,10 @@ public class WorkMatch {
 
     public void addMatch(Field f) {
         matching.add(f);
+    }
+    
+    public void addPrefLabel(Field f) {
+        prefLabel.add(f);
     }
     
     public void addTopic(String t) {
@@ -77,14 +81,6 @@ public class WorkMatch {
 
     public void setMatching(ArrayList<Field> matching) {
         this.matching = matching;
-    }
-
-    public String getPrefLabel() {
-        return prefLabel;
-    }
-
-    public void setPrefLabel(String prefLabel) {
-        this.prefLabel = prefLabel;
     }
     
 }

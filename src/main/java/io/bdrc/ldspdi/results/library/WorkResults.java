@@ -84,7 +84,7 @@ public class WorkResults {
             
             if(prop.equals(PREFLABEL)) {                
                 done=true;                
-                wm.setPrefLabel(node.getLiteral().toString());
+                wm.addPrefLabel(lf);
             }   
             if(prop.equals(ACCESS)) {
                 done=true;
