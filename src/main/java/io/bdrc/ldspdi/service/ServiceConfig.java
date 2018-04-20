@@ -68,7 +68,7 @@ public class ServiceConfig {
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
 			}			
-			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
+			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));        
 			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
@@ -84,7 +84,7 @@ public class ServiceConfig {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
             prop.load(input);            
-                
+            sparqlPrefixes=new String(Files.readAllBytes(Paths.get("/home/marc/lds-queries/public/prefixes.txt")));    
             String mimes=prop.getProperty("mime");
             StringTokenizer st=new StringTokenizer(mimes,",");
             while(st.hasMoreTokens()){
@@ -125,5 +125,6 @@ public class ServiceConfig {
 	public static String getRobots() {
 	    return "User-agent: *"+System.lineSeparator()+"Disallow: /";
 	}
+	
 	
 }

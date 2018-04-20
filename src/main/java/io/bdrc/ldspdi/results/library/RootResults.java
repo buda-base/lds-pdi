@@ -46,7 +46,7 @@ public class RootResults {
                 }
             }
             if(prop.equals(PREFLABEL)) {
-                rm.setLabel(lf);
+                rm.addPrefLabel(lf);
             }
             if(!prop.equals(PREFLABEL) && !prop.equals(TYPE)) {
                 rm.addMatch(lf);

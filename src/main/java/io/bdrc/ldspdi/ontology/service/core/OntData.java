@@ -83,7 +83,7 @@ public class OntData implements Runnable{
     public static ArrayList<OntResource> getDomainUsages(String uri) {        
         String query=ServiceConfig.getPrefixes()+ " select distinct ?s where {\n" + 
                 "    ?s rdfs:domain <"+uri+"> .    \n" + 
-                "} order by ?p ?s";
+                "} order by ?p ?s";        
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
         ResultSet res = qexec.execSelect() ;        
         ArrayList<OntResource> list=new ArrayList<>();
@@ -307,7 +307,6 @@ public class OntData implements Runnable{
             }
         }
     }
-
     
 
 }

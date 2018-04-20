@@ -21,8 +21,6 @@ package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,7 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import javax.ws.rs.core.Application;
@@ -67,7 +64,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.jena.sttl.CompareComplex;
@@ -252,7 +248,7 @@ public class LdsTest extends JerseyTest {
 		return ret;
 	}
 	
-	private Model[] prepareGetAssertModel(String res) throws IOException{
+	/*private Model[] prepareGetAssertModel(String res) throws IOException{
 		// Loads resource model from .ttl file
 		// Gets resource model from rest API
 		// and returns them for comparison by testGetModel() 
@@ -266,9 +262,9 @@ public class LdsTest extends JerseyTest {
 		Model[] md={m,m_rest};		
 		is.close();
 		return md;
-	}
+	}*/
 	
-	private String[] prepareGetAssertSTTLSyntax(String res) throws IOException{
+	/*private String[] prepareGetAssertSTTLSyntax(String res) throws IOException{
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
 		// Gets resource model from rest API
@@ -303,7 +299,7 @@ public class LdsTest extends JerseyTest {
 		baos1.close();
 		baos2.close();
 		return ret;
-	}
+	}*/
 	
 	
 	static void loadData(){
