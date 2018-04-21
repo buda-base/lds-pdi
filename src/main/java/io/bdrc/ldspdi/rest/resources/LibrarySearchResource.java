@@ -78,19 +78,19 @@ public class LibrarySearchResource {
         String q="select * where {?s ?p ?o}";
         switch (file) {
             case "rootSearchGraph":
-                res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=RootResults.getResultsMap(model);
                 break;
             case "personFacetGraph":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "workAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "personAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "placeAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
@@ -136,19 +136,19 @@ public class LibrarySearchResource {
         String q="select * where {?s ?p ?o}";
         switch (file) {
             case "rootSearchGraph":
-                res=RootResults.getResultsMap(model,QueryProcessor.getResultsFromModel(q, model));
+                res=RootResults.getResultsMap(model);
                 break;
             case "personFacetGraph":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "workAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "personAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "placeAssocPersons":
-                res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));

@@ -3,15 +3,12 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.ldspdi.results.LiteralStringField;
+
 
 public class RootResults {
     
@@ -71,7 +68,7 @@ public class RootResults {
         return res;
     }*/
     
-    public static HashMap<String,Object> getResultsMap(Model mod,ResultSet rs){
+    public static HashMap<String,Object> getResultsMap(Model mod){
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> works=new HashMap<>(); 
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
