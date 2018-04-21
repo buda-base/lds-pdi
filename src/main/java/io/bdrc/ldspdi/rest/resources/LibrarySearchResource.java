@@ -84,10 +84,7 @@ public class LibrarySearchResource {
                 break;
             case "workAssocPersons":
                 res=PersonResults.getResultsMap(model);
-                break;
-            case "personAssocPersons":
-                res=PersonResults.getResultsMap(model);
-                break;
+                break;            
             case "placeAssocPersons":
                 res=PersonResults.getResultsMap(model);
                 break;
@@ -141,10 +138,7 @@ public class LibrarySearchResource {
                 break;
             case "workAssocPersons":
                 res=PersonResults.getResultsMap(model);
-                break;
-            case "personAssocPersons":
-                res=PersonResults.getResultsMap(model);
-                break;
+                break;            
             case "placeAssocPersons":
                 res=PersonResults.getResultsMap(model);
                 break;

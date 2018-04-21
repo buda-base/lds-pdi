@@ -3,9 +3,6 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -28,132 +25,9 @@ public class WorkResults {
     static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     static final String MATCH="http://purl.bdrc.io/ontology/core/labelMatch";
         
-    public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());    
+    public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());  
      
-    /*public static HashMap<String,Object> getResultsMap(Model mod){
-        HashMap<String,Object> res=new HashMap<>();
-        HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
-        HashMap<String,Integer> access=new HashMap<>();
-        HashMap<String,Integer> license=new HashMap<>();
-        HashMap<String,Integer> status=new HashMap<>();
-        HashMap<String,Integer> langScript=new HashMap<>();
-        HashMap<String,Integer> tax=new HashMap<>();
-        HashMap<String,Integer> topics=new HashMap<>();
-        HashMap<String,WorkMatch> map=new HashMap<>();
-        
-        StmtIterator iter=mod.listStatements();
-        while(iter.hasNext()) {
-            Statement st=iter.next();           
-            String uri=st.getSubject().getURI();
-            String prop=st.getPredicate().getURI();            
-            Node node=st.getObject().asNode();
-            String val="";
-            LiteralStringField lf=null;
-            if(node.isURI()) {
-                val=node.getURI();
-            }
-            if(node.isLiteral()) {
-                lf=new LiteralStringField(prop,node.getLiteralLanguage(),node.getLiteral().getValue().toString());
-            }
-            WorkMatch wm=map.get(uri);            
-            if(wm == null) {
-                wm=new WorkMatch();
-            }
-            boolean done=false;
-            if(prop.equals(MATCH)) {
-                done=true;  
-                lf=new LiteralStringField(PREFLABEL,node.getLiteralLanguage(),node.getLiteral().getValue().toString());
-                wm.addMatch(lf);
-            }
-            if(prop.equals(WORK_GENRE)) {
-                done=true;                
-                wm.addTopic(val);
-                String it=TaxModel.getTaxonomyItem(val);
-                if(it !=null) {                    
-                    Integer ct=tax.get(it);
-                    if(ct!=null) {
-                        tax.put(it, ct.intValue()+1);
-                    }
-                    else {
-                        tax.put(it, 1);
-                    }
-                    wm.addTaxonomy(it);
-                }
-                Integer t=topics.get(val);
-                if(t!=null) {
-                    topics.put(val, t.intValue()+1);
-                }
-                else {
-                    topics.put(val, 1);
-                }
-            }
-            
-            if(prop.equals(PREFLABEL)) {                
-                done=true;                
-                wm.addPrefLabel(lf);
-            }   
-            if(prop.equals(ACCESS)) {
-                done=true;
-                wm.setAccess(val);
-                Integer ct=access.get(val);
-                if(ct!=null) {
-                    access.put(val, ct.intValue()+1);
-                }
-                else {
-                    access.put(val, 1);
-                }
-            }
-            if(prop.equals(LICENSE)) {
-                done=true;
-                wm.setLicense(val);
-                Integer ct=license.get(val);
-                if(ct!=null) {
-                    license.put(val, ct.intValue()+1);
-                }
-                else {
-                    license.put(val, 1);
-                }
-            }
-            if(prop.equals(STATUS)) {
-                done=true;
-                wm.setStatus(val);
-                Integer ct=status.get(val);
-                if(ct!=null) {
-                    status.put(val, ct.intValue()+1);
-                }
-                else {
-                    status.put(val, 1);
-                }
-            }
-            if(prop.equals(LANG_SCRIPT)) {
-                done=true;
-                String tmp=node.getURI();
-                wm.setLangScript(tmp);
-                Integer ct=langScript.get(tmp);
-                if(ct!=null) {
-                    langScript.put(tmp, ct.intValue()+1);
-                }
-                else {
-                    langScript.put(tmp, 1);
-                }
-            }
-            if(!done && lf!=null) {
-                wm.addMatch(lf);
-            }
-            
-            map.put(uri, wm);
-        }
-        res.put("data",map);
-        count.put("access", access);
-        count.put("license",license);
-        count.put("status",status);
-        count.put("langScript",langScript);
-        count.put("taxonomies",tax);
-        count.put("topics",topics);
-        res.put("metadata",count);
-        return res;
-    }*/
-    
+      
     public static HashMap<String,Object> getResultsMap(Model mod){
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
@@ -163,8 +37,7 @@ public class WorkResults {
         HashMap<String,Integer> langScript=new HashMap<>();
         HashMap<String,Integer> tax=new HashMap<>();
         HashMap<String,Integer> topics=new HashMap<>();        
-        HashMap<String,ArrayList<Field>> works=new HashMap<>();
-        ArrayList<String> tops;
+        HashMap<String,ArrayList<Field>> works=new HashMap<>();        
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             Statement st=iter.next();           
