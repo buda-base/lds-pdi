@@ -136,7 +136,7 @@ public class LibrarySearchResource {
         String q="select * where {?s ?p ?o}";
         switch (file) {
             case "rootSearchGraph":
-                res=RootResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=RootResults.getResultsMap(model,QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "personFacetGraph":
                 res=PersonResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
