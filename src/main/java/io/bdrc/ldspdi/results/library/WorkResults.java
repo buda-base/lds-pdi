@@ -5,6 +5,9 @@ import java.util.HashMap;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +26,9 @@ public class WorkResults {
     static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     static final String MATCH="http://purl.bdrc.io/ontology/core/labelMatch";
         
-    public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());
-    
-    public static HashMap<String,Object> getResultsMap(ResultSet rs){
+    public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());    
+     
+    public static HashMap<String,Object> getResultsMap(Model mod){
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
         HashMap<String,Integer> access=new HashMap<>();
@@ -36,11 +39,12 @@ public class WorkResults {
         HashMap<String,Integer> topics=new HashMap<>();
         HashMap<String,WorkMatch> map=new HashMap<>();
         
-        while(rs.hasNext()) {            
-            QuerySolution qs=rs.next();
-            String uri=qs.get("?s").asNode().getURI();
-            String prop=qs.get("?p").asNode().getURI();            
-            Node node=qs.get("?o").asNode();
+        StmtIterator iter=mod.listStatements();
+        while(iter.hasNext()) {
+            Statement st=iter.next();           
+            String uri=st.getSubject().getURI();
+            String prop=st.getPredicate().getURI();            
+            Node node=st.getObject().asNode();
             String val="";
             LiteralStringField lf=null;
             if(node.isURI()) {

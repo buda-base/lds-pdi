@@ -74,8 +74,7 @@ public class LibrarySearchResource {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        HashMap<String,Object> res=null;
-        String q="select * where {?s ?p ?o}";
+        HashMap<String,Object> res=null;        
         switch (file) {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
@@ -93,10 +92,10 @@ public class LibrarySearchResource {
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
-                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=WorkResults.getResultsMap(model);
                 break;
             case "associatedWorks":
-                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":
                 res=ResourceResults.getResultsMap(model);
@@ -132,8 +131,7 @@ public class LibrarySearchResource {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
-        HashMap<String,Object> res=null;
-        String q="select * where {?s ?p ?o}";
+        HashMap<String,Object> res=null;        
         switch (file) {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
@@ -151,10 +149,10 @@ public class LibrarySearchResource {
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
-                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=WorkResults.getResultsMap(model);
                 break;
             case "associatedWorks":
-                res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":
                 res=ResourceResults.getResultsMap(model);
