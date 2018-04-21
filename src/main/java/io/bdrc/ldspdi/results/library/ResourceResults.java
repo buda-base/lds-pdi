@@ -1,40 +1,35 @@
 package io.bdrc.ldspdi.results.library;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 
-import io.bdrc.ldspdi.results.LiteralStringField;
+import io.bdrc.ldspdi.results.Field;
 
 public class ResourceResults {
     
-    static final String RELATION_TYPE="http://purl.bdrc.io/ontology/tmp/relationType";
-    
-    public static HashMap<String,Object> getResultsMap(ResultSet rs){
-        
+    static final String RELATION_TYPE="http://purl.bdrc.io/ontology/tmp/relationType";    
+      
+    public static HashMap<String,Object> getResultsMap(Model mod){
         HashMap<String,Object> res=new HashMap<>();
-        HashMap<String,ResourceDesc> map=new HashMap<>();
-        while(rs.hasNext()) {             
-            QuerySolution qs=rs.next();            
-            String uri=qs.get("?s").asNode().getURI();
-            String prop=qs.get("?p").asNode().getURI();
-            Node node=qs.get("?o").asNode();
-            LiteralStringField lf=null;
-            
-            if(node.isLiteral()) {
-                lf=new LiteralStringField(prop,node.getLiteralLanguage(),node.getLiteral().getValue().toString());
+        HashMap<String,ArrayList<Field>> resources=new HashMap<>(); 
+        StmtIterator it=mod.listStatements();
+        while(it.hasNext()) {
+            Statement st=it.next();
+            String uri=st.getSubject().getURI();
+            ArrayList<Field> f=resources.get(uri);
+            if(f==null) {
+                f=new ArrayList<Field>();
             }
-            ResourceDesc desc=map.get(uri);            
-            if(desc == null) {
-                desc=new ResourceDesc();
-            }
-            desc.addMatch(lf);
-            map.put(uri,desc);
+            f.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+            resources.put(uri,f);            
         }
-        res.put("data",map);
+        res.put("data",resources);
         return res;
     }
+        
 
 }

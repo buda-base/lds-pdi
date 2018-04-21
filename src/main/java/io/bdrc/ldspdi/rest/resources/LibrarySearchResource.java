@@ -99,7 +99,7 @@ public class LibrarySearchResource {
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "allAssocResource":
-                res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=ResourceResults.getResultsMap(model);
                 break;
             case "personAllAssociations":
                 res=PersonAllResults.getResultsMap(model);
@@ -157,7 +157,7 @@ public class LibrarySearchResource {
                 res=WorkResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
                 break;
             case "allAssocResource":
-                res=ResourceResults.getResultsMap(QueryProcessor.getResultsFromModel(q, model));
+                res=ResourceResults.getResultsMap(model);
                 break;
             case "personAllAssociations":
                 res=PersonAllResults.getResultsMap(model);
