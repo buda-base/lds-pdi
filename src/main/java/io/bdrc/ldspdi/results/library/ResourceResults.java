@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.ldspdi.results.LiteralStringField;
 
 public class ResourceResults {
     
@@ -24,7 +25,12 @@ public class ResourceResults {
             if(f==null) {
                 f=new ArrayList<Field>();
             }
-            f.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+            System.out.println("STAT >> "+st+" IsLiteral >> "+st.getObject().isLiteral());
+            if(st.getObject().isLiteral()) {
+                f.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
+            }else {
+                f.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+            }
             resources.put(uri,f);            
         }
         res.put("data",resources);

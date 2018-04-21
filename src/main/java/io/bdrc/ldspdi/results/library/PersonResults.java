@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.ldspdi.results.LiteralStringField;
 
 
 public class PersonResults {
@@ -45,7 +46,11 @@ public class PersonResults {
                 if(pl==null) {
                     pl=new ArrayList<Field>();
                 }
-                pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                if(st.getObject().isLiteral()) {
+                    pl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
+                }else {
+                    pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                }
                 people.put(st.getSubject().getURI(),pl);
             }
             
