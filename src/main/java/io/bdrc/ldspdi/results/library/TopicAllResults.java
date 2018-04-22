@@ -51,11 +51,7 @@ public class TopicAllResults {
                     if(wl==null) {
                         wl=new ArrayList<Field>();
                     }
-                    if(st.getObject().isLiteral()) {
-                        wl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                    }else {
-                        wl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                    }
+                    wl.add(Field.getField(st)); 
                     works.put(st.getSubject().getURI(),wl);
                     if(st.getPredicate().getURI().equals(ACCESS)) {
                         Integer ct=access.get(st.getObject().asNode().getURI());
@@ -99,11 +95,7 @@ public class TopicAllResults {
                     if(pli==null) {
                         pli=new ArrayList<Field>();
                     }
-                    if(st.getObject().isLiteral()) {
-                        pli.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                    }else {
-                        pli.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                    }
+                    pli.add(Field.getField(st)); 
                     lineages.put(st.getSubject().getURI(),pli);
                     break;                
                 default:

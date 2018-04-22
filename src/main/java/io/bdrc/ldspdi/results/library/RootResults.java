@@ -54,11 +54,7 @@ public class RootResults {
                         if(wl==null) {
                             wl=new ArrayList<Field>();
                         }                    
-                        if(st.getObject().isLiteral()) {
-                            wl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                        }else {
-                            wl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                        }
+                        wl.add(Field.getField(st)); 
                         works.put(st.getSubject().getURI(),wl);                    
                         break;
                     case TOPIC:
@@ -66,11 +62,7 @@ public class RootResults {
                         if(tl==null) {
                             tl=new ArrayList<Field>();
                         }
-                        if(st.getObject().isLiteral()) {
-                            tl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                        }else {
-                            tl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                        }
+                        tl.add(Field.getField(st)); 
                         topics.put(st.getSubject().getURI(),tl);
                         break;                        
                     case LINEAGE:
@@ -78,11 +70,7 @@ public class RootResults {
                         if(pli==null) {
                             pli=new ArrayList<Field>();
                         }
-                        if(st.getObject().isLiteral()) {
-                            pli.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                        }else {
-                            pli.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                        }
+                        pli.add(Field.getField(st)); 
                         lineages.put(st.getSubject().getURI(),pli);
                         break;
                     case PERSON:
@@ -91,11 +79,7 @@ public class RootResults {
                             if(pl==null) {
                                 pl=new ArrayList<Field>();
                             }
-                            if(st.getObject().isLiteral()) {
-                                pl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                            }else {
-                                pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                            }
+                            pl.add(Field.getField(st)); 
                             people.put(st.getSubject().getURI(),pl);
                         }
                         break;
@@ -104,11 +88,7 @@ public class RootResults {
                         if(rl==null) {
                             rl=new ArrayList<Field>();
                         }
-                        if(st.getObject().isLiteral()) {
-                            rl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                        }else {
-                            rl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                        }
+                        rl.add(Field.getField(st)); 
                         roles.put(st.getSubject().getURI(),rl);
                         break;
                     case PLACE:
@@ -116,11 +96,7 @@ public class RootResults {
                         if(pla==null) {
                             pla=new ArrayList<Field>();
                         }
-                        if(st.getObject().isLiteral()) {
-                            pla.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                        }else {
-                            pla.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                        }
+                        pla.add(Field.getField(st)); 
                         places.put(st.getSubject().getURI(),pla);
                         break;
                         

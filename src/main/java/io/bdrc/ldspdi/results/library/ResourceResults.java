@@ -24,13 +24,8 @@ public class ResourceResults {
             ArrayList<Field> f=resources.get(uri);
             if(f==null) {
                 f=new ArrayList<Field>();
-            }
-            System.out.println("STAT >> "+st+" IsLiteral >> "+st.getObject().isLiteral());
-            if(st.getObject().isLiteral()) {
-                f.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-            }else {
-                f.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-            }
+            }            
+            f.add(Field.getField(st)); 
             resources.put(uri,f);            
         }
         res.put("data",resources);

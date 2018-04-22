@@ -47,11 +47,7 @@ public class WorkResults {
             if(w == null) {
                 w=new ArrayList<Field>();
             }
-            if(st.getObject().isLiteral()) {
-                w.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-            }else {
-                w.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-            }
+            w.add(Field.getField(st)); 
             if(st.getPredicate().getURI().equals(ACCESS)) {
                 Integer ct=access.get(st.getObject().asNode().getURI());
                 if(ct!=null) {

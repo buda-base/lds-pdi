@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.ldspdi.results.LiteralStringField;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class PersonAllResults {
@@ -35,7 +36,7 @@ public class PersonAllResults {
                     if(wl==null) {
                         wl=new ArrayList<Field>();
                     }
-                    wl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    wl.add(Field.getField(st)); 
                     works.put(st.getSubject().getURI(),wl);
                     break;
                 case PLACE:
@@ -43,7 +44,7 @@ public class PersonAllResults {
                     if(pla==null) {
                         pla=new ArrayList<Field>();
                     }
-                    pla.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    pla.add(Field.getField(st)); 
                     places.put(st.getSubject().getURI(),pla);
                     break;
                 case LINEAGE:
@@ -51,7 +52,7 @@ public class PersonAllResults {
                     if(pli==null) {
                         pli=new ArrayList<Field>();
                     }
-                    pli.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    pli.add(Field.getField(st));                    
                     lineages.put(st.getSubject().getURI(),pli);
                     break;
                 case PERSON:
@@ -60,7 +61,7 @@ public class PersonAllResults {
                         if(pl==null) {
                             pl=new ArrayList<Field>();
                         }
-                        pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                        pl.add(Field.getField(st)); 
                         people.put(st.getSubject().getURI(),pl);
                     }
                     break;

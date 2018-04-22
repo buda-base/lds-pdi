@@ -55,7 +55,7 @@ public class PlaceAllResults {
                     if(wl==null) {
                         wl=new ArrayList<Field>();
                     }
-                    wl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    wl.add(Field.getField(st));
                     works.put(st.getSubject().getURI(),wl);
                     if(st.getPredicate().getURI().equals(ACCESS)) {
                         Integer ct=access.get(st.getObject().asNode().getURI());
@@ -99,7 +99,7 @@ public class PlaceAllResults {
                     if(wp==null) {
                         wp=new ArrayList<Field>();
                     }
-                    wp.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    wp.add(Field.getField(st));
                     litprod.put(st.getSubject().getURI(),wp);
                     break;
                 case PLACE:
@@ -107,7 +107,7 @@ public class PlaceAllResults {
                     if(pla==null) {
                         pla=new ArrayList<Field>();
                     }
-                    pla.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                    pla.add(Field.getField(st));
                     places.put(st.getSubject().getURI(),pla);
                     break;
                 case PERSON:
@@ -116,7 +116,7 @@ public class PlaceAllResults {
                         if(pl==null) {
                             pl=new ArrayList<Field>();
                         }
-                        pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
+                        pl.add(Field.getField(st));
                         people.put(st.getSubject().getURI(),pl);
                     }
                     break;

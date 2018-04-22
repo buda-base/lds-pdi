@@ -46,11 +46,7 @@ public class PersonResults {
                 if(pl==null) {
                     pl=new ArrayList<Field>();
                 }
-                if(st.getObject().isLiteral()) {
-                    pl.add(new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString()));  
-                }else {
-                    pl.add(new Field(st.getPredicate().getURI(),st.getObject().toString()));
-                }
+                pl.add(Field.getField(st)); 
                 people.put(st.getSubject().getURI(),pl);
             }
             
