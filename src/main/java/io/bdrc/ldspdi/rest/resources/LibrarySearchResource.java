@@ -26,6 +26,7 @@ import io.bdrc.ldspdi.results.library.PersonAllResults;
 import io.bdrc.ldspdi.results.library.PersonResults;
 import io.bdrc.ldspdi.results.library.ResourceResults;
 import io.bdrc.ldspdi.results.library.RootResults;
+import io.bdrc.ldspdi.results.library.TopicAllResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
@@ -100,6 +101,9 @@ public class LibrarySearchResource {
             case "personAllAssociations":
                 res=PersonAllResults.getResultsMap(model);
                 break;
+            case "topicAllAssociations":
+                res=TopicAllResults.getResultsMap(model);
+                break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
         }       
@@ -153,6 +157,9 @@ public class LibrarySearchResource {
                 break;
             case "personAllAssociations":
                 res=PersonAllResults.getResultsMap(model);
+                break;
+            case "topicAllAssociations":
+                res=TopicAllResults.getResultsMap(model);
                 break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
