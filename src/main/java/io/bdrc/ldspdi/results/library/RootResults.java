@@ -36,7 +36,7 @@ public class RootResults {
         ArrayList<String> processed=new ArrayList<>();
         StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
-            Statement st=it.next();
+            Statement st=it.next();            
             String type=mod.getProperty(st.getSubject(), mod.getProperty(TYPE)).getObject().asResource().getURI().toString();
             Integer ct=count.get(type);
             if(!processed.contains(st.getSubject().getURI())) {

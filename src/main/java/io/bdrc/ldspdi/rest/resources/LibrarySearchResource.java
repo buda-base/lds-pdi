@@ -24,6 +24,7 @@ import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.results.library.PersonAllResults;
 import io.bdrc.ldspdi.results.library.PersonResults;
+import io.bdrc.ldspdi.results.library.PlaceAllResults;
 import io.bdrc.ldspdi.results.library.ResourceResults;
 import io.bdrc.ldspdi.results.library.RootResults;
 import io.bdrc.ldspdi.results.library.TopicAllResults;
@@ -104,6 +105,9 @@ public class LibrarySearchResource {
             case "topicAllAssociations":
                 res=TopicAllResults.getResultsMap(model);
                 break;
+            case "placeAllAssociations":
+                res=PlaceAllResults.getResultsMap(model);
+                break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
         }       
@@ -132,6 +136,7 @@ public class LibrarySearchResource {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        log.info("Model Size >>>>>> "+model.size());
         HashMap<String,Object> res=null;        
         switch (file) {
             case "rootSearchGraph":
@@ -160,6 +165,9 @@ public class LibrarySearchResource {
                 break;
             case "topicAllAssociations":
                 res=TopicAllResults.getResultsMap(model);
+                break;
+            case "placeAllAssociations":
+                res=PlaceAllResults.getResultsMap(model);
                 break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
