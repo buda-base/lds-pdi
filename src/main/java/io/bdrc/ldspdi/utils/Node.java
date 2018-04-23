@@ -3,56 +3,54 @@ package io.bdrc.ldspdi.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node<T> {
+@SuppressWarnings("hiding")
+public class Node<String> {
     
-    private T data = null;
+    private String data = null;
  
-    private List<Node<T>> children = new ArrayList<>();    
+    private List<Node<String>> children = new ArrayList<>();    
  
-    private Node<T> parent = null;
+    private Node<String> parent = null;
  
-    public Node(T data) {
+    public Node(String data) {
         this.data = data;
     }
  
-    public Node<T> addChild(Node<T> child) {
+    public Node<String> addChild(Node<String> child) {
         child.setParent(this);
         this.children.add(child);        
         return child;
     }
  
-    public void addChildren(List<Node<T>> children) {
+    public void addChildren(List<Node<String>> children) {
         children.forEach(each -> each.setParent(this));
         this.children.addAll(children);
     }
  
-    public List<Node<T>> getChildren() {
+    public List<Node<String>> getChildren() {
         return children;
     }
  
-    public T getData() {
+    public String getData() {
         return data;
     }
  
-    public void setData(T data) {
+    public void setData(String data) {
         this.data = data;
     }
  
-    private void setParent(Node<T> parent) {
+    private void setParent(Node<String> parent) {
         this.parent = parent;
     }
  
-    public Node<T> getParent() {
+    public Node<String> getParent() {
         return parent;
     }
     
-    public boolean exist(Node<T> node) {
+    public boolean exist(Node<String> node) {
         return children.contains(node);
     }
         
-    public static <T> void printTree(Node<T> node, String appender,int x) {
-        System.out.println(x +" "+appender + node.getData());
-        node.getChildren().forEach(each ->  printTree(each, appender + appender,x+1));
-   }
+    
  
 }
