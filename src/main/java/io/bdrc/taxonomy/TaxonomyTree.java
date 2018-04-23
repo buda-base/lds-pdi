@@ -2,6 +2,8 @@ package io.bdrc.taxonomy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.apache.jena.graph.Graph;
@@ -31,6 +33,7 @@ public class TaxonomyTree {
     public static ArrayList<Node<String>> allNodes=new ArrayList<>();
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static Node<String> ROOT=new Node("O9TAXTBRC201605");
+    public static JsonNode JSON_ROOT;
     
       
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -41,7 +44,7 @@ public class TaxonomyTree {
         Triple tp=null;
         while(ext.hasNext()) {            
             tp=ext.next();
-            Node nn=new Node(tp.getSubject().getLocalName());
+            Node nn=new Node(tp.getSubject().getURI());
             allNodes.add(nn);
             root.addChild(nn);
             Triple ttp=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(tp.getSubject().getURI()));
@@ -58,7 +61,7 @@ public class TaxonomyTree {
         Triple tp=null;
         while(ext.hasNext()) {            
             tp=ext.next();
-            Node nn=new Node(tp.getSubject().getLocalName());
+            Node nn=new Node(tp.getSubject().getURI());
             allNodes.add(nn);
             root.addChild(nn);
             Triple ttp=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(tp.getSubject().getURI()));
@@ -80,10 +83,10 @@ public class TaxonomyTree {
             String prefLabel="";
             while(label.hasNext()){
                 Triple lb=label.next();
-                prefLabel=prefLabel+lb.getObject().getLiteral()+",";
+                prefLabel=prefLabel+lb.getObject().getLiteral()+" , ";
             }
             JsonNode newNode = mapper.createObjectNode();
-            ((ObjectNode) newNode).put(tp.getSubject().getLocalName(), prefLabel.substring(0,prefLabel.length()-1));
+            ((ObjectNode) newNode).put(tp.getSubject().getURI(), prefLabel.substring(0,prefLabel.length()-3));
             an1.add(newNode);
             ((ObjectNode) root).set("children", an1);
             Triple ttp=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(tp.getSubject().getURI()));
@@ -92,6 +95,7 @@ public class TaxonomyTree {
         return root;
     }
     
+       
     @SuppressWarnings("rawtypes")
     public static Node getNode(String str) {
         for(Node n:allNodes) {            
@@ -114,6 +118,7 @@ public class TaxonomyTree {
     @SuppressWarnings("unchecked")
     public static LinkedList<String> getLeafToRootPath(Node<String> root,String data) {
         LinkedList<String> linkedList = new LinkedList<String>();
+        System.out.println("DATA >> "+data);
         Node<String> nodeLeaf=TaxonomyTree.getNode(data);        
         linkedList.addLast(nodeLeaf.getData());
         while(nodeLeaf!=null) {            
@@ -133,7 +138,7 @@ public class TaxonomyTree {
             nodeLeaf=TaxonomyTree.getNode(nodeLeaf.getParent().getData());
         }        
         return linkedList;
-    } 
+    }
     
     public static <T> void printTaxTree(Node<String> node, String appender,int x) {        
         
@@ -143,22 +148,32 @@ public class TaxonomyTree {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void main(String[] args) throws RestException, InterruptedException {
+        ArrayList<String> test=new ArrayList<>();
+        test.add("http://purl.bdrc.io/resource/T3");
+        test.add("http://purl.bdrc.io/resource/T1465");
+        test.add("http://purl.bdrc.io/resource/T1");
+        test.add("http://purl.bdrc.io/resource/T184");
+        test.add("http://purl.bdrc.io/resource/T140");
+        test.add("http://purl.bdrc.io/resource/T6");
         
         TaxModel.init();
-        Node root=new Node("O9TAXTBRC201605");        
+        Node root=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605");        
         Triple t=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"));
         TaxonomyTree.buildTaxTree(t, 0, root);
-        TaxonomyTree.printTaxTree(root, " ", 0);
+        //TaxonomyTree.printTaxTree(root, " ", 0);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.createObjectNode();
-        ((ObjectNode) node).put("O9TAXTBRC201605", 0);
-        TaxonomyTree.buildJsonTaxTree(t, 0, node);        
+        ((ObjectNode) node).put("O9TAXTBRC201605", "Root Taxonomy");        
+        TaxonomyTree.buildJsonTaxTree(t, 0, node);
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(System.out , node);
         } catch (IOException e) {            
             e.printStackTrace();
         }
+        //System.out.println(TaxonomyTree.getRootToLeafPath(root,"http://purl.bdrc.io/resource/T3"));
         
     }
+    
+    
 
 }
