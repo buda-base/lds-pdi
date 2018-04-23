@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.ldspdi.results.LiteralStringField;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class TopicAllResults {

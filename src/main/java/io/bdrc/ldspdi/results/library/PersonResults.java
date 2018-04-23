@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.ldspdi.results.LiteralStringField;
 
 
 public class PersonResults {

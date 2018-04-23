@@ -76,5 +76,13 @@ public class TaxModel {
     public static String getTaxonomyItem(String key) {
         return items.get(key);
     }
+    
+    public static InfModel getInfModel() {
+        return infMod;
+    }
+    
+    public static Model getModel() {
+        return m;
+    }
 
 }
