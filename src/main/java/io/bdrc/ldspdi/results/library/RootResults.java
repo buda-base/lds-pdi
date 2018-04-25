@@ -107,7 +107,7 @@ public class RootResults {
         }
         res.put("metadata",count);
         res.put("works",works);
-        res.put("people",people);
+        res.put("persons",people);
         res.put("lineages",lineages);
         res.put("topics",topics);
         res.put("places",places);

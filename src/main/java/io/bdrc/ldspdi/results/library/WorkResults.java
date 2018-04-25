@@ -104,7 +104,7 @@ public class WorkResults {
             }
             works.put(uri, w);
         }
-        res.put("data",works);
+        res.put("works",works);
         count.put("access", access);
         count.put("license",license);
         count.put("status",status);

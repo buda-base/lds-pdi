@@ -163,7 +163,7 @@ public class TaxonomyTree {
         //TaxonomyTree.printTaxTree(root, " ", 0);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.createObjectNode();
-        ((ObjectNode) node).put("O9TAXTBRC201605", "Root Taxonomy");        
+        ((ObjectNode) node).put("http://purl.bdrc.io/resource/O9TAXTBRC201605", "Root Taxonomy");        
         TaxonomyTree.buildJsonTaxTree(t, 0, node);
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(System.out , node);
