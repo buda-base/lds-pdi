@@ -133,7 +133,7 @@ public class PlaceAllResults {
         res.put("metadata",count);
         res.put("works",works);
         res.put("literaryProd",litprod);
-        res.put("people",people);       
+        res.put("persons",people);       
         res.put("places",places);        
         return res;
     }
