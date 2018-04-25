@@ -51,7 +51,7 @@ public class PersonResults {
             
         }
         res.put("metadata",count);
-        res.put("people",people);
+        res.put("persons",people);
         return res;
     }
 
