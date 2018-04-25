@@ -15,8 +15,7 @@ public class PlaceAllResults {
     public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
-    public final static String PLACE="http://purl.bdrc.io/ontology/core/Place";
-    public final static String WORK_PRINTED="http://purl.bdrc.io/ontology/tmp/WorkPrinted";
+    public final static String PLACE="http://purl.bdrc.io/ontology/core/Place";    
     public final static String ACCESS="http://purl.bdrc.io/ontology/admin/access";
     public final static String LICENSE="http://purl.bdrc.io/ontology/admin/license";
     public final static String STATUS="http://purl.bdrc.io/ontology/admin/status";
@@ -26,8 +25,7 @@ public class PlaceAllResults {
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> works=new HashMap<>(); 
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
-        HashMap<String,ArrayList<Field>> places=new HashMap<>();
-        HashMap<String,ArrayList<Field>> litprod=new HashMap<>();
+        HashMap<String,ArrayList<Field>> places=new HashMap<>();        
         HashMap<String,Integer> access=new HashMap<>();
         HashMap<String,Integer> license=new HashMap<>();
         HashMap<String,Integer> status=new HashMap<>();
@@ -93,15 +91,7 @@ public class PlaceAllResults {
                             status.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
-                    break;
-                case WORK_PRINTED:
-                    ArrayList<Field> wp=litprod.get(st.getSubject().getURI());
-                    if(wp==null) {
-                        wp=new ArrayList<Field>();
-                    }
-                    wp.add(Field.getField(st));
-                    litprod.put(st.getSubject().getURI(),wp);
-                    break;
+                    break;                
                 case PLACE:
                     ArrayList<Field> pla=places.get(st.getSubject().getURI());
                     if(pla==null) {
@@ -131,8 +121,7 @@ public class PlaceAllResults {
         count.put("status",status);
         count.put("langScript",langScript);
         res.put("metadata",count);
-        res.put("works",works);
-        res.put("literaryProd",litprod);
+        res.put("works",works);        
         res.put("persons",people);       
         res.put("places",places);        
         return res;
