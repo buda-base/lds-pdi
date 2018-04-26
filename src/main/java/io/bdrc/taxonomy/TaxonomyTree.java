@@ -6,11 +6,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +33,8 @@ public class TaxonomyTree {
     public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     public final static String SUBCLASSOF="http://purl.bdrc.io/ontology/core/taxSubclassOf";
     public final static String TAXONOMY="http://purl.bdrc.io/ontology/core/Taxonomy";
-    public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel"; 
+    public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
+    public final static String COUNT="http://purl.bdrc.io/ontology/tmp/count";
     
     
     public static ArrayList<Node<String>> allNodes=new ArrayList<>();
@@ -112,6 +116,31 @@ public class TaxonomyTree {
         return root;
     }
     
+    public static Graph getPartialTaxGraph(Triple t,Graph mGraph) {       
+        Model mod=TaxModel.getModel();
+        Graph modGraph=mod.getGraph();        
+        ExtendedIterator<Triple> ext=mGraph.find(t); 
+        Triple tp=null;
+        ArrayNode an1=new ArrayNode(JsonNodeFactory.instance);
+        ObjectMapper mapper = new ObjectMapper();
+        while(ext.hasNext()) {            
+            tp=ext.next();
+            mGraph.add(new Triple(tp.getSubject(),NodeFactory.createURI(COUNT),NodeFactory.createLiteralByValue(0,XSDDatatype.XSDinteger)));
+            System.out.println("TP >> "+tp);
+                ExtendedIterator<Triple> label=modGraph.find(new Triple(tp.getSubject(),NodeFactory.createURI(PREFLABEL),org.apache.jena.graph.Node.ANY));
+                ArrayList<Field> f=new ArrayList<>();
+                while(label.hasNext()){
+                    Triple lb=label.next();
+                    //prefLabel=prefLabel+lb.getObject().getLiteral()+" , ";
+                    mGraph.add(lb);
+                }
+                Triple ttp=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(tp.getSubject().getURI()));
+                getPartialTaxGraph(ttp,mGraph);
+            
+        }
+        return mGraph;
+    }
+    
        
     @SuppressWarnings("rawtypes")
     public static Node getNode(String str) {
@@ -187,15 +216,17 @@ public class TaxonomyTree {
         ArrayList<String> test=new ArrayList<>();
         test.add("http://purl.bdrc.io/resource/T3");
         test.add("http://purl.bdrc.io/resource/T1465");
-        test.add("http://purl.bdrc.io/resource/T1");
+        /*test.add("http://purl.bdrc.io/resource/T1");
         test.add("http://purl.bdrc.io/resource/T184");
         test.add("http://purl.bdrc.io/resource/T140");
-        test.add("http://purl.bdrc.io/resource/T6");
+        test.add("http://purl.bdrc.io/resource/T6");*/
         
         TaxModel.init();                     
         Triple t=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"));
         TaxonomyTree.buildTree(t, 0, ROOT);
         Graph partial=TaxonomyTree.getPartialTreeTriples(ROOT, test);
+        /*Model m=ModelFactory.createModelForGraph(partial);
+        m.write(System.out,RDFLanguages.strLangJSONLD);*/
         ExtendedIterator<Triple> ext=partial.find();
         while(ext.hasNext()) {
             System.out.println(ext.next());
@@ -208,14 +239,20 @@ public class TaxonomyTree {
         JsonNode node1 = mapper.createObjectNode();
         ((ObjectNode) node1).putPOJO("http://purl.bdrc.io/resource/O9TAXTBRC201605", new TaxonomyItem(1,new LiteralStringField("literal","en","Root Taxonomy")));    
         //TaxonomyTree.buildJsonTaxTree(t, 0, node);
-        TaxonomyTree.buildJsonTaxTree(t,0,node1,partial);
-        try {
+        //TaxonomyTree.buildJsonTaxTree(t,0,node1,partial);
+        Graph ldGraph=getPartialTaxGraph(t,partial);
+        Model m=ModelFactory.createModelForGraph(ldGraph);
+        m.write(System.out,RDFLanguages.strLangJSONLD);
+        /*try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, node1);
         } catch (IOException e) {            
             e.printStackTrace();
-        }
+        }*/
         //System.out.println(TaxonomyTree.getRootToLeafPath(ROOT,"http://purl.bdrc.io/resource/T3"));
-        //System.out.println(TaxonomyTree.getTaxNode("http://purl.bdrc.io/resource/T3"));
+        ExtendedIterator<Triple> ext1=ldGraph.find();
+        while(ext1.hasNext()) {
+        System.out.println(ext1.next());
+        }
         
     }
     
