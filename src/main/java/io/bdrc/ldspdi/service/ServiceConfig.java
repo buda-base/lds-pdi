@@ -83,8 +83,7 @@ public class ServiceConfig {
         try {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
-            prop.load(input);            
-            sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));    
+            prop.load(input);
             String mimes=prop.getProperty("mime");
             StringTokenizer st=new StringTokenizer(mimes,",");
             while(st.hasMoreTokens()){
