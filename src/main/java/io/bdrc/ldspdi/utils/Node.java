@@ -50,5 +50,5 @@ public class Node<String> {
     public boolean exist(Node<String> node) {
         return children.contains(node);
     }
- 
+    
 }

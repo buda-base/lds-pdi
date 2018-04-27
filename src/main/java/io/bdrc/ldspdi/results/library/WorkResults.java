@@ -2,15 +2,27 @@ package io.bdrc.ldspdi.results.library;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.ldspdi.results.LiteralStringField;
 import io.bdrc.taxonomy.TaxModel;
+import io.bdrc.taxonomy.Taxonomy;
+import io.bdrc.taxonomy.TaxonomyItem;
 
 
 public class WorkResults {
@@ -36,10 +48,13 @@ public class WorkResults {
         HashMap<String,Integer> langScript=new HashMap<>();
         HashMap<String,Integer> tax=new HashMap<>();
         HashMap<String,Integer> topics=new HashMap<>();        
-        HashMap<String,ArrayList<Field>> works=new HashMap<>();        
+        HashMap<String,ArrayList<Field>> works=new HashMap<>();
+        HashSet<String> tops=new HashSet<>();
+        int numTops=0;
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
-            Statement st=iter.next();           
+            
+            Statement st=iter.next();            
             String uri=st.getSubject().getURI();            
             ArrayList<Field> w=works.get(uri);
                      
@@ -83,18 +98,34 @@ public class WorkResults {
                     status.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(WORK_GENRE)) {                                
+            if(st.getPredicate().getURI().equals(WORK_GENRE)) { 
+                tops.add(st.getObject().asNode().getURI());
                 String it=TaxModel.getTaxonomyItem(st.getObject().asNode().getURI());
                 if(it !=null) {                    
-                    Integer ct=tax.get(it);
+                    Integer ct=topics.get(it);
                     if(ct!=null) {
-                        tax.put(it, ct.intValue()+1);
+                        topics.put(it, ct.intValue()+1);
                     }
                     else {
-                        tax.put(it, 1);
+                        topics.put(it, 1);
                     }                    
                 }
                 Integer t=topics.get(st.getObject().asNode().getURI());
+                numTops++;
+                LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
+                if(!nodes.isEmpty()) {
+                    nodes.removeFirst();
+                    nodes.removeLast();
+                }
+                for(String s:nodes) {
+                    Integer tp=topics.get(s);
+                    if(tp!=null) {
+                        topics.put(s, tp.intValue()+1);
+                    }
+                    else {
+                        topics.put(s, 1);
+                    }
+                }
                 if(t!=null) {
                     topics.put(st.getObject().asNode().getURI(), t.intValue()+1);
                 }
@@ -104,13 +135,17 @@ public class WorkResults {
             }
             works.put(uri, w);
         }
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.createObjectNode();
+        ((ObjectNode) node).putPOJO("http://purl.bdrc.io/resource/O9TAXTBRC201605", new TaxonomyItem(numTops,new LiteralStringField("literal","en","Root Taxonomy")));  
+        Graph g=Taxonomy.getPartialTreeTriples(Taxonomy.ROOT, tops);
+        Taxonomy.buildJsonTaxTree(null,node, g, topics);
         res.put("works",works);
+        res.put("tree",node);
         count.put("access", access);
         count.put("license",license);
         count.put("status",status);
         count.put("langScript",langScript);
-        count.put("taxonomies",tax);
-        count.put("topics",topics);
         res.put("metadata",count);
         return res;
     }
