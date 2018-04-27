@@ -73,6 +73,7 @@ import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.test.TestUtils;
+import io.bdrc.restapi.exceptions.RestException;
 
 
 public class LdsTest extends JerseyTest {
@@ -83,6 +84,8 @@ public class LdsTest extends JerseyTest {
 	private static Model model = ModelFactory.createDefaultModel();	
 	public static Lang sttl = STTLWriter.registerWriter();
 	public static String fusekiUrl;
+	
+	
 	
 	@BeforeClass
 	public static void init() {
@@ -116,7 +119,7 @@ public class LdsTest extends JerseyTest {
 	
 	
 	@Test
-	public void testQueryProcessorModel(){
+	public void testQueryProcessorModel() throws RestException{
 		// Makes sure that requested model is actually returned
 		// by the query processor
 		
@@ -194,7 +197,7 @@ public class LdsTest extends JerseyTest {
 	}*/
 	
 	@Test
-    public void testJSONLDFormatter() throws IOException{
+    public void testJSONLDFormatter() throws IOException, RestException{
         // Loads resource model from .ttl file
         // Creates a jsonld object of that model and saves it to.jsonld file
         // Loads Model from jsonld file
@@ -236,7 +239,7 @@ public class LdsTest extends JerseyTest {
 		}		
 	}*/
 			
-	private Model[] prepareAssertModel(String res){
+	private Model[] prepareAssertModel(String res) throws RestException{
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
 		// Get resource model from embedded fuseki via QueryProcessor

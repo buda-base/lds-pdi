@@ -44,7 +44,7 @@ public class ServiceConfig {
 	
 	static Properties prop = new Properties();
 	static ArrayList<String> mime=new ArrayList<>();
-	public static String sparqlPrefixes="";
+	//public static String sparqlPrefixes="";
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
@@ -68,7 +68,7 @@ public class ServiceConfig {
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
 			}			
-			sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));        
+			//sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));        
 			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
@@ -117,9 +117,9 @@ public class ServiceConfig {
 		return prop.getProperty(key);
 	}
 	
-	public static String getPrefixes(){
+	/*public static String getPrefixes(){
 		return sparqlPrefixes;
-	}
+	}*/
 	
 	public static String getRobots() {
 	    return "User-agent: *"+System.lineSeparator()+"Disallow: /";

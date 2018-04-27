@@ -8,7 +8,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class DatasetBuilder {
     
@@ -57,14 +59,14 @@ public class DatasetBuilder {
     
     static String fusekiUrl="http://buda1.bdrc.io:13180/fuseki/bdrcrw/query";
     
-    public static void writeModel(String construct,String filename) throws IOException {
-        Model model=QueryProcessor.getGraph(prefixes+" "+construct, fusekiUrl);
+    public static void writeModel(String construct,String filename) throws IOException, RestException {
+        Model model=QueryProcessor.getGraph(Prefixes.getPrefixes()+" "+construct, fusekiUrl);
         FileWriter fw=new FileWriter(new File(TestUtils.TESTDIR+filename));
         model.write(fw, Lang.TURTLE.getName());
         fw.close();
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, RestException {
         ServiceConfig.initForTests();
         //DatasetBuilder.writeModel(Work_chos_dbyings, "W_Chos_Yin.ttl");
         //DatasetBuilder.writeModel(literal1, "literal1.ttl");

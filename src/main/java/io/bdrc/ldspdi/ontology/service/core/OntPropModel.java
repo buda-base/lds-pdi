@@ -7,6 +7,8 @@ import org.apache.jena.ontology.OntResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.restapi.exceptions.RestException;
+
 public class OntPropModel {
     
     final static Logger log = LoggerFactory.getLogger(OntPropModel.class.getName());
@@ -43,7 +45,7 @@ public class OntPropModel {
         }
     }
     
-    public ArrayList<OntPropModel> getAllSubProps(){
+    public ArrayList<OntPropModel> getAllSubProps() throws RestException{
         ArrayList<OntResource> res= OntData.getSubProps(uri);
         ArrayList<OntPropModel> list=new ArrayList<>();
         for(OntResource r:res) {
@@ -52,7 +54,7 @@ public class OntPropModel {
         return list;
     }
     
-    public ArrayList<OntPropModel> getParentProps(){
+    public ArrayList<OntPropModel> getParentProps() throws RestException{
         ArrayList<OntResource> res= OntData.getParentProps(uri);
         ArrayList<OntPropModel> list=new ArrayList<>();
         for(OntResource r:res) {

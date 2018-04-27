@@ -43,12 +43,12 @@ public class QueryProcessor {
 	
     public final static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
-	public static Model getResourceGraph(String resID,String fusekiUrl){			
+	public static Model getResourceGraph(String resID,String fusekiUrl) throws RestException{			
 	    
 	    int hash=Objects.hashCode(resID);
 	    Model model=(Model)ResultsCache.getObjectFromCache(hash);	    
 	    if(model==null) {
-    		Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+    		Query q=QueryFactory.create(loadPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
     		qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
     		model = qe.execDescribe();
@@ -58,12 +58,12 @@ public class QueryProcessor {
 		return model;		
 	}
 	
-	public static Model getGraph(String query,String fusekiUrl){           
+	public static Model getGraph(String query,String fusekiUrl) throws RestException{           
         
         int hash=Objects.hashCode(query);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
-            Query q=QueryFactory.create(ServiceConfig.getPrefixes()+" "+query);
+            Query q=QueryFactory.create(loadPrefixes()+" "+query);
             QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
             model = qe.execConstruct();
@@ -137,5 +137,29 @@ public class QueryProcessor {
 	    catch(Exception ex) {
 	        throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Error while getting results from Model using query : \""+query+"\"");
 	    }
+	}
+	
+	private static String loadPrefixes() {
+	    try {
+            return Prefixes.getPrefixes();
+        } catch (RestException e) {
+            return "PREFIX : <http://purl.bdrc.io/ontology/core/>\n" + 
+                    " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" + 
+                    " PREFIX adm: <http://purl.bdrc.io/ontology/admin/>\n" + 
+                    " PREFIX bdr: <http://purl.bdrc.io/resource/>\n" + 
+                    " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
+                    " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" + 
+                    " PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" + 
+                    " PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" + 
+                    " PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>\n" + 
+                    " PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>\n" + 
+                    " PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n" + 
+                    " PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" + 
+                    " PREFIX text: <http://jena.apache.org/text#>\n" + 
+                    " PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" + 
+                    " PREFIX dcterms: <http://purl.org/dc/terms/>\n" + 
+                    " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>";
+        }
+	    
 	}
 }

@@ -39,7 +39,7 @@ public class InjectionTracker {
     
     public static String getValidQuery(String query,HashMap<String,String> converted,HashMap<String,String> litParams,boolean limit) 
                 throws RestException{        
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query); 
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query); 
         log.info("HashMap >> "+converted);
         for(String st:converted.keySet()) {            
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
@@ -100,9 +100,9 @@ public class InjectionTracker {
         
     }
     
-    public static String getValidURLQuery(String query,String param,String type) {
+    public static String getValidURLQuery(String query,String param,String type) throws RestException {
         
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(ServiceConfig.getPrefixes()+" " +query);        
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query);        
         try {
             param=param.replace("+", " ");
             param=param.replace("/", "\"/");

@@ -120,15 +120,13 @@ public class TaxonomyTree {
         Model mod=TaxModel.getModel();
         Graph modGraph=mod.getGraph();        
         ExtendedIterator<Triple> ext=mGraph.find(t); 
-        Triple tp=null;
-        ArrayNode an1=new ArrayNode(JsonNodeFactory.instance);
-        ObjectMapper mapper = new ObjectMapper();
+        Triple tp=null;        
         while(ext.hasNext()) {            
             tp=ext.next();
             mGraph.add(new Triple(tp.getSubject(),NodeFactory.createURI(COUNT),NodeFactory.createLiteralByValue(0,XSDDatatype.XSDinteger)));
+            mGraph.add(new Triple(tp.getSubject(),NodeFactory.createURI(TYPE),NodeFactory.createURI(TAXONOMY)));            
             System.out.println("TP >> "+tp);
                 ExtendedIterator<Triple> label=modGraph.find(new Triple(tp.getSubject(),NodeFactory.createURI(PREFLABEL),org.apache.jena.graph.Node.ANY));
-                ArrayList<Field> f=new ArrayList<>();
                 while(label.hasNext()){
                     Triple lb=label.next();
                     //prefLabel=prefLabel+lb.getObject().getLiteral()+" , ";
@@ -239,15 +237,15 @@ public class TaxonomyTree {
         JsonNode node1 = mapper.createObjectNode();
         ((ObjectNode) node1).putPOJO("http://purl.bdrc.io/resource/O9TAXTBRC201605", new TaxonomyItem(1,new LiteralStringField("literal","en","Root Taxonomy")));    
         //TaxonomyTree.buildJsonTaxTree(t, 0, node);
-        //TaxonomyTree.buildJsonTaxTree(t,0,node1,partial);
+        TaxonomyTree.buildJsonTaxTree(t,0,node1,partial);
         Graph ldGraph=getPartialTaxGraph(t,partial);
         Model m=ModelFactory.createModelForGraph(ldGraph);
         m.write(System.out,RDFLanguages.strLangJSONLD);
-        /*try {
+        try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, node1);
         } catch (IOException e) {            
             e.printStackTrace();
-        }*/
+        }
         //System.out.println(TaxonomyTree.getRootToLeafPath(ROOT,"http://purl.bdrc.io/resource/T3"));
         ExtendedIterator<Triple> ext1=ldGraph.find();
         while(ext1.hasNext()) {

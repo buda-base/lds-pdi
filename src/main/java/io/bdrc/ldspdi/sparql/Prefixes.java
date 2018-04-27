@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.jena.riot.system.PrefixMapStd;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.restapi.exceptions.RestException;
 
 
 public class Prefixes {
@@ -31,6 +34,16 @@ public class Prefixes {
             }
             br.close();
         }catch(IOException ex) {
+            
+        }
+    }
+    
+    public static String getPrefixes() throws RestException {
+        //return new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
+        try {
+            return new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
+        } catch (IOException e) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Couldn't read prefixes from : "+ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");
             
         }
     }
