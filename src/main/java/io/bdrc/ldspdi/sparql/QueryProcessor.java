@@ -43,12 +43,14 @@ public class QueryProcessor {
 	
     public final static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
-	public static Model getResourceGraph(String resID,String fusekiUrl) throws RestException{			
-	    
+	public static Model getResourceGraph(String resID,String fusekiUrl,String prefixes) throws RestException{			
+	    if(prefixes==null) {
+	        prefixes=loadPrefixes();
+	    }
 	    int hash=Objects.hashCode(resID);
 	    Model model=(Model)ResultsCache.getObjectFromCache(hash);	    
 	    if(model==null) {
-    		Query q=QueryFactory.create(loadPrefixes()+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+    		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
     		qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
     		model = qe.execDescribe();
@@ -58,12 +60,14 @@ public class QueryProcessor {
 		return model;		
 	}
 	
-	public static Model getGraph(String query,String fusekiUrl) throws RestException{           
-        
+	public static Model getGraph(String query,String fusekiUrl, String prefixes) throws RestException{           
+	    if(prefixes==null) {
+            prefixes=loadPrefixes();
+        }
         int hash=Objects.hashCode(query);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
-            Query q=QueryFactory.create(loadPrefixes()+" "+query);
+            Query q=QueryFactory.create(prefixes+" "+query);
             QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
             model = qe.execConstruct();
@@ -139,10 +143,12 @@ public class QueryProcessor {
 	    }
 	}
 	
-	private static String loadPrefixes() {
-	    try {
-            return Prefixes.getPrefixes();
-        } catch (RestException e) {
+	private static String loadPrefixes() throws RestException {
+	    String pref=Prefixes.getPrefixes();
+        if(pref!=null) {
+            return pref;
+        }
+        else {
             return "PREFIX : <http://purl.bdrc.io/ontology/core/>\n" + 
                     " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" + 
                     " PREFIX adm: <http://purl.bdrc.io/ontology/admin/>\n" + 
@@ -160,6 +166,5 @@ public class QueryProcessor {
                     " PREFIX dcterms: <http://purl.org/dc/terms/>\n" + 
                     " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>";
         }
-	    
 	}
 }

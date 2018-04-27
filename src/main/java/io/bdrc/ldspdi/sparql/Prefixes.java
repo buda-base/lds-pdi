@@ -19,12 +19,14 @@ public class Prefixes {
     private final static HashMap<String,String> IRIByprefixes=new HashMap<>();
     private final static HashMap<String,String> prefixesByIRI=new HashMap<>();
     private final static PrefixMapStd pMap=new PrefixMapStd();
+    private static String prefixes;
     
     static {
         try {
             File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");            
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String readLine = ""; 
+            String readLine = "";
+            loadPrefixes();
             while ((readLine = br.readLine()) != null) {
                 String tmp=readLine.trim().substring(6).trim();                
                 String uri= tmp.trim().substring(tmp.indexOf(':')+1).replace(">","").replace("<", "");
@@ -33,15 +35,20 @@ public class Prefixes {
                 prefixesByIRI.put(uri.trim(),tmp.substring(0, tmp.indexOf(':')+1));
             }
             br.close();
-        }catch(IOException ex) {
+        }catch(IOException | RestException ex) {
             
         }
     }
     
     public static String getPrefixes() throws RestException {
+        return prefixes;
+    }
+    
+    public static void loadPrefixes() throws RestException {
         //return new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
         try {
-            return new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
+            prefixes = new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
+        
         } catch (IOException e) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Couldn't read prefixes from : "+ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");
             

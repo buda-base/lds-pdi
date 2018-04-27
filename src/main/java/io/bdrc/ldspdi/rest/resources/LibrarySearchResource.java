@@ -75,7 +75,7 @@ public class LibrarySearchResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;        
         switch (file) {
             case "rootSearchGraph":
@@ -135,7 +135,7 @@ public class LibrarySearchResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         log.info("Model Size >>>>>> "+model.size());
         HashMap<String,Object> res=null;        
         switch (file) {

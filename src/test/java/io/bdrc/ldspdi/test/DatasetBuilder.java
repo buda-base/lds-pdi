@@ -60,7 +60,7 @@ public class DatasetBuilder {
     static String fusekiUrl="http://buda1.bdrc.io:13180/fuseki/bdrcrw/query";
     
     public static void writeModel(String construct,String filename) throws IOException, RestException {
-        Model model=QueryProcessor.getGraph(Prefixes.getPrefixes()+" "+construct, fusekiUrl);
+        Model model=QueryProcessor.getGraph(construct, fusekiUrl,prefixes);
         FileWriter fw=new FileWriter(new File(TestUtils.TESTDIR+filename));
         model.write(fw, Lang.TURTLE.getName());
         fw.close();

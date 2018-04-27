@@ -151,7 +151,7 @@ public class PublicDataResource {
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
@@ -169,7 +169,7 @@ public class PublicDataResource {
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }           
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl); 
+        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null); 
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
@@ -275,7 +275,7 @@ public class PublicDataResource {
             fusekiUrl=fuseki;            
         }
         MediaType media=getMediaType(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }       
@@ -295,7 +295,7 @@ public class PublicDataResource {
             fusekiUrl=fuseki;            
         }
         MediaType media=getMediaType(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl);
+        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }     

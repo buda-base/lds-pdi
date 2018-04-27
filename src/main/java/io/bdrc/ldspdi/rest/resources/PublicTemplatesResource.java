@@ -58,6 +58,7 @@ import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.InjectionTracker;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -273,7 +274,7 @@ public class PublicTemplatesResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
@@ -304,7 +305,7 @@ public class PublicTemplatesResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl);
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
@@ -328,7 +329,8 @@ public class PublicTemplatesResource {
     public Response updateQueries() throws RestException{        
         log.info("updating query templates >>");
         Thread t=new Thread(new GitService());
-        t.start();               
+        t.start();
+        Prefixes.loadPrefixes();
         return Response.ok().build();       
     }
 }

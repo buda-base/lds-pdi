@@ -216,7 +216,7 @@ public class LdsTest extends JerseyTest {
                 File to_delete=new File(TestUtils.TESTDIR+res+".jsonld");
                 to_delete.delete();
                 // Checking Model against QueryProcessor 
-                Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl);
+                Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
                 assertTrue(mq.isIsomorphicWith(json));
             }
         }
@@ -246,7 +246,7 @@ public class LdsTest extends JerseyTest {
 		// returns both models to be compared by testQueryProcessorModel()
 		
 		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
-		Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl);			
+		Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl,null);			
 		Model[] ret={m,mq};		
 		return ret;
 	}
