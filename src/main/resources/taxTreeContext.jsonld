@@ -1,0 +1,9 @@
+{   
+  "@context" : { 
+    "taxHasSubclass" : { "@id" : "http://purl.bdrc.io/ontology/core/taxHasSubclass", "@type" : "@id" }, 
+    "prefLabel" : { "@id" : "http://www.w3.org/2004/02/skos/core#prefLabel" }, 
+    "@vocab" : "http://purl.bdrc.io/ontology/core/", 
+    "bdr" : "http://purl.bdrc.io/resource/",
+    "tmp" : "http://purl.bdrc.io/ontology/tmp/",
+    "bdo" : "http://purl.bdrc.io/ontology/core/"
+  } }

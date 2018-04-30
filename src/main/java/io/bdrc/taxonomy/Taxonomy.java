@@ -29,6 +29,8 @@ public class Taxonomy {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static Node<String> ROOT=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605");
     public final static String SUBCLASSOF="http://purl.bdrc.io/ontology/core/taxSubclassOf";
+    public final static String HASSUBCLASS="http://purl.bdrc.io/ontology/core/taxHasSubclass";
+    public final static String COUNT="http://purl.bdrc.io/ontology/tmp/count";
     public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     
     static {
@@ -97,6 +99,7 @@ public class Taxonomy {
         return root;
     }
     
+        
     public static LinkedList<String> getRootToLeafPath(String leaf) {
         LinkedList<String> tmp= getLeafToRootPath(leaf);
         Collections.reverse(tmp);
@@ -113,6 +116,36 @@ public class Taxonomy {
                 if(!node.equals(previous) && !node.equals(ROOT.getData())) {
                     Triple t=new Triple(NodeFactory.createURI(node),NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(previous));
                     partialTree.add(t);
+                }
+                previous=node;
+            }
+        }
+        return partialTree;
+    }
+    
+    public static Graph getPartialLDTreeTriples(Node<String> root,HashSet<String> leafTopics,HashMap<String,Integer> topics){
+        Model model=TaxModel.getModel();
+        Graph modGraph=model.getGraph();
+        Model mod=ModelFactory.createDefaultModel();
+        Graph partialTree=mod.getGraph();
+        String previous=ROOT.getData();        
+        for(String uri:leafTopics) {
+            LinkedList<String> ll=getRootToLeafPath(uri);            
+            for(String node:ll) { 
+                Integer count=topics.get(node);
+                if(count==null) {
+                    count=-1;
+                }                
+                if(!node.equals(previous) && !node.equals(ROOT.getData())) {
+                    partialTree.add(new Triple(NodeFactory.createURI(node),
+                            NodeFactory.createURI(COUNT),
+                            NodeFactory.createLiteral(count.toString())));
+                    partialTree.add(new Triple(NodeFactory.createURI(previous),NodeFactory.createURI(HASSUBCLASS),NodeFactory.createURI(node) ));
+                }
+                ExtendedIterator<Triple> label=modGraph.find(NodeFactory.createURI(node),NodeFactory.createURI(PREFLABEL),org.apache.jena.graph.Node.ANY);
+                
+                while(label.hasNext()){
+                    partialTree.add(label.next());                    
                 }
                 previous=node;
             }

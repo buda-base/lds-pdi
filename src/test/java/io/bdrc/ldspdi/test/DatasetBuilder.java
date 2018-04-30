@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
 

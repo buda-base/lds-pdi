@@ -1,28 +1,35 @@
 package io.bdrc.ldspdi.results.library;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.riot.JsonLDWriteContext;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.writer.JsonLDWriter;
+import org.apache.jena.sparql.core.mem.DatasetGraphInMemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.ldspdi.results.LiteralStringField;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.taxonomy.TaxModel;
 import io.bdrc.taxonomy.Taxonomy;
-import io.bdrc.taxonomy.TaxonomyItem;
+
 
 
 public class WorkResults {
@@ -45,16 +52,14 @@ public class WorkResults {
         HashMap<String,Integer> access=new HashMap<>();
         HashMap<String,Integer> license=new HashMap<>();
         HashMap<String,Integer> status=new HashMap<>();
-        HashMap<String,Integer> langScript=new HashMap<>();
-        HashMap<String,Integer> tax=new HashMap<>();
+        HashMap<String,Integer> langScript=new HashMap<>();        
         HashMap<String,Integer> topics=new HashMap<>();        
         HashMap<String,ArrayList<Field>> works=new HashMap<>();
-        HashSet<String> tops=new HashSet<>();
-        int numTops=0;
+        HashSet<String> tops=new HashSet<>();       
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             
-            Statement st=iter.next();            
+            Statement st=iter.next();  
             String uri=st.getSubject().getURI();            
             ArrayList<Field> w=works.get(uri);
                      
@@ -110,8 +115,7 @@ public class WorkResults {
                         topics.put(it, 1);
                     }                    
                 }
-                Integer t=topics.get(st.getObject().asNode().getURI());
-                numTops++;
+                Integer t=topics.get(st.getObject().asNode().getURI());                
                 LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
                 if(!nodes.isEmpty()) {
                     nodes.removeFirst();
@@ -135,13 +139,28 @@ public class WorkResults {
             }
             works.put(uri, w);
         }
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.createObjectNode();
-        ((ObjectNode) node).putPOJO("http://purl.bdrc.io/resource/O9TAXTBRC201605", new TaxonomyItem(numTops,new LiteralStringField("literal","en","Root Taxonomy")));  
-        Graph g=Taxonomy.getPartialTreeTriples(Taxonomy.ROOT, tops);
-        Taxonomy.buildJsonTaxTree(null,node, g, topics);
+        JsonNode nn=null;
+        if(tops.size()>0) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+                Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops,topics);
+                ByteArrayOutputStream baos=new ByteArrayOutputStream();        
+                DatasetGraphInMemory dg=new DatasetGraphInMemory();
+                dg.setDefaultGraph(g);
+                JsonLDWriter wr=new JsonLDWriter(RDFFormat.JSONLD_FRAME_FLAT);
+                JsonLDWriteContext ctx = new JsonLDWriteContext();        
+                ctx.setFrame(ServiceConfig.getTAX_CONTEXT());            
+                wr.write(baos, dg,null, null, ctx);            
+                nn=mapper.readTree(baos.toString());
+                baos.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
         res.put("works",works);
-        res.put("tree",node);
+        res.put("tree",nn);
         count.put("access", access);
         count.put("license",license);
         count.put("status",status);

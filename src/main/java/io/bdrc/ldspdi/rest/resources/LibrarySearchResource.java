@@ -93,7 +93,7 @@ public class LibrarySearchResource {
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(model);
                 break;
-            case "associatedWorks":
+            case "workAssocWorks":
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":
@@ -154,7 +154,7 @@ public class LibrarySearchResource {
             case "workFacetGraph":
                 res=WorkResults.getResultsMap(model);
                 break;
-            case "associatedWorks":
+            case "workAssocWorks":
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":

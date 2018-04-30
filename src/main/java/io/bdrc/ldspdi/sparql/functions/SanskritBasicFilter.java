@@ -42,11 +42,4 @@ public SanskritBasicFilter() { super() ; }
 		return NodeValue.makeBoolean(false);
 		
     }
-	
-	public static void main(String[] args) {
-		SanskritBasicFilter sbf=new SanskritBasicFilter();
-		NodeValue nv=sbf.exec(new NodeValueString("prajnaparamita"), new NodeValueString("prajna paramita"));
-		System.out.println(nv);
-	}
-
 }

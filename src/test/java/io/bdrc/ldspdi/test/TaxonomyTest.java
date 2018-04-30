@@ -2,7 +2,6 @@ package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,21 +9,18 @@ import java.util.LinkedList;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.bdrc.ldspdi.results.LiteralStringField;
 import io.bdrc.ldspdi.utils.Node;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 import io.bdrc.taxonomy.Taxonomy;
-import io.bdrc.taxonomy.TaxonomyItem;
-import io.bdrc.taxonomy.TaxonomyTree;
+
 
 public class TaxonomyTest {    
         
@@ -56,9 +52,7 @@ public class TaxonomyTest {
         test.addFirst("http://purl.bdrc.io/resource/T3");
         System.out.println(test);
         String data="http://purl.bdrc.io/resource/T3";
-        LinkedList<String> ll=Taxonomy.getLeafToRootPath(data);
-        LinkedList<String> llx=Taxonomy.getLeafToRootPath("http://purl.bdrc.io/resource/T1598");
-        System.out.println("CHECK >>>>>>>>>>>>>"+llx);
+        LinkedList<String> ll=Taxonomy.getLeafToRootPath(data);        
         System.out.println(ll);
         assertTrue(ll.equals(test));
     }
@@ -80,10 +74,17 @@ public class TaxonomyTest {
         node.getChildren().forEach(each ->  printTaxTree(each, appender + appender,x+1));
     }
     
-    @Test
+    /*@Test
     public void getPartialGraph() {
         Graph partial=Taxonomy.getPartialTreeTriples(Taxonomy.ROOT, getTestTopics());
         printGraph(partial);
+    }
+    
+    @Test
+    public void getPartialLDGraph() {
+        Graph partial=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, getTestTopics(),getTestCountTopics());
+        printGraph(partial);
+        
     }
     
     public void printGraph(Graph partial) {
@@ -93,7 +94,21 @@ public class TaxonomyTest {
         }
     }
     
+    public void writeLDGraph(Graph partial) {
+        Model mod=ModelFactory.createModelForGraph(partial);
+        mod.write(System.out,RDFLanguages.strLangJSONLD);
+    }*/
     
+    public HashMap<String,Integer> getTestCountTopics(){
+        HashMap<String,Integer> test=new HashMap<>();
+        test.put("http://purl.bdrc.io/resource/T3",3);
+        test.put("http://purl.bdrc.io/resource/T1465",1);
+        test.put("http://purl.bdrc.io/resource/T1",2);
+        test.put("http://purl.bdrc.io/resource/T184",4);
+        test.put("http://purl.bdrc.io/resource/T140",5);
+        test.put("http://purl.bdrc.io/resource/T6",6);
+        return test;
+    }
     
     public HashSet<String> getTestTopics(){
         HashSet<String> test=new HashSet<>();
