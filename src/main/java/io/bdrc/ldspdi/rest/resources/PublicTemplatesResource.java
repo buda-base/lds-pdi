@@ -285,10 +285,9 @@ public class PublicTemplatesResource {
     @Path("/graph/{file}") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @HeaderParam("Accept") String format,
+            @HeaderParam("Accept") final String format,
             @PathParam("file") String file,
-            HashMap<String,String> map) throws RestException{     
-        
+            HashMap<String,String> map) throws RestException{
         log.info("Call to getQueryTemplateResultsPost() with format >>"+format);
         if(fuseki !=null){fusekiUrl=fuseki;} 
                 
@@ -309,7 +308,7 @@ public class PublicTemplatesResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,format),getMediaType(format)).build();        
+        return Response.ok(ResponseOutputStream.getModelStream(model,ServiceConfig.getProperty(format)),getMediaType(format)).build();        
     }
     
     private MediaType getMediaType(String format) {
