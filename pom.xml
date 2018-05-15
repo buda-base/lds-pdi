@@ -10,7 +10,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jersey.version>2.27</jersey.version>
-    <jena.version>3.7.0-SNAPSHOT</jena.version>
+    <jena.version>3.7.0</jena.version>
     <jetty.version>9.4.9.v20180320</jetty.version>
   </properties>
   <repositories>
