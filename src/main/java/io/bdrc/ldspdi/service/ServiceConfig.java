@@ -27,14 +27,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +46,6 @@ public class ServiceConfig {
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 	public static String JSONLD_CONTEXT;
-	public static String TAX_CONTEXT;
-	
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
@@ -68,12 +64,10 @@ public class ServiceConfig {
 			while(st.hasMoreTokens()){
 				mime.add(st.nextToken());
 			}			
-			//sparqlPrefixes=new String(Files.readAllBytes(Paths.get(params.get(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));        
 			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
 			InputStream in = ServiceConfig.class.getClassLoader().getResourceAsStream("taxTreeContext.jsonld");
-			TAX_CONTEXT=IOUtils.toString(in, StandardCharsets.UTF_8);
 			in.close();
 			
 	    } catch (IOException ex) {
@@ -121,11 +115,6 @@ public class ServiceConfig {
 		return prop.getProperty(key);
 	}
 	
-	
-	public static String getTAX_CONTEXT() {
-        return TAX_CONTEXT;        
-    }
-
     public static String getRobots() {
 	    return "User-agent: *"+System.lineSeparator()+"Disallow: /";
 	}

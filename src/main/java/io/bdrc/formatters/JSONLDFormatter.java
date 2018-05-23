@@ -254,5 +254,6 @@ public class JSONLDFormatter {
          Object jsonO = modelToJsonObject(m, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
          jsonObjectToOutputStream(jsonO, out);
      }
+     
 }
 
