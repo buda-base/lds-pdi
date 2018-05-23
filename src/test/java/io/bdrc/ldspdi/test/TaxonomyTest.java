@@ -6,13 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RDFLanguages;
-import org.apache.jena.util.iterator.ExtendedIterator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,14 +26,13 @@ public class TaxonomyTest {
     public static void init() throws RestException {
         TaxModel.init();                     
         Triple t=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(Taxonomy.SUBCLASSOF),NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"));
-        TREE=Taxonomy.buildTree(t, 1, Taxonomy.ROOT);
+        TREE=Taxonomy.buildFullTree(t, 1, Taxonomy.ROOT);
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     @Test
-    public void getNode() throws RestException {
-       
-        Node<String> test=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605_0392");
+    public void getNode() throws RestException {       
+        
         Node<String> ntest=Taxonomy.getNode("http://purl.bdrc.io/resource/O9TAXTBRC201605_0392");
         assertTrue(ntest!=null);
     }

@@ -21,7 +21,6 @@ package io.bdrc.ldspdi.sparql.functions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 import io.bdrc.ldspdi.utils.Helpers;
@@ -40,6 +39,5 @@ public SanskritBasicFilter() { super() ; }
 			return NodeValue.makeBoolean(StringUtils.containsAny(v1,test));
 		}		
 		return NodeValue.makeBoolean(false);
-		
     }
 }

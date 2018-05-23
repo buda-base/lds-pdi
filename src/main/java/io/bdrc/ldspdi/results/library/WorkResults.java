@@ -2,14 +2,11 @@ package io.bdrc.ldspdi.results.library;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -150,7 +147,8 @@ public class WorkResults {
                 dg.setDefaultGraph(g);
                 JsonLDWriter wr=new JsonLDWriter(RDFFormat.JSONLD_FRAME_FLAT);
                 JsonLDWriteContext ctx = new JsonLDWriteContext();        
-                ctx.setFrame(ServiceConfig.getTAX_CONTEXT());            
+                ctx.setFrame(ServiceConfig.getTAX_CONTEXT());  
+                //ctx.setJsonLDContext(JSONLDFormatter.getJsonLdContext()); 
                 wr.write(baos, dg,null, null, ctx);            
                 nn=mapper.readTree(baos.toString());
                 baos.close();
