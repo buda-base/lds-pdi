@@ -2,17 +2,25 @@ package io.bdrc.ldspdi.results.library;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 
+import org.apache.jena.atlas.io.IO;
+import org.apache.jena.atlas.lib.Chars;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFFormat.JSONLDVariant;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.mem.DatasetGraphInMemory;
 import org.slf4j.Logger;
@@ -21,9 +29,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.utils.JsonUtils;
 
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 import io.bdrc.taxonomy.Taxonomy;
 
@@ -43,7 +54,7 @@ public class WorkResults {
     public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());  
      
       
-    public static HashMap<String,Object> getResultsMap(Model mod){
+    public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
         HashMap<String,Integer> access=new HashMap<>();
@@ -144,17 +155,22 @@ public class WorkResults {
                 Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops,topics);
                 ByteArrayOutputStream baos=new ByteArrayOutputStream();        
                 DatasetGraphInMemory dg=new DatasetGraphInMemory();
-                dg.setDefaultGraph(g);
-                JsonLDWriter wr=new JsonLDWriter(RDFFormat.JSONLD_FRAME_FLAT);
-                JsonLDWriteContext ctx = new JsonLDWriteContext();        
-                ctx.setFrame(ServiceConfig.getTAX_CONTEXT());  
-                //ctx.setJsonLDContext(JSONLDFormatter.getJsonLdContext()); 
-                wr.write(baos, dg,null, null, ctx);            
+                dg.setDefaultGraph(g);                
+                JsonLDWriteContext ctx = new JsonLDWriteContext();
+                ctx.setFrame(ServiceConfig.getTAX_CONTEXT());
+                JSONLDVariant variant= (RDFFormat.JSONLDVariant) RDFFormat.JSONLD_COMPACT_PRETTY.getVariant();
+                PrefixMap pm = RiotLib.prefixMap(g);
+                @SuppressWarnings("unchecked")
+                Map<String,Object> obj= (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, dg, pm, null, ctx);
+                obj.replace("@context", "http://purl.bdrc.io/context.jsonld");
+                Writer wrt = new OutputStreamWriter(baos, Chars.charsetUTF8) ;
+                JsonUtils.writePrettyPrint(wrt, obj) ;
+                wrt.write("\n");
+                IO.flush(wrt) ;
                 nn=mapper.readTree(baos.toString());
                 baos.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (IOException | JsonLdError e1) {
+                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"WorkResults was unable to write Taxonomy Tree : \""+e1.getMessage()+"\"");              
             }
         }
         res.put("works",works);
