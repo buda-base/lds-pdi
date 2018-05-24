@@ -25,8 +25,8 @@ public class TaxonomyTest {
     @BeforeClass
     public static void init() throws RestException {
         TaxModel.init();                     
-        Triple t=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(Taxonomy.SUBCLASSOF),NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"));
-        TREE=Taxonomy.buildFullTree(t, 1, Taxonomy.ROOT);
+        Triple t=new Triple(NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"),NodeFactory.createURI(Taxonomy.HASSUBCLASS),org.apache.jena.graph.Node.ANY);
+        TREE=Taxonomy.buildTree(t, Taxonomy.ROOT);
     }
     
     @SuppressWarnings({ "unchecked" })

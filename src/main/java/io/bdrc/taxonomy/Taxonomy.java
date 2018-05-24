@@ -19,34 +19,32 @@ public class Taxonomy {
     
     public static ArrayList<Node<String>> allNodes=new ArrayList<>();
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Node<String> ROOT=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605");
-    public final static String SUBCLASSOF="http://purl.bdrc.io/ontology/core/taxSubclassOf";
-    public final static String HASSUBCLASS="http://purl.bdrc.io/ontology/core/taxHasSubclass";
+    public static Node<String> ROOT=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605");    
+    public final static String HASSUBCLASS="http://purl.bdrc.io/ontology/core/taxHasSubClass";
     public final static String COUNT="http://purl.bdrc.io/ontology/tmp/count";
     public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     
     static {
-        Triple t=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(Taxonomy.SUBCLASSOF),NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"));
-        Taxonomy.buildFullTree(t, 1, Taxonomy.ROOT);
+        Triple t=new Triple(NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"),NodeFactory.createURI(Taxonomy.HASSUBCLASS),org.apache.jena.graph.Node.ANY);
+        Taxonomy.buildTree(t, Taxonomy.ROOT);
     }
-    
+       
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Node buildFullTree(Triple t,int x,Node root) {
+    public static Node buildTree(Triple t,Node root) {
         Model mod=TaxModel.getModel();
         Graph mGraph =mod.getGraph();        
         ExtendedIterator<Triple> ext=mGraph.find(t); 
         Triple tp=null;
         while(ext.hasNext()) {            
-            tp=ext.next();
-            Node nn=new Node(tp.getSubject().getURI());
+            tp=ext.next();            
+            Node nn=new Node(tp.getObject().getURI());
             allNodes.add(nn);
             root.addChild(nn);
-            Triple ttp=new Triple(org.apache.jena.graph.Node.ANY,NodeFactory.createURI(SUBCLASSOF),NodeFactory.createURI(tp.getSubject().getURI()));
-            buildFullTree(ttp,x+1,nn);
+            Triple ttp=new Triple(NodeFactory.createURI(tp.getObject().getURI()),NodeFactory.createURI(HASSUBCLASS),org.apache.jena.graph.Node.ANY);
+            buildTree(ttp,nn);
         }
         return root;
     }
-    
        
     @SuppressWarnings("unchecked")
     public static LinkedList<String> getLeafToRootPath(String leaf) {

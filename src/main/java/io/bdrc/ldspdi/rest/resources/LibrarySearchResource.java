@@ -1,8 +1,6 @@
 package io.bdrc.ldspdi.rest.resources;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -15,22 +13,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.JsonLDWriteContext;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.RDFFormat.JSONLDVariant;
-import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.RiotLib;
-import org.apache.jena.riot.writer.JsonLDWriter;
-import org.apache.jena.sparql.core.DatasetGraph;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jsonldjava.core.JsonLdError;
 
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
@@ -49,7 +37,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
-import io.bdrc.taxonomy.TaxModel;
+
 
 @Path("/")
 public class LibrarySearchResource {
@@ -188,29 +176,4 @@ public class LibrarySearchResource {
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
         
     }
-    
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("/lib/taxtree") 
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTaxonomyTree( @HeaderParam("fusekiUrl") final String fuseki) throws RestException {
-        
-        log.info(">> Call to getTaxonomyTree >> "); 
-        Model m=TaxModel.getModel();
-        DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
-        PrefixMap pm = RiotLib.prefixMap(g);
-        JSONLDVariant variant = (RDFFormat.JSONLDVariant) RDFFormat.JSONLD_COMPACT_PRETTY.getVariant();
-        JsonLDWriteContext ctx = new JsonLDWriteContext();
-        Map<String, Object> res=null;
-        try {
-            res = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
-            res.replace("@context", "http://purl.bdrc.io/context.jsonld");
-        } catch (JsonLdError | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
-    }
-    
 }
