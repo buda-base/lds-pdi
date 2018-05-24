@@ -41,6 +41,7 @@ public class InjectionTracker {
                 throws RestException{        
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query); 
         log.info("HashMap >> "+converted);
+        if(converted ==null) { converted=new HashMap<>();}
         for(String st:converted.keySet()) {            
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));                

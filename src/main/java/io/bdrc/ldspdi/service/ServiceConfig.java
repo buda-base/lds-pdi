@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
 public class ServiceConfig {
 	
 	static Properties prop = new Properties();
-	static ArrayList<String> mime=new ArrayList<>();
-	//public static String sparqlPrefixes="";
+	static ArrayList<String> mime=new ArrayList<>();	
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
