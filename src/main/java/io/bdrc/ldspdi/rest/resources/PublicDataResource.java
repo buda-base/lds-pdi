@@ -278,7 +278,7 @@ public class PublicDataResource {
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }       
+        }
         return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).build();       
     }
     
@@ -353,10 +353,11 @@ public class PublicDataResource {
     }
     
     private MediaType getMediaType(String format) {
-        MediaType media=default_media;
-        if(ServiceConfig.getProperty(format)!=null){
-            if(ServiceConfig.isValidMime(format)){
-                String[] parts=format.split(Pattern.quote("/"));
+        MediaType media=default_media;        
+        String tmp=ServiceConfig.getProperty("m"+format);
+        if(tmp!=null){
+            if(ServiceConfig.isValidMime(tmp)){
+                String[] parts=tmp.split(Pattern.quote("/"));
                 media = new MediaType(parts[0],parts[1]); 
             }
         }
