@@ -41,60 +41,55 @@ import io.bdrc.restapi.exceptions.RestException;
 
 @Path("/")
 public class LibrarySearchResource {
-    
-    public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());   
+
+    public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-    
-       
+
+
     public LibrarySearchResource() {
         super();
         ResourceConfig config=new ResourceConfig(PublicDataResource.class);
         config.register(LoggingFeature.class);
-        config.register(CorsFilter.class); 
+        config.register(CorsFilter.class);
         config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
     }
-    
-        
+
+
     @POST
-    @Path("/lib/{file}")  
+    @Path("/lib/{file}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLibGraphPost(
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") final String file,
             HashMap<String,String> map) throws RestException {
-        
+
         log.info("Call to getLibGraphPost() with template name >> "+file);
-        QueryFileParser qfp=new QueryFileParser(file+".arq","library");        
+        QueryFileParser qfp=new QueryFileParser(file+".arq","library");
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
-        HashMap<String,Object> res=null;        
+        HashMap<String,Object> res=null;
         switch (file) {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
                 break;
             case "personFacetGraph":
-                res=PersonResults.getResultsMap(model);
-                break;
             case "workAssocPersons":
-                res=PersonResults.getResultsMap(model);
-                break;            
             case "placeAssocPersons":
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
-                res=WorkResults.getResultsMap(model);
-                break;
             case "workAssocWorks":
+            case "workAllAssociations":
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":
@@ -111,51 +106,46 @@ public class LibrarySearchResource {
                 break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
-        }       
+        }
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
-    
+
     @GET
-    @Path("/lib/{file}") 
+    @Path("/lib/{file}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLibGraphGet( @Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file
             ) throws RestException {
-        
+
         log.info("Call to getLibGraphGet() with template name >> "+file);
-        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());  
-        QueryFileParser qfp=new QueryFileParser(file+".arq","library");        
+        HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());
+        QueryFileParser qfp=new QueryFileParser(file+".arq","library");
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
                     RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);        
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         log.info("Model Size >>>>>> "+model.size());
-        HashMap<String,Object> res=null;        
+        HashMap<String,Object> res=null;
         switch (file) {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
                 break;
             case "personFacetGraph":
-                res=PersonResults.getResultsMap(model);
-                break;
             case "workAssocPersons":
-                res=PersonResults.getResultsMap(model);
-                break;            
             case "placeAssocPersons":
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workFacetGraph":
-                res=WorkResults.getResultsMap(model);
-                break;
             case "workAssocWorks":
+            case "workAllAssociations":
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":
@@ -172,8 +162,8 @@ public class LibrarySearchResource {
                 break;
             default:
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
-        }     
+        }
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-        
+
     }
 }
