@@ -311,17 +311,6 @@ public class PublicTemplatesResource {
         return Response.ok(ResponseOutputStream.getModelStream(model,ServiceConfig.getProperty(format)),getMediaType(format)).build();        
     }
     
-    /*private MediaType getMediaType(String format) {
-        MediaType media=new MediaType("text","turtle","utf-8");        
-        if(ServiceConfig.getProperty(format)!=null){
-            if(ServiceConfig.isValidMime(format)){
-                String[] parts=format.split(Pattern.quote("/"));
-                media = new MediaType(parts[0],parts[1]); 
-            }
-        }
-        return media;
-    }*/
-    
     private MediaType getMediaType(String format) {
         MediaType media=default_media;        
         String tmp=ServiceConfig.getProperty("m"+format);

@@ -10,21 +10,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.InjectionTracker;
+import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class TaxModel {    
+public class TaxModel {   
        
-    static InfModel infMod;
+    
     static Model m;
     static HashMap<String,String> items;
     public final static Logger log=LoggerFactory.getLogger(TaxModel.class.getName());
     
     public static void init() throws RestException {
         
-        QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");
+        /*QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");
         String query=qfp.getQuery();
+        m=QueryProcessor.getGraph(query,ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL),null);*/
+        QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");        
+        String check=qfp.checkQueryArgsSyntax();
+        HashMap<String,String> map=new HashMap<>();
+        map.put("R_RES","bdr:O9TAXTBRC201605");
+        if(!check.trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ ServiceConfig.getProperty("taxtree")+".arq"+"; ERROR: "+check);
+        }
+        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
+        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+        }
         m=QueryProcessor.getGraph(query,ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL),null);
         items=getRootCatByTopics();
     }
@@ -47,10 +63,6 @@ public class TaxModel {
     
     public static String getTaxonomyItem(String key) {
         return items.get(key);
-    }
-    
-    public static InfModel getInfModel() {
-        return infMod;
     }
     
     public static Model getModel() {
