@@ -6,8 +6,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 
-import io.bdrc.ldspdi.service.ServiceConfig;
-
 public class MediaTypeUtils {
     
     public static ArrayList<String> MIMES;

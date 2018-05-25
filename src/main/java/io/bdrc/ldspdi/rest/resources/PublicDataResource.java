@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -35,11 +34,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
@@ -50,9 +47,6 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
@@ -61,16 +55,9 @@ import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.results.CacheAccessModel;
-import io.bdrc.ldspdi.results.ResultPage;
-import io.bdrc.ldspdi.results.ResultSetWrapper;
-import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.InjectionTracker;
-import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
-import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -174,91 +161,6 @@ public class PublicDataResource {
         }
         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),MediaTypeUtils.getMediaTypeFromExt(format)).build();       
-    }
-    
-    @GET
-    @Path("/resource/{type}/exact/{res}") 
-    public Viewable getExactPersonURLResources(@PathParam("res") final String res,
-        @PathParam("type") final String type,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws RestException {
-        
-        log.info("Call to getExactPersonURLResources()");
-        
-        //Settings  
-        if(fuseki !=null){ 
-            fusekiUrl=fuseki;            
-        }
-        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());             
-        hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/")); 
-                      
-        QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE_EXACT));
-        String q=InjectionTracker.getValidURLQuery(qfp.getQuery(), res,type);
-        
-        boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
-        String msg =q;
-        if(error) {
-            return new Viewable("/error.jsp",msg);
-        }
-        ResultSetWrapper rs = QueryProcessor.getResults(q,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-        ResultPage model=null;
-        try {
-            if(hm.get(QueryConstants.JSON_OUT)!=null) {
-                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new Results(rs,hm)));
-            }
-            hm.put(QueryConstants.REQ_METHOD, "GET");             
-            hm.put("query", qfp.getQueryHtml());
-            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);
-            model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
-        }
-        catch (JsonProcessingException jx) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
-        }
-        return new Viewable("/resPage.jsp",model);    
-        
-    }
-    
-    @GET
-    @Path("/resource/{type}/{res}") 
-    public Viewable getTypedResource(@PathParam("res") final String res,
-        @PathParam("type") final String type,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws RestException{
-        
-        log.info("getTypedResource()");        
-        if(fuseki !=null){
-            fusekiUrl=fuseki;            
-        }
-        //Settings
-        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
-        hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
-                
-        QueryFileParser qfp=new QueryFileParser("/URL/"+ServiceConfig.getProperty(QueryConstants.URL_TEMPLATE));        
-        String query=qfp.getQuery();
-        String q=InjectionTracker.getValidURLQuery(query, "\""+res+"\"",type);  
-        
-        boolean error=q.startsWith(QueryConstants.QUERY_ERROR);
-        String msg =q;
-        if(error) {
-            return new Viewable("/error.jsp",msg);
-        }
-        ResultSetWrapper rs = QueryProcessor.getResults(q, fuseki, hm.get(QueryConstants.RESULT_HASH), ServiceConfig.getProperty(QueryConstants.QS_PAGE_SIZE));        
-        //Json output requested
-        ResultPage model=null;
-        try {
-            if(hm.get(QueryConstants.JSON_OUT)!=null) {                                         
-                return new Viewable("/json.jsp",new ObjectMapper().writeValueAsString(new Results(rs,hm)));
-            }
-            hm.put(QueryConstants.REQ_METHOD, "GET");             
-            hm.put("query", qfp.getQueryHtml());
-            hm.put(QueryConstants.QUERY_TYPE, QueryConstants.URL_QUERY);        
-            model=new ResultPage(rs,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
-        }
-        catch (JsonProcessingException jx) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
-        }
-        return new Viewable("/resPage.jsp",model);   
-        
     }
      
     @GET
