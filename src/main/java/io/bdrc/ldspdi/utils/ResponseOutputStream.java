@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.rest.resources.MediaTypeUtils;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class ResponseOutputStream {
@@ -61,12 +62,12 @@ public class ResponseOutputStream {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {                
                  
-                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
+                if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {      
                         Object json = JSONLDFormatter.modelToJsonObject(model, res);
                         JSONLDFormatter.jsonObjectToOutputStream(json, os);
                     } else {
-                        model.write(os,ServiceConfig.getProperty(format));
+                        model.write(os,MediaTypeUtils.getJenaFromExtension(format));
                     }
                 } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
@@ -82,11 +83,11 @@ public class ResponseOutputStream {
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {                
                  
-                if(ServiceConfig.getProperty(format)!=null && !format.equalsIgnoreCase("ttl")){
+                if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {                        
                         JSONLDFormatter.writeModelAsCompact(model, os);
                     } else {
-                        model.write(os,ServiceConfig.getProperty(format));
+                        model.write(os,MediaTypeUtils.getJenaFromExtension(format));
                     }
                 } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   

@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.rest.resources;
 
 
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -70,8 +69,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @Path("/")
 public class PublicTemplatesResource {
     
-    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
-    MediaType default_media=new MediaType("text","turtle","utf-8");
+    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     
     public PublicTemplatesResource() {
@@ -278,7 +276,7 @@ public class PublicTemplatesResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,format),getMediaType(format)).build();        
+        return Response.ok(ResponseOutputStream.getModelStream(model,format),MediaTypeUtils.getMediaTypeFromExt(format)).build();        
     }
     
     @POST
@@ -308,19 +306,7 @@ public class PublicTemplatesResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,ServiceConfig.getProperty(format)),getMediaType(format)).build();        
-    }
-    
-    private MediaType getMediaType(String format) {
-        MediaType media=default_media;        
-        String tmp=ServiceConfig.getProperty("m"+format);
-        if(tmp!=null){
-            if(ServiceConfig.isValidMime(tmp)){
-                String[] parts=tmp.split(Pattern.quote("/"));
-                media = new MediaType(parts[0],parts[1]); 
-            }
-        }
-        return media;
+        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format)).build();        
     }
     
     @POST

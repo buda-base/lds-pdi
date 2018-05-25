@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +24,6 @@ public class TaxModel {
     
     public static void init() throws RestException {
         
-        /*QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");
-        String query=qfp.getQuery();
-        m=QueryProcessor.getGraph(query,ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL),null);*/
         QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");        
         String check=qfp.checkQueryArgsSyntax();
         HashMap<String,String> map=new HashMap<>();

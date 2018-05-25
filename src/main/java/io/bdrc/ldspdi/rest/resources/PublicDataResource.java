@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -82,7 +81,7 @@ public class PublicDataResource {
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);    
-    MediaType default_media=new MediaType("text","turtle","utf-8");
+    
     
     public ArrayList<String> validMedia=new ArrayList<>();
     
@@ -140,7 +139,7 @@ public class PublicDataResource {
         
         String redirect="http://library.bdrc.io/show/bdr:"+res;
         if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
-                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isRdfMedia(format)) {            
+                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isMime(format)) {            
             try {
                 return Response.seeOther(new URI(redirect)).build();
             } catch (URISyntaxException e) {
@@ -155,7 +154,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getJenaFormat(format)),getMediaType(format)).build();       
+        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format)).build();       
     }
     
     @POST
@@ -174,7 +173,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
-        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),getMediaType(format)).build();       
+        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),MediaTypeUtils.getMediaTypeFromExt(format)).build();       
     }
     
     @GET
@@ -274,7 +273,7 @@ public class PublicDataResource {
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
-        MediaType media=getMediaType(format);
+        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
@@ -294,7 +293,7 @@ public class PublicDataResource {
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
-        MediaType media=getMediaType(format);
+        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
@@ -329,11 +328,11 @@ public class PublicDataResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 
                 Model model=OntData.ontMod;
-                if(ServiceConfig.getProperty(ext)!=null && !ext.equalsIgnoreCase("ttl")){
+                if(MediaTypeUtils.getJenaFromExtension(ext)!=null && !ext.equalsIgnoreCase("ttl")){
                     if(ext.equalsIgnoreCase("jsonld")) {
-                        model.write(os,ServiceConfig.getProperty("json"));
+                        model.write(os,MediaTypeUtils.getJenaFromExtension("json"));
                     }else {
-                        model.write(os,ServiceConfig.getProperty(ext));
+                        model.write(os,MediaTypeUtils.getJenaFromExtension(ext));
                     }
                 }else{
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
@@ -341,7 +340,7 @@ public class PublicDataResource {
                 }                
             }
         };
-        return Response.ok(stream,getMediaType(ext)).build();        
+        return Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext)).build();        
     }
     
     @GET
@@ -350,18 +349,6 @@ public class PublicDataResource {
     public Viewable getOntologyHomePage() {        
         log.info("Call to getOntologyHomePage()");          
         return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
-    }
-    
-    private MediaType getMediaType(String format) {
-        MediaType media=default_media;        
-        String tmp=ServiceConfig.getProperty("m"+format);
-        if(tmp!=null){
-            if(ServiceConfig.isValidMime(tmp)){
-                String[] parts=tmp.split(Pattern.quote("/"));
-                media = new MediaType(parts[0],parts[1]); 
-            }
-        }
-        return media;
     }
     
     @POST

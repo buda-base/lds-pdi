@@ -39,8 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public class ServiceConfig {
 	
-	static Properties prop = new Properties();
-	static ArrayList<String> mime=new ArrayList<>();	
+	static Properties prop = new Properties();	
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
@@ -56,13 +55,8 @@ public class ServiceConfig {
 			Set<String> set=params.keySet();
 			for(String st:set) {
 			    prop.setProperty(st, params.get(st));
-			}
+			}	
 					
-			String mimes=prop.getProperty("mime");
-			StringTokenizer st=new StringTokenizer(mimes,",");
-			while(st.hasMoreTokens()){
-				mime.add(st.nextToken());
-			}			
 			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
@@ -80,12 +74,7 @@ public class ServiceConfig {
         try {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
-            prop.load(input);
-            String mimes=prop.getProperty("mime");
-            StringTokenizer st=new StringTokenizer(mimes,",");
-            while(st.hasMoreTokens()){
-                mime.add(st.nextToken());
-            } 
+            prop.load(input);            
             input.close();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -106,9 +95,6 @@ public class ServiceConfig {
         return st.toString();
     }
 	
-	public static boolean isValidMime(String mimeString){
-		return mime.contains(mimeString);
-	}
 	
 	public static String getProperty(String key){
 		return prop.getProperty(key);
