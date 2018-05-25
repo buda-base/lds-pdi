@@ -33,7 +33,8 @@ public class QueryMvcSolutionItem {
                     }
                     else {
                         if(Uri.startsWith("http://purl.bdrc.io/resource")) {
-                            tmp="<a href=/resource/"+res.getLocalName()+"> "+res.getLocalName()+"</a>";
+                            tmp="<a href=/resource/"+res.getLocalName()+"> "+res.getLocalName()+"</a>  "+
+                                    "<a href=/resource/"+res.getLocalName()+".ttl> (ttl)</a>";
                         }else if(Uri.startsWith("http://purl.bdrc.io/ontology/core/")){
                             tmp="<a href=\""+Uri+"\"> "+res.getLocalName()+"</a>"; 
                         }
