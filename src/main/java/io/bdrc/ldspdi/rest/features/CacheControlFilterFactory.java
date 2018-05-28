@@ -11,12 +11,6 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 
-
-
-/**
- * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
- * @author ALVN
- */
 @Provider
 public class CacheControlFilterFactory implements DynamicFeature {
     
