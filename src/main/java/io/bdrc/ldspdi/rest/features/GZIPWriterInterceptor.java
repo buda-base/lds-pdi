@@ -38,8 +38,7 @@ public class GZIPWriterInterceptor implements WriterInterceptor{
                 if(st.contains("gzip")) {process=true;}
             }
         }
-        if(process) {
-            log.info("Writer Interceptor compressing >>>>>> ");
+        if(process) {            
             MultivaluedMap<String,Object> headers = context.getHeaders();
             headers.add("Content-Encoding", "gzip");    
             final OutputStream outputStream = context.getOutputStream();

@@ -48,8 +48,10 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
@@ -70,17 +72,20 @@ import io.bdrc.restapi.exceptions.RestException;
 public class PublicTemplatesResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
+    public final static int MAX_AGE=Integer.parseInt(ServiceConfig.getProperty("max_age"));
     
     public PublicTemplatesResource() {
         super();        
         ResourceConfig config=new ResourceConfig(PublicTemplatesResource.class);
         config.register(CorsFilter.class); 
         config.register(GZIPWriterInterceptor.class);
+        config.register(CacheControlFilterFactory.class);
     }
     
     @GET
     @Path("/query/{file}")
+    @JerseyCacheControl()
     @Produces("text/html")
     public Viewable getQueryTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -126,6 +131,7 @@ public class PublicTemplatesResource {
     
     @GET
     @Path("/test/{file}")
+    @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
     public Response testTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -161,6 +167,7 @@ public class PublicTemplatesResource {
        
     @POST 
     @Path("/query/{file}")
+    @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getQueryTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -209,6 +216,7 @@ public class PublicTemplatesResource {
     
     @POST 
     @Path("/query/{file}")
+    @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getQueryTemplateResultsJsonPost( 
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -248,7 +256,8 @@ public class PublicTemplatesResource {
     }
     
     @GET
-    @Path("/graph/{file}")    
+    @Path("/graph/{file}")  
+    @JerseyCacheControl()
     public Response getGraphTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             @DefaultValue("jsonld") @QueryParam("format") final String format,            
@@ -281,6 +290,7 @@ public class PublicTemplatesResource {
     
     @POST
     @Path("/graph/{file}") 
+    @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
             @HeaderParam("Accept") final String format,

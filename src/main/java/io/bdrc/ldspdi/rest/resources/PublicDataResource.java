@@ -52,8 +52,10 @@ import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
+import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -80,11 +82,13 @@ public class PublicDataResource {
         config.register(CorsFilter.class); 
         config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
+        config.register(CacheControlFilterFactory.class);
         validMedia.add(MediaType.TEXT_HTML);
         validMedia.add(MediaType.APPLICATION_XHTML_XML);
     }
     
-    @GET    
+    @GET   
+    @JerseyCacheControl()
     @Produces(MediaType.TEXT_HTML)    
     public Viewable getHomePage() throws RestException{
         log.info("Call to getHomePage()");         
@@ -119,7 +123,8 @@ public class PublicDataResource {
     }
 
     @GET
-    @Path("/resource/{res}") 
+    @Path("/resource/{res}")
+    @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
@@ -146,6 +151,7 @@ public class PublicDataResource {
     
     @POST
     @Path("/resource/{res}") 
+    @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
@@ -165,6 +171,7 @@ public class PublicDataResource {
      
     @GET
     @Path("/resource/{res}.{ext}")   
+    @JerseyCacheControl()
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
@@ -184,7 +191,8 @@ public class PublicDataResource {
     }
     
     @POST
-    @Path("/resource/{res}.{ext}")   
+    @Path("/resource/{res}.{ext}") 
+    @JerseyCacheControl()
     public Response getFormattedResourceGraphPost(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,

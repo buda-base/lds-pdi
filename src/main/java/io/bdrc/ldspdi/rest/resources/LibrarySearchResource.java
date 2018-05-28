@@ -20,8 +20,10 @@ import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.library.PersonAllResults;
 import io.bdrc.ldspdi.results.library.PersonResults;
 import io.bdrc.ldspdi.results.library.PlaceAllResults;
@@ -53,11 +55,13 @@ public class LibrarySearchResource {
         config.register(CorsFilter.class);
         config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
+        config.register(CacheControlFilterFactory.class);
     }
 
 
     @POST
     @Path("/lib/{file}")
+    @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLibGraphPost(
             @HeaderParam("fusekiUrl") final String fuseki,
@@ -112,6 +116,7 @@ public class LibrarySearchResource {
 
     @GET
     @Path("/lib/{file}")
+    @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLibGraphGet( @Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki,
