@@ -52,7 +52,6 @@ import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
-import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
@@ -286,7 +285,7 @@ public class PublicTemplatesResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,format),MediaTypeUtils.getMediaTypeFromExt(format)).build();        
+        return Response.ok(ResponseOutputStream.getModelStream(model,format),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();        
     }
     
     @POST
@@ -317,7 +316,7 @@ public class PublicTemplatesResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format)).build();        
+        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format)).header("Vary", "Accept").build();        
     }
     
     @POST

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
@@ -150,7 +149,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format)).build();       
+        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();       
     }
     
     @POST
@@ -170,7 +169,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
-        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),MediaTypeUtils.getMediaTypeFromExt(format)).build();       
+        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();       
     }
      
     @GET
@@ -191,7 +190,8 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).build();       
+        Response resp=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).header("Vary", "Accept").build();
+        return resp;       
     }
     
     @POST
@@ -212,7 +212,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }     
-        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).build();      
+        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).header("Vary", "Accept").build();      
     }
     
        
@@ -226,7 +226,7 @@ public class PublicDataResource {
         String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl; 
         Date lastUpdate=OntData.getLastUpdated();
         EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+uri).hashCode()));
-        ResponseBuilder builder = request.evaluatePreconditions(etag);
+        ResponseBuilder builder = request.evaluatePreconditions(etag);        
         if(OntData.ontMod.getOntResource(uri)==null) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
         } 
@@ -269,7 +269,7 @@ public class PublicDataResource {
         ResponseBuilder builder = request.evaluatePreconditions(tag);
         if(builder == null){
             builder = Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext));
-            builder.header("Last-Modified", OntData.getLastUpdated()).tag(tag);
+            builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
         }
         return builder.build();        
     }

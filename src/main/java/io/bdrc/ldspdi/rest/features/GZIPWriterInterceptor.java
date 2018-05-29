@@ -38,16 +38,21 @@ public class GZIPWriterInterceptor implements WriterInterceptor{
                 if(st.contains("gzip")) {process=true;}
             }
         }
+        MultivaluedMap<String,Object> headers = context.getHeaders();              
+        List<Object> l=headers.get("Vary");        
         if(process) {            
-            MultivaluedMap<String,Object> headers = context.getHeaders();
-            headers.add("Content-Encoding", "gzip");    
+            headers.add("Content-Encoding", "gzip");
+            if(l!=null) {
+                headers.putSingle("Vary", "Accept, Accept-Encoding");
+            }else {
+                headers.putSingle("Vary", "Accept-Encoding");
+            }
             final OutputStream outputStream = context.getOutputStream();
             context.setOutputStream(new GZIPOutputStream(outputStream));
             context.proceed();
         }else {            
             context.proceed();
         }
-        
     }
 
 }

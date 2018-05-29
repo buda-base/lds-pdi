@@ -38,5 +38,6 @@ public class CorsFilter implements ContainerResponseFilter {
         response.getHeaders().add("Access-Control-Allow-Credentials", ServiceConfig.getProperty("Allow-Credentials"));
         response.getHeaders().add("Access-Control-Allow-Methods",ServiceConfig.getProperty("Allow-Methods"));
         response.getHeaders().add("Access-Control-Expose-Headers",ServiceConfig.getProperty("Expose-Headers"));
+        response.getHeaders().add("Access-Control-Max-Age",ServiceConfig.getProperty("Max-Age"));
     }
 }
