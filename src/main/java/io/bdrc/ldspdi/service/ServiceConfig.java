@@ -1,7 +1,5 @@
 package io.bdrc.ldspdi.service;
 
-import java.io.BufferedReader;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -23,10 +21,6 @@ import java.io.BufferedReader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
@@ -41,7 +35,8 @@ public class ServiceConfig {
 	public static HashMap<String,String> params;
 	public final static String FUSEKI_URL="fusekiUrl";
 	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
-	public static String JSONLD_CONTEXT;
+	
+	
 		
 	public static void init(HashMap<String,String> params) {
 	    ServiceConfig.params=params;
@@ -54,8 +49,6 @@ public class ServiceConfig {
 			for(String st:set) {
 			    prop.setProperty(st, params.get(st));
 			}	
-					
-			JSONLD_CONTEXT=readGithubJsonLDContext();
 			input.close();
 			
 			InputStream in = ServiceConfig.class.getClassLoader().getResourceAsStream("taxTreeContext.jsonld");
@@ -78,21 +71,6 @@ public class ServiceConfig {
             ex.printStackTrace();
         }
     }
-	
-	private static String readGithubJsonLDContext() throws MalformedURLException, IOException {
-        
-	    URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();        
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder st = new StringBuilder();        
-        String line;
-        while ((line = in.readLine()) != null) {
-            st.append(line+"\n");
-        }
-        in.close();        
-        return st.toString();
-    }
-	
 	
 	public static String getProperty(String key){
 		return prop.getProperty(key);

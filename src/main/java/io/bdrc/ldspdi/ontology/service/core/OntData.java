@@ -1,8 +1,11 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +13,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.EntityTag;
 
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
@@ -45,6 +50,8 @@ public class OntData implements Runnable{
     public static InfModel infMod;    
     public static OntModel ontMod;    
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
+    public static String JSONLD_CONTEXT;
+    static EntityTag update;
     
     public static void init() {
         try {
@@ -56,10 +63,30 @@ public class OntData implements Runnable{
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
             rdf10tordf11(ontMod); 
+            readGithubJsonLDContext();
     
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
         }
+    }
+    
+    public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
+        
+        URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();        
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder st = new StringBuilder();        
+        String line;
+        while ((line = in.readLine()) != null) {
+            st.append(line+"\n");
+        }
+        in.close();
+        JSONLD_CONTEXT=st.toString();
+        update=new EntityTag(Long.toString(System.currentTimeMillis()));
+    }
+    
+    public static EntityTag getEntityTag() {
+        return update;
     }
     
     @Override
@@ -75,6 +102,7 @@ public class OntData implements Runnable{
             log.info("OntModel Size >> "+ontMod.size());
             InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);            
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+            readGithubJsonLDContext();
         }        
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);

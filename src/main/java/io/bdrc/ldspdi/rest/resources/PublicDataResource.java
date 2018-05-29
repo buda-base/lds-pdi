@@ -34,8 +34,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.jena.rdf.model.Model;
@@ -119,7 +123,7 @@ public class PublicDataResource {
     @Path("/context.jsonld")
     public Response getJsonContext() throws RestException {
         log.info("Call to getJsonContext()");
-        return Response.ok(ServiceConfig.JSONLD_CONTEXT, "application/ld+json").build();
+        return Response.ok(OntData.JSONLD_CONTEXT, "application/ld+json").build();
     }
 
     @GET
@@ -232,7 +236,7 @@ public class PublicDataResource {
     
     @GET
     @Path("/ontology.{ext}")     
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext) {        
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext,@Context Request request) {        
         log.info("getOntology()");
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -250,7 +254,13 @@ public class PublicDataResource {
                 }                
             }
         };
-        return Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext)).build();        
+        EntityTag tag=OntData.getEntityTag();
+        ResponseBuilder builder = request.evaluatePreconditions(tag);
+        if(builder == null){
+            builder = Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext));
+            builder.tag(tag);
+        }
+        return builder.build();        
     }
     
     @GET
