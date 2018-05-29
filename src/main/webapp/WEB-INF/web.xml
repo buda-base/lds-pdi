@@ -20,6 +20,10 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
                 <param-name>jersey.config.server.provider.classnames</param-name>
                 <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature, org.glassfish.jersey.server.mvc.jsp.JspMvcFeature</param-value>
         </init-param>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>io.bdrc.ldspdi.service.LdspdiApplication</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name >Jersey Service </filter-name >

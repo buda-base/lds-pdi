@@ -48,18 +48,6 @@ public class LibrarySearchResource {
     public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
-
-    public LibrarySearchResource() {
-        super();
-        ResourceConfig config=new ResourceConfig(PublicDataResource.class);
-        config.register(LoggingFeature.class);
-        config.register(CorsFilter.class);
-        config.register(GZIPWriterInterceptor.class);
-        config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
-        config.register(CacheControlFilterFactory.class);
-    }
-
-
     @POST
     @Path("/lib/{file}")
     @JerseyCacheControl()

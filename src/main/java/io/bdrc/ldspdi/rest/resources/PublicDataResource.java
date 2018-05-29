@@ -73,16 +73,6 @@ public class PublicDataResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        
-    public PublicDataResource() {
-        super();
-        ResourceConfig config=new ResourceConfig(PublicDataResource.class);
-        config.register(LoggingFeature.class);
-        config.register(CorsFilter.class); 
-        config.register(GZIPWriterInterceptor.class);
-        config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
-        config.register(CacheControlFilterFactory.class);
-    }
     
     @GET   
     @JerseyCacheControl()

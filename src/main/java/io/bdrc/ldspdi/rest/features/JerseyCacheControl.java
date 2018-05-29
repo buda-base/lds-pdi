@@ -19,6 +19,6 @@ public @interface JerseyCacheControl {
      * max-age cache control.
      *
     */
-    int maxAge() default 172800;
+    long maxAge() default 172800;
     
 }

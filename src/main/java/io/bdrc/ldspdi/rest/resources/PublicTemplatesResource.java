@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.rest.resources;
 
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -40,7 +39,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
-import io.bdrc.ldspdi.rest.features.CorsFilter;
-import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
@@ -73,15 +68,6 @@ public class PublicTemplatesResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
-    public final static int MAX_AGE=Integer.parseInt(ServiceConfig.getProperty("max_age"));
-    
-    public PublicTemplatesResource() {
-        super();        
-        ResourceConfig config=new ResourceConfig(PublicTemplatesResource.class);
-        config.register(CorsFilter.class); 
-        config.register(GZIPWriterInterceptor.class);
-        config.register(CacheControlFilterFactory.class);
-    }
     
     @GET
     @Path("/query/{file}")
