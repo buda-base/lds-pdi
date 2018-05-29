@@ -44,8 +44,7 @@ public class OntClassModel {
     protected String uri;
     protected OntClass clazz;
     
-    public OntClassModel(String uri) {
-        log.info("Instanciated  OntClassModel >> "+uri);
+    public OntClassModel(String uri) {        
         this.uri = uri;
         clazz = OntData.ontMod.getOntClass(uri);        
     }
@@ -57,7 +56,6 @@ public class OntClassModel {
    }
     
     public boolean isPresent() {
-        //return !(OntClassNotPresent.class.equals(clazz.getClass()));
         return clazz!=null;
     }
     

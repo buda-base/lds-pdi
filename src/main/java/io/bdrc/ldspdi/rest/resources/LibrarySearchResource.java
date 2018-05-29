@@ -172,6 +172,5 @@ public class LibrarySearchResource {
                 throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
         }
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
-
     }
 }

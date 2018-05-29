@@ -52,6 +52,7 @@ import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
@@ -87,7 +88,7 @@ public class PublicTemplatesResource {
     @Path("/query/{file}")
     @JerseyCacheControl()
     @Produces("text/html")
-    public Viewable getQueryTemplateResults(@Context UriInfo info, 
+    public Response getQueryTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
@@ -108,7 +109,7 @@ public class PublicTemplatesResource {
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),true);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            return new Viewable("/error.jsp",query);
+            return Response.ok(new Viewable("/error.jsp",query)).build();
         }
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;        
@@ -117,7 +118,7 @@ public class PublicTemplatesResource {
                 Results mod=new Results(res,hm);
                 hm.remove("query");            
                 String it=new ObjectMapper().writeValueAsString(mod);            
-                return new Viewable("/json.jsp",it);
+                return Response.ok(new Viewable("/json.jsp",it)).build();
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");             
             hm.put("query", qfp.getQueryHtml());
@@ -126,7 +127,7 @@ public class PublicTemplatesResource {
         catch (JsonProcessingException jx) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
         }
-        return new Viewable("/resPage.jsp",model);
+        return Response.ok(new Viewable("/resPage.jsp",model)).build();        
     }
     
     @GET

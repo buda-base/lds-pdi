@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -71,13 +72,8 @@ import io.bdrc.restapi.exceptions.RestException;
 @Path("/")
 public class PublicDataResource {   
     
-    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
-    
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);    
-    
-    
-    public ArrayList<String> validMedia=new ArrayList<>();
-    
+    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         
     public PublicDataResource() {
         super();
@@ -87,16 +83,14 @@ public class PublicDataResource {
         config.register(GZIPWriterInterceptor.class);
         config.property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
         config.register(CacheControlFilterFactory.class);
-        validMedia.add(MediaType.TEXT_HTML);
-        validMedia.add(MediaType.APPLICATION_XHTML_XML);
     }
     
     @GET   
     @JerseyCacheControl()
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getHomePage() throws RestException{
+    public Response getHomePage() throws RestException{
         log.info("Call to getHomePage()");         
-        return new Viewable("/index.jsp",new DocFileModel()); 
+        return Response.ok(new Viewable("/index.jsp",new DocFileModel())).build();     
     }
     
     @GET 
@@ -114,16 +108,22 @@ public class PublicDataResource {
     @GET 
     @Path("cache")
     @Produces(MediaType.TEXT_HTML)    
-    public Viewable getCacheInfo() {
-        log.info("Call to getCacheInfo()");        
-        return new Viewable("/cache.jsp",new CacheAccessModel()); 
+    public Response getCacheInfo() {
+        log.info("Call to getCacheInfo()"); 
+        return Response.ok(new Viewable("/cache.jsp",new CacheAccessModel())).build();        
     }
     
     @GET
     @Path("/context.jsonld")
-    public Response getJsonContext() throws RestException {
+    public Response getJsonContext(@Context Request request) throws RestException {
         log.info("Call to getJsonContext()");
-        return Response.ok(OntData.JSONLD_CONTEXT, "application/ld+json").build();
+        EntityTag tag=OntData.getEntityTag();
+        ResponseBuilder builder = request.evaluatePreconditions(tag);
+        if(builder == null){
+            builder = Response.ok(OntData.JSONLD_CONTEXT, "application/ld+json");
+            builder.header("Last-Modified", OntData.getLastUpdated()).tag(tag);
+        }
+        return builder.build();        
     }
 
     @GET
@@ -217,21 +217,32 @@ public class PublicDataResource {
     
        
     @GET
-    @Path("/ontology/{path}/{class}")
+    @Path("/ontology/{path}/{class}")    
     @Produces("text/html")
-    public Viewable getCoreOntologyClassView(@PathParam("class") String cl, @PathParam("path") String path) throws RestException{
+    public Response getCoreOntologyClassView(@PathParam("class") String cl, 
+            @PathParam("path") String path,
+            @Context Request request) throws RestException{
         log.info("getCoreOntologyClassView()");          
-        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;        
+        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl; 
+        Date lastUpdate=OntData.getLastUpdated();
+        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+uri).hashCode()));
+        ResponseBuilder builder = request.evaluatePreconditions(etag);
         if(OntData.ontMod.getOntResource(uri)==null) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
         } 
         if(OntData.isClass(uri)) {
             /** class view **/
-            return new Viewable("/ontClassView.jsp", new OntClassModel(uri));
+            if(builder == null){
+                builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(uri)));              
+            }        
         }else {
             /** Properties view **/
-            return new Viewable("/ontPropView.jsp",new OntPropModel(uri));
-        }      
+            if(builder == null){
+                builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri)));                
+            }          
+        } 
+        builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
+        return builder.build();
     }
     
     @GET
@@ -258,7 +269,7 @@ public class PublicDataResource {
         ResponseBuilder builder = request.evaluatePreconditions(tag);
         if(builder == null){
             builder = Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext));
-            builder.tag(tag);
+            builder.header("Last-Modified", OntData.getLastUpdated()).tag(tag);
         }
         return builder.build();        
     }
@@ -266,9 +277,16 @@ public class PublicDataResource {
     @GET
     @Path("/ontology")
     @Produces("text/html")
-    public Viewable getOntologyHomePage() {        
-        log.info("Call to getOntologyHomePage()");          
-        return new Viewable("/ontologyHome.jsp",OntData.ontMod);        
+    public Response getOntologyHomePage(@Context Request request) {        
+        log.info("Call to getOntologyHomePage()"); 
+        Date lastUpdate=OntData.getLastUpdated();
+        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+"/ontologyHome.jsp").hashCode()));
+        ResponseBuilder builder = request.evaluatePreconditions(etag);
+        if(builder == null){
+            builder = Response.ok(new Viewable("/ontologyHome.jsp",OntData.ontMod));
+            builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
+        }
+        return builder.build();                
     }
     
     @POST

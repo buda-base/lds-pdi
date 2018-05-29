@@ -19,12 +19,11 @@ public class OntClassParent {
     OntClass sup3r;
     String uri;
     
-    final static Logger log = LoggerFactory.getLogger(OntClassModel.class.getName());
+    final static Logger log = LoggerFactory.getLogger(OntClassParent.class.getName());
         
     public OntClassParent(String uri) {
         this.uri=uri;
         sup3r = OntData.ontMod.getOntClass(uri).getSuperClass();
-        log.info("Get Super Class >>"+OntData.ontMod.getOntClass(uri).listSuperClasses(false).toList());
         isAnonymous=sup3r.isAnon();
     }
     

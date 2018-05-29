@@ -8,8 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +54,7 @@ public class OntData implements Runnable{
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
     public static String JSONLD_CONTEXT;
     static EntityTag update;
+    static Date lastUpdated;
     
     public static void init() {
         try {
@@ -82,11 +85,16 @@ public class OntData implements Runnable{
         }
         in.close();
         JSONLD_CONTEXT=st.toString();
+        lastUpdated=Calendar.getInstance().getTime();
         update=new EntityTag(Long.toString(System.currentTimeMillis()));
     }
     
     public static EntityTag getEntityTag() {
         return update;
+    }
+    
+    public static Date getLastUpdated() {
+        return lastUpdated;
     }
     
     @Override
