@@ -120,18 +120,16 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
-        
-        String redirect="http://library.bdrc.io/show/bdr:"+res;
+        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{        
+        log.info("Call to getResourceGraphGET()");        
         if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
                 format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isMime(format)) {            
             try {
-                return Response.seeOther(new URI(redirect)).build();
+                return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
         }
-        log.info("Call to getResourceGraph()");
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
@@ -149,8 +147,10 @@ public class PublicDataResource {
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
-           
-        log.info("Call to getResourceGraphPost");
+        log.info("Call to getResourceGraphPost");   
+        if(!MediaTypeUtils.isMime(format)&& !format.equals("*/*")) {
+            return Response.status(406).build();
+        }
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }           
@@ -169,9 +169,7 @@ public class PublicDataResource {
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
             @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
-        
-        log.info("Call to getFormattedResourceGraph()");
-        
+        log.info("Call to getFormattedResourceGraph()");        
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
@@ -193,7 +191,6 @@ public class PublicDataResource {
             @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         
         log.info("Call to getFormattedResourceGraphPost()");
-        
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
