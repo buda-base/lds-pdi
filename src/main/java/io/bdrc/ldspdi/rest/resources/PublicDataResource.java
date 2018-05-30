@@ -44,10 +44,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
-import org.glassfish.jersey.logging.LoggingFeature;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
-import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +53,6 @@ import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
-import io.bdrc.ldspdi.rest.features.CorsFilter;
-import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -121,14 +115,19 @@ public class PublicDataResource {
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
         @HeaderParam("fusekiUrl") final String fuseki) throws RestException{        
-        log.info("Call to getResourceGraphGET()");        
+        log.info("Call to getResourceGraphGET()"); 
+        /** Redirection to /show if format is null or of html type **/
         if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
-                format.equals(MediaType.TEXT_HTML) || !MediaTypeUtils.isMime(format)) {            
+                format.equals(MediaType.TEXT_HTML)) {            
             try {
                 return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
+        }
+        /** Accept header is not null and not of html type **/ 
+        if(!MediaTypeUtils.isMime(format)&& !format.equals("*/*")) {
+            return Response.status(406).build();
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -169,7 +168,10 @@ public class PublicDataResource {
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
             @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
-        log.info("Call to getFormattedResourceGraph()");        
+        log.info("Call to getFormattedResourceGraph()"); 
+        if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
+            return Response.status(406).build();
+        }
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
@@ -191,6 +193,9 @@ public class PublicDataResource {
             @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
         
         log.info("Call to getFormattedResourceGraphPost()");
+        if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
+            return Response.status(406).build();
+        }
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
