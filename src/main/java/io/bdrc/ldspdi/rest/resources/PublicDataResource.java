@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -41,6 +43,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
@@ -58,6 +61,7 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -114,13 +118,17 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{        
-        log.info("Call to getResourceGraphGET()"); 
+        @HeaderParam("fusekiUrl") final String fuseki,
+        @Context UriInfo info) throws RestException{        
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
         /** Redirection to /show if format is null or of html type **/
-        if(format==null || format.equals(MediaType.APPLICATION_XHTML_XML) ||
-                format.equals(MediaType.TEXT_HTML)) {            
+        if(format==null || format.contains(MediaType.APPLICATION_XHTML_XML) ||
+                format.contains(MediaType.TEXT_HTML)) {            
             try {
-                return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();
+                
+                //return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
@@ -136,7 +144,8 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();       
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format));
+        return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();             
     }
     
     @POST
@@ -145,7 +154,8 @@ public class PublicDataResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") final String format,
-        @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
+        @HeaderParam("fusekiUrl") final String fuseki,
+        @Context UriInfo info) throws RestException{
         log.info("Call to getResourceGraphPost");   
         if(!MediaTypeUtils.isMime(format)&& !format.equals("*/*")) {
             return Response.status(406).build();
@@ -158,7 +168,8 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
-        return Response.ok(ResponseOutputStream.getJsonLDResponseStream(jsonObject),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();       
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)));
+        return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();
     }
      
     @GET
@@ -167,7 +178,8 @@ public class PublicDataResource {
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @Context UriInfo info) throws RestException{
         log.info("Call to getFormattedResourceGraph()"); 
         if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
             return Response.status(406).build();
@@ -180,8 +192,8 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        Response resp=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).header("Vary", "Accept").build();
-        return resp;       
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
+        return setHeaders(builder,getResourceHeaders(info.getPath(),format)).build();                     
     }
     
     @POST
@@ -190,7 +202,8 @@ public class PublicDataResource {
     public Response getFormattedResourceGraphPost(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki) throws RestException{
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @Context UriInfo info) throws RestException{
         
         log.info("Call to getFormattedResourceGraphPost()");
         if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
@@ -203,8 +216,9 @@ public class PublicDataResource {
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }     
-        return Response.ok(ResponseOutputStream.getModelStream(model, format, res),media).header("Vary", "Accept").build();      
+        }
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
+        return setHeaders(builder,getResourceHeaders(info.getPath(),format)).build();
     }
     
        
@@ -289,6 +303,29 @@ public class PublicDataResource {
         Thread t=new Thread(new OntData());
         t.start();               
         return Response.ok().build();       
+    }
+    
+    private static HashMap<String,String> getResourceHeaders(String url,String ext) {
+        HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,String> headers=new HashMap<>();
+        if(ext!=null) {
+            url=url.substring(0, url.lastIndexOf("."));
+        }
+        StringBuilder sb=new StringBuilder("");
+        for(String ex:map.keySet()) {
+            sb.append("{\""+url+"."+ex+"\" 1.000 {type "+MediaTypeUtils.getMimeFromExtension(ex)+"}},");               
+        }
+        headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
+        headers.put("TCN", "Choice");
+        headers.put("Vary", "Negotiate,Accept");
+        return headers;
+    } 
+    
+    private static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String,String> headers) {
+        for(String key:headers.keySet()) {
+            builder.header(key, headers.get(key));
+        }
+        return builder;
     }
     
 }

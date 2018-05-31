@@ -67,6 +67,14 @@ public class MediaTypeUtils {
         
     }
     
+    public static HashMap<String,String> getExtensionMimeMap(){
+        return EXTENSION;
+    }
+    
+    public static HashMap<String,String> getMimeMap(){
+        return MIMEFORMAT;
+    }
+    
     public static String getExtFormatFromMime(String mime) {
         return MIMEFORMAT.get(mime);
     }

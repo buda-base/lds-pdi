@@ -43,7 +43,7 @@ public class GZIPWriterInterceptor implements WriterInterceptor{
         if(process) {            
             headers.add("Content-Encoding", "gzip");
             if(l!=null) {
-                headers.putSingle("Vary", "Accept, Accept-Encoding");
+                headers.putSingle("Vary", "Negociate, Accept, Accept-Encoding");
             }else {
                 headers.putSingle("Vary", "Accept-Encoding");
             }
