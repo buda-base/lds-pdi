@@ -309,6 +309,7 @@ public class PublicDataResource {
         HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
+            headers.put("Content-Location", url);
             url=url.substring(0, url.lastIndexOf("."));
         }
         StringBuilder sb=new StringBuilder("");
