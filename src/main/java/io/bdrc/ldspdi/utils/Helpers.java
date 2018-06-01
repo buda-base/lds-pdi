@@ -1,5 +1,10 @@
 package io.bdrc.ldspdi.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  * 
@@ -25,13 +30,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.commons.text.StrSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import io.bdrc.ldspdi.rest.resources.MediaTypeUtils;
 import io.bdrc.ldspdi.sparql.functions.Wylie;
+import io.bdrc.restapi.exceptions.RestException;
 
 
 public class Helpers {
@@ -81,4 +89,31 @@ public class Helpers {
         uri=uri.substring(8);
         return uri.substring(uri.indexOf("/"));
     }
+	
+	public static String getMultiChoicesHtml(String path) throws RestException {
+	    InputStream stream = Helpers.class.getClassLoader().getResourceAsStream("multiChoice.tpl");
+	    BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
+	    StringBuffer sb=new StringBuffer();
+	    try {
+    	    String line=buffer.readLine();
+    	    while(line!=null) {
+    	        sb.append(line+System.lineSeparator());
+    	        line=buffer.readLine();
+                
+    	    }
+	    } catch (IOException e) {
+	        throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
+	                "Unable to parse the html multi Choices template"+e.getMessage());         
+        }
+	    String rows="";
+	    for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
+	        rows=rows+"<tr><td><a href=\""+path+"."+k+"\">"+path+"."+k+"</a><td>"+
+	                MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
+	    }
+	    HashMap<String,String> map=new HashMap<>();
+	    map.put("path", path);
+	    map.put("rows",rows);
+	    StrSubstitutor s=new StrSubstitutor(map);
+	    return s.replace(sb);
+	}
 }

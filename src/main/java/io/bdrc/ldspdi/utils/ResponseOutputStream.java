@@ -21,6 +21,8 @@ package io.bdrc.ldspdi.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -104,6 +106,18 @@ public class ResponseOutputStream {
             public void write(OutputStream os) throws IOException, WebApplicationException {             
                 RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model); 
                 writer.output(os); 
+            }
+        };
+        return stream;
+    }
+    
+    public static StreamingOutput getStringStream(String toWrite) {
+        
+        StreamingOutput stream = new StreamingOutput() {
+            
+            public void write(OutputStream os) throws IOException, WebApplicationException {             
+                Writer w = new OutputStreamWriter(os); 
+                w.write(toWrite);
             }
         };
         return stream;

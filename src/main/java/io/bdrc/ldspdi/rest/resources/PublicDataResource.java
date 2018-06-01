@@ -62,6 +62,7 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -132,7 +133,9 @@ public class PublicDataResource {
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);        
         
         if(format==null) {            
-            ResponseBuilder rb=Response.status(300).header("Link",info.getBaseUri()+"choice?path="+info.getPath());
+            String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());            
+            ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         
@@ -180,8 +183,10 @@ public class PublicDataResource {
         log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
         
         ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
-        if(format==null) {            
-            ResponseBuilder rb=Response.status(300).header("Link",info.getBaseUri()+"choice?path="+info.getPath());
+        if(format==null) {
+            String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());            
+            ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         /** Accept header is not null and not of html type **/ 
