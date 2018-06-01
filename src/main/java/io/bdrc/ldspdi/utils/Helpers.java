@@ -81,5 +81,4 @@ public class Helpers {
         uri=uri.substring(8);
         return uri.substring(uri.indexOf("/"));
     }
-	
 }

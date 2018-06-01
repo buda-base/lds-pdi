@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
@@ -91,6 +92,16 @@ public class MediaTypeUtils {
         return MIMES.contains(media) ;  
     }
     
+    public static ArrayList<String> getValidMime(List<MediaType> list) {
+        ArrayList<String> valid=new ArrayList<>();
+        for(MediaType m:list) {
+            if(isMime(m.toString())){
+                valid.add(m.toString());
+            }
+        }
+        return valid ;  
+    }
+    
     public static MediaType getMediaTypeFromExt(String format) {
         MediaType media=new MediaType("text","turtle","utf-8");        
         String tmp=getMimeFromExtension(format);
@@ -112,5 +123,7 @@ public class MediaTypeUtils {
             }        
         return media;
     }
+    
+    
 
 }

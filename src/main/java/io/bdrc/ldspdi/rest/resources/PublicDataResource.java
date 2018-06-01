@@ -38,6 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -61,7 +62,6 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
-import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -117,12 +117,15 @@ public class PublicDataResource {
     @Path("/resource/{res}")
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
-        @HeaderParam("Accept") final String format,
+        @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws RestException{        
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
+        @Context UriInfo info,
+        @Context HttpHeaders headers) throws RestException{        
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);
+        log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
+        ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
         /** Redirection to /show if format is null or of html type **/
-        if(format==null || format.contains(MediaType.APPLICATION_XHTML_XML) ||
+        if(validMimes.size()==0 || format.contains(MediaType.APPLICATION_XHTML_XML) ||
                 format.contains(MediaType.TEXT_HTML)) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
@@ -134,8 +137,11 @@ public class PublicDataResource {
             }
         }
         /** Accept header is not null and not of html type **/ 
-        if(!MediaTypeUtils.isMime(format)&& !format.equals("*/*")) {
+        if(validMimes.size()==0 && !format.equals("*/*")) {
             return Response.status(406).build();
+        }
+        if(validMimes.size()>0) {
+            format=validMimes.get(0);
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -144,8 +150,8 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromExt(format));
-        return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();             
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
+        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format))).build();             
     }
     
     @POST
@@ -153,23 +159,32 @@ public class PublicDataResource {
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
-        @HeaderParam("Accept") final String format,
+        @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info) throws RestException{
-        log.info("Call to getResourceGraphPost");   
-        if(!MediaTypeUtils.isMime(format)&& !format.equals("*/*")) {
+        @Context UriInfo info,
+        @Context HttpHeaders headers) throws RestException{        
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);
+        log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
+        ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
+        if (format == null) {
+            
+        }
+        /** Accept header is not null and not of html type **/ 
+        else if(validMimes.size()==0 && !format.equals("*/*")) {
             return Response.status(406).build();
         }
-        if(fuseki !=null){
+        if(validMimes.size()>0) {
+            format=validMimes.get(0);
+        }
+        if(fuseki !=null){ 
             fusekiUrl=fuseki;            
-        }           
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null); 
+        }            
+        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        Object jsonObject=JSONLDFormatter.modelToJsonObject(model, res);        
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)));
-        return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
+        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format))).build();
     }
      
     @GET
@@ -309,8 +324,7 @@ public class PublicDataResource {
         HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
-            headers.put("Content-Location", url);
-            url=url.substring(0, url.lastIndexOf("."));
+            headers.put("Content-Location", url+"."+ext);
         }
         StringBuilder sb=new StringBuilder("");
         for(String ex:map.keySet()) {
