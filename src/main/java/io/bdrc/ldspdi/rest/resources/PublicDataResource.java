@@ -35,6 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -52,7 +53,6 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -100,6 +100,14 @@ public class PublicDataResource {
         return Response.ok(new Viewable("/cache.jsp",new CacheAccessModel())).build();        
     }
     
+    @GET 
+    @Path("choice")
+    @Produces(MediaType.TEXT_HTML)    
+    public Response getMultiChoice(@QueryParam("path") String it,@Context UriInfo info) {
+        log.info("Call to getMultiChoice()");
+        return Response.ok(new Viewable("/multiChoice.jsp",info.getBaseUri()+it)).build();        
+    }
+    
     @GET
     @Path("/context.jsonld")
     public Response getJsonContext(@Context Request request) throws RestException {
@@ -121,15 +129,20 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,
         @Context HttpHeaders headers) throws RestException{        
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);
-        log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);        
+        
+        if(format==null) {            
+            ResponseBuilder rb=Response.status(300).header("Link",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+        }
+        
         ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
         /** Redirection to /show if format is null or of html type **/
         if(validMimes.size()==0 || format.contains(MediaType.APPLICATION_XHTML_XML) ||
                 format.contains(MediaType.TEXT_HTML)) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
-                return setHeaders(builder,getResourceHeaders(info.getPath(),null)).build();
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
                 
                 //return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
@@ -151,7 +164,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format))).build();             
+        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();             
     }
     
     @POST
@@ -165,9 +178,11 @@ public class PublicDataResource {
         @Context HttpHeaders headers) throws RestException{        
         log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);
         log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
+        
         ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
-        if (format == null) {
-            
+        if(format==null) {            
+            ResponseBuilder rb=Response.status(300).header("Link",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         /** Accept header is not null and not of html type **/ 
         else if(validMimes.size()==0 && !format.equals("*/*")) {
@@ -184,7 +199,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format))).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
     }
      
     @GET
@@ -208,7 +223,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),format)).build();                     
+        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();                     
     }
     
     @POST
@@ -233,7 +248,7 @@ public class PublicDataResource {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),format)).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();
     }
     
        
@@ -320,7 +335,7 @@ public class PublicDataResource {
         return Response.ok().build();       
     }
     
-    private static HashMap<String,String> getResourceHeaders(String url,String ext) {
+    private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn) {
         HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
@@ -335,7 +350,7 @@ public class PublicDataResource {
             sb.append("{\""+url+"."+ex+"\" 1.000 {type "+MediaTypeUtils.getMimeFromExtension(ex)+"}},");               
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
-        headers.put("TCN", "Choice");
+        headers.put("TCN", tcn);
         headers.put("Vary", "Negotiate,Accept");
         return headers;
     } 
