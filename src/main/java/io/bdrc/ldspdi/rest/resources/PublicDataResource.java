@@ -131,17 +131,16 @@ public class PublicDataResource {
         @Context UriInfo info,
         @Context HttpHeaders headers) throws RestException{        
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);        
-        
-        if(format==null) {            
-            String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());            
+        String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
+        if(format==null) {
             ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         
         ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
-        /** Redirection to /show if format is null or of html type **/
-        if(validMimes.size()==0 || format.contains(MediaType.APPLICATION_XHTML_XML) ||
+        /** Redirection to /show if format is of html/xml type **/
+        if(format.contains(MediaType.APPLICATION_XHTML_XML) ||
                 format.contains(MediaType.TEXT_HTML)) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
@@ -154,7 +153,10 @@ public class PublicDataResource {
         }
         /** Accept header is not null and not of html type **/ 
         if(validMimes.size()==0 && !format.equals("*/*")) {
-            return Response.status(406).build();
+            //return Response.status(406).build();
+            ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         if(validMimes.size()>0) {
             format=validMimes.get(0);
@@ -181,17 +183,18 @@ public class PublicDataResource {
         @Context HttpHeaders headers) throws RestException{        
         log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);
         log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
-        
+        String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath()); 
         ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
         if(format==null) {
-            String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());            
             ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         /** Accept header is not null and not of html type **/ 
         else if(validMimes.size()==0 && !format.equals("*/*")) {
-            return Response.status(406).build();
+            ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
         }
         if(validMimes.size()>0) {
             format=validMimes.get(0);
