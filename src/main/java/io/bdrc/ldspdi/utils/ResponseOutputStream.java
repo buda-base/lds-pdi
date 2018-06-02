@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.TTLRDFWriter;
-import io.bdrc.ldspdi.rest.resources.MediaTypeUtils;
 
 public class ResponseOutputStream {
 

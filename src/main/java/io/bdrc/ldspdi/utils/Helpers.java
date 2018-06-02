@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import io.bdrc.ldspdi.rest.resources.MediaTypeUtils;
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 import io.bdrc.restapi.exceptions.RestException;
 

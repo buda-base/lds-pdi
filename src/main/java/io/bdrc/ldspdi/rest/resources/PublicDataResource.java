@@ -63,6 +63,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -129,8 +130,10 @@ public class PublicDataResource {
         @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,
-        @Context HttpHeaders headers) throws RestException{        
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format);        
+        @Context HttpHeaders headers,
+        @Context Request request) throws RestException{        
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
+        log.info("Variant >>>: "+request.selectVariant(MediaTypeUtils.getVariantList()));
         String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
         if(format==null) {
             ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
