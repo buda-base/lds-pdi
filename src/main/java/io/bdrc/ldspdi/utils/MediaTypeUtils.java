@@ -56,7 +56,7 @@ public class MediaTypeUtils {
         MIMEFORMAT.put("application/owl+xml","owl");
         MIMEFORMAT.put("application/ld+json","jsonld");
         MIMEFORMAT.put("application/rdf+thrift","rt");
-        MIMEFORMAT.put("application/*","rj");
+        MIMEFORMAT.put("application/*","jsonld");
         MIMEFORMAT.put("application/json","rj");
         MIMEFORMAT.put("application/trix+xml","trix");
         
@@ -137,7 +137,7 @@ public class MediaTypeUtils {
     public static MediaType getMediaTypeFromMime(String mime) {
         MediaType media=new MediaType("text","turtle","utf-8");        
             if(mime.equals("text/*")) {return new MediaType("text","turtle");} 
-            if(mime.equals("application/*")) {return new MediaType("application","json");} 
+            if(mime.equals("application/*")) {return new MediaType("application","ld+json");} 
             if(isMime(mime)){
                 String[] parts=mime.split(Pattern.quote("/"));
                 media = new MediaType(parts[0],parts[1]); 
