@@ -46,6 +46,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFWriter;
@@ -130,21 +131,19 @@ public class PublicDataResource {
         @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,
-        @Context HttpHeaders headers,
         @Context Request request) throws RestException{        
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
-        log.info("Variant >>>: "+request.selectVariant(MediaTypeUtils.getVariantList()));
+        log.info("BasiVariant >>>: "+request.selectVariant(MediaTypeUtils.getBasicVariantList()));
+        log.info("JenaVariant >>>: "+request.selectVariant(MediaTypeUtils.getJenaVariantList()));
+        Variant basicVariant=request.selectVariant(MediaTypeUtils.getBasicVariantList());
+        Variant jenaVariant=request.selectVariant(MediaTypeUtils.getJenaVariantList());
         String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
         if(format==null) {
             ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
-        
-        ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
-        /** Redirection to /show if format is of html/xml type **/
-        if(format.contains(MediaType.APPLICATION_XHTML_XML) ||
-                format.contains(MediaType.TEXT_HTML)) {            
+        if(basicVariant!=null) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
@@ -154,15 +153,14 @@ public class PublicDataResource {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
         }
-        /** Accept header is not null and not of html type **/ 
-        if(validMimes.size()==0 && !format.equals("*/*")) {
+        if(jenaVariant==null) {
             //return Response.status(406).build();
             ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
-        }
-        if(validMimes.size()>0) {
-            format=validMimes.get(0);
+        }else {
+            format=jenaVariant.getMediaType().toString();
+            log.info("Format from Variant >>>: "+format);
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -171,7 +169,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),jenaVariant.getMediaType());
         return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();             
     }
     
@@ -182,25 +180,38 @@ public class PublicDataResource {
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
-        @Context UriInfo info,
-        @Context HttpHeaders headers) throws RestException{        
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);
-        log.info("Valid mediaTypes "+MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes()));
+        @Context UriInfo info,        
+        @Context Request request) throws RestException{        
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format); 
+        log.info("BasiVariant >>>: "+request.selectVariant(MediaTypeUtils.getBasicVariantList()));
+        log.info("JenaVariant >>>: "+request.selectVariant(MediaTypeUtils.getJenaVariantList()));
+        Variant basicVariant=request.selectVariant(MediaTypeUtils.getBasicVariantList());
+        Variant jenaVariant=request.selectVariant(MediaTypeUtils.getJenaVariantList());
         String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath()); 
-        ArrayList<String> validMimes=MediaTypeUtils.getValidMime(headers.getAcceptableMediaTypes());
+        
         if(format==null) {
             ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
-        /** Accept header is not null and not of html type **/ 
-        else if(validMimes.size()==0 && !format.equals("*/*")) {
+        if(basicVariant!=null) {            
+            try {
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
+                
+                //return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
+            }
+        }
+        if(jenaVariant==null) {
+            //return Response.status(406).build();
             ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
-        }
-        if(validMimes.size()>0) {
-            format=validMimes.get(0);
+        }else {
+            format=jenaVariant.getMediaType().toString();
+            log.info("Format from Variant >>>: "+format);
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -209,7 +220,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format));
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),jenaVariant.getMediaType());
         return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
     }
      

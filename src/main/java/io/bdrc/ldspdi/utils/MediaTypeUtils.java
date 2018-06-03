@@ -36,7 +36,7 @@ public class MediaTypeUtils {
         JENAFORMAT.put("ttl","TURTLE");
         JENAFORMAT.put("nt","N-Triples");
         JENAFORMAT.put("nq","N-Quads");
-        JENAFORMAT.put("trig","Trig");
+        JENAFORMAT.put("trig","TriG");
         JENAFORMAT.put("rdf","RDF/XML");
         JENAFORMAT.put("owl","RDF/XML");
         JENAFORMAT.put("jsonld","JSON-LD");
@@ -74,6 +74,8 @@ public class MediaTypeUtils {
         EXTENSION.put("trix","application/trix+xml");
         
         MEDIAS=new HashMap<>();
+        MEDIAS.put("jsonld",new MediaType("application","ld+json"));
+        MEDIAS.put("rt",new MediaType("application","rdf+thrift"));
         MEDIAS.put("ttl",new MediaType("text","turtle"));
         MEDIAS.put("nt",new MediaType("application","n-triples"));
         MEDIAS.put("nq",new MediaType("application","n-quads"));
@@ -82,10 +84,11 @@ public class MediaTypeUtils {
         MEDIAS.put("owl",new MediaType("application","owl+xml"));
         MEDIAS.put("jsonld",new MediaType("application","ld+json"));
         MEDIAS.put("rt",new MediaType("application","rdf+thrift"));
+        MEDIAS.put("trig",new MediaType("text","trig"));
+        MEDIAS.put("rdf",new MediaType("application","rdf+xml"));
         MEDIAS.put("rj",MediaType.APPLICATION_JSON_TYPE);
         MEDIAS.put("json",MediaType.APPLICATION_JSON_TYPE);
         MEDIAS.put("trix",new MediaType("application","trix+xml"));
-        
     }
     
     public static HashMap<String,String> getExtensionMimeMap(){
@@ -145,11 +148,17 @@ public class MediaTypeUtils {
         return media;
     }
     
-    public static ArrayList<Variant> getVariantList(){
+    public static ArrayList<Variant> getJenaVariantList(){
         ArrayList<Variant> variants=new ArrayList<>();
         for(String key:MEDIAS.keySet()) {
-            variants.add(new Variant(MEDIAS.get(key),Locale.US,"UTF-8"));
+            variants.add(new Variant(MEDIAS.get(key),(Locale)null,null));
         }
+        return variants;
+    }
+    
+    public static List<Variant> getBasicVariantList(){
+        //ArrayList<Variant> variants=new ArrayList<>(); 
+        List<Variant> variants=Variant.mediaTypes(MediaType.TEXT_HTML_TYPE).build();
         return variants;
     }
 

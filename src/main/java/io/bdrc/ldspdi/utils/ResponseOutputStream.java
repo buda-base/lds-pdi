@@ -27,8 +27,16 @@ import java.io.Writer;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.riot.writer.TriGWriter;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,8 +46,7 @@ import io.bdrc.formatters.TTLRDFWriter;
 public class ResponseOutputStream {
 
       
-    public static StreamingOutput getJsonResponseStream(Object toJson) {
-        
+    public static StreamingOutput getJsonResponseStream(Object toJson) {        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 ObjectMapper mapper = new ObjectMapper();
@@ -78,16 +85,16 @@ public class ResponseOutputStream {
         return stream;
     }
     
-    public static StreamingOutput getModelStream(Model model, String format) {
-        
+    public static StreamingOutput getModelStream(Model model, String format) {        
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {                
-                 
+                System.out.println("getJenaFromExtension :"+format+" >>> "+MediaTypeUtils.getJenaFromExtension(format)); 
                 if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {                        
                         JSONLDFormatter.writeModelAsCompact(model, os);
-                    } else {
-                        model.write(os,MediaTypeUtils.getJenaFromExtension(format));
+                    } 
+                    else {
+                        model.write(os,MediaTypeUtils.getJenaFromExtension(format)); 
                     }
                 } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
@@ -98,10 +105,8 @@ public class ResponseOutputStream {
         return stream;
     }
     
-    public static StreamingOutput getModelStream(Model model) {
-        
-        StreamingOutput stream = new StreamingOutput() {
-            
+    public static StreamingOutput getModelStream(Model model) {        
+        StreamingOutput stream = new StreamingOutput() {            
             public void write(OutputStream os) throws IOException, WebApplicationException {             
                 RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model); 
                 writer.output(os); 
@@ -110,10 +115,8 @@ public class ResponseOutputStream {
         return stream;
     }
     
-    public static StreamingOutput getStringStream(String toWrite) {
-        
-        StreamingOutput stream = new StreamingOutput() {
-            
+    public static StreamingOutput getStringStream(String toWrite) {        
+        StreamingOutput stream = new StreamingOutput() {            
             public void write(OutputStream os) throws IOException, WebApplicationException {             
                 Writer w = new OutputStreamWriter(os); 
                 w.write(toWrite);
