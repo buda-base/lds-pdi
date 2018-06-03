@@ -72,7 +72,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class PublicDataResource {   
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
+    public static final String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
     
     @GET   
     @JerseyCacheControl()
@@ -123,6 +123,35 @@ public class PublicDataResource {
         return builder.build();        
     }
 
+    public Response getResourceGraphCommon(final String res, final String format, String fuseki, UriInfo info, Request request) throws RestException {
+        Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        if(variant == null) {
+            final int status = (format == null ? 300 : 406); 
+            final String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
+            final ResponseBuilder rb=Response.status(status).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+        }
+        final MediaType mediaType = variant.getMediaType();
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
+            try {
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
+            }
+        }
+        if(fuseki == null)
+            fuseki = fusekiUrl;  
+        Model model=QueryProcessor.getResourceGraph(res,fuseki,null);
+        if(model.size()==0) {
+            throw new RestException(404, RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
+        }
+        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
+        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
+    }
+    
     @GET
     @Path("/resource/{res}")
     @JerseyCacheControl()
@@ -132,70 +161,19 @@ public class PublicDataResource {
         @Context UriInfo info,
         @Context Request request) throws RestException{        
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
-        Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if(format==null || variant == null) {
-            final String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
-            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
-        }
-        final MediaType mediaType = variant.getMediaType();
-        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
-            try {
-                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
-                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
-            } catch (URISyntaxException e) {
-                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
-            }
-        }
-        if(fuseki !=null){ 
-            fusekiUrl=fuseki;            
-        }            
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
-        if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
+        return getResourceGraphCommon(res, format, fuseki, info, request);
     }
     
     @POST
     @Path("/resource/{res}") 
     @JerseyCacheControl()
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,        
         @Context Request request) throws RestException{        
         log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);  
-        Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if(format==null || variant == null) {
-            final String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
-            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
-        }
-        final MediaType mediaType = variant.getMediaType();
-        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
-            try {
-                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
-                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
-            } catch (URISyntaxException e) {
-                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
-            }
-        }
-        if(fuseki !=null){ 
-            fusekiUrl=fuseki;            
-        }            
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
-        if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
+        return getResourceGraphCommon(res, format, fuseki, info, request);
     }
      
     @GET
@@ -204,50 +182,24 @@ public class PublicDataResource {
     public Response getFormattedResourceGraph(
             @PathParam("res") final String res, 
             @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki,
+            @DefaultValue("default query param value")
+            @HeaderParam("fusekiUrl") String fuseki,
             @Context UriInfo info) throws RestException{
         log.info("Call to getFormattedResourceGraph()"); 
         if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
             return Response.status(406).build();
         }
-        if(fuseki !=null){
-            fusekiUrl=fuseki;            
-        }
-        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
-        if(model.size()==0) {
+        if(fuseki == null)
+            fuseki = fusekiUrl;            
+        MediaType media = MediaTypeUtils.getMediaTypeFromExt(format);
+        Model model = QueryProcessor.getResourceGraph(res, fuseki, null);
+        if (model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
         return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();                     
     }
-    
-    @POST
-    @Path("/resource/{res}.{ext}") 
-    @JerseyCacheControl()
-    public Response getFormattedResourceGraphPost(
-            @PathParam("res") final String res, 
-            @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            @Context UriInfo info) throws RestException{
-        
-        log.info("Call to getFormattedResourceGraphPost()");
-        if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
-            return Response.status(406).build();
-        }
-        if(fuseki !=null){
-            fusekiUrl=fuseki;            
-        }
-        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
-        if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();
-    }
-    
-       
+
     @GET
     @Path("/ontology/{path}/{class}")    
     @Produces("text/html")
@@ -262,12 +214,12 @@ public class PublicDataResource {
         if(OntData.ontMod.getOntResource(uri)==null) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"There is no resource matching the following URI: \""+uri+"\"");
         } 
-        if(OntData.isClass(uri)) {
+        if (OntData.isClass(uri)) {
             /** class view **/
             if(builder == null){
                 builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(uri)));              
             }        
-        }else {
+        } else {
             /** Properties view **/
             if(builder == null){
                 builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri)));                
@@ -283,15 +235,14 @@ public class PublicDataResource {
         log.info("getOntology()");
         StreamingOutput stream = new StreamingOutput() {
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                
                 Model model=OntData.ontMod;
-                if(MediaTypeUtils.getJenaFromExtension(ext)!=null && !ext.equalsIgnoreCase("ttl")){
+                if (MediaTypeUtils.getJenaFromExtension(ext)!=null && !ext.equalsIgnoreCase("ttl")){
                     if(ext.equalsIgnoreCase("jsonld")) {
                         model.write(os,MediaTypeUtils.getJenaFromExtension("json"));
-                    }else {
+                    } else {
                         model.write(os,MediaTypeUtils.getJenaFromExtension(ext));
                     }
-                }else{
+                } else {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
                     writer.output(os);                                      
                 }                
