@@ -3,7 +3,6 @@ package io.bdrc.ldspdi.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
@@ -11,16 +10,35 @@ import javax.ws.rs.core.Variant;
 
 public class MediaTypeUtils {
     
-    public static ArrayList<String> MIMES;
-    public static HashMap<String,String> JENAFORMAT;
-    public static HashMap<String,String> MIMEFORMAT;
-    public static HashMap<String,String> EXTENSION;
-    public static HashMap<String,MediaType> MEDIAS;
+    public static final ArrayList<String> MIMES;
+    public static final HashMap<String,String> JENAFORMAT;
+    public static final HashMap<String,String> MIMEFORMAT;
+    public static final HashMap<String,String> EXTENSION;
     
+    public static final MediaType MT_JSONLD = new MediaType("application","ld+json");
+    public static final MediaType MT_RT = new MediaType("application","rdf+thrift");
+    public static final MediaType MT_TTL = new MediaType("text","turtle");
+    public static final MediaType MT_NT = new MediaType("application","n-triples");
+    public static final MediaType MT_NQ = new MediaType("application","n-quads");
+    public static final MediaType MT_TRIG = new MediaType("text","trig");
+    public static final MediaType MT_RDF = new MediaType("application","rdf+xml");
+    public static final MediaType MT_OWL = new MediaType("application","owl+xml");
+    public static final MediaType MT_TRIX = new MediaType("application","trix+xml");
+    
+    public static final List<Variant> resVariants;
+    public static final List<Variant> graphVariants;
+
     static {
+        resVariants = Variant.mediaTypes(MediaType.TEXT_HTML_TYPE,
+                MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
+                MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
+                MT_TRIX).build();
+        graphVariants = Variant.mediaTypes(
+                MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
+                MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
+                MT_TRIX).build();
+        
         MIMES = new ArrayList<>();
-        MIMES.add("text/*");
-        MIMES.add("application/*");
         MIMES.add("text/turtle");
         MIMES.add("application/n-triples");
         MIMES.add("application/n-quads");
@@ -47,7 +65,6 @@ public class MediaTypeUtils {
         JENAFORMAT.put("trix","Trix");
         
         MIMEFORMAT=new HashMap<>();
-        MIMEFORMAT.put("text/*","ttl");
         MIMEFORMAT.put("text/turtle","ttl");
         MIMEFORMAT.put("application/n-triples","nt");
         MIMEFORMAT.put("application/n-quads","nq");
@@ -56,7 +73,6 @@ public class MediaTypeUtils {
         MIMEFORMAT.put("application/owl+xml","owl");
         MIMEFORMAT.put("application/ld+json","jsonld");
         MIMEFORMAT.put("application/rdf+thrift","rt");
-        MIMEFORMAT.put("application/*","jsonld");
         MIMEFORMAT.put("application/json","rj");
         MIMEFORMAT.put("application/trix+xml","trix");
         
@@ -72,23 +88,7 @@ public class MediaTypeUtils {
         EXTENSION.put("rj","application/json");
         EXTENSION.put("json","application/json");
         EXTENSION.put("trix","application/trix+xml");
-        
-        MEDIAS=new HashMap<>();
-        MEDIAS.put("jsonld",new MediaType("application","ld+json"));
-        MEDIAS.put("rt",new MediaType("application","rdf+thrift"));
-        MEDIAS.put("ttl",new MediaType("text","turtle"));
-        MEDIAS.put("nt",new MediaType("application","n-triples"));
-        MEDIAS.put("nq",new MediaType("application","n-quads"));
-        MEDIAS.put("trig",new MediaType("text","trig"));
-        MEDIAS.put("rdf",new MediaType("application","rdf+xml"));
-        MEDIAS.put("owl",new MediaType("application","owl+xml"));
-        MEDIAS.put("jsonld",new MediaType("application","ld+json"));
-        MEDIAS.put("rt",new MediaType("application","rdf+thrift"));
-        MEDIAS.put("trig",new MediaType("text","trig"));
-        MEDIAS.put("rdf",new MediaType("application","rdf+xml"));
-        MEDIAS.put("rj",MediaType.APPLICATION_JSON_TYPE);
-        MEDIAS.put("json",MediaType.APPLICATION_JSON_TYPE);
-        MEDIAS.put("trix",new MediaType("application","trix+xml"));
+
     }
     
     public static HashMap<String,String> getExtensionMimeMap(){
@@ -126,7 +126,7 @@ public class MediaTypeUtils {
     }
     
     public static MediaType getMediaTypeFromExt(String format) {
-        MediaType media=new MediaType("text","turtle","utf-8");        
+        MediaType media=null;        
         String tmp=getMimeFromExtension(format);
         if(tmp!=null){
             if(isMime(tmp)){
@@ -138,28 +138,12 @@ public class MediaTypeUtils {
     }
     
     public static MediaType getMediaTypeFromMime(String mime) {
-        MediaType media=new MediaType("text","turtle","utf-8");        
-            if(mime.equals("text/*")) {return new MediaType("text","turtle");} 
-            if(mime.equals("application/*")) {return new MediaType("application","ld+json");} 
-            if(isMime(mime)){
-                String[] parts=mime.split(Pattern.quote("/"));
-                media = new MediaType(parts[0],parts[1]); 
-            }        
+        MediaType media = null;
+        if(isMime(mime)){
+            String[] parts=mime.split(Pattern.quote("/"));
+            media = new MediaType(parts[0],parts[1]); 
+        }        
         return media;
-    }
-    
-    public static ArrayList<Variant> getJenaVariantList(){
-        ArrayList<Variant> variants=new ArrayList<>();
-        for(String key:MEDIAS.keySet()) {
-            variants.add(new Variant(MEDIAS.get(key),(Locale)null,null));
-        }
-        return variants;
-    }
-    
-    public static List<Variant> getBasicVariantList(){
-        //ArrayList<Variant> variants=new ArrayList<>(); 
-        List<Variant> variants=Variant.mediaTypes(MediaType.TEXT_HTML_TYPE).build();
-        return variants;
     }
 
 }
