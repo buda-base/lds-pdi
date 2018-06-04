@@ -21,6 +21,7 @@ package io.bdrc.ldspdi.rest.resources;
 
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -35,8 +36,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.jena.rdf.model.Model;
 import org.glassfish.jersey.server.mvc.Viewable;
@@ -248,11 +252,21 @@ public class PublicTemplatesResource {
     public Response getGraphTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             @DefaultValue("jsonld") @QueryParam("format") final String format,            
-            @PathParam("file") String file) throws RestException{     
-        
-        log.info("Call to getGraphTemplateResults with format >>"+format);
+            @PathParam("file") String file,            
+            @Context Request request,
+            HashMap<String,String> map) throws RestException{     
+        String path=info.getPath()+info.relativize(info.getRequestUri());
+        Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
+        log.info("Call to getGraphTemplateResults() with URL: "+path+" Accept: "+format+ " Variant >> "+variant);
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
+        
+        if(format==null || variant == null) {
+            final String html=Helpers.getMultiChoicesHtml(path,false);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+path);
+            return setHeaders(rb,getGraphResourceHeaders(path,null,"List")).build();
+        }
         //Settings       
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
                  
@@ -268,11 +282,14 @@ public class PublicTemplatesResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
+        final MediaType mediaType = variant.getMediaType();
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,format),MediaTypeUtils.getMediaTypeFromExt(format)).header("Vary", "Accept").build();        
+        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
+        return setHeaders(builder,getGraphResourceHeaders(path,ext,"Choice")).build();
     }
     
     @POST
@@ -280,15 +297,28 @@ public class PublicTemplatesResource {
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
-            @HeaderParam("Accept") final String format,
+            @DefaultValue("jsonld") @HeaderParam("Accept") final String format,
             @PathParam("file") String file,
+            @Context UriInfo info,
+            @Context Request request,
             HashMap<String,String> map) throws RestException{
-        log.info("Call to getQueryTemplateResultsPost() with format >>"+format);
+        String path=info.getPath()+info.relativize(info.getRequestUri());
+        Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
+        log.info("Call to getGraphTemplateResultsPost() with URL: "+path+" Accept: "+format+ " Selected Variant >> "+variant);
         if(fuseki !=null){fusekiUrl=fuseki;} 
-                
+        String params="";
+        for(String key:map.keySet()) {
+            params="&"+key+"="+map.get(key)+"&";
+        }
+        params="?"+params.substring(1,params.length()-1);
+        if(format==null || variant == null) {            
+            final String html=Helpers.getMultiChoicesHtml(path+params,false);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+path+params);
+            return setHeaders(rb,getGraphResourceHeaders(path+params,null,"List")).build();
+        }    
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");
-        log.info("QueryResult Type >> "+qfp.getTemplate().getQueryReturn());
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
             throw new RestException(500,
@@ -299,11 +329,14 @@ public class PublicTemplatesResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
+        final MediaType mediaType = variant.getMediaType();
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        return Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),MediaTypeUtils.getMediaTypeFromMime(format)).header("Vary", "Accept").build();        
+        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
+        return setHeaders(builder,getGraphResourceHeaders(path+params,ext,"Choice")).build();       
     }
     
     @POST
@@ -315,5 +348,32 @@ public class PublicTemplatesResource {
         t.start();
         Prefixes.loadPrefixes();
         return Response.ok().build();       
+    }
+    
+    private static HashMap<String,String> getGraphResourceHeaders(String url,String ext, String tcn) {
+        HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,String> headers=new HashMap<>();
+        if(ext!=null) {
+            if(url.indexOf(".")<0) {
+                headers.put("Content-Location", url+"&format="+ext);
+            }else {
+                url=url.substring(0, url.lastIndexOf("."));
+            }
+        }
+        StringBuilder sb=new StringBuilder("");
+        for(Entry<String,String> e :map.entrySet()) {
+            sb.append("{\""+url+"&format="+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
+        }
+        headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
+        headers.put("TCN", tcn);
+        headers.put("Vary", "Negotiate, Accept");
+        return headers;
+    }
+    
+    private static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String,String> headers) {
+        for(String key:headers.keySet()) {
+            builder.header(key, headers.get(key));
+        }
+        return builder;
     }
 }

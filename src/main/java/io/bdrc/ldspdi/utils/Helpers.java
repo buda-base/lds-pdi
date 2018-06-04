@@ -89,7 +89,7 @@ public class Helpers {
         return uri.substring(uri.indexOf("/"));
     }
 	
-	public static String getMultiChoicesHtml(String path) throws RestException {
+	public static String getMultiChoicesHtml(String path,boolean resource) throws RestException {
 	    InputStream stream = Helpers.class.getClassLoader().getResourceAsStream("multiChoice.tpl");
 	    BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
 	    StringBuffer sb=new StringBuffer();
@@ -105,9 +105,16 @@ public class Helpers {
 	                "Unable to parse the html multi Choices template"+e.getMessage());         
         }
 	    String rows="";
-	    for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
-	        rows=rows+"<tr><td><a href=\""+path+"."+k+"\">"+path+"."+k+"</a><td>"+
-	                MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
+	    if(resource) {
+    	    for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
+    	        rows=rows+"<tr><td><a href=\""+path+"."+k+"\">"+path+"."+k+"</a><td>"+
+    	                MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
+    	    }
+	    }else {
+	        for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
+                rows=rows+"<tr><td><a href=\""+path+"&format="+k+"\">"+path+"."+k+"</a><td>"+
+                        MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
+            }
 	    }
 	    HashMap<String,String> map=new HashMap<>();
 	    map.put("path", path);

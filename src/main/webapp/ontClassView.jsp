@@ -141,8 +141,6 @@
             <ul><li><a href="${sub.getUri()}">${sub.getId()}</a></li></ul>
         </c:forEach> 
     </c:if>
-    
-    
 </c:if>
 <br><br>
 </body>

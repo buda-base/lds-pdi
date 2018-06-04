@@ -1,6 +1,6 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
-<%@page import="io.bdrc.ldspdi.rest.resources.*"%>
+<%@page import="io.bdrc.ldspdi.utils.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -37,12 +37,18 @@
 <h1>Possible choices</h1>
 <p>The document name you requested (${it.toString()}) without specifying a content type could not be found on this server. However, we found documents similar to the one you requested having various content type.</p>
 <br>
-
 <table id="specs" style="width:60%;">
 <tr><th>Link</th><th>Mime Type</th></tr> 
 <c:forEach items="${MediaTypeUtils.getExtensionMimeMap().keySet()}" var="k">
 <c:set var="val" value="${k}"/>
-<tr><td><a href="${it}.${k}">${it}.${k}</a><td>${MediaTypeUtils.getExtensionMimeMap().get(val)}</td></tr>  
+<c:choose>
+<c:when test="${it.contains('/resource/')}">
+<tr><td><a href="${it}.${k}">${it}.${k}</a><td>${MediaTypeUtils.getExtensionMimeMap().get(val)}</td></tr>
+</c:when>
+<c:otherwise>
+<tr><td><a href="${it}&format=${k}">${it}&format=${k}</a><td>${MediaTypeUtils.getExtensionMimeMap().get(val)}</td></tr>
+</c:otherwise>
+</c:choose>  
 </c:forEach>
 </table>
 

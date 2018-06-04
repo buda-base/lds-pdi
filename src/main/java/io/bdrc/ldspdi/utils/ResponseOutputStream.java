@@ -27,16 +27,9 @@ import java.io.Writer;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFWriter;
-import org.apache.jena.riot.writer.TriGWriter;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Context;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -39,7 +39,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -73,7 +72,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class PublicDataResource {   
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
     
     @GET   
     @JerseyCacheControl()
@@ -107,7 +106,7 @@ public class PublicDataResource {
     @Path("choice")
     @Produces(MediaType.TEXT_HTML)    
     public Response getMultiChoice(@QueryParam("path") String it,@Context UriInfo info) {
-        log.info("Call to getMultiChoice()");
+        log.info("Call to getMultiChoice() with path="+it);
         return Response.ok(new Viewable("/multiChoice.jsp",info.getBaseUri()+it)).build();        
     }
     
@@ -133,34 +132,21 @@ public class PublicDataResource {
         @Context UriInfo info,
         @Context Request request) throws RestException{        
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
-        log.info("BasiVariant >>>: "+request.selectVariant(MediaTypeUtils.getBasicVariantList()));
-        log.info("JenaVariant >>>: "+request.selectVariant(MediaTypeUtils.getJenaVariantList()));
-        Variant basicVariant=request.selectVariant(MediaTypeUtils.getBasicVariantList());
-        Variant jenaVariant=request.selectVariant(MediaTypeUtils.getJenaVariantList());
-        String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath());
-        if(format==null) {
-            ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+        Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        if(format==null || variant == null) {
+            final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
-        if(basicVariant!=null) {            
+        final MediaType mediaType = variant.getMediaType();
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
-                
-                //return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
-        }
-        if(jenaVariant==null) {
-            //return Response.status(406).build();
-            ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
-        }else {
-            format=jenaVariant.getMediaType().toString();
-            log.info("Format from Variant >>>: "+format);
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -169,49 +155,35 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),jenaVariant.getMediaType());
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();             
+        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
+        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice")).build();
     }
     
     @POST
     @Path("/resource/{res}") 
     @JerseyCacheControl()
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,        
         @Context Request request) throws RestException{        
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format); 
-        log.info("BasiVariant >>>: "+request.selectVariant(MediaTypeUtils.getBasicVariantList()));
-        log.info("JenaVariant >>>: "+request.selectVariant(MediaTypeUtils.getJenaVariantList()));
-        Variant basicVariant=request.selectVariant(MediaTypeUtils.getBasicVariantList());
-        Variant jenaVariant=request.selectVariant(MediaTypeUtils.getJenaVariantList());
-        String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath()); 
-        
-        if(format==null) {
-            ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);  
+        Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        if(format==null || variant == null) {
+            final String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath(),true);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
-        if(basicVariant!=null) {            
+        final MediaType mediaType = variant.getMediaType();
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
-                
-                //return Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"getResourceGraph : URISyntaxException"+e.getMessage());
             }
-        }
-        if(jenaVariant==null) {
-            //return Response.status(406).build();
-            ResponseBuilder b=Response.status(406).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(b,getResourceHeaders(info.getPath(),null,"List")).build();
-        }else {
-            format=jenaVariant.getMediaType().toString();
-            log.info("Format from Variant >>>: "+format);
         }
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
@@ -220,8 +192,9 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
         }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,MediaTypeUtils.getExtFormatFromMime(format)),jenaVariant.getMediaType());
-        return setHeaders(builder,getResourceHeaders(info.getPath(),MediaTypeUtils.getExtFormatFromMime(format),"Choice")).build();
+        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
+        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice")).build();
     }
      
     @GET
@@ -368,12 +341,12 @@ public class PublicDataResource {
             }
         }
         StringBuilder sb=new StringBuilder("");
-        for(String ex:map.keySet()) {
-            sb.append("{\""+url+"."+ex+"\" 1.000 {type "+MediaTypeUtils.getMimeFromExtension(ex)+"}},");               
+        for(Entry<String,String> e :map.entrySet()) {
+            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
         headers.put("TCN", tcn);
-        headers.put("Vary", "Negotiate,Accept");
+        headers.put("Vary", "Negotiate, Accept");
         return headers;
     } 
     
