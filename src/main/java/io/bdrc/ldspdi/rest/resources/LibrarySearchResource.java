@@ -77,7 +77,7 @@ public class LibrarySearchResource {
             case "workFacetGraph":
             case "workAssocWorks":
             case "workAllAssociations":
-                res=WorkResults.getResultsMap(model);
+                res=WorkAllResults.getResultsMap(model);
                 break;
             case "allAssocResource":
                 res=ResourceResults.getResultsMap(model);
