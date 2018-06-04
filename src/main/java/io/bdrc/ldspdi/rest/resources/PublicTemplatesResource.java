@@ -82,7 +82,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to getQueryTemplateResults()");
+        log.info("Call to getQueryTemplateResults()"+file);
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
@@ -128,7 +128,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to testTemplateResults()");
+        log.info("Call to testTemplateResults()"+file);
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
