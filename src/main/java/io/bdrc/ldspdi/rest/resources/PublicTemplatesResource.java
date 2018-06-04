@@ -251,20 +251,18 @@ public class PublicTemplatesResource {
     @JerseyCacheControl()
     public Response getGraphTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @QueryParam("format") final String format,            
+            @QueryParam("format") final String format,            
             @PathParam("file") String file,            
             @Context Request request,
             HashMap<String,String> map) throws RestException{     
         String path=info.getPath()+info.relativize(info.getRequestUri());
         Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
         log.info("Call to getGraphTemplateResults() with URL: "+path+" Accept: "+format+ " Variant >> "+variant);
-        if(fuseki !=null){fusekiUrl=fuseki;}        
-        
-        
-        if(format==null || variant == null) {
-            final String html=Helpers.getMultiChoicesHtml(path,false);
-            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+path);
+        if(fuseki !=null){fusekiUrl=fuseki;} 
+        if(format==null && variant == null) {            
+            final ResponseBuilder rb=Response.status(300).entity(Helpers.getMultiChoicesHtml(path,false))
+                    .header("Content-Type", "text/html")
+                    .header("Content-Location",info.getBaseUri()+"choice?path="+path);
             return setHeaders(rb,getGraphResourceHeaders(path,null,"List")).build();
         }
         //Settings       
@@ -274,18 +272,23 @@ public class PublicTemplatesResource {
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String check=qfp.checkQueryArgsSyntax();
         if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
                     "Exception : File->"+ file+".arq"+"; ERROR: "+check);
         }
         String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),false);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
+                    "The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        final MediaType mediaType = variant.getMediaType();
+        //format is prevalent
+        MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
+        if(mediaType==null) {
+            mediaType=variant.getMediaType();
+        }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
+            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,
+                    "No graph was found for the given resource Id");
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -297,7 +300,7 @@ public class PublicTemplatesResource {
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @HeaderParam("Accept") final String format,
+            @DefaultValue("jsonld") @HeaderParam("Accept") String format,
             @PathParam("file") String file,
             @Context UriInfo info,
             @Context Request request,
@@ -311,11 +314,8 @@ public class PublicTemplatesResource {
             params="&"+key+"="+map.get(key)+"&";
         }
         params="?"+params.substring(1,params.length()-1);
-        if(format==null || variant == null) {            
-            final String html=Helpers.getMultiChoicesHtml(path+params,false);
-            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+path+params);
-            return setHeaders(rb,getGraphResourceHeaders(path+params,null,"List")).build();
+        if(format==null || variant == null) { 
+            format="jsonld";
         }    
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -329,14 +329,20 @@ public class PublicTemplatesResource {
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
         }
-        final MediaType mediaType = variant.getMediaType();
+        //format is prevalent
+        MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
+        if(mediaType==null) {
+            mediaType=variant.getMediaType();
+        }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
         }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
-        return setHeaders(builder,getGraphResourceHeaders(path+params,ext,"Choice")).build();       
+        return Response.ok(ResponseOutputStream.getModelStream(
+                        model,
+                        MediaTypeUtils.getExtFormatFromMime(mediaType.toString())), 
+                        mediaType)
+                        .build();          
     }
     
     @POST

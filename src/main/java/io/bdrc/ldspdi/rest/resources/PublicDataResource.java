@@ -127,13 +127,12 @@ public class PublicDataResource {
     @Path("/resource/{res}")
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
-        @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,
         @Context Request request) throws RestException{        
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept: "+format); 
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()); 
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if(format==null || variant == null) {
+        if(variant == null) {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
             final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
@@ -164,17 +163,13 @@ public class PublicDataResource {
     @Path("/resource/{res}") 
     @JerseyCacheControl()
     public Response getResourceGraphPost(@PathParam("res") final String res,
-        @HeaderParam("Accept") String format,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,        
         @Context Request request) throws RestException{        
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+" Accept: "+format);  
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath());  
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if(format==null || variant == null) {
-            final String html=Helpers.getMultiChoicesHtml(info.getBaseUri()+"choice?path="+info.getPath(),true);
-            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
-                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+        if(variant == null) {
+            return Response.status(406).build();
         }
         final MediaType mediaType = variant.getMediaType();
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
