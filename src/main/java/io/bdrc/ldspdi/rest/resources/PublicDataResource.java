@@ -165,9 +165,10 @@ public class PublicDataResource {
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("fusekiUrl") final String fuseki,
         @Context UriInfo info,        
-        @Context Request request) throws RestException{        
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath());  
+        @Context Request request) throws RestException{ 
+        
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+ " Variant >> "+variant); 
         if(variant == null) {
             return Response.status(406).build();
         }

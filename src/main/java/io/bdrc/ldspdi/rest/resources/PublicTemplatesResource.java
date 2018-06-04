@@ -314,7 +314,7 @@ public class PublicTemplatesResource {
             params="&"+key+"="+map.get(key)+"&";
         }
         params="?"+params.substring(1,params.length()-1);
-        if(format==null || variant == null) { 
+        if(format==null && variant == null) { 
             format="jsonld";
         }    
         //process
