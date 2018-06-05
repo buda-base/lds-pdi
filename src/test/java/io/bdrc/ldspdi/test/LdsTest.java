@@ -117,20 +117,7 @@ public class LdsTest extends JerseyTest {
 		return config;
     }
 	
-	
 	@Test
-	public void testQueryProcessorModel() throws RestException{
-		// Makes sure that requested model is actually returned
-		// by the query processor
-		
-		ArrayList<String> list=TestUtils.getResourcesList();
-		for(String res : list){
-			Model[] md=prepareAssertModel(res);
-			assertTrue(md[0].isIsomorphicWith(md[1]));			
-		}	
-	}
-
-    @Test
     public void testHtmlLitFormatter(){
         PrefixMap pm = PrefixMapFactory.create();
         pm.add("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -184,18 +171,6 @@ public class LdsTest extends JerseyTest {
         
     }
 	
-	/*@Test
-	public void testGetModel() throws IOException{
-		// Makes sure that requested model is actually returned
-		// by the rest API		
-		ArrayList<String> resList=TestUtils.getResourcesList();
-		//Browser-like query without extension nor accept header --> returns STTL by default
-		for(String res : resList){		    
-			Model[] md= prepareGetAssertModel(res);	
-			assertTrue(md[0].isIsomorphicWith(md[1]));
-		}		
-	}*/
-	
 	@Test
     public void testJSONLDFormatter() throws IOException, RestException{
         // Loads resource model from .ttl file
@@ -222,88 +197,22 @@ public class LdsTest extends JerseyTest {
         }
     }
 	
-	/*@Test
-	public void testGetSTTLSyntax() throws IOException{
-		ArrayList<String> resList=TestUtils.getResourcesList();
-		// Browser-like query without extension nor accept header 
-		// --> returns STTL by default
-		// Tests the STTL string produced by the API
-		
-		for(String res : resList){
-			//Excluding unsupported Etext format
-			if(!res.startsWith("U")) {
-			    System.out.println(">>>>>>>>>>>>>>>> RES >>>< "+res);
-				String[] st= prepareGetAssertSTTLSyntax(res);
-				assertTrue(st[0].equals(st[1]));
-			}
-		}		
-	}*/
 			
-	private Model[] prepareAssertModel(String res) throws RestException{
+	@Test
+	public void prepareAssertModel() throws RestException{
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
 		// Get resource model from embedded fuseki via QueryProcessor
 		// returns both models to be compared by testQueryProcessorModel()
+	    ArrayList<String> list=TestUtils.getResourcesList();
+        for(String res : list){
+    		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
+    		Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl,null);			
+    		Model[] ret={m,mq};
+    		assertTrue(ret[0].isIsomorphicWith(ret[1]));
+        }
 		
-		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
-		Model mq=QueryProcessor.getResourceGraph(res,fusekiUrl,null);			
-		Model[] ret={m,mq};		
-		return ret;
 	}
-	
-	/*private Model[] prepareGetAssertModel(String res) throws IOException{
-		// Loads resource model from .ttl file
-		// Gets resource model from rest API
-		// and returns them for comparison by testGetModel() 
-		
-		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);		
-		Model m_rest = ModelFactory.createDefaultModel();
-		Response output = target("/resource/"+res).request().header("fusekiUrl", fusekiUrl).get();
-		String resp=output.readEntity(String.class).trim();		
-		ByteArrayInputStream is=new ByteArrayInputStream(resp.getBytes());
-		m_rest.read(is,null,Lang.TURTLE.getName());
-		Model[] md={m,m_rest};		
-		is.close();
-		return md;
-	}*/
-	
-	/*private String[] prepareGetAssertSTTLSyntax(String res) throws IOException{
-		// Loads resource model from .ttl file
-		// Adjusts prefix mapping
-		// Gets resource model from rest API
-		// Writes both model and returns them as strings to be compared
-		// by testGetModelSyntax()  
-		
-		Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", sttl);
-		RDFWriter wFile=getSttlRDFWriter(m);
-		Map<String,String> prefixMap=m.getNsPrefixMap();
-		String prefix=TestUtils.convertToString(prefixMap);
-		
-		Model m_rest = ModelFactory.createDefaultModel();
-		Response output = target("/resource/"+res)
-				.request()
-				.header("fusekiUrl", fusekiUrl)
-				.header("prefix", prefix)
-				.get();
-		String resp=output.readEntity(String.class).trim();		
-		output.close();		
-		ByteArrayInputStream is=new ByteArrayInputStream(resp.getBytes());
-		m_rest.read(is,null,"TURTLE");
-		RDFWriter w=getSttlRDFWriter(m_rest);
-		
-		ByteArrayOutputStream baos1=new ByteArrayOutputStream();
-		ByteArrayOutputStream baos2=new ByteArrayOutputStream();
-				
-		wFile.output(baos1);
-		w.output(baos2);	
-		
-		String[] ret={baos2.toString(),baos2.toString()};
-		is.close();
-		baos1.close();
-		baos2.close();
-		return ret;
-	}*/
-	
 	
 	static void loadData(){
 		//Loads the test dataset/

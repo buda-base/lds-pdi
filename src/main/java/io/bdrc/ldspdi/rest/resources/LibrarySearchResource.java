@@ -27,8 +27,6 @@ import io.bdrc.ldspdi.results.library.TopicAllResults;
 import io.bdrc.ldspdi.results.library.WorkAllResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.InjectionTracker;
-import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -53,16 +51,7 @@ public class LibrarySearchResource {
 
         log.info("Call to getLibGraphPost() with template name >> "+file);
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
+        String query=qfp.getParametizedQuery(map,false);
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
@@ -109,16 +98,7 @@ public class LibrarySearchResource {
         log.info("Call to getLibGraphGet() with template name >> "+file);
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
+        String query=qfp.getParametizedQuery(map,true);
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         log.info("Model Size >>>>>> "+model.size());
         HashMap<String,Object> res=null;

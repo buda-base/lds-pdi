@@ -57,7 +57,6 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.InjectionTracker;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
@@ -91,13 +90,7 @@ public class PublicTemplatesResource {
                 
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),true);        
+        String query=qfp.getParametizedQuery(hm,true);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(new Viewable("/error.jsp",query)).build();
         }
@@ -137,18 +130,7 @@ public class PublicTemplatesResource {
                 
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),true);        
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "template ->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+query);
-        }
+        String query=qfp.getParametizedQuery(hm,true);        
         //The output we build using jackson
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         FusekiResultSet model=new FusekiResultSet(res);  
@@ -173,15 +155,8 @@ public class PublicTemplatesResource {
         if(fuseki !=null){fusekiUrl=fuseki;}
         HashMap<String,String> hm=Helpers.convertMulti(mp);
         
-        QueryFileParser qfp=new QueryFileParser(file+".arq");                
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ hm.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(),hm,qfp.getLitLangParams(),true);
-        
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        String query=qfp.getParametizedQuery(hm,true);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
         }
@@ -220,14 +195,8 @@ public class PublicTemplatesResource {
                     "Exception : request parameters are missing-> in Post json query template request");
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}         
-        QueryFileParser qfp=new QueryFileParser(file+".arq");             
-        String check=qfp.checkQueryArgsSyntax();
-        if (!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ map.get(QueryConstants.SEARCH_TYPE)+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(),map,qfp.getLitLangParams(),true);        
+        QueryFileParser qfp=new QueryFileParser(file+".arq");
+        String query=qfp.getParametizedQuery(map,true);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
         } else {
@@ -270,16 +239,7 @@ public class PublicTemplatesResource {
                  
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), hm,qfp.getLitLangParams(),false);        
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
-                    "The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
+        String query=qfp.getParametizedQuery(hm,false);        
         //format is prevalent
         MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
         if(mediaType==null) {
@@ -319,16 +279,7 @@ public class PublicTemplatesResource {
         }    
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String check=qfp.checkQueryArgsSyntax();
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ file+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
+        String query=qfp.getParametizedQuery(map,false);     
         //format is prevalent
         MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
         if(mediaType==null) {
@@ -382,4 +333,6 @@ public class PublicTemplatesResource {
         }
         return builder;
     }
+    
+    
 }

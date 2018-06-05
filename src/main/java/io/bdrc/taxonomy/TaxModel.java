@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.InjectionTracker;
-import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
@@ -24,19 +22,10 @@ public class TaxModel {
     
     public static void init() throws RestException {
         
-        QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");        
-        String check=qfp.checkQueryArgsSyntax();
+        QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");
         HashMap<String,String> map=new HashMap<>();
         map.put("R_RES","bdr:O9TAXTBRC201605");
-        if(!check.trim().equals("")) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : File->"+ ServiceConfig.getProperty("taxtree")+".arq"+"; ERROR: "+check);
-        }
-        String query=InjectionTracker.getValidQuery(qfp.getQuery(), map,qfp.getLitLangParams(),false);         
-        if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"The injection Tracker failed to build the query : "+qfp.getQuery());
-        }
+        String query=qfp.getParametizedQuery(map,false);
         m=QueryProcessor.getGraph(query,ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL),null);
         items=getRootCatByTopics();
     }

@@ -25,10 +25,14 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,7 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.objects.json.ResParam;
 import io.bdrc.ldspdi.objects.json.StringParam;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class QueryFileParser {	
@@ -56,7 +61,7 @@ public class QueryFileParser {
 	
 	
 	public QueryFileParser(String filename) throws RestException{
-	    
+	    ;
 		metaInf= new HashMap<>();		
 		queryName=filename.substring(0,filename.lastIndexOf("."));
 		parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
@@ -73,8 +78,9 @@ public class QueryFileParser {
                 getQuery());		
 	}
 	
+	
 	public QueryFileParser(String filename,String type) throws RestException{
-        
+	    
         metaInf= new HashMap<>();       
         queryName=filename.substring(0,filename.lastIndexOf("."));
         parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename));
@@ -257,6 +263,84 @@ public class QueryFileParser {
 	public String getQuery() {
         return query;
     }
+	
+	public String getParametizedQuery(HashMap<String,String> converted,boolean limit) throws RestException {
+	    if (!checkQueryArgsSyntax().trim().equals("")) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "Exception : File->"+ getTemplateName()+"; ERROR: "+checkQueryArgsSyntax());
+        }
+	    List<String> params=getQueryParams();
+	    HashMap<String,String> litParams=getLitLangParams();
+	    if(converted ==null) { converted=new HashMap<>();}
+        if(!hasValidParams(converted.keySet(),params)) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "The request is missing at least one parameter");
+        }
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query);
+        for(String st:converted.keySet()) {            
+            if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
+                queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));                
+            }
+            if(st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
+                String param=converted.get(st);
+                if(param.contains(":")) {
+                    if(Helpers.isValidURI(param)) {
+                        queryStr.setIri(st,param);
+                    }
+                    else {
+                        String[] parts=param.split(Pattern.compile(":").toString());
+                        if(parts[0]==null) {
+                            parts[0]="";
+                        }                        
+                        if(Prefixes.getFullIRI(parts[0]+":")!=null) {
+                            queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
+                        }else {
+                            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                                    "Unknown prefix","");
+                        }
+                    }
+                }
+                else {
+                    throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"ParameterException :"+param,
+                            "This parameter must be of the form prefix:resource or spaceNameUri/resource","");
+                }
+                    
+            }
+            if(st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
+                if(litParams.keySet().contains(st)) {
+                    String lang=converted.get(litParams.get(st)).toLowerCase();
+                    try {
+                        new Locale.Builder().setLanguageTag(lang).build();
+                    }catch(IllformedLocaleException ex) {
+                        return "ERROR --> language param :"+lang+" is not a valid BCP 47 language tag"+ex.getMessage();
+                    }                    
+                    queryStr.setLiteral(st, converted.get(st),lang);                    
+                }else {                    
+                    //Some literals do not have a lang associated with them
+                    queryStr.setLiteral(st, converted.get(st));                    
+                }
+            }
+        }
+        Query q=queryStr.asQuery(); 
+        if(limit) {
+            long limit_max=Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));        
+            if(q.hasLimit()) {
+                if(q.getLimit()>limit_max) {
+                    q.setLimit(limit_max);
+                }
+            }else {
+                q.setLimit(limit_max);
+            }
+        }
+        if(q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
+            throw new RestException(500,
+                    RestException.GENERIC_APP_ERROR_CODE,
+                    "template ->"+ getTemplateName()+".arq"+"; ERROR: "+query);
+        }
+        return q.toString();
+    }
 
     public HashMap<String, String> getLitLangParams() {
         return litLangParams;
@@ -268,6 +352,19 @@ public class QueryFileParser {
 
     public QueryTemplate getTemplate() {
         return template;
+    }
+    
+    public List<String> getQueryParams() {
+        return Arrays.asList(template.getQueryParams().split(","));
+    }
+    
+    private static boolean hasValidParams(Set<String> reqParams,  List<String> params) {
+        for(String pr:params) {
+            if(!reqParams.contains(pr.trim())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
