@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.sparql;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import org.apache.jena.query.DatasetAccessor;
@@ -50,7 +51,11 @@ public class QueryProcessor {
 	    int hash=Objects.hashCode(resID);
 	    Model model=(Model)ResultsCache.getObjectFromCache(hash);	    
 	    if(model==null) {
-    		Query q=QueryFactory.create(prefixes+" DESCRIBE <http://purl.bdrc.io/resource/"+resID.trim()+">");
+	        QueryFileParser qfp=new QueryFileParser("Resgraph.arq","library"); 
+	        HashMap<String,String> map=new HashMap<>();
+	        map.put("R_RES","bdr:"+resID);
+	        String query=qfp.getParametizedQuery(map,false);
+    		Query q=QueryFactory.create(prefixes+" "+query);
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
     		qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
     		model = qe.execDescribe();

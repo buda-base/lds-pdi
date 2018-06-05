@@ -97,24 +97,7 @@ public class QueryFileParser {
                 getQuery());        
     }
 	
-    public QueryFileParser(String filename,String type,String st) throws RestException{
-        
-        metaInf= new HashMap<>();       
-        queryName=filename.substring(0,filename.lastIndexOf("."));
-        parseTemplate(new File("/home/marc/lds-queries/"+type+"/"+filename));
-        template= new QueryTemplate(
-                getTemplateName(),
-                QueryConstants.QUERY_PUBLIC_DOMAIN,
-                metaInf.get(QueryConstants.QUERY_URL),
-                metaInf.get(QueryConstants.QUERY_SCOPE),
-                metaInf.get(QueryConstants.QUERY_RESULTS),
-                metaInf.get(QueryConstants.QUERY_RETURN_TYPE),
-                metaInf.get(QueryConstants.QUERY_PARAMS),
-                params, 
-                outputs,
-                getQuery());        
-    }
-	public String getTemplateName() {
+    public String getTemplateName() {
 	    return this.queryName;
 	}
 	
