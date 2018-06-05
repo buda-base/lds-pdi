@@ -97,7 +97,8 @@ public class QueryFileParser {
                 getQuery());        
     }
 	
-    public String getTemplateName() {
+        
+	public String getTemplateName() {
 	    return this.queryName;
 	}
 	

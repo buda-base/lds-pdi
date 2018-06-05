@@ -171,7 +171,7 @@ public class LdsTest extends JerseyTest {
         
     }
 	
-	@Test
+	/*@Test
     public void testJSONLDFormatter() throws IOException, RestException{
         // Loads resource model from .ttl file
         // Creates a jsonld object of that model and saves it to.jsonld file
@@ -195,10 +195,10 @@ public class LdsTest extends JerseyTest {
                 assertTrue(mq.isIsomorphicWith(json));
             }
         }
-    }
+    }*/
 	
 			
-	@Test
+	/*@Test
 	public void prepareAssertModel() throws RestException{
 		// Loads resource model from .ttl file
 		// Adjusts prefix mapping
@@ -212,7 +212,7 @@ public class LdsTest extends JerseyTest {
     		assertTrue(ret[0].isIsomorphicWith(ret[1]));
         }
 		
-	}
+	}*/
 	
 	static void loadData(){
 		//Loads the test dataset/
