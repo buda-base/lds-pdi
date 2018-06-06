@@ -35,6 +35,7 @@ public class WorkResults {
     static final String STATUS="http://purl.bdrc.io/ontology/admin/status";
     static final String LANG_SCRIPT="http://purl.bdrc.io/ontology/core/workLangScript";
     static final String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
+    static final String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     static final String MATCH="http://purl.bdrc.io/ontology/core/labelMatch";
         
@@ -50,6 +51,8 @@ public class WorkResults {
         HashMap<String,Integer> langScript=new HashMap<>();        
         HashMap<String,Integer> topics=new HashMap<>();        
         HashMap<String,ArrayList<Field>> works=new HashMap<>();
+        HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
+        HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
         HashSet<String> tops=new HashSet<>();       
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
@@ -98,18 +101,14 @@ public class WorkResults {
                     status.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(WORK_GENRE)) { 
+            if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) { 
                 tops.add(st.getObject().asNode().getURI());
-                String it=TaxModel.getTaxonomyItem(st.getObject().asNode().getURI());
-                if(it !=null) {                    
-                    Integer ct=topics.get(it);
-                    if(ct!=null) {
-                        topics.put(it, ct.intValue()+1);
-                    }
-                    else {
-                        topics.put(it, 1);
-                    }                    
+                HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
+                if (tmp==null) {
+                    tmp=new HashSet<>();
                 }
+                tmp.add(st.getSubject().asNode().getURI());
+                Wtopics.put(st.getObject().asNode().getURI(), tmp);                                     
                 Integer t=topics.get(st.getObject().asNode().getURI());                
                 LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
                 if(!nodes.isEmpty()) {
@@ -117,20 +116,15 @@ public class WorkResults {
                     nodes.removeLast();
                 }
                 for(String s:nodes) {
-                    Integer tp=topics.get(s);
-                    if(tp!=null) {
-                        topics.put(s, tp.intValue()+1);
+                    HashSet<String> bt=WorkBranch.get(s);
+                    if (bt==null) {
+                        bt=new HashSet<>();
                     }
-                    else {
-                        topics.put(s, 1);
-                    }
+                    bt.add(st.getSubject().asNode().getURI());
+                    WorkBranch.put(s, bt);
+                    topics.put(s, bt.size());
                 }
-                if(t!=null) {
-                    topics.put(st.getObject().asNode().getURI(), t.intValue()+1);
-                }
-                else {
-                    topics.put(st.getObject().asNode().getURI(), 1);
-                }
+                topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
             }
             works.put(uri, w);
         }
