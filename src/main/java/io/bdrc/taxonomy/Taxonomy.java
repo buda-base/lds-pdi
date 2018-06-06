@@ -1,5 +1,7 @@
 package io.bdrc.taxonomy;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +15,13 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.utils.Node;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class Taxonomy {
     
@@ -95,6 +103,24 @@ public class Taxonomy {
             }
         }
         return partialTree;
+    }
+    
+    public static JsonNode buildFacetTree(HashSet<String> tops,HashMap<String,Integer> topics) throws RestException {
+        JsonNode nn=null;
+        if(tops.size()>0) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+                Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops,topics);
+                ByteArrayOutputStream baos=new ByteArrayOutputStream();        
+                JSONLDFormatter.writeModelAsCompact(ModelFactory.createModelForGraph(g),baos);
+                nn=mapper.readTree(baos.toString());
+                baos.close();
+            } catch (IOException ex) {
+                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"WorkResults was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"");              
+            }
+        }
+        return nn;
     }
     
        

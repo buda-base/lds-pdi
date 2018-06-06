@@ -2,6 +2,8 @@ package io.bdrc.ldspdi.results.library;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -9,6 +11,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.restapi.exceptions.RestException;
+import io.bdrc.taxonomy.Taxonomy;
 
 public class PersonAllResults {
     
@@ -17,12 +20,18 @@ public class PersonAllResults {
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
     public final static String PLACE="http://purl.bdrc.io/ontology/core/Place";
     public final static String LINEAGE="http://purl.bdrc.io/ontology/core/Lineage";
+    public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
+    public final static String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,ArrayList<Field>> works=new HashMap<>(); 
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
         HashMap<String,ArrayList<Field>> places=new HashMap<>();
         HashMap<String,ArrayList<Field>> lineages=new HashMap<>();
+        HashMap<String,Integer> topics=new HashMap<>();
+        HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
+        HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
+        HashSet<String> tops=new HashSet<>(); 
         HashMap<String,Object> res=new HashMap<>();
         StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
@@ -36,6 +45,30 @@ public class PersonAllResults {
                     }
                     wl.add(Field.getField(st)); 
                     works.put(st.getSubject().getURI(),wl);
+                    if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) {                        
+                        tops.add(st.getObject().asNode().getURI());
+                        HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
+                        if (tmp==null) {
+                            tmp=new HashSet<>();
+                        }
+                        tmp.add(st.getSubject().asNode().getURI());
+                        Wtopics.put(st.getObject().asNode().getURI(), tmp); 
+                        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
+                        if(!nodes.isEmpty()) {
+                            nodes.removeFirst();
+                            nodes.removeLast();
+                        }
+                        for(String s:nodes) {
+                            HashSet<String> bt=WorkBranch.get(s);
+                            if (bt==null) {
+                                bt=new HashSet<>();
+                            }
+                            bt.add(st.getSubject().asNode().getURI());
+                            WorkBranch.put(s, bt);
+                            topics.put(s, bt.size());
+                        }
+                        topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
+                    }
                     break;
                 case PLACE:
                     ArrayList<Field> pla=places.get(st.getSubject().getURI());
@@ -67,11 +100,12 @@ public class PersonAllResults {
                     throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Unknown type in PersonAllResults >> "+type);
             
             }
-        }
+        }        
         res.put("associatedWorks",works);
         res.put("associatedPeople",people);
         res.put("associatedPlaces",places);
         res.put("associatedLineages",lineages);
+        res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
         
     }

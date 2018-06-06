@@ -2,6 +2,8 @@ package io.bdrc.ldspdi.results.library;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -9,6 +11,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.restapi.exceptions.RestException;
+import io.bdrc.taxonomy.Taxonomy;
 
 public class PlaceAllResults {
     
@@ -20,6 +23,8 @@ public class PlaceAllResults {
     public final static String LICENSE="http://purl.bdrc.io/ontology/admin/license";
     public final static String STATUS="http://purl.bdrc.io/ontology/admin/status";
     public final static String LANG_SCRIPT="http://purl.bdrc.io/ontology/core/workLangScript";
+    public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
+    public final static String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
@@ -33,8 +38,12 @@ public class PlaceAllResults {
         HashMap<String,Integer> total=new HashMap<>();
         HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
         ArrayList<String> processed=new ArrayList<>();
-        StmtIterator it=mod.listStatements();
+        HashMap<String,Integer> topics=new HashMap<>();
+        HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
+        HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
+        HashSet<String> tops=new HashSet<>();
         
+        StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
             Statement st=it.next();
             String type=mod.getProperty(st.getSubject(), mod.getProperty(TYPE)).getObject().asResource().getURI().toString();
@@ -91,6 +100,30 @@ public class PlaceAllResults {
                             status.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
+                    if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) {                        
+                        tops.add(st.getObject().asNode().getURI());
+                        HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
+                        if (tmp==null) {
+                            tmp=new HashSet<>();
+                        }
+                        tmp.add(st.getSubject().asNode().getURI());
+                        Wtopics.put(st.getObject().asNode().getURI(), tmp); 
+                        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
+                        if(!nodes.isEmpty()) {
+                            nodes.removeFirst();
+                            nodes.removeLast();
+                        }
+                        for(String s:nodes) {
+                            HashSet<String> bt=WorkBranch.get(s);
+                            if (bt==null) {
+                                bt=new HashSet<>();
+                            }
+                            bt.add(st.getSubject().asNode().getURI());
+                            WorkBranch.put(s, bt);
+                            topics.put(s, bt.size());
+                        }
+                        topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
+                    }
                     break;                
                 case PLACE:
                     ArrayList<Field> pla=places.get(st.getSubject().getURI());
@@ -123,7 +156,8 @@ public class PlaceAllResults {
         res.put("metadata",count);
         res.put("works",works);        
         res.put("persons",people);       
-        res.put("places",places);        
+        res.put("places",places); 
+        res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
         

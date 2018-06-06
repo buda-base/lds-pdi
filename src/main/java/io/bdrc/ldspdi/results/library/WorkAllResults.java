@@ -1,23 +1,14 @@
 package io.bdrc.ldspdi.results.library;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
@@ -55,8 +46,7 @@ public class WorkAllResults {
                             tmp=new HashSet<>();
                         }
                         tmp.add(st.getSubject().asNode().getURI());
-                        Wtopics.put(st.getObject().asNode().getURI(), tmp);                                     
-                        Integer t=topics.get(st.getObject().asNode().getURI());                
+                        Wtopics.put(st.getObject().asNode().getURI(), tmp);
                         LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
                         if(!nodes.isEmpty()) {
                             nodes.removeFirst();
@@ -89,23 +79,9 @@ public class WorkAllResults {
             
             }
         }
-        JsonNode nn=null;
-        if(tops.size()>0) {
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-                Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops,topics);
-                ByteArrayOutputStream baos=new ByteArrayOutputStream();        
-                JSONLDFormatter.writeModelAsCompact(ModelFactory.createModelForGraph(g),baos);
-                nn=mapper.readTree(baos.toString());
-                baos.close();
-            } catch (IOException ex) {
-                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"WorkResults was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"");              
-            }
-        }
         res.put("associatedWorks",works);
         res.put("associatedLineages",lineages);
-        res.put("tree",nn);
+        res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
 
