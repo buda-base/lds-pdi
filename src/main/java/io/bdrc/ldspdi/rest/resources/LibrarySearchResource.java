@@ -58,13 +58,10 @@ public class LibrarySearchResource {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
                 break;
-            case "personFacetGraph":
-            case "workAssocPersons":
-            case "placeAssocPersons":
+            case "personFacetGraph":            
                 res=PersonResults.getResultsMap(model);
                 break;
-            case "workFacetGraph":
-            case "workAssocWorks":
+            case "workFacetGraph":            
             case "workAllAssociations":
                 res=WorkAllResults.getResultsMap(model);
                 break;
@@ -106,16 +103,13 @@ public class LibrarySearchResource {
             case "rootSearchGraph":
                 res=RootResults.getResultsMap(model);
                 break;
-            case "personFacetGraph":
-            case "workAssocPersons":
-            case "placeAssocPersons":
+            case "personFacetGraph":            
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workAllAssociations":
                 res=WorkAllResults.getResultsMap(model);
                 break;
-            case "workFacetGraph":
-            case "workAssocWorks":            
+            case "workFacetGraph":                        
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":

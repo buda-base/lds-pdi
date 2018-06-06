@@ -67,6 +67,7 @@ public class ServiceConfig {
             // load a properties file
             prop.load(input);            
             input.close();
+            GitService.update(getProperty("queryPath"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

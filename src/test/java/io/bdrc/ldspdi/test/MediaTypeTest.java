@@ -72,7 +72,7 @@ public class MediaTypeTest extends JerseyTest {
         assertTrue(res.getHeaderString("Location").equals("http://library.bdrc.io/show/bdr:test"));
     }
     
-    /*@Test
+    @Test
     public void normalResource() {
         Response res = target("/resource/test").request()
                 .accept("text/turtle")
@@ -89,9 +89,9 @@ public class MediaTypeTest extends JerseyTest {
         Model dist = ModelFactory.createDefaultModel();
         dist.read(ttl, null, "TURTLE");
         assertTrue(dist.isIsomorphicWith(defaultModel));
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void nores() {
         Response res = target("/resource/nonexistant").request()
                 .accept("text/turtle")
@@ -100,7 +100,7 @@ public class MediaTypeTest extends JerseyTest {
                 .get();
         System.out.println(res.getHeaders());
         assertTrue(res.getStatus() == 404);
-    }*/
+    }
 
     @Test
     public void wrongAccept() {
