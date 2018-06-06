@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 
 public class QueryConstants {
-    
+       
     /********* Results Objects Constants ****************/
     public final static String RES_URI="URI";
     public final static String PAGE_SIZE="pageSize";

@@ -10,19 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.taxonomy.Taxonomy;
 
 
 public class PersonResults {
     
-    public final static Logger log=LoggerFactory.getLogger(PersonResults.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(PersonResults.class.getName());    
     
-    static final String LABEL_MATCH="http://purl.bdrc.io/ontology/tmp/prefLabelMatch";
-    static final String PREF_LABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
-    static final String RELATION_TYPE="http://purl.bdrc.io/ontology/tmp/relationType";
-    static final String WORK_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
-    static final String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";    
-    
-       
     public static HashMap<String,Object> getResultsMap(Model mod){
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
@@ -31,7 +25,7 @@ public class PersonResults {
         while(it.hasNext()) {
             Statement st=it.next();            
             if(!st.getPredicate().getURI().equals(st.getObject().toString())) {
-                if(st.getPredicate().getURI().equals(PERSONGENDER)) {
+                if(st.getPredicate().getURI().equals(Taxonomy.PERSONGENDER)) {
                     String gender=st.getObject().asNode().getURI();
                     Integer ct=count.get(gender);
                     if(ct!=null) {

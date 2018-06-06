@@ -3,7 +3,6 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -19,16 +18,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class WorkResults {
     
-    static final String TYPE="http://purl.bdrc.io/ontology/core/Work";
-    static final String ACCESS="http://purl.bdrc.io/ontology/admin/access";
-    static final String LICENSE="http://purl.bdrc.io/ontology/admin/license";
-    static final String STATUS="http://purl.bdrc.io/ontology/admin/status";
-    static final String LANG_SCRIPT="http://purl.bdrc.io/ontology/core/workLangScript";
-    static final String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
-    static final String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
-    static final String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
-    static final String MATCH="http://purl.bdrc.io/ontology/core/labelMatch";
-        
+   
     public final static Logger log=LoggerFactory.getLogger(WorkResults.class.getName());  
      
       
@@ -54,7 +44,7 @@ public class WorkResults {
                 w=new ArrayList<Field>();
             }
             w.add(Field.getField(st)); 
-            if(st.getPredicate().getURI().equals(ACCESS)) {
+            if(st.getPredicate().getURI().equals(Taxonomy.ACCESS)) {
                 Integer ct=access.get(st.getObject().asNode().getURI());
                 if(ct!=null) {
                     access.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -63,7 +53,7 @@ public class WorkResults {
                     access.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(LICENSE)) {
+            if(st.getPredicate().getURI().equals(Taxonomy.LICENSE)) {
                 Integer ct=license.get(st.getObject().asNode().getURI());
                 if(ct!=null) {
                     license.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -72,7 +62,7 @@ public class WorkResults {
                     license.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(LANG_SCRIPT)) {
+            if(st.getPredicate().getURI().equals(Taxonomy.LANG_SCRIPT)) {
                 Integer ct=langScript.get(st.getObject().asNode().getURI());
                 if(ct!=null) {
                     langScript.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -81,7 +71,7 @@ public class WorkResults {
                     langScript.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(STATUS)) {
+            if(st.getPredicate().getURI().equals(Taxonomy.STATUS)) {
                 Integer ct=status.get(st.getObject().asNode().getURI());
                 if(ct!=null) {
                     status.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -90,29 +80,8 @@ public class WorkResults {
                     status.put(st.getObject().asNode().getURI(), 1);
                 }
             }
-            if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) { 
-                tops.add(st.getObject().asNode().getURI());
-                HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
-                if (tmp==null) {
-                    tmp=new HashSet<>();
-                }
-                tmp.add(st.getSubject().asNode().getURI());
-                Wtopics.put(st.getObject().asNode().getURI(), tmp); 
-                LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
-                if(!nodes.isEmpty()) {
-                    nodes.removeFirst();
-                    nodes.removeLast();
-                }
-                for(String s:nodes) {
-                    HashSet<String> bt=WorkBranch.get(s);
-                    if (bt==null) {
-                        bt=new HashSet<>();
-                    }
-                    bt.add(st.getSubject().asNode().getURI());
-                    WorkBranch.put(s, bt);
-                    topics.put(s, bt.size());
-                }
-                topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
+            if(st.getPredicate().getURI().equals(Taxonomy.WORK_GENRE) || st.getPredicate().getURI().equals(Taxonomy.WORK_IS_ABOUT)) { 
+                Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);                
             }
             works.put(uri, w);
         }

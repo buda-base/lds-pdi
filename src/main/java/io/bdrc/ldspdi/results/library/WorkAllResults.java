@@ -3,7 +3,6 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -14,12 +13,6 @@ import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
 public class WorkAllResults {
-    
-    public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";    
-    public final static String WORK="http://purl.bdrc.io/ontology/core/Work";    
-    public final static String LINEAGE="http://purl.bdrc.io/ontology/core/Lineage";
-    public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
-    public final static String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
     
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
@@ -32,41 +25,20 @@ public class WorkAllResults {
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             Statement st=iter.next();
-            String type=mod.getProperty(st.getSubject(), mod.getProperty(TYPE)).getObject().asResource().getURI().toString();
+            String type=mod.getProperty(st.getSubject(), mod.getProperty(Taxonomy.TYPE)).getObject().asResource().getURI().toString();
             switch (type) {
-                case WORK:
+                case Taxonomy.WORK:
                     ArrayList<Field> wl=works.get(st.getSubject().getURI());
                     if(wl==null) {
                         wl=new ArrayList<Field>();
                     }
-                    if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) {                        
-                        tops.add(st.getObject().asNode().getURI());
-                        HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
-                        if (tmp==null) {
-                            tmp=new HashSet<>();
-                        }
-                        tmp.add(st.getSubject().asNode().getURI());
-                        Wtopics.put(st.getObject().asNode().getURI(), tmp);
-                        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
-                        if(!nodes.isEmpty()) {
-                            nodes.removeFirst();
-                            nodes.removeLast();
-                        }
-                        for(String s:nodes) {
-                            HashSet<String> bt=WorkBranch.get(s);
-                            if (bt==null) {
-                                bt=new HashSet<>();
-                            }
-                            bt.add(st.getSubject().asNode().getURI());
-                            WorkBranch.put(s, bt);
-                            topics.put(s, bt.size());
-                        }
-                        topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
+                    if(st.getPredicate().getURI().equals(Taxonomy.WORK_GENRE) || st.getPredicate().getURI().equals(Taxonomy.WORK_IS_ABOUT)) {                        
+                        Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                     }
                     wl.add(Field.getField(st)); 
                     works.put(st.getSubject().getURI(),wl);
                     break;
-                case LINEAGE:
+                case Taxonomy.LINEAGE:
                     ArrayList<Field> pli=lineages.get(st.getSubject().getURI());
                     if(pli==null) {
                         pli=new ArrayList<Field>();

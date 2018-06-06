@@ -3,7 +3,6 @@ package io.bdrc.ldspdi.results.library;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -15,16 +14,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class TopicAllResults {
     
-    public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    public final static String WORK="http://purl.bdrc.io/ontology/core/Work";    
-    public final static String LINEAGE="http://purl.bdrc.io/ontology/core/Lineage";
-    public final static String ACCESS="http://purl.bdrc.io/ontology/admin/access";
-    public final static String LICENSE="http://purl.bdrc.io/ontology/admin/license";
-    public final static String STATUS="http://purl.bdrc.io/ontology/admin/status";
-    public final static String LANG_SCRIPT="http://purl.bdrc.io/ontology/core/workLangScript";
-    public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
-    public final static String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
-    
+           
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,ArrayList<Field>> works=new HashMap<>();         
         HashMap<String,ArrayList<Field>> lineages=new HashMap<>();
@@ -43,7 +33,7 @@ public class TopicAllResults {
         StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
             Statement st=it.next();
-            String type=mod.getProperty(st.getSubject(), mod.getProperty(TYPE)).getObject().asResource().getURI().toString();
+            String type=mod.getProperty(st.getSubject(), mod.getProperty(Taxonomy.TYPE)).getObject().asResource().getURI().toString();
             Integer ctt=total.get(type);
             if(!processed.contains(st.getSubject().getURI())) {
                 if(ctt!=null) {
@@ -54,14 +44,14 @@ public class TopicAllResults {
                 }
             }            
             switch (type) {
-                case WORK:
+                case Taxonomy.WORK:
                     ArrayList<Field> wl=works.get(st.getSubject().getURI());
                     if(wl==null) {
                         wl=new ArrayList<Field>();
                     }
                     wl.add(Field.getField(st)); 
                     works.put(st.getSubject().getURI(),wl);
-                    if(st.getPredicate().getURI().equals(ACCESS)) {
+                    if(st.getPredicate().getURI().equals(Taxonomy.ACCESS)) {
                         Integer ct=access.get(st.getObject().asNode().getURI());
                         if(ct!=null) {
                             access.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -70,7 +60,7 @@ public class TopicAllResults {
                             access.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
-                    if(st.getPredicate().getURI().equals(LICENSE)) {
+                    if(st.getPredicate().getURI().equals(Taxonomy.LICENSE)) {
                         Integer ct=license.get(st.getObject().asNode().getURI());
                         if(ct!=null) {
                             license.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -79,7 +69,7 @@ public class TopicAllResults {
                             license.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
-                    if(st.getPredicate().getURI().equals(LANG_SCRIPT)) {
+                    if(st.getPredicate().getURI().equals(Taxonomy.LANG_SCRIPT)) {
                         Integer ct=langScript.get(st.getObject().asNode().getURI());
                         if(ct!=null) {
                             langScript.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -88,7 +78,7 @@ public class TopicAllResults {
                             langScript.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
-                    if(st.getPredicate().getURI().equals(STATUS)) {
+                    if(st.getPredicate().getURI().equals(Taxonomy.STATUS)) {
                         Integer ct=status.get(st.getObject().asNode().getURI());
                         if(ct!=null) {
                             status.put(st.getObject().asNode().getURI(), ct.intValue()+1);
@@ -97,32 +87,11 @@ public class TopicAllResults {
                             status.put(st.getObject().asNode().getURI(), 1);
                         }
                     }
-                    if(st.getPredicate().getURI().equals(WORK_GENRE) || st.getPredicate().getURI().equals(WORK_IS_ABOUT)) {                        
-                        tops.add(st.getObject().asNode().getURI());
-                        HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
-                        if (tmp==null) {
-                            tmp=new HashSet<>();
-                        }
-                        tmp.add(st.getSubject().asNode().getURI());
-                        Wtopics.put(st.getObject().asNode().getURI(), tmp);
-                        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
-                        if(!nodes.isEmpty()) {
-                            nodes.removeFirst();
-                            nodes.removeLast();
-                        }
-                        for(String s:nodes) {
-                            HashSet<String> bt=WorkBranch.get(s);
-                            if (bt==null) {
-                                bt=new HashSet<>();
-                            }
-                            bt.add(st.getSubject().asNode().getURI());
-                            WorkBranch.put(s, bt);
-                            topics.put(s, bt.size());
-                        }
-                        topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
+                    if(st.getPredicate().getURI().equals(Taxonomy.WORK_GENRE) || st.getPredicate().getURI().equals(Taxonomy.WORK_IS_ABOUT)) {                        
+                        Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                     }
                     break;                
-                case LINEAGE:
+                case Taxonomy.LINEAGE:
                     ArrayList<Field> pli=lineages.get(st.getSubject().getURI());
                     if(pli==null) {
                         pli=new ArrayList<Field>();
