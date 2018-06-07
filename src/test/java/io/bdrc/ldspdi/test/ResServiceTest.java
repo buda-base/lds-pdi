@@ -54,6 +54,7 @@ public class ResServiceTest extends JerseyTest{
     private static Model model = ModelFactory.createDefaultModel(); 
     public static String fusekiUrl;
     public final static Logger log=LoggerFactory.getLogger(ResServiceTest.class.getName());
+    public final static String[] methods= {"GET", "POST"};
     
     @BeforeClass
     public static void init() {        
@@ -82,18 +83,16 @@ public class ResServiceTest extends JerseyTest{
     
     @Test
     public void normalResource() throws IOException {
-        String[] methods= {"GET", "POST"};
+        
         Set<Entry<String,String>> fmt=MediaTypeUtils.JENAFORMAT.entrySet();
         for(String method:methods) {
             for(Entry<String,String> ent:fmt) {            
-                log.info("MIME for >> "+ent.getKey()+ " IS >>>>>> "+MediaTypeUtils.getMimeFromExtension(ent.getKey()));
                 String mime=MediaTypeUtils.getMimeFromExtension(ent.getKey());
                 Response res = target("/resource/P1AG29").request()                    
                         .accept(mime)
                         .header("fusekiUrl", fusekiUrl)
                         .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                        .method(method);
-                logResponse(res);
+                        .method(method);                
                 assertTrue(res.getStatus() == 200);
                 assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
                 assertTrue(res.getHeaderString("TCN").equals("Choice"));
@@ -105,6 +104,53 @@ public class ResServiceTest extends JerseyTest{
                 returned.read(res.readEntity(InputStream.class),"",ent.getValue());
                 assertTrue(dist.isIsomorphicWith(returned));            
             }
+        }
+    }
+    
+    @Test
+    public void html() {
+        for(String method:methods) {
+            Response res = target("/resource/P1AG29").request()
+                    .accept("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                    .header("fusekiUrl", fusekiUrl)
+                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                    .method(method);
+            assertTrue(res.getStatus() == 303);
+            assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
+            assertTrue(res.getHeaderString("TCN").equals("Choice"));
+            assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
+            assertTrue(res.getHeaderString("Location").equals("http://library.bdrc.io/show/bdr:P1AG29"));
+        }
+    }
+    
+    @Test
+    public void wrongAccept() {
+        for(String method:methods) {
+            Response res = target("/resource/test").request()
+                    .accept("application/xhtml+xml")
+                    .header("fusekiUrl", fusekiUrl)
+                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                    .method(method);
+            if(method.equals("GET")) {
+                assertTrue(res.getStatus() == 300);
+                assertTrue(res.getHeaderString("TCN").equals("List"));
+            }
+            if(method.equals("POST")) {
+                assertTrue(res.getStatus() == 406);                
+            }
+        }
+    }
+    
+    @Test
+    public void nores() {
+        for(String method:methods) {
+            Response res = target("/resource/nonexistant").request()
+                    .accept("text/turtle")
+                    .header("fusekiUrl", fusekiUrl)
+                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                    .method(method);
+            System.out.println(res.getHeaders());
+            assertTrue(res.getStatus() == 404);
         }
     }
     
@@ -174,7 +220,7 @@ public class ResServiceTest extends JerseyTest{
     static void logResponse(Response res) {
         log.info(" Status >> "+res.getStatus());
         log.info(" Vary >> "+res.getHeaderString("Vary"));
-        log.info(" TCn >> "+res.getHeaderString("TCN"));
+        log.info(" TCN >> "+res.getHeaderString("TCN"));
         log.info(" Alternates >> "+res.getHeaderString("Alternates"));
         log.info(" Content-Type >> "+res.getHeaderString("Content-type"));
         log.info(" Content-Location >> "+res.getHeaderString("Content-Location"));

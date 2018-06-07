@@ -44,8 +44,7 @@ import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
-
-public class TemplateJsonOutput {
+public class JsonOutputTest {
     
     String prefixes="PREFIX : <http://purl.bdrc.io/ontology/core/>\n" + 
             " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" + 
@@ -104,8 +103,9 @@ public class TemplateJsonOutput {
     static HashMap<String,String> datasets=new HashMap<>();
     
     static Model model = ModelFactory.createDefaultModel();
-    final static Logger log=LoggerFactory.getLogger(TemplateJsonOutput.class.getName());
+    final static Logger log=LoggerFactory.getLogger(JsonOutputTest.class.getName());
        
+      
     @BeforeClass
     public static void init() {
         ServiceConfig.initForTests();
