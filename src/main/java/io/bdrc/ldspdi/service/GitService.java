@@ -109,8 +109,5 @@ public class GitService implements Runnable{
         update(ServiceConfig.getProperty(QueryConstants.QUERY_PATH));        
     }
     
-    public static void main(String[] args) {
-        GitService.update("./lds-queries");
-    }
-
+    
 }

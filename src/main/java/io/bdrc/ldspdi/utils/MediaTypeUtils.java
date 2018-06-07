@@ -58,8 +58,7 @@ public class MediaTypeUtils {
         JENAFORMAT.put("rdf","RDF/XML");
         JENAFORMAT.put("owl","RDF/XML");
         JENAFORMAT.put("jsonld","JSON-LD");
-        JENAFORMAT.put("rt","RDFThrift");
-        JENAFORMAT.put("trdf", "RDFThrift");
+        JENAFORMAT.put("rt","RDFThrift");        
         JENAFORMAT.put("rj","RDF/JSON");
         JENAFORMAT.put("json","RDF/JSON");
         JENAFORMAT.put("trix","Trix");
@@ -72,7 +71,7 @@ public class MediaTypeUtils {
         MIMEFORMAT.put("application/rdf+xml","rdf");
         MIMEFORMAT.put("application/owl+xml","owl");
         MIMEFORMAT.put("application/ld+json","jsonld");
-        MIMEFORMAT.put("application/rdf+thrift","rt");
+        MIMEFORMAT.put("application/rdf+thrift","rt");        
         MIMEFORMAT.put("application/json","rj");
         MIMEFORMAT.put("application/trix+xml","trix");
         
@@ -84,7 +83,7 @@ public class MediaTypeUtils {
         EXTENSION.put("rdf","application/rdf+xml");
         EXTENSION.put("owl","application/owl+xml");
         EXTENSION.put("jsonld","application/ld+json");
-        EXTENSION.put("rt","application/rdf+thrift");
+        EXTENSION.put("rt","application/rdf+thrift");        
         EXTENSION.put("rj","application/json");
         EXTENSION.put("json","application/json");
         EXTENSION.put("trix","application/trix+xml");

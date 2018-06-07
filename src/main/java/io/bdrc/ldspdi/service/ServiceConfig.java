@@ -45,12 +45,15 @@ public class ServiceConfig {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			// load a properties file
 			prop.load(input);
-			Set<String> set=params.keySet();
-			for(String st:set) {
-			    prop.setProperty(st, params.get(st));
-			}	
 			input.close();
-			
+			/** 
+			 * sets the PROD values of fuseki and queryPath properties 
+			 * Overrides test queryPath value			 * 
+			**/
+			Set<String> set=params.keySet();
+            for(String st:set) {
+                prop.setProperty(st, params.get(st));
+            } 
 			InputStream in = ServiceConfig.class.getClassLoader().getResourceAsStream("taxTreeContext.jsonld");
 			in.close();
 			
@@ -66,8 +69,7 @@ public class ServiceConfig {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
             prop.load(input);            
-            input.close();
-            GitService.update(getProperty("queryPath"));
+            input.close();                       
         } catch (IOException ex) {
             ex.printStackTrace();
         }

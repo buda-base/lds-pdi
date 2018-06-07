@@ -154,7 +154,7 @@ public class QueryFileParser {
                     query=query+" "+readLine;
                     queryHtml=queryHtml+" "+readLine+"<br>";
                 }
-            } 
+            }
             brd.close();
             //Check the validity of the return type
             checkReturnType();
