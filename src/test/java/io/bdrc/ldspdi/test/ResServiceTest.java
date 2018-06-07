@@ -132,7 +132,7 @@ public class ResServiceTest extends JerseyTest{
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .method(method);
             if(method.equals("GET")) {
-                assertTrue(res.getStatus() == 300);
+                assertTrue(res.getStatus() == 406);
                 assertTrue(res.getHeaderString("TCN").equals("List"));
             }
             if(method.equals("POST")) {
@@ -140,6 +140,23 @@ public class ResServiceTest extends JerseyTest{
             }
         }
     }
+    
+    /*@Test
+    public void NullAccept() {
+        for(String method:methods) {
+            Response res = target("/resource/P1AG29").request()
+                    //.accept((String[])null)
+                    .header("fusekiUrl", fusekiUrl)
+                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                    .method(method);
+            log.info("NO Accept resp  >>" +res);
+            log.info("NO Accept resp status >>" +res.getStatus());
+            assertTrue(res.getStatus() == 300);
+            if(method.equals("GET")) {
+                assertTrue(res.getHeaderString("TCN").equals("List"));
+            }
+        }
+    }*/
     
     @Test
     public void nores() {

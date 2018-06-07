@@ -344,7 +344,7 @@ public class QueryFileParser {
     
     private static boolean hasValidParams(Set<String> reqParams,  List<String> params) {
         for(String pr:params) {
-            if(!reqParams.contains(pr.trim())) {
+            if(!reqParams.contains(pr.trim())&& !pr.equals("NONE")) {
                 return false;
             }
         }

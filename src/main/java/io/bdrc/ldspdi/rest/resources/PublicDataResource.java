@@ -128,13 +128,20 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
         @HeaderParam("fusekiUrl") final String fuseki,
+        @HeaderParam("Accept") String format,
         @Context UriInfo info,
         @Context Request request) throws RestException{        
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()); 
+        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept >> "+format); 
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if(variant == null) {
+        if(format == null) {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
             final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+        }
+        if(variant == null) {
+            final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
+            final ResponseBuilder rb=Response.status(406).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
         }
@@ -164,11 +171,19 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getResourceGraphPost(@PathParam("res") final String res,
         @HeaderParam("fusekiUrl") final String fuseki,
+        @HeaderParam("Accept") String format,
         @Context UriInfo info,        
         @Context Request request) throws RestException{ 
         
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+ " Variant >> "+variant); 
+        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+ " Variant >> "+variant+ " Accept >> "+format); 
+        if(format== null) {
+            final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return rb.build();
+            //return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+        }
         if(variant == null) {
             return Response.status(406).build();
         }
