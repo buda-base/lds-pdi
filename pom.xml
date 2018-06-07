@@ -122,6 +122,17 @@
 	    <groupId>org.glassfish.jersey.inject</groupId>
 	    <artifactId>jersey-hk2</artifactId>
 	</dependency>
+    <!-- following javax business is for Java 9 onwards -->
+    <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.3.0</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>activation</artifactId>
+        <version>1.1.1</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.glassfish.hk2/osgi-resource-locator -->
     <dependency>
         <groupId>org.glassfish.hk2</groupId>
