@@ -40,7 +40,7 @@ public class LibrarySearchResource {
 
     public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-
+    
     @POST
     @Path("/lib/{file}")
     @JerseyCacheControl()
@@ -79,7 +79,7 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             default:
-                throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file));                
+                throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file));                
         }
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
@@ -126,7 +126,7 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             default:
-                throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file));
+                throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file));
         }
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }

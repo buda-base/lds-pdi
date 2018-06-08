@@ -16,12 +16,13 @@ import org.apache.commons.jcs.engine.behavior.ICompositeCacheAttributes;
 import org.apache.commons.jcs.engine.behavior.IElementAttributes;
 import org.apache.commons.jcs.engine.control.CompositeCache;
 
+import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.RestException;
+
 public class CacheAccessModel {
-      
-       
+    
     public CacheAccessModel() {
         super();
-            
     }
 
     /**
@@ -151,70 +152,64 @@ public class CacheAccessModel {
         return map;
     }
     
-    public MemoryUsage getCodeMemoryUsage() {
+    public MemoryUsage getCodeMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Code Cache")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getCodeMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
-    public MemoryUsage getMetaMemoryUsage() {
+    public MemoryUsage getMetaMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Metaspace")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getMetaMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
-    public MemoryUsage getCompressedMemoryUsage() {
+    public MemoryUsage getCompressedMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Compressed Class Space")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getCompressedMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
-    public MemoryUsage getEdenMemoryUsage() {
+    public MemoryUsage getEdenMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Eden Space")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getEdenMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
-    public MemoryUsage getSurvivorMemoryUsage() {
+    public MemoryUsage getSurvivorMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Survivor Space")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getSurvivorMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
-    public MemoryUsage getOldMemoryUsage() {
+    public MemoryUsage getOldMemoryUsage() throws RestException {
         try {
             
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Old Gen")).getUsage();
         }
         catch(MalformedObjectNameException ex) {
-            ex.printStackTrace();
+            throw new RestException(5001,new Error(Error.GENERIC_ERR).setContext(" in CacheAccessModel.getOldMemoryUsage()"+ex.getMessage()));
         }
-        return null;
     }
     
     public int getPending() {

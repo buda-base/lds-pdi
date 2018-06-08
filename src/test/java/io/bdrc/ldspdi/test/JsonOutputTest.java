@@ -43,6 +43,7 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class JsonOutputTest {
     
@@ -181,7 +182,7 @@ public class JsonOutputTest {
     }
     
     @Test
-    public void testFullResultsParsing() throws NumberFormatException, IOException {
+    public void testFullResultsParsing() throws NumberFormatException, IOException, RestException {
         HashMap<String,String> params=new HashMap<>();
         params.put(QueryConstants.PAGE_NUMBER, "1");
         params.put(QueryConstants.REQ_METHOD, "POST");

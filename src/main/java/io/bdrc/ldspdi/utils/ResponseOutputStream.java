@@ -21,8 +21,6 @@ package io.bdrc.ldspdi.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -60,7 +58,7 @@ public class ResponseOutputStream {
     
     public static StreamingOutput getModelStream(final Model model, String format, final String res) {
         StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {                
+            public void write(OutputStream os){                
                  
                 if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {      
@@ -80,7 +78,7 @@ public class ResponseOutputStream {
     
     public static StreamingOutput getModelStream(Model model, String format) {        
         StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) throws IOException, WebApplicationException {                
+            public void write(OutputStream os) {                
                 System.out.println("getJenaFromExtension :"+format+" >>> "+MediaTypeUtils.getJenaFromExtension(format)); 
                 if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {                        
@@ -100,22 +98,11 @@ public class ResponseOutputStream {
     
     public static StreamingOutput getModelStream(Model model) {        
         StreamingOutput stream = new StreamingOutput() {            
-            public void write(OutputStream os) throws IOException, WebApplicationException {             
+            public void write(OutputStream os){             
                 RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model); 
                 writer.output(os); 
             }
         };
         return stream;
     }
-    
-    public static StreamingOutput getStringStream(String toWrite) {        
-        StreamingOutput stream = new StreamingOutput() {            
-            public void write(OutputStream os) throws IOException, WebApplicationException {             
-                Writer w = new OutputStreamWriter(os); 
-                w.write(toWrite);
-            }
-        };
-        return stream;
-    }
-
 }

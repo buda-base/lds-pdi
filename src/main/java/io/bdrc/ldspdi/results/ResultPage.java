@@ -28,12 +28,11 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.bdrc.ldspdi.objects.json.Output;
 import io.bdrc.ldspdi.objects.json.Param;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPage {
     
@@ -50,7 +49,7 @@ public class ResultPage {
     private QueryTemplate temp;    
 
     public ResultPage(ResultSetWrapper res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
-            throws JsonProcessingException,NumberFormatException{
+            throws RestException{
         if(pageNum!=null) {
             this.pageNumber=Integer.parseInt(pageNum);
         }else {

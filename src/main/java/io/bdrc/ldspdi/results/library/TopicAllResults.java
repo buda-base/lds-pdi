@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
@@ -100,8 +101,7 @@ public class TopicAllResults {
                     lineages.put(st.getSubject().getURI(),pli);
                     break;                
                 default:
-                    throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Unknown type in PersonAllResults >> "+type);
-            
+                    throw new RestException(500,new Error(Error.UNKNOWN_ERR).setContext(" type in TopicAllResults.getResultsMap(Model mod) >> "+type));
             }
             processed.add(st.getSubject().getURI());
         }

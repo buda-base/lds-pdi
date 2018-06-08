@@ -25,9 +25,8 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class Results {
     
@@ -46,7 +45,7 @@ public class Results {
     public HashMap<String,ArrayList<Row>> results;
     
     public Results(ResultSetWrapper res,HashMap<String,String> hm) 
-            throws JsonProcessingException,NumberFormatException{
+            throws RestException{
         String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
         if(pageNum!=null) {
             this.pageNumber=Integer.parseInt(pageNum);

@@ -9,10 +9,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
 public class PlaceAllResults {
+    
         
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
@@ -111,7 +113,7 @@ public class PlaceAllResults {
                     }
                     break;
                 default:
-                    throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Unknown type in placeAllAssociations >> "+type);
+                    throw new RestException(500,new Error(Error.UNKNOWN_ERR).setContext(" type in PlaceAllResults.getResultsMap(Model mod) >> "+type));
             }
             processed.add(st.getSubject().getURI());
         }

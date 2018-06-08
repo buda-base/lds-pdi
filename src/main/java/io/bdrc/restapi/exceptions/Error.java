@@ -5,10 +5,39 @@ public class Error {
     public int code;
     public String msg;
     
-    public Error(int code, String msg) {
+    public Error() {
+        super();
+        this.code = -1;
+        this.msg = "";
+    }
+    
+    public Error(int code) {
         super();
         this.code = code;
-        this.msg = msg;
+        switch (code) {
+            case 5001:
+                msg="${ctx}";
+            case 5002:
+                msg="URI Parsing error ${ctx}";
+            case 5003:
+                msg="Missing Parameter ${ctx}";
+            case 5004:
+                msg="Missing Resource ${ctx}";
+            case 5005:
+                msg="Unknown ${ctx}";
+            case 5010:
+                msg="No graph was found for ${ctx}";
+            case 5011:
+                msg="Parsing error ${ctx}";
+            case 5012:
+                msg="Sparql processing error ${ctx}";
+            case 5020:
+                msg="No resource found for ${ctx}";
+            case 5030:
+                msg="Json processing error ${ctx}";
+            default:
+                msg="${ctx}"; 
+        }
     }
 
     public int getCode() {
@@ -24,12 +53,17 @@ public class Error {
         return this;
     } 
     
-    public static Error URISyntaxERR=new Error(5002,"${ctx} : URISyntaxException");
-    public static Error MISSING_PARAM_ERR=new Error(5003,"Parameters are missing : ${ctx}");
+    public  static int GENERIC_ERR=5001;
+    public  static int URI_SYNTAX_ERR=5002;
+    public  static int MISSING_PARAM_ERR=5003;
+    public  static int MISSING_RES_ERR=5004;
+    public  static int UNKNOWN_ERR=5005;
     
-    public static Error NO_GRAPH_ERR=new Error(5010,"No graph was found for : ${ctx}");
+    public  static int NO_GRAPH_ERR=5010;
+    public  static int PARSE_ERR=5011;
+    public  static int SPARQL_ERR=5012;
     
-    public static Error ONT_URI_ERR=new Error(5020,"There is no resource matching the following URI: ${ctx}");
+    public  static int ONT_URI_ERR=5020;
     
-    public static Error JSON_ERR=new Error(5030,"JsonProcessingException ${ctx}");
+    public  static int JSON_ERR=5030;
 }

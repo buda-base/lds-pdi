@@ -72,7 +72,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class PublicTemplatesResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());    
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL); 
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);    
     
     @GET
     @Path("/query/{file}")
@@ -109,7 +109,7 @@ public class PublicTemplatesResource {
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
         }
         catch (JsonProcessingException jx) {
-            throw new RestException(500,Error.JSON_ERR.setContext(" in getQueryTemplateResults()+jx.getMessage()"));
+            throw new RestException(500,new Error(Error.JSON_ERR).setContext(" in getQueryTemplateResults()+jx.getMessage()"));
         }
         return Response.ok(new Viewable("/resPage.jsp",model)).build();        
     }
@@ -149,7 +149,7 @@ public class PublicTemplatesResource {
             MultivaluedMap<String,String> mp) throws RestException{ 
         log.info("Call to getQueryTemplateResultsPost()");
         if(mp.size()==0) {
-            throw new RestException(500,Error.MISSING_PARAM_ERR.setContext("in getQueryTemplateResultsPost() : Map ="+mp));
+            throw new RestException(500,new Error(Error.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsPost() : Map ="+mp));
         }
         if(fuseki !=null){fusekiUrl=fuseki;}
         HashMap<String,String> hm=Helpers.convertMulti(mp);
@@ -168,11 +168,7 @@ public class PublicTemplatesResource {
                     hm.get(QueryConstants.PAGE_SIZE));                
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
             hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-            try {
-                rp=new Results(res,hm);
-            } catch(JsonProcessingException jx) {
-                throw new RestException(500,Error.JSON_ERR.setContext("in getQueryTemplateResultsPost() "+jx.getMessage()));                
-            }
+            rp=new Results(res,hm);
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
         }
     }
@@ -187,7 +183,7 @@ public class PublicTemplatesResource {
             HashMap<String,String> map) throws RestException{     
         log.info("Call to getQueryTemplateResultsJsonPost()");        
         if(map.size()==0) {
-            throw new RestException(500,Error.MISSING_PARAM_ERR.setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
+            throw new RestException(500,new Error(Error.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}         
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -198,12 +194,8 @@ public class PublicTemplatesResource {
             Results rp=null;
             ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,map.get(QueryConstants.RESULT_HASH),map.get(QueryConstants.PAGE_SIZE));                
             map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
-            map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-            try {
-                rp=new Results(res,map);
-            }catch(JsonProcessingException jx) {
-                throw new RestException(500,Error.JSON_ERR.setContext("in getQueryTemplateResultsJsonPost() "+jx.getMessage()));                
-            }
+            map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));            
+            rp=new Results(res,map);            
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();            
         }
     }
@@ -240,7 +232,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file+ " in getGraphTemplateResults()"));
+            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResults()"));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -279,7 +271,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file+ " in getGraphTemplateResultsPost()"));
+            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         return Response.ok(ResponseOutputStream.getModelStream(
                         model,

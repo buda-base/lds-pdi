@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.ldspdi.utils.Node;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class Taxonomy {
@@ -132,7 +133,7 @@ public class Taxonomy {
                 nn=mapper.readTree(baos.toString());
                 baos.close();
             } catch (IOException ex) {
-                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"WorkResults was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"");              
+                throw new RestException(500,new Error(Error.JSON_ERR).setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \""+ex.getMessage()+"\""));              
             }
         }
         return nn;

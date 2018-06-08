@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
+import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPageLinks {
     
@@ -37,9 +39,9 @@ public class ResultPageLinks {
     public String prevJsonParams;
     public String nextJsonParams;    
     
-    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());    
     
-    public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws JsonProcessingException{
+    public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
         String method=hm.get(QueryConstants.REQ_METHOD);
         if(method !=null) {
@@ -70,17 +72,22 @@ public class ResultPageLinks {
                 }
             }
         }
-        currJsonParams=mapper.writer().writeValueAsString(hm);
-        hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-        hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
-        nextJsonParams=mapper.writer().writeValueAsString(hm);
-        if(page.getPageNumber()!=1) {
-            hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
-            prevJsonParams=mapper.writer().writeValueAsString(hm);
+        try {
+            currJsonParams=mapper.writer().writeValueAsString(hm);
+            hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
+            hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
+            nextJsonParams=mapper.writer().writeValueAsString(hm);
+            if(page.getPageNumber()!=1) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
+                prevJsonParams=mapper.writer().writeValueAsString(hm);
+            }
+        }
+        catch(JsonProcessingException ex) {
+            throw new RestException(5001,new Error(Error.JSON_ERR).setContext(" in ResultPageLinks constructor "+ex.getMessage()));
         }
     }
     
-    public ResultPageLinks(Results page, HashMap<String,String> hm) throws JsonProcessingException{
+    public ResultPageLinks(Results page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
         String method=hm.get(QueryConstants.REQ_METHOD);
         if(method !=null) {
@@ -107,15 +114,20 @@ public class ResultPageLinks {
                 }
             }
         }
-        currJsonParams=mapper.writer().writeValueAsString(hm);
-        hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-        if(page.getPageNumber()>1 && (page.getPageNumber()<page.getNumberOfPages())) {
-            hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
-            nextJsonParams=mapper.writer().writeValueAsString(hm);
+        try {
+            currJsonParams=mapper.writer().writeValueAsString(hm);
+            hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
+            if(page.getPageNumber()>1 && (page.getPageNumber()<page.getNumberOfPages())) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
+                nextJsonParams=mapper.writer().writeValueAsString(hm);
+            }
+            if(page.getPageNumber()!=1) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
+                prevJsonParams=mapper.writer().writeValueAsString(hm);
+            }
         }
-        if(page.getPageNumber()!=1) {
-            hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
-            prevJsonParams=mapper.writer().writeValueAsString(hm);
+        catch(JsonProcessingException ex) {
+            throw new RestException(5001,new Error(Error.JSON_ERR).setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor "+ex.getMessage()));
         }
     }
     

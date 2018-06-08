@@ -16,6 +16,7 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class DocFileModel {    
@@ -58,22 +59,30 @@ public class DocFileModel {
         return keys;
     }
 
-    public static ArrayList<String> getQueryTemplates() {
+    public static ArrayList<String> getQueryTemplates() throws RestException {
         ArrayList<String> files=new ArrayList<>();
-        Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");      
-        if (Files.isDirectory(dpath)) {        
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dpath)) {
+        Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"publi");      
+        if (Files.isDirectory(dpath)) { 
+            String tmp=null;
+            try {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(dpath);
                 for (Path path : stream) {
-                    String tmp=path.toString();
+                    tmp=path.toString();
                     //Filtering arq files
                     if(tmp.endsWith(".arq")) {
                         files.add(tmp.substring(tmp.lastIndexOf("/")+1));
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException e) {                
                 log.error("Error while getting query templates", e);
                 e.printStackTrace();
+                throw new RestException(500,new Error(Error.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+tmp+
+                        " in DocFileModel.getQueryTemplates()"));
             }
+        }
+        else {
+            throw new RestException(500,new Error(Error.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/ is an invalid path"+
+                    " in DocFileModel.getQueryTemplates()"));
         }
         return files;       
     }

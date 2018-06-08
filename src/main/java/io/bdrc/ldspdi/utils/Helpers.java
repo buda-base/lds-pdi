@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.MultivaluedMap;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -101,8 +102,7 @@ public class Helpers {
                 
     	    }
 	    } catch (IOException e) {
-	        throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,
-	                "Unable to parse the html multi Choices template"+e.getMessage());         
+	        throw new RestException(500,new Error(Error.PARSE_ERR).setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)"));         
         }
 	    String rows="";
 	    if(resource) {
