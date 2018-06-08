@@ -7,6 +7,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 
 import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
+import io.bdrc.ldspdi.rest.features.CharsetResponseFilter;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 
@@ -19,5 +20,6 @@ public class LdspdiApplication extends ResourceConfig {
         register(GZIPWriterInterceptor.class);
         property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
         register(CacheControlFilterFactory.class);
+        register(CharsetResponseFilter.class);
     }
 }
