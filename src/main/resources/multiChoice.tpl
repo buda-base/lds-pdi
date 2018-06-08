@@ -30,7 +30,7 @@
 </head>
 <body>
 <h1>Possible choices</h1>
-<p>The document name you requested (${path}) without specifying a content type could not be found on this server. However, we found documents similar to the one you requested having various content type.</p>
+<p>The document name you requested (${path}) without specifying a valid content type or extension could not be found on this server. However, we found documents similar to the one you requested having various content type.</p>
 <br>
 
 <table id="specs" style="width:60%;">

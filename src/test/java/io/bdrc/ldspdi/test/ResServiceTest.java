@@ -141,22 +141,21 @@ public class ResServiceTest extends JerseyTest{
         }
     }
     
-    /*@Test
-    public void NullAccept() {
-        for(String method:methods) {
-            Response res = target("/resource/P1AG29").request()
-                    //.accept((String[])null)
+    @Test
+    public void GetResourceByExtension() {
+        Set<String> map=MediaTypeUtils.getExtensionMimeMap().keySet();
+        for(String ent:map) {                
+            Response res = target("/resource/P1AG29."+ent).request()
                     .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                    .method(method);
-            log.info("NO Accept resp  >>" +res);
-            log.info("NO Accept resp status >>" +res.getStatus());
-            assertTrue(res.getStatus() == 300);
-            if(method.equals("GET")) {
-                assertTrue(res.getHeaderString("TCN").equals("List"));
-            }
+                    .get();
+            assertTrue(res.getStatus() == 200);
+            assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent)));
+            assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
+            assertTrue(res.getHeaderString("TCN").equals("Choice"));
+            assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
         }
-    }*/
+    }
     
     @Test
     public void nores() {
@@ -267,10 +266,8 @@ public class ResServiceTest extends JerseyTest{
             sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
         }
         String alt=sb.toString().substring(0, sb.toString().length()-1);
-        List<String> alt1=Arrays.asList(alternates.split(","));
-        log.error("Alternates check alt1 >>> "+alt1);
-        List<String> alt2=Arrays.asList(alt.split(","));
-        log.error("Alternates check alt2 >>> "+alt2);
+        List<String> alt1=Arrays.asList(alternates.split(","));        
+        List<String> alt2=Arrays.asList(alt.split(","));        
         for(String test:alt2) {            
             if(!alt1.contains(test)) {
                 log.error("Alternates check failed >>> "+test + alt1.contains(test));

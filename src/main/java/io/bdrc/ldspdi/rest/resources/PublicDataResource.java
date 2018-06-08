@@ -217,8 +217,11 @@ public class PublicDataResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @Context UriInfo info) throws RestException{
         log.info("Call to getFormattedResourceGraph()"); 
-        if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
-            return Response.status(406).build();
+        if(MediaTypeUtils.getMimeFromExtension(format)==null) {
+            final String html=Helpers.getMultiChoicesHtml("/resource/"+res,true);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return rb.build();
         }
         if(fuseki !=null){
             fusekiUrl=fuseki;            
@@ -230,33 +233,7 @@ public class PublicDataResource {
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
         return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();                     
-    }
-    
-    @POST
-    @Path("/resource/{res}.{ext}") 
-    @JerseyCacheControl()
-    public Response getFormattedResourceGraphPost(
-            @PathParam("res") final String res, 
-            @DefaultValue("ttl") @PathParam("ext") final String format,
-            @HeaderParam("fusekiUrl") final String fuseki,
-            @Context UriInfo info) throws RestException{
-        
-        log.info("Call to getFormattedResourceGraphPost()");
-        if(!MediaTypeUtils.isMime(MediaTypeUtils.getMimeFromExtension(format))) {
-            return Response.status(406).build();
-        }
-        if(fuseki !=null){
-            fusekiUrl=fuseki;            
-        }
-        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
-        if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for resource Id : \""+res+"\"");
-        }
-        ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();
-    }
-    
+    }     
        
     @GET
     @Path("/ontology/{path}/{class}")    
