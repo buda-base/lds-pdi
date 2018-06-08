@@ -44,7 +44,9 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
+import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class ResServiceTest extends JerseyTest{
@@ -155,6 +157,25 @@ public class ResServiceTest extends JerseyTest{
             assertTrue(res.getHeaderString("TCN").equals("Choice"));
             assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
         }
+    }
+    
+    @Test
+    public void WrongResource() {
+        Response res = target("/resource/wrong.ttl").request()
+                .header("fusekiUrl", fusekiUrl)
+                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                .get();
+        assertTrue(res.getStatus() == 404);
+    }
+    
+    @Test
+    public void WrongExt() throws RestException {
+        Response res = target("/resource/C68.wrong").request()
+                .header("fusekiUrl", fusekiUrl)
+                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                .get();
+        assertTrue(res.getStatus() == 300);
+        assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
     }
     
     @Test
