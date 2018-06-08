@@ -64,6 +64,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -108,7 +109,7 @@ public class PublicTemplatesResource {
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
         }
         catch (JsonProcessingException jx) {
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"JsonProcessingException"+jx.getMessage());
+            throw new RestException(500,Error.JSON_ERR.setContext(" in getQueryTemplateResults()+jx.getMessage()"));
         }
         return Response.ok(new Viewable("/resPage.jsp",model)).build();        
     }
@@ -148,9 +149,7 @@ public class PublicTemplatesResource {
             MultivaluedMap<String,String> mp) throws RestException{ 
         log.info("Call to getQueryTemplateResultsPost()");
         if(mp.size()==0) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : request parameters are missing-> in Post urlencoded query template request");
+            throw new RestException(500,Error.MISSING_PARAM_ERR.setContext("in getQueryTemplateResultsPost() : Map ="+mp));
         }
         if(fuseki !=null){fusekiUrl=fuseki;}
         HashMap<String,String> hm=Helpers.convertMulti(mp);
@@ -172,9 +171,7 @@ public class PublicTemplatesResource {
             try {
                 rp=new Results(res,hm);
             } catch(JsonProcessingException jx) {
-                throw new RestException(500,
-                        RestException.GENERIC_APP_ERROR_CODE,
-                        "JsonProcessingException :"+ jx.getMessage());                
+                throw new RestException(500,Error.JSON_ERR.setContext("in getQueryTemplateResultsPost() "+jx.getMessage()));                
             }
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
         }
@@ -190,9 +187,7 @@ public class PublicTemplatesResource {
             HashMap<String,String> map) throws RestException{     
         log.info("Call to getQueryTemplateResultsJsonPost()");        
         if(map.size()==0) {
-            throw new RestException(500,
-                    RestException.GENERIC_APP_ERROR_CODE,
-                    "Exception : request parameters are missing-> in Post json query template request");
+            throw new RestException(500,Error.MISSING_PARAM_ERR.setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}         
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -207,9 +202,7 @@ public class PublicTemplatesResource {
             try {
                 rp=new Results(res,map);
             }catch(JsonProcessingException jx) {
-                throw new RestException(500,
-                        RestException.GENERIC_APP_ERROR_CODE,
-                        "JsonProcessingException :"+ jx.getMessage());                
+                throw new RestException(500,Error.JSON_ERR.setContext("in getQueryTemplateResultsJsonPost() "+jx.getMessage()));                
             }
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();            
         }
@@ -247,8 +240,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,
-                    "No graph was found for the given resource Id");
+            throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file+ " in getGraphTemplateResults()"));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -287,7 +279,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph was found for the given resource Id");
+            throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         return Response.ok(ResponseOutputStream.getModelStream(
                         model,

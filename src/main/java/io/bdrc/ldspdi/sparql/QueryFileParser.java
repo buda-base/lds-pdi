@@ -164,7 +164,7 @@ public class QueryFileParser {
     	}
         catch(Exception ex){
             log.error("QueryFile parsing error", ex);
-            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Query template parsing failed :"+ex.getMessage());
+            throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Query template parsing failed for: "+file.getName());
         }
 	}
 	

@@ -31,6 +31,7 @@ import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.Error;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -78,7 +79,7 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             default:
-                throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
+                throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file));                
         }
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
@@ -125,7 +126,7 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             default:
-                throw new RestException(404,RestException.GENERIC_APP_ERROR_CODE,"No graph template was found for the given path >>"+file);
+                throw new RestException(404,Error.NO_GRAPH_ERR.setContext(file));
         }
         return Response.ok(ResponseOutputStream.getJsonLDResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }

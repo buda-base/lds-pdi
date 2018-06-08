@@ -4,8 +4,8 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ErrorMessage {    
-         
+public class ErrorMessage {
+                
         /** contains the same HTTP Status code returned by the server */
         @JsonProperty("status")
         public int status;

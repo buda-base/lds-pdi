@@ -34,6 +34,15 @@ public class RestException extends Exception
         this.developerMessage = null;
         this.link = null;
     }
+    
+    public RestException(int status, Error err) {
+        super(err.getMsg());
+        this.status = status;
+        this.code = err.getCode();
+        this.message = err.getMsg();
+        this.developerMessage = null;
+        this.link = null;
+    }
 
     public void setStatus(int status) {
         this.status = status;

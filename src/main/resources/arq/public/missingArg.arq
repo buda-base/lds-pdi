@@ -1,0 +1,21 @@
+#QueryScope=Place
+#QueryReturnType=Table
+#QueryResults=A table containing the Id and the name of the place whose name contains the NAME param value
+#QueryParams=L_NAME
+#QueryUrl=/Place_byName?L_NAME=dgon gsar
+
+#param.L_NAME.type=string
+#param.L_NAME.isLucene=false
+#param.L_NAME.example=dgon gsar
+
+#output.?Place_ID.type=URI
+#output.?Place_ID.desc=the resource ID of the place
+#output.?Place_Name.type=string
+#output.?Place_Name.desc=the pref. label of the place
+
+select ?Place_ID ?Place_Name
+where {
+  ?Place_ID a :Place;
+   skos:prefLabel ?Place_Name .
+  Filter(contains(?Place_Name, ?L_NAME))
+}
