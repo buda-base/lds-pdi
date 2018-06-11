@@ -152,7 +152,8 @@ public class PublicDataResource {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
-                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()"));
+                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).
+                        setContext("getResourceGraphGet()",e));
             }
         }
         if(fuseki !=null){ 
@@ -193,7 +194,7 @@ public class PublicDataResource {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
-                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()"));
+                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()",e));
             }
         }
         if(fuseki !=null){ 

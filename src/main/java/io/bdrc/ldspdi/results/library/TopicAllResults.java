@@ -101,7 +101,8 @@ public class TopicAllResults {
                     lineages.put(st.getSubject().getURI(),pli);
                     break;                
                 default:
-                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in TopicAllResults.getResultsMap(Model mod) >> "+type));
+                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
+                            setContext(" type in TopicAllResults.getResultsMap(Model mod) >> "+type));
             }
             processed.add(st.getSubject().getURI());
         }

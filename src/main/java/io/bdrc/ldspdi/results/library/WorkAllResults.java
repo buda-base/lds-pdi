@@ -48,7 +48,8 @@ public class WorkAllResults {
                     lineages.put(st.getSubject().getURI(),pli);
                     break;
                 default:
-                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
+                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
+                            setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
                }
         }
         res.put("associatedWorks",works);

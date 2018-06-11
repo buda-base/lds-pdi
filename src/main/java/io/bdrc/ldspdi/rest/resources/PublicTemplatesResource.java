@@ -93,7 +93,8 @@ public class PublicTemplatesResource {
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String query=qfp.getParametizedQuery(hm,true);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() "+query));
+            throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).
+                    setContext(" in getQueryTemplateResults() "+query));
         }
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;        
@@ -183,7 +184,8 @@ public class PublicTemplatesResource {
             HashMap<String,String> map) throws RestException{     
         log.info("Call to getQueryTemplateResultsJsonPost()");        
         if(map==null || map.size()==0) {
-            throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
+            throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).
+                    setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}         
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -231,7 +233,8 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResults()"));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).
+                    setContext(file+ " in getGraphTemplateResults()"));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -270,7 +273,8 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResultsPost()"));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).
+                    setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         return Response.ok(ResponseOutputStream.getModelStream(
                         model,

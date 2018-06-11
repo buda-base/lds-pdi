@@ -113,7 +113,8 @@ public class PlaceAllResults {
                     }
                     break;
                 default:
-                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in PlaceAllResults.getResultsMap(Model mod) >> "+type));
+                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
+                            setContext(" type in PlaceAllResults.getResultsMap(Model mod) >> "+type));
             }
             processed.add(st.getSubject().getURI());
         }

@@ -145,7 +145,8 @@ public class QueryProcessor {
             return res;
 	    }
 	    catch(Exception ex) {
-	        throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \""+query+"\""));
+	        throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).
+	                setContext(" in QueryProcessor.getResultsFromModel(query, model)) \""+query+"\"",ex));
 	    }
 	}
 	

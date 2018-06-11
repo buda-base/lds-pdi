@@ -133,7 +133,8 @@ public class Taxonomy {
                 nn=mapper.readTree(baos.toString());
                 baos.close();
             } catch (IOException ex) {
-                throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \""+ex.getMessage()+"\""));              
+                throw new RestException(500,new LdsError(LdsError.JSON_ERR).
+                        setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"",ex));              
             }
         }
         return nn;

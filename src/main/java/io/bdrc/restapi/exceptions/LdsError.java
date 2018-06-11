@@ -53,6 +53,11 @@ public class LdsError {
         return this;
     } 
     
+    public LdsError setContext(String ctx, Exception ex) {
+        msg=msg.replace("${ctx}", ctx)+System.lineSeparator()+"Exception : "+ex.getMessage();
+        return this;
+    } 
+    
     public  static int GENERIC_ERR=5001;
     public  static int URI_SYNTAX_ERR=5002;
     public  static int MISSING_PARAM_ERR=5003;

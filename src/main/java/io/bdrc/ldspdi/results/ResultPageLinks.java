@@ -83,7 +83,8 @@ public class ResultPageLinks {
             }
         }
         catch(JsonProcessingException ex) {
-            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks constructor "+ex.getMessage()));
+            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).
+                    setContext(" in ResultPageLinks constructor ",ex));
         }
     }
     
@@ -127,7 +128,8 @@ public class ResultPageLinks {
             }
         }
         catch(JsonProcessingException ex) {
-            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor "+ex.getMessage()));
+            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).
+                    setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor ",ex));
         }
     }
     

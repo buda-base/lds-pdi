@@ -50,7 +50,10 @@ public class Prefixes {
             prefixes = new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
         
         } catch (IOException e) {                     
-            throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).setContext("Couldn't read prefixes from >> "+ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt"));           
+            throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).
+                    setContext("Couldn't read prefixes from >> "
+            +ServiceConfig.getProperty(QueryConstants.QUERY_PATH)
+            +"public/prefixes.txt",e));           
         }
     }
     

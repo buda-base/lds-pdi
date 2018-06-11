@@ -68,7 +68,8 @@ public class PersonAllResults {
                     }
                     break;
                 default:
-                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in PersonAllResults.getResultsMap(Model mod) >> "+type));
+                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
+                            setContext(" type in PersonAllResults.getResultsMap(Model mod) >> "+type));
             }
         }        
         res.put("associatedWorks",works);

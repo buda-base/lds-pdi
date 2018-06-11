@@ -91,7 +91,8 @@ public class RootResults {
                         places.put(st.getSubject().getURI(),pla);
                         break;
                     default:
-                        throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in RootResults.getResultsMap(Model mod) >> "+type));
+                        throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
+                                setContext(" type in RootResults.getResultsMap(Model mod) >> "+type));
         
                 }
                 processed.add(st.getSubject().getURI());

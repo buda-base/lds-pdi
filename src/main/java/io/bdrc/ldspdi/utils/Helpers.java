@@ -102,7 +102,8 @@ public class Helpers {
                 
     	    }
 	    } catch (IOException e) {
-	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)"));         
+	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).
+	                setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)",e));         
         }
 	    String rows="";
 	    if(resource) {
