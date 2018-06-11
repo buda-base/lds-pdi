@@ -11,7 +11,7 @@ import java.util.HashMap;
 import org.apache.jena.riot.system.PrefixMapStd;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -50,7 +50,7 @@ public class Prefixes {
             prefixes = new String(Files.readAllBytes(Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt")));
         
         } catch (IOException e) {                     
-            throw new RestException(500,new Error(Error.MISSING_RES_ERR).setContext("Couldn't read prefixes from >> "+ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt"));           
+            throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).setContext("Couldn't read prefixes from >> "+ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt"));           
         }
     }
     

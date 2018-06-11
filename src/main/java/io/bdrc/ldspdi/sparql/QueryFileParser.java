@@ -44,7 +44,7 @@ import io.bdrc.ldspdi.objects.json.ResParam;
 import io.bdrc.ldspdi.objects.json.StringParam;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class QueryFileParser {	
@@ -130,7 +130,7 @@ public class QueryFileParser {
                                 mp.put(parsed.get(2), info1);
                                 p_map.put(parsed.get(1), mp);
                             }else {
-                                throw new RestException(500,RestException.GENERIC_APP_ERROR_CODE,"Query template parsing failed, invalid param declaration :"+info0);
+                                throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed, invalid param declaration :"+info0));
                             }
                             processed=true;
                         }
@@ -165,13 +165,13 @@ public class QueryFileParser {
     	}
         catch(Exception ex){
             log.error("QueryFile parsing error", ex);
-            throw new RestException(500,new Error(Error.PARSE_ERR).setContext("Query template parsing failed for: "+file.getName()));
+            throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: "+file.getName()));
         }
 	}
 	
 	private void checkReturnType() throws RestException{
 	    if(! QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
-	        throw new RestException(500,new Error(Error.PARSE_ERR).setContext("Query template parsing failed :"+
+	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed :"+
 	                metaInf.get(QueryConstants.QUERY_RETURN_TYPE)+" is not a valid query return type"));
 	    }
 	}
@@ -251,13 +251,13 @@ public class QueryFileParser {
 	
 	public String getParametizedQuery(HashMap<String,String> converted,boolean limit) throws RestException {
 	    if (!checkQueryArgsSyntax().trim().equals("")) {
-            throw new RestException(500,new Error(Error.PARSE_ERR).setContext(" in File->"+ getTemplateName()+"; ERROR: "+checkQueryArgsSyntax()));
+            throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in File->"+ getTemplateName()+"; ERROR: "+checkQueryArgsSyntax()));
         }
 	    List<String> params=getQueryParams();
 	    HashMap<String,String> litParams=getLitLangParams();
 	    if(converted ==null) { converted=new HashMap<>();}
         if(!hasValidParams(converted.keySet(),params)) {
-            throw new RestException(500,new Error(Error.MISSING_PARAM_ERR).setContext(" in QueryFileParser.getParametizedQuery() "+converted));
+            throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext(" in QueryFileParser.getParametizedQuery() "+converted));
         }
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query);
         for(String st:converted.keySet()) {            
@@ -278,13 +278,13 @@ public class QueryFileParser {
                         if(Prefixes.getFullIRI(parts[0]+":")!=null) {
                             queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
                         }else {
-                            throw new RestException(500,new Error(Error.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param +
+                            throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param +
                                     " Unknown prefix"));
                         }
                     }
                 }
                 else {
-                    throw new RestException(500,new Error(Error.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param+
+                    throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param+
                             " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
                 }
                     
@@ -316,7 +316,7 @@ public class QueryFileParser {
             }
         }
         if(q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500,new Error(Error.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() template ->"+ getTemplateName()+".arq"+"; ERROR: "+query));
+            throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() template ->"+ getTemplateName()+".arq"+"; ERROR: "+query));
         }
         return q.toString();
     }

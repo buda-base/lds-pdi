@@ -4,10 +4,20 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
@@ -20,6 +30,7 @@ import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.system.StreamRDFLib;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,6 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class TemplatesTest extends JerseyTest{
@@ -66,25 +78,129 @@ public class TemplatesTest extends JerseyTest{
     
     @Override
     protected Application configure() {
-        return new ResourceConfig(PublicTemplatesResource.class).register(RestExceptionMapper.class);
+        return new ResourceConfig(PublicTemplatesResource.class).register(RestExceptionMapper.class);        
     }
     
     @Test
-    public void wrongTemplateName() throws JsonProcessingException, IOException {
-        Response res = target("/query/wrongTemplateName").request()
+    public void wrongTemplateNameGet() throws JsonProcessingException, IOException {        
+            Response res = target("/query/wrongTemplateName").request()
+                    .header("fusekiUrl", fusekiUrl)
+                    .get();
+            String entity=res.readEntity(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node=mapper.readTree(entity);
+            int code=Integer.parseInt(node.findValue("code").asText());
+            assertTrue(res.getStatus() == 500);            
+            assertTrue(code==LdsError.PARSE_ERR);
+    }
+    
+    @Test
+    public void wrongTemplateNamePost() throws JsonProcessingException, IOException { 
+            MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
+            map.add("L_NAME","dgon gsar"); 
+            Response res = target("/query/wrongTemplateName").request()
+                    .header("fusekiUrl", fusekiUrl)
+                    .post(Entity.form(map));
+            String entity=res.readEntity(String.class);            
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node=mapper.readTree(entity);
+            int code=Integer.parseInt(node.findValue("code").asText());
+            assertTrue(res.getStatus() == 500);            
+            assertTrue(code==LdsError.PARSE_ERR);
+    }
+    
+    @Test
+    public void TemplateGet() throws JsonProcessingException, IOException {
+            Response res = target("/query/missingArg")
+                    .queryParam("L_NAME", "rgyal")
+                    .request()
+                    .header("fusekiUrl", fusekiUrl)
+                    .get();
+            assertTrue(res.getStatus() == 200);   
+    }
+    
+    @Test
+    public void TemplatePost() throws JsonProcessingException, IOException {
+        MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
+        map.add("L_NAME","rgyal");
+        Response res = target("/query/missingArg").request()
+                .header("fusekiUrl", fusekiUrl)
+                .post(Entity.form(map));                
+        assertTrue(res.getStatus() == 200);       
+    }
+    
+    @Test
+    public void missingParameter() throws JsonProcessingException, IOException {
+        for(String method:methods) {
+            Response res = target("/query/missingArg").request()
+                    .header("fusekiUrl", fusekiUrl)
+                    .method(method);
+            String entity=res.readEntity(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node=mapper.readTree(entity);
+            int code=Integer.parseInt(node.findValue("code").asText());
+            assertTrue(res.getStatus() == 500);
+            assertTrue(code==LdsError.MISSING_PARAM_ERR);
+        }
+    }
+    
+    @Test
+    public void WrongParamNameGet() throws JsonProcessingException, IOException {
+        Response res = target("/query/missingArg)")
+                .queryParam("WRONG", "rgyal")
+                .request()
                 .header("fusekiUrl", fusekiUrl)
                 .get();
         String entity=res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node=mapper.readTree(entity);
-        String msg=node.findValue("message").asText();
-        log.info("JSON MESSAGE >> "+msg);
-        log.info("Query template parsing failed :"
-        +ServiceConfig.getProperty("queryPath")+"public/wrongTemplateName.arq  (Aucun fichier ou dossier de ce type)");
-        assertTrue(res.getStatus() == 500);
-        assert(msg.equals("Query template parsing failed for: wrongTemplateName.arq"));
+        int code=Integer.parseInt(node.findValue("code").asText());
+        assertTrue(res.getStatus() == 500);            
+        assertTrue(code==LdsError.PARSE_ERR);
     }
     
+    @Test
+    public void WrongParamNamePost() throws JsonProcessingException, IOException {
+        MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
+        map.add("WRONG","rgyal");
+        Response res = target("/query/missingArg").request()
+                .header("fusekiUrl", fusekiUrl)
+                .post(Entity.form(map));  
+        String entity=res.readEntity(String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node=mapper.readTree(entity);
+        int code=Integer.parseInt(node.findValue("code").asText());
+        assertTrue(res.getStatus() == 500);            
+        assertTrue(code==LdsError.MISSING_PARAM_ERR);
+    }
+    
+    @Test
+    public void wrongGraphTemplateNameGet() throws JsonProcessingException, IOException {        
+            Response res = target("/graph/wrongTemplateName").request()
+                    .header("fusekiUrl", fusekiUrl)
+                    .get();
+            String entity=res.readEntity(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node=mapper.readTree(entity);
+            int code=Integer.parseInt(node.findValue("code").asText());
+            assertTrue(res.getStatus() == 500);            
+            assertTrue(code==LdsError.PARSE_ERR);
+    }
+    
+    @Test
+    public void wrongGraphTemplateNamePost() throws JsonProcessingException, IOException { 
+        Response res = target("/graph/wrongTemplateName").request()
+                .accept(MediaType.APPLICATION_JSON)
+                .header("fusekiUrl", fusekiUrl)
+                .header("Content-Type","application/json")
+                .post(Entity.entity("{\"ddd\":\"\"}",MediaType.APPLICATION_JSON));
+        String entity=res.readEntity(String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node=mapper.readTree(entity);
+        int code=Integer.parseInt(node.findValue("code").asText());
+        assertTrue(res.getStatus() == 500);            
+        assertTrue(code==LdsError.PARSE_ERR);
+    }
     
     static void loadData(){
         //Loads the test dataset/

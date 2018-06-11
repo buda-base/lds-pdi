@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPageLinks {
@@ -83,7 +83,7 @@ public class ResultPageLinks {
             }
         }
         catch(JsonProcessingException ex) {
-            throw new RestException(5001,new Error(Error.JSON_ERR).setContext(" in ResultPageLinks constructor "+ex.getMessage()));
+            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks constructor "+ex.getMessage()));
         }
     }
     
@@ -127,7 +127,7 @@ public class ResultPageLinks {
             }
         }
         catch(JsonProcessingException ex) {
-            throw new RestException(5001,new Error(Error.JSON_ERR).setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor "+ex.getMessage()));
+            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor "+ex.getMessage()));
         }
     }
     

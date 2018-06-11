@@ -1,17 +1,17 @@
 package io.bdrc.restapi.exceptions;
 
-public class Error {
+public class LdsError {
     
     public int code;
     public String msg;
     
-    public Error() {
+    public LdsError() {
         super();
         this.code = -1;
         this.msg = "";
     }
     
-    public Error(int code) {
+    public LdsError(int code) {
         super();
         this.code = code;
         switch (code) {
@@ -48,7 +48,7 @@ public class Error {
         return msg;
     } 
     
-    public Error setContext(String ctx) {
+    public LdsError setContext(String ctx) {
         msg=msg.replace("${ctx}", ctx);
         return this;
     } 

@@ -65,7 +65,7 @@ import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -152,7 +152,7 @@ public class PublicDataResource {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
-                throw new RestException(500,new Error(Error.URI_SYNTAX_ERR).setContext("getResourceGraphGet()"));
+                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()"));
             }
         }
         if(fuseki !=null){ 
@@ -160,7 +160,7 @@ public class PublicDataResource {
         }            
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -193,7 +193,7 @@ public class PublicDataResource {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
-                throw new RestException(500,new Error(Error.URI_SYNTAX_ERR).setContext("getResourceGraphPost()"));
+                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()"));
             }
         }
         if(fuseki !=null){ 
@@ -201,7 +201,7 @@ public class PublicDataResource {
         }            
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -229,7 +229,7 @@ public class PublicDataResource {
         MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
         Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
         return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();                     
@@ -247,7 +247,7 @@ public class PublicDataResource {
         EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+uri).hashCode()));
         ResponseBuilder builder = request.evaluatePreconditions(etag);        
         if(OntData.ontMod.getOntResource(uri)==null) {
-            throw new RestException(404,new Error(Error.ONT_URI_ERR).setContext(uri));
+            throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(uri));
         } 
         if(OntData.isClass(uri)) {
             /** class view **/

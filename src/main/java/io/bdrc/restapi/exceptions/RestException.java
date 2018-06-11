@@ -35,7 +35,7 @@ public class RestException extends Exception
         this.link = null;
     }
     
-    public RestException(int status, Error err) {
+    public RestException(int status, LdsError err) {
         super(err.getMsg());
         this.status = status;
         this.code = err.getCode();

@@ -9,7 +9,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
@@ -48,7 +48,7 @@ public class WorkAllResults {
                     lineages.put(st.getSubject().getURI(),pli);
                     break;
                 default:
-                    throw new RestException(500,new Error(Error.UNKNOWN_ERR).setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
+                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
                }
         }
         res.put("associatedWorks",works);

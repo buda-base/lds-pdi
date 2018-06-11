@@ -64,7 +64,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
-import io.bdrc.restapi.exceptions.Error;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 
@@ -77,23 +77,23 @@ public class PublicTemplatesResource {
     @GET
     @Path("/query/{file}")
     @JerseyCacheControl()
-    @Produces("text/html")
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     public Response getQueryTemplateResults(@Context UriInfo info, 
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to getQueryTemplateResults()"+file);
+        log.info("Call to getQueryTemplateResults()"+file+ " Params >>"+info.getQueryParameters());
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
-        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());        
+        HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters()); 
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));        
                 
         //process
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
-        String query=qfp.getParametizedQuery(hm,true);
+        String query=qfp.getParametizedQuery(hm,true);        
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
-            return Response.ok(new Viewable("/error.jsp",query)).build();
+            throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() "+query));
         }
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;        
@@ -107,9 +107,10 @@ public class PublicTemplatesResource {
             hm.put(QueryConstants.REQ_METHOD, "GET");             
             hm.put("query", qfp.getQueryHtml());
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
+            
         }
         catch (JsonProcessingException jx) {
-            throw new RestException(500,new Error(Error.JSON_ERR).setContext(" in getQueryTemplateResults()+jx.getMessage()"));
+            throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()+jx.getMessage()"));
         }
         return Response.ok(new Viewable("/resPage.jsp",model)).build();        
     }
@@ -122,7 +123,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{     
         
-        log.info("Call to testTemplateResults()"+file);
+        log.info("Call to testTemplateResults() "+file+ "Params >>"+info.getQueryParameters());
         if(fuseki !=null){fusekiUrl=fuseki;}        
         
         //Settings       
@@ -148,12 +149,11 @@ public class PublicTemplatesResource {
             @PathParam("file") String file,
             MultivaluedMap<String,String> mp) throws RestException{ 
         log.info("Call to getQueryTemplateResultsPost()");
-        if(mp.size()==0) {
-            throw new RestException(500,new Error(Error.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsPost() : Map ="+mp));
+        if(mp==null || mp.size()==0) {
+            throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsPost() : Map ="+mp));
         }
         if(fuseki !=null){fusekiUrl=fuseki;}
         HashMap<String,String> hm=Helpers.convertMulti(mp);
-        
         QueryFileParser qfp=new QueryFileParser(file+".arq");
         String query=qfp.getParametizedQuery(hm,true);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
@@ -176,14 +176,14 @@ public class PublicTemplatesResource {
     @POST 
     @Path("/query/{file}")
     @JerseyCacheControl()
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)    
     public Response getQueryTemplateResultsJsonPost( 
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file,
             HashMap<String,String> map) throws RestException{     
         log.info("Call to getQueryTemplateResultsJsonPost()");        
-        if(map.size()==0) {
-            throw new RestException(500,new Error(Error.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
+        if(map==null || map.size()==0) {
+            throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}         
         QueryFileParser qfp=new QueryFileParser(file+".arq");
@@ -207,8 +207,7 @@ public class PublicTemplatesResource {
             @HeaderParam("fusekiUrl") final String fuseki,
             @QueryParam("format") final String format,            
             @PathParam("file") String file,            
-            @Context Request request,
-            HashMap<String,String> map) throws RestException{     
+            @Context Request request) throws RestException{     
         String path=info.getPath()+info.relativize(info.getRequestUri());
         Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
         log.info("Call to getGraphTemplateResults() with URL: "+path+" Accept: "+format+ " Variant >> "+variant);
@@ -232,7 +231,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResults()"));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResults()"));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -251,7 +250,7 @@ public class PublicTemplatesResource {
             HashMap<String,String> map) throws RestException{
         String path=info.getPath()+info.relativize(info.getRequestUri());
         Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
-        log.info("Call to getGraphTemplateResultsPost() with URL: "+path+" Accept: "+format+ " Selected Variant >> "+variant);
+        log.info("Call to getGraphTemplateResultsPost() with URL: "+path+" Accept: "+format+ " Selected Variant >> "+variant+ " Map>>"+map);
         if(fuseki !=null){fusekiUrl=fuseki;} 
         String params="";
         for(String key:map.keySet()) {
@@ -271,7 +270,7 @@ public class PublicTemplatesResource {
         }
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new Error(Error.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResultsPost()"));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         return Response.ok(ResponseOutputStream.getModelStream(
                         model,
