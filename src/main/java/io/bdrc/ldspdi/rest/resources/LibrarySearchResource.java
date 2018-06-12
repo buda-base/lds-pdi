@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import io.bdrc.ldspdi.results.library.TopicAllResults;
 import io.bdrc.ldspdi.results.library.WorkAllResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.AsyncSparql;
 import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -51,13 +53,32 @@ public class LibrarySearchResource {
             HashMap<String,String> map) throws RestException {
 
         log.info("Call to getLibGraphPost() with template name >> "+file);
+        Thread t=null;
+        AsyncSparql async=null;
+        if(file.equals("rootSearchGraph")) {
+            async=new AsyncSparql(fusekiUrl,"Etexts_count.arq",map);
+            t=new Thread(async);
+            t.run();
+        }
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
         String query=qfp.getParametizedQuery(map,false);
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
             case "rootSearchGraph":
-                res=RootResults.getResultsMap(model);
+                log.info("MAP >>> "+map);
+                int etext_count=0;
+                if(t!=null) {
+                    try {
+                        t.join();
+                        ResultSet rs=async.res;
+                        etext_count=rs.next().getLiteral("?c").getInt();
+                    } catch (InterruptedException e) {
+                        throw new RestException(500,new LdsError(LdsError.ASYNC_ERR).
+                                setContext("getLibGraphPost()",e));
+                    }
+                }
+                res=RootResults.getResultsMap(model,etext_count);
                 break;
             case "personFacetGraph":            
                 res=PersonResults.getResultsMap(model);
@@ -93,16 +114,35 @@ public class LibrarySearchResource {
             @PathParam("file") String file
             ) throws RestException {
 
-        log.info("Call to getLibGraphGet() with template name >> "+file);
+        log.info("Call to getLibGraphGet() with template name >> "+file);        
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());
+        Thread t=null;
+        AsyncSparql async=null;
+        if(file.equals("rootSearchGraph")) {
+            async=new AsyncSparql(fusekiUrl,"Etexts_count.arq",map);
+            t=new Thread(async);
+            t.run();
+        }
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String query=qfp.getParametizedQuery(map,true);
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
-        log.info("Model Size >>>>>> "+model.size());
+        String query=qfp.getParametizedQuery(map,false);        
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null); 
+        
         HashMap<String,Object> res=null;
         switch (file) {
-            case "rootSearchGraph":
-                res=RootResults.getResultsMap(model);
+            case "rootSearchGraph":                
+                int etext_count=0;
+                if(t!=null) {
+                    try {                        
+                        t.join();
+                        ResultSet rs=async.res;
+                        etext_count=rs.next().getLiteral("?c").getInt(); 
+                    } catch (InterruptedException e) {
+                        throw new RestException(500,new LdsError(LdsError.ASYNC_ERR).
+                                setContext("getLibGraphGet()",e));
+                    }
+                }
+                
+                res=RootResults.getResultsMap(model,etext_count);
                 break;
             case "personFacetGraph":            
                 res=PersonResults.getResultsMap(model);

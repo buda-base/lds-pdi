@@ -69,7 +69,7 @@ public class QueryProcessor {
 	public static Model getGraph(String query,String fusekiUrl, String prefixes) throws RestException{           
 	    if(prefixes==null) {
             prefixes=loadPrefixes();
-        }
+        }	    
         int hash=Objects.hashCode(query);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {

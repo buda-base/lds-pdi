@@ -15,7 +15,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class RootResults {
     
-    public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
+    public static HashMap<String,Object> getResultsMap(Model mod,int etext_count) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> works=new HashMap<>(); 
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
@@ -24,10 +24,11 @@ public class RootResults {
         HashMap<String,ArrayList<Field>> roles=new HashMap<>();
         HashMap<String,ArrayList<Field>> topics=new HashMap<>();
         HashMap<String,Integer> count=new HashMap<>();
-        ArrayList<String> processed=new ArrayList<>();
+        ArrayList<String> processed=new ArrayList<>();        
+        count.put("http://purl.bdrc.io/ontology/core/Etext", etext_count);        
         StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
-            Statement st=it.next();            
+            Statement st=it.next();
             String type=mod.getProperty(st.getSubject(), mod.getProperty(Taxonomy.TYPE)).getObject().asResource().getURI().toString();
             Integer ct=count.get(type);
             if(!processed.contains(st.getSubject().getURI())) {

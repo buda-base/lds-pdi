@@ -25,6 +25,8 @@ public class LdsError {
                 msg="Missing Resource ${ctx}";
             case 5005:
                 msg="Unknown ${ctx}";
+            case 5006:
+                msg="Asynchrounous query issue : ${ctx}";
             case 5010:
                 msg="No graph was found for ${ctx}";
             case 5011:
@@ -63,6 +65,7 @@ public class LdsError {
     public  static int MISSING_PARAM_ERR=5003;
     public  static int MISSING_RES_ERR=5004;
     public  static int UNKNOWN_ERR=5005;
+    public  static int ASYNC_ERR=5006;
     
     public  static int NO_GRAPH_ERR=5010;
     public  static int PARSE_ERR=5011;

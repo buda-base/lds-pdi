@@ -78,8 +78,7 @@ public class ResponseOutputStream {
     
     public static StreamingOutput getModelStream(Model model, String format) {        
         StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os) {                
-                System.out.println("getJenaFromExtension :"+format+" >>> "+MediaTypeUtils.getJenaFromExtension(format)); 
+            public void write(OutputStream os) {
                 if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {                        
                         JSONLDFormatter.writeModelAsCompact(model, os);
