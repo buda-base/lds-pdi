@@ -36,10 +36,12 @@ public class Taxonomy {
     public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
+    public final static String ETEXT="http://purl.bdrc.io/ontology/core/Etext";
     public final static String PLACE="http://purl.bdrc.io/ontology/core/Place";
     public final static String LINEAGE="http://purl.bdrc.io/ontology/core/Lineage";
     public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";
     public final static String WORK_IS_ABOUT="http://purl.bdrc.io/ontology/core/workIsAbout";
+    public final static String WORK_MAIN_AUTHOR="http://purl.bdrc.io/ontology/core/creatorMainAuthor";
     public final static String PERSONGENDER="http://purl.bdrc.io/ontology/core/personGender";
     public final static String ACCESS="http://purl.bdrc.io/ontology/admin/access";
     public final static String LICENSE="http://purl.bdrc.io/ontology/admin/license";

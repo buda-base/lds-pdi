@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.results.library.EtextResults;
 import io.bdrc.ldspdi.results.library.PersonAllResults;
 import io.bdrc.ldspdi.results.library.PersonResults;
 import io.bdrc.ldspdi.results.library.PlaceAllResults;
@@ -99,6 +100,9 @@ public class LibrarySearchResource {
             case "placeAllAssociations":
                 res=PlaceAllResults.getResultsMap(model);
                 break;
+            case "etextFacetGraph":
+                res=WorkAllResults.getResultsMap(model);
+                break;
             default:
                 throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));                
         }
@@ -123,10 +127,11 @@ public class LibrarySearchResource {
             t=new Thread(async);
             t.run();
         }
+        System.out.println("Deb >>>> "+System.currentTimeMillis());
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
         String query=qfp.getParametizedQuery(map,false);        
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null); 
-        
+        System.out.println("Fin >>>> "+System.currentTimeMillis());
         HashMap<String,Object> res=null;
         switch (file) {
             case "rootSearchGraph":                
@@ -164,6 +169,9 @@ public class LibrarySearchResource {
                 break;
             case "placeAllAssociations":
                 res=PlaceAllResults.getResultsMap(model);
+                break;
+            case "etextFacetGraph":
+                res=EtextResults.getResultsMap(model);
                 break;
             default:
                 throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
