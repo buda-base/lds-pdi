@@ -7,21 +7,21 @@ import java.util.HashSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
-public class EtextResults {
+public class ChunksResults {
     
-    public final static Logger log=LoggerFactory.getLogger(EtextResults.class.getName());
+    public static final String CHUNK_ABOUT="http://purl.bdrc.io/ontology/tmp/etextAbout";
+    public static final String CHUNK_GENRE="http://purl.bdrc.io/ontology/tmp/etextGenre";
+    public static final String CHUNK_FOR_WORK="http://purl.bdrc.io/ontology/tmp/forWork";
+    public static final String CHUNK_FOR_ETEXT="http://purl.bdrc.io/ontology/tmp/forEtext";
     
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
-        HashMap<String,ArrayList<Field>> etexts=new HashMap<>();  
         HashMap<String,ArrayList<Field>> chunks=new HashMap<>();
         HashMap<String,Integer> topics=new HashMap<>();
         HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
@@ -33,20 +33,12 @@ public class EtextResults {
             
             String type=mod.getProperty(st.getSubject(), mod.getProperty(Taxonomy.TYPE)).getObject().asResource().getURI().toString();
             switch (type) {
-                case Taxonomy.ETEXT:
-                    ArrayList<Field> etextl=etexts.get(st.getSubject().getURI());
-                    if(etextl==null) {
-                        etextl=new ArrayList<Field>();
-                    }
+                case Taxonomy.ETEXT_CHUNK:
+                    ArrayList<Field> chunksl=chunks.get(st.getSubject().toString()); 
                     String pred_uri=st.getPredicate().getURI();
-                    if(pred_uri.equals(Taxonomy.WORK_GENRE) || pred_uri.equals(Taxonomy.WORK_IS_ABOUT)) {                        
+                    if(pred_uri.equals(CHUNK_ABOUT) || pred_uri.equals(CHUNK_GENRE)) {                        
                         Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                     }
-                    etextl.add(Field.getField(st));
-                    etexts.put(st.getSubject().getURI(),etextl);
-                    break;
-                case Taxonomy.ETEXT_CHUNK:
-                    ArrayList<Field> chunksl=chunks.get(st.getSubject().toString());
                     if(chunksl==null) {
                         chunksl=new ArrayList<Field>();
                     }
@@ -59,9 +51,7 @@ public class EtextResults {
                }
         }
         res.put("chunks",chunks);  
-        log.info("Nb of Etexts >>"+etexts.size());
-        log.info("Nb of Chunks>>"+chunks.size());
-        res.put("etexts",etexts);        
+        System.out.println("Nb of Etexts >>"+chunks.size());
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }

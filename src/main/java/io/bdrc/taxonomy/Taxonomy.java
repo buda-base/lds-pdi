@@ -153,7 +153,12 @@ public class Taxonomy {
         if (tmp==null) {
             tmp=new HashSet<>();
         }
-        tmp.add(st.getSubject().asNode().getURI());
+        if(st.getSubject().isURIResource()) {
+            tmp.add(st.getSubject().asNode().getURI());
+        }
+        else {
+            tmp.add(st.getSubject().toString());
+        }
         Wtopics.put(st.getObject().asNode().getURI(), tmp); 
         LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
         if(!nodes.isEmpty()) {
@@ -165,7 +170,12 @@ public class Taxonomy {
             if (bt==null) {
                 bt=new HashSet<>();
             }
-            bt.add(st.getSubject().asNode().getURI());
+            if(st.getSubject().isURIResource()) {
+                bt.add(st.getSubject().asNode().getURI());
+            }
+            else {
+                bt.add(st.getSubject().toString());
+            }
             WorkBranch.put(s, bt);
             topics.put(s, bt.size());
         }
