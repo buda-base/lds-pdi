@@ -259,13 +259,11 @@ public class JsonOutputTest {
         ResultSetWrapper rsw=getResults(blank+" limit "+limit, fusekiUrl);
         FusekiResultSet frs=new FusekiResultSet(rsw);
         ObjectMapper mapper = new ObjectMapper();
-        String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(frs);
-        System.out.println(json1);
+        String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(frs);        
         ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(blank+" limit "+limit)).execSelect(); 
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
         String json2=new String(baos.toByteArray());
-        System.out.println(json2);
         baos.close();
         JsonNode node1=mapper.readTree(json1);
         JsonNode node2=mapper.readTree(json2);

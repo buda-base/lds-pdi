@@ -37,6 +37,7 @@ public class Taxonomy {
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
     public final static String ETEXT="http://purl.bdrc.io/ontology/core/Etext";
+    public final static String ETEXT_CHUNK="http://purl.bdrc.io/ontology/core/EtextChunk";
     public final static String PLACE="http://purl.bdrc.io/ontology/core/Place";
     public final static String LINEAGE="http://purl.bdrc.io/ontology/core/Lineage";
     public final static String WORK_GENRE="http://purl.bdrc.io/ontology/core/workGenre";

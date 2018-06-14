@@ -186,7 +186,6 @@ public class ResServiceTest extends JerseyTest{
                     .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .method(method);
-            System.out.println(res.getHeaders());
             assertTrue(res.getStatus() == 404);
         }
     }

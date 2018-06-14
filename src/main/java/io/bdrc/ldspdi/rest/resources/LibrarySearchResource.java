@@ -101,7 +101,10 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             case "etextFacetGraph":
-                res=WorkAllResults.getResultsMap(model);
+                res=EtextResults.getResultsMap(model);
+                break;
+            case "chunkByEtextGraph":
+                res=EtextResults.getResultsMap(model);
                 break;
             default:
                 throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));                
@@ -126,12 +129,11 @@ public class LibrarySearchResource {
             async=new AsyncSparql(fusekiUrl,"Etexts_count.arq",map);
             t=new Thread(async);
             t.run();
-        }
-        System.out.println("Deb >>>> "+System.currentTimeMillis());
+        }        
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String query=qfp.getParametizedQuery(map,false);        
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null); 
-        System.out.println("Fin >>>> "+System.currentTimeMillis());
+        String query=qfp.getParametizedQuery(map,false); 
+        System.out.println(query);
+        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
             case "rootSearchGraph":                
@@ -171,6 +173,9 @@ public class LibrarySearchResource {
                 res=PlaceAllResults.getResultsMap(model);
                 break;
             case "etextFacetGraph":
+                res=EtextResults.getResultsMap(model);
+                break;
+            case "chunkByEtextGraph":
                 res=EtextResults.getResultsMap(model);
                 break;
             default:
