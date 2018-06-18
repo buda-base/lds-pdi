@@ -27,6 +27,7 @@ public class EtextResults {
         HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
         HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
         HashSet<String> tops=new HashSet<>(); 
+        HashSet<String> authors=new HashSet<>();
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             Statement st=iter.next();
@@ -41,6 +42,9 @@ public class EtextResults {
                     String pred_uri=st.getPredicate().getURI();
                     if(pred_uri.equals(Taxonomy.WORK_GENRE) || pred_uri.equals(Taxonomy.WORK_IS_ABOUT)) {                        
                         Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
+                    }
+                    if(pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {                        
+                        authors.add(st.getObject().asResource().getURI());
                     }
                     etextl.add(Field.getField(st));
                     etexts.put(st.getSubject().getURI(),etextl);
@@ -58,9 +62,8 @@ public class EtextResults {
                             setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
                }
         }
-        res.put("chunks",chunks);  
-        log.info("Nb of Etexts >>"+etexts.size());
-        log.info("Nb of Chunks>>"+chunks.size());
+        res.put("chunks",chunks);
+        res.put("authors",authors); 
         res.put("etexts",etexts);        
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
