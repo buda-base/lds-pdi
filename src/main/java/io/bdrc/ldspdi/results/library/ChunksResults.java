@@ -27,6 +27,7 @@ public class ChunksResults {
         HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
         HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
         HashSet<String> tops=new HashSet<>(); 
+        HashSet<String> authors=new HashSet<>();
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             Statement st=iter.next();
@@ -39,6 +40,9 @@ public class ChunksResults {
                     if(pred_uri.equals(CHUNK_ABOUT) || pred_uri.equals(CHUNK_GENRE)) {                        
                         Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                     }
+                    if(pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {                        
+                        authors.add(st.getObject().asResource().getURI());
+                    }
                     if(chunksl==null) {
                         chunksl=new ArrayList<Field>();
                     }
@@ -50,8 +54,8 @@ public class ChunksResults {
                             setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
                }
         }
-        res.put("chunks",chunks);  
-        System.out.println("Nb of Etexts >>"+chunks.size());
+        res.put("authors",authors);
+        res.put("chunks",chunks);
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
