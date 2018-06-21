@@ -19,8 +19,13 @@ public class ResourceResults {
         HashMap<String,ArrayList<Field>> resources=new HashMap<>(); 
         StmtIterator it=mod.listStatements();
         while(it.hasNext()) {
+            String uri=null;
             Statement st=it.next();
-            String uri=st.getSubject().getURI();
+            if(st.getSubject().isAnon()) {
+                uri=st.getSubject().asNode().getBlankNodeLabel();
+            }else {
+                uri=st.getSubject().getURI();
+            }
             ArrayList<Field> f=resources.get(uri);
             if(f==null) {
                 f=new ArrayList<Field>();
