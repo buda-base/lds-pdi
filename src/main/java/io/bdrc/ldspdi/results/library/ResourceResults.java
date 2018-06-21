@@ -22,7 +22,7 @@ public class ResourceResults {
             String uri=null;
             Statement st=it.next();
             if(st.getSubject().isAnon()) {
-                uri=st.getSubject().asNode().getBlankNodeLabel();
+                uri="_:"+st.getSubject().asNode().getBlankNodeLabel();
             }else {
                 uri=st.getSubject().getURI();
             }

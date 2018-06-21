@@ -18,7 +18,12 @@ public class Field extends HashMap<String,String>{
         if(st.getObject().isLiteral()) {
             return new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString());  
         }else {
-            return new Field(st.getPredicate().getURI(),st.getObject().toString());
+            if(st.getObject().isAnon()) {
+                return new Field(st.getPredicate().getURI(),"_:"+st.getObject().asNode().getBlankNodeLabel());
+            }
+            else {
+                return new Field(st.getPredicate().getURI(),st.getObject().toString());
+            }
         }
     }
 
