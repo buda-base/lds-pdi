@@ -38,7 +38,7 @@ public class OntPropModel {
         this.uri=uri;
         this.name=uri;
         StmtIterator it=((Model)OntData.ontMod).listStatements(
-        ResourceFactory.createResource("http://purl.bdrc.io/ontology/admin/statementScore"),(Property)null,(RDFNode)null);
+        ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
             String pred=st.getPredicate().getURI();            
@@ -118,18 +118,6 @@ public class OntPropModel {
     public String toString() {
         return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range="
                 + range + ", domain=" + domain + "]";
-    }
-
-    public static void main(String[] args) {
-        ServiceConfig.initForTests();
-        OntData.init();
-        OntPropModel m=new OntPropModel("http://purl.bdrc.io/ontology/admin/statementScore");
-        System.out.println(m);
-        StmtIterator it=((Model)OntData.ontMod).listStatements(
-        ResourceFactory.createResource("http://purl.bdrc.io/ontology/admin/statementScore"),(Property)null,(RDFNode)null);
-        while(it.hasNext()) {
-            System.out.println(it.next());
-        }
     }
     
 }
