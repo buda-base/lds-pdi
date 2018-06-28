@@ -4,14 +4,27 @@ import java.util.ArrayList;
 
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class OntPropModel {
     
     final static Logger log = LoggerFactory.getLogger(OntPropModel.class.getName());
+    
+    public static final String DOMAIN="http://www.w3.org/2000/01/rdf-schema#domain";
+    public static final String RANGE="http://www.w3.org/2000/01/rdf-schema#range";
+    public static final String LABEL="http://www.w3.org/2000/01/rdf-schema#label";
+    public static final String COMMENT="http://www.w3.org/2000/01/rdf-schema#comment";
+    public static final String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     
     public String uri;
     public String name;
@@ -19,30 +32,34 @@ public class OntPropModel {
     public String label;
     public String range;
     public String domain;
+    public String comment;
     
     public OntPropModel(String uri) {
         this.uri=uri;
-        OntProperty prop=OntData.ontMod.getOntResource(uri).asProperty();
-        this.rdfType=prop.getRDFType().getLocalName();
-        this.name=prop.getLocalName();
-        String lab=prop.getLabel(null);
-        if(lab!=null) {
-            this.label=prop.getLabel(null);
-        }else {
-            this.label=name;
-        }
-        OntResource dom=prop.getDomain();
-        if(dom!=null) {
-            this.domain=dom.getLocalName();
-        }else {
-            this.domain="Inherited";
-        }        
-        OntResource ontRes =prop.getRange();
-        if(ontRes!=null) {
-            this.range=ontRes.getLocalName();
-        }else {
-            this.range="Inherited";
-        }
+        this.name=uri;
+        StmtIterator it=((Model)OntData.ontMod).listStatements(
+        ResourceFactory.createResource("http://purl.bdrc.io/ontology/admin/statementScore"),(Property)null,(RDFNode)null);
+        while(it.hasNext()) {
+            Statement st=it.next();
+            String pred=st.getPredicate().getURI();            
+            switch(pred) {
+                case DOMAIN:
+                    this.domain=st.getObject().toString();
+                    break;
+                case RANGE:
+                    this.range=st.getObject().toString();
+                    break;
+                case LABEL:
+                    this.label=st.getObject().toString();
+                    break;
+                case COMMENT:
+                    this.comment=st.getObject().toString();
+                    break;
+                case TYPE:
+                    this.rdfType=st.getObject().toString();
+                    break;
+            }
+        } 
     }
     
     public ArrayList<OntPropModel> getAllSubProps() throws RestException{
@@ -80,12 +97,39 @@ public class OntPropModel {
     }
 
     public String getRange() {
+        if(range==null) {
+            return "Inherited";
+        }
         return range;
     }
 
     public String getDomain() {
+        if(domain==null) {
+            return "Inherited";
+        }
         return domain;
     }
     
+    public String getComment() {
+        return comment;
+    }
+    
+    @Override
+    public String toString() {
+        return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range="
+                + range + ", domain=" + domain + "]";
+    }
+
+    public static void main(String[] args) {
+        ServiceConfig.initForTests();
+        OntData.init();
+        OntPropModel m=new OntPropModel("http://purl.bdrc.io/ontology/admin/statementScore");
+        System.out.println(m);
+        StmtIterator it=((Model)OntData.ontMod).listStatements(
+        ResourceFactory.createResource("http://purl.bdrc.io/ontology/admin/statementScore"),(Property)null,(RDFNode)null);
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
     
 }

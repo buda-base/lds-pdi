@@ -32,7 +32,7 @@ public class ResultsCache {
         
     public static void addToCache(Object res, int hash) {        
         try{
-            CACHE.put( Integer.valueOf(hash), res );            
+            CACHE.put(Integer.valueOf(hash), res );            
             res=null;
         }
         catch (CacheException e ){
@@ -41,7 +41,6 @@ public class ResultsCache {
     }
     
     public static Object getObjectFromCache(int hash) {
-        
         return CACHE.get( Integer.valueOf(hash));
     }
 }

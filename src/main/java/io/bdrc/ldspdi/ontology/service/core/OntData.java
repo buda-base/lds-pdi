@@ -49,6 +49,8 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class OntData implements Runnable{
     
+    
+    
     public static InfModel infMod;    
     public static OntModel ontMod;    
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
@@ -344,6 +346,4 @@ public class OntData implements Runnable{
             }
         }
     }
-    
-
 }
