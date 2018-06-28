@@ -37,8 +37,22 @@
 <h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
 <b>Rdf Type:</b> <a href="${model.getRdfType()}">${model.getRdfType()}</a><br>
 <b>Label:</b> ${model.getLabel()}<br>
+<c:choose>
+<c:when test="${model.isDomainInherited()}">
+<b>Domain:</b> ${model.getDomain()}<br>
+</c:when>
+<c:otherwise>
 <b>Domain:</b> <a href="${model.getDomain()}">${model.getDomain()}</a><br>
+</c:otherwise>
+</c:choose>
+<c:choose>
+<c:when test="${model.isRangeInherited()}">
+<b>Range:</b> ${model.getRange()}<br>
+</c:when>
+<c:otherwise>
 <b>Range:</b> <a href="${model.getRange()}">${model.getRange()}</a><br>
+</c:otherwise>
+</c:choose>
 <b>Comment:</b> ${model.getComment()}<br>
 <br>
 <!-- SUB PROPS -->

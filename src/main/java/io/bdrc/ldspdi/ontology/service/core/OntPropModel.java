@@ -13,7 +13,6 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class OntPropModel {
@@ -108,6 +107,14 @@ public class OntPropModel {
             return "Inherited";
         }
         return domain;
+    }
+    
+    public boolean isDomainInherited() {
+        return getDomain().equals("Inherited");
+    }
+    
+    public boolean isRangeInherited() {
+        return getRange().equals("Inherited");
     }
     
     public String getComment() {
