@@ -35,7 +35,7 @@
 </head>
 <body>
 <h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
-<b>Rdf Type:</b> <a href="${model.getRdfType()}">${model.getRdfType()}</a><br>
+<b>Type:</b> <a href="${model.getRdfType()}">${model.getRdfType()}</a><br>
 <b>Label:</b> ${model.getLabel()}<br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
@@ -62,11 +62,11 @@
         <c:forEach items="${model.getAllSubProps()}" var="prop"> 
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
-            <tr><td><b>Uri :</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
-            <tr><td><b>Rdf Type :</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
-            <tr><td><b>Label :</b></td><td> ${prop.getLabel()}</td></tr>
-            <tr><td><b>Domain :</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
-            <tr><td><b>Range :</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
+            <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
+            <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
+            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}</td></tr>
+            <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
+            <tr><td><b>Range:</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
             </table><br>          
         </c:forEach>
         
@@ -79,11 +79,11 @@
         <c:forEach items="${model.getParentProps()}" var="prop"> 
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
-            <tr><td><b>Uri :</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
-            <tr><td><b>Rdf Type :</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
-            <tr><td><b>Label :</b></td><td> ${prop.getLabel()}</td></tr>
-            <tr><td><b>Domain :</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
-            <tr><td><b>Range :</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
+            <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
+            <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
+            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}</td></tr>
+            <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
+            <tr><td><b>Range:</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
             </table><br>          
         </c:forEach>
         
