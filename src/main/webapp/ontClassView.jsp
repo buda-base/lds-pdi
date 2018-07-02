@@ -32,6 +32,15 @@
     background-color: #4e7F50;
     color: white;
 }
+.lang {
+    position: relative;
+    margin: 0;
+    vertical-align: -5px;
+    padding: 3px;
+    line-height: 0;
+    font-size: 12px;
+    color: #778899;
+}
 </style>
 </head>
 <body style="margin-left:50px;width:80%;">
@@ -51,16 +60,16 @@
     <!-- LABELS -->
     <c:if test = "${model.getLabels().size()>0}">
         <h4>Labels: </h4>
-        <c:forEach items="${model.getLabels()}" var="label">    
-            ${label}<br>
+        <c:forEach items="${model.getLangLabels()}" var="label">    
+            ${label[0]}<span class="lang">${label[1]}</span><br>
         </c:forEach> 
     </c:if>
     
     <!-- COMMENTS -->
     <c:if test = "${model.getComments().size()>0}">
         <h4>Comments:</h4>
-        <c:forEach items="${model.getComments()}" var="comm">    
-            <div style="white-space: pre-wrap;">${comm}</div><hr/>
+        <c:forEach items="${model.getLangComments()}" var="comm">    
+            <div style="white-space: pre-wrap;">${comm[0]}<span class="lang">${comm[1]}</span></div><hr/>
         </c:forEach> 
     </c:if>
     

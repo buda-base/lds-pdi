@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
+import java.util.AbstractMap;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -128,6 +130,15 @@ public class OntClassModel {
         return labels;
     }
     
+    public List<String[]> getLangLabels() {
+        List<String[]> labels = new ArrayList<>();
+        
+        for (RDFNode node : clazz.listLabels(null).toList()) {            
+            labels.add(new String[]{node.asLiteral().getString(),node.asLiteral().getLanguage()});
+        }
+        return labels;
+    }
+    
     public List<String> getComments() {
         List<String> comments = new ArrayList<>();
         
@@ -135,6 +146,14 @@ public class OntClassModel {
             comments.add(node.toString());
         }
         
+        return comments; 
+    }
+    
+    public List<String[]> getLangComments() {
+        List<String[]> comments = new ArrayList<>();
+        for (RDFNode node : clazz.listComments(null).toList()) {
+            comments.add(new String[]{node.asLiteral().getString(),node.asLiteral().getLanguage()});
+        }
         return comments; 
     }
     
