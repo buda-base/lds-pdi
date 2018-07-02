@@ -29,13 +29,15 @@ public class OntPropModel {
     public String name;
     public String rdfType;
     public String label;
+    public String labelLang;
     public String range;
     public String domain;
     public String comment;
+    public String commentLang;
     
     public OntPropModel(String uri) {
         this.uri=uri;
-        this.name=uri;
+        this.name=OntData.ontMod.shortForm(uri);
         StmtIterator it=((Model)OntData.ontMod).listStatements(
         ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
@@ -43,19 +45,21 @@ public class OntPropModel {
             String pred=st.getPredicate().getURI();            
             switch(pred) {
                 case DOMAIN:
-                    this.domain=st.getObject().toString();
+                    this.domain=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
                     break;
                 case RANGE:
-                    this.range=st.getObject().toString();
+                    this.range=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
                     break;
                 case LABEL:
-                    this.label=st.getObject().toString();
+                    this.label=st.getObject().asLiteral().getString();
+                    this.labelLang=st.getObject().asLiteral().getLanguage();
                     break;
                 case COMMENT:
-                    this.comment=st.getObject().toString();
+                    this.comment=st.getObject().asLiteral().getString();
+                    this.commentLang=st.getObject().asLiteral().getLanguage();
                     break;
                 case TYPE:
-                    this.rdfType=st.getObject().toString();
+                    this.rdfType=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
                     break;
             }
         } 
@@ -121,6 +125,14 @@ public class OntPropModel {
         return comment;
     }
     
+    public String getLabelLang() {
+        return labelLang;
+    }
+
+    public String getCommentLang() {
+        return commentLang;
+    }
+
     @Override
     public String toString() {
         return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range="

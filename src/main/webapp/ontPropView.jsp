@@ -31,12 +31,21 @@
     background-color: #4e7F50;
     color: white;
 }
+.lang {
+    position: relative;
+    margin: 0;
+    vertical-align: -5px;
+    padding: 3px;
+    line-height: 0;
+    font-size: 12px;
+    color: #778899;
+}
 </style>
 </head>
 <body>
 <h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
 <b>Type:</b> <a href="${model.getRdfType()}">${model.getRdfType()}</a><br>
-<b>Label:</b> ${model.getLabel()}<br>
+<b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
 <b>Domain:</b> ${model.getDomain()}<br>
@@ -53,7 +62,7 @@
 <b>Range:</b> <a href="${model.getRange()}">${model.getRange()}</a><br>
 </c:otherwise>
 </c:choose>
-<b>Comment:</b> ${model.getComment()}<br>
+<b>Comment:</b>${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
 <br>
 <!-- SUB PROPS -->
     <c:if test = "${model.getAllSubProps().size()>0}">
@@ -64,7 +73,7 @@
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
-            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}</td></tr>
+            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
             <tr><td><b>Range:</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
             </table><br>          
@@ -81,7 +90,7 @@
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfType()}">${prop.getRdfType()}</a></td></tr>
-            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}</td></tr>
+            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomain()}">${prop.getDomain()}</a></td></tr>            
             <tr><td><b>Range:</b></td><td> <a href="${prop.getRange()}">${prop.getRange()}</a></td></tr>
             </table><br>          
