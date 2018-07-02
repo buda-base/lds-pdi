@@ -44,14 +44,14 @@
 </head>
 <body>
 <h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
-<b>Type:</b> <a href="${model.getRdfTypeUri()}">${model.getRdfType()}</a><br>
+<b>Type:</b><a href="${model.getRdfTypeUri()}"> ${model.getRdfType()}</a><br>
 <b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
 <b>Domain:</b> ${model.getDomain()}<br>
 </c:when>
 <c:otherwise>
-<b>Domain:</b> <a href="${model.getDomainUri()}">${model.getDomain()}</a><br>
+<b>Domain:</b> <a href="${model.getDomainUri()}"> ${model.getDomain()}</a><br>
 </c:otherwise>
 </c:choose>
 <c:choose>
@@ -59,10 +59,10 @@
 <b>Range:</b> ${model.getRange()}<br>
 </c:when>
 <c:otherwise>
-<b>Range:</b> <a href="${model.getRangeUri()}">${model.getRange()}</a><br>
+<b>Range:</b><a href="${model.getRangeUri()}"> ${model.getRange()}</a><br>
 </c:otherwise>
 </c:choose>
-<b>Comment:</b>${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
+<b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
 <br>
 <!-- SUB PROPS -->
     <c:if test = "${model.getAllSubProps().size()>0}">
@@ -73,10 +73,10 @@
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfTypeUri()}">${prop.getRdfType()}</a></td></tr>
-            <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
+            <tr><td><b>Label:</b></td><td>${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
 				<c:when test="${prop.isDomainInherited()}">
-				<tr><td><b>Domain:</b></td><td> ${prop.getDomain()}</td></tr>
+				<tr><td><b>Domain:</b></td><td>${prop.getDomain()}</td></tr>
 				</c:when>
 				<c:otherwise>
                 <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomainUri()}">${prop.getDomain()}</a></td></tr>
@@ -84,7 +84,7 @@
             </c:choose> 
             <c:choose>
 				<c:when test="${prop.isRangeInherited()}">
-				<tr><td><b>Range:</b></td><td> ${prop.getRange()}</td></tr>
+				<tr><td><b>Range:</b></td><td>${prop.getRange()}</td></tr>
 				</c:when>
 				<c:otherwise>           
                 <tr><td><b>Range:</b></td><td> <a href="${prop.getRangeUri()}">${prop.getRange()}</a></td></tr>
@@ -107,7 +107,7 @@
             <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
                 <c:when test="${prop.isDomainInherited()}">
-                <tr><td><b>Domain:</b></td><td> ${prop.getDomain()}</td></tr>
+                <tr><td><b>Domain:</b></td><td>${prop.getDomain()}</td></tr>
                 </c:when>
                 <c:otherwise>
                 <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomainUri()}">${prop.getDomain()}</a></td></tr>
@@ -115,7 +115,7 @@
             </c:choose>            
             <c:choose>
                 <c:when test="${prop.isRangeInherited()}">
-                <tr><td><b>Range:</b></td><td> ${prop.getRange()}</td></tr>
+                <tr><td><b>Range:</b></td><td>${prop.getRange()}</td></tr>
                 </c:when>
                 <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> <a href="${prop.getRangeUri()}">${prop.getRange()}</a></td></tr>
