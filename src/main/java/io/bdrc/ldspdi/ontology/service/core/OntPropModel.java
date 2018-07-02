@@ -28,10 +28,13 @@ public class OntPropModel {
     public String uri;
     public String name;
     public String rdfType;
+    public String rdfTypeUri;
     public String label;
     public String labelLang;
     public String range;
+    public String rangeUri;
     public String domain;
+    public String domainUri;
     public String comment;
     public String commentLang;
     
@@ -45,10 +48,12 @@ public class OntPropModel {
             String pred=st.getPredicate().getURI();            
             switch(pred) {
                 case DOMAIN:
-                    this.domain=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
+                    this.domainUri=st.getObject().asNode().getURI();
+                    this.domain=OntData.ontMod.shortForm(domainUri);
                     break;
                 case RANGE:
-                    this.range=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
+                    this.rangeUri=st.getObject().asNode().getURI();
+                    this.range=OntData.ontMod.shortForm(rangeUri);
                     break;
                 case LABEL:
                     this.label=st.getObject().asLiteral().getString();
@@ -59,7 +64,8 @@ public class OntPropModel {
                     this.commentLang=st.getObject().asLiteral().getLanguage();
                     break;
                 case TYPE:
-                    this.rdfType=OntData.ontMod.shortForm(st.getObject().asNode().getURI());
+                    this.rdfTypeUri=st.getObject().asNode().getURI();
+                    this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
                     break;
             }
         } 
@@ -131,6 +137,18 @@ public class OntPropModel {
 
     public String getCommentLang() {
         return commentLang;
+    }
+
+    public String getRdfTypeUri() {
+        return rdfTypeUri;
+    }
+
+    public String getRangeUri() {
+        return rangeUri;
+    }
+
+    public String getDomainUri() {
+        return domainUri;
     }
 
     @Override

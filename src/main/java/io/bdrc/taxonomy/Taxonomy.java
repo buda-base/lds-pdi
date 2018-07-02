@@ -147,7 +147,7 @@ public class Taxonomy {
                                       HashSet<String> tops,
                                       HashMap<String,HashSet<String>> Wtopics,
                                       HashMap<String,HashSet<String>> WorkBranch,
-                                      HashMap<String,Integer> topics) {
+                                      HashMap<String,Integer> topics) {        
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
         if (tmp==null) {
