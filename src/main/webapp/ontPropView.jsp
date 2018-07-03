@@ -44,14 +44,14 @@
 </head>
 <body>
 <h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
-<b>Type:</b><a href="${model.getRdfTypeUri()}"> ${model.getRdfType()}</a><br>
+<b>Type:</b> <a href="${model.getRdfTypeUri()}">${model.getRdfType()}</a><br>
 <b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
 <b>Domain:</b> ${model.getDomain()}<br>
 </c:when>
 <c:otherwise>
-<b>Domain:</b> <a href="${model.getDomainUri()}"> ${model.getDomain()}</a><br>
+<b>Domain:</b> <a href="${model.getDomainUri()}">${model.getDomain()}</a><br>
 </c:otherwise>
 </c:choose>
 <c:choose>
@@ -59,7 +59,7 @@
 <b>Range:</b> ${model.getRange()}<br>
 </c:when>
 <c:otherwise>
-<b>Range:</b><a href="${model.getRangeUri()}"> ${model.getRange()}</a><br>
+<b>Range:</b> <a href="${model.getRangeUri()}">${model.getRange()}</a><br>
 </c:otherwise>
 </c:choose>
 <b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
