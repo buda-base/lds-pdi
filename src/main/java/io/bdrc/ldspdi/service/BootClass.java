@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.RestException;
@@ -46,13 +47,17 @@ public class BootClass implements javax.servlet.ServletContextListener{
             
             String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
             String queryPath=arg0.getServletContext().getInitParameter("queryPath");
+            String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
             HashMap<String,String> params=new HashMap<>();            
             params.put(QueryConstants.QUERY_PATH,queryPath);
-            params.put("fusekiUrl",fuseki);            
+            params.put("fusekiUrl",fuseki);
+            params.put("propertyPath",propertyPath);
+            log.info("QUERY PATH >> "+queryPath);
             GitService.update(queryPath);
             ServiceConfig.init(params); 
             OntData.init();
             TaxModel.init();
+            RdfAuthModel.init();
         } 
         catch (IllegalArgumentException e) {
             log.error("BootClass init error", e);

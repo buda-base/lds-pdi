@@ -235,7 +235,19 @@
         <groupId>jstl</groupId>
         <artifactId>jstl</artifactId>
     <version>1.2</version>
-    </dependency>    
+    </dependency> 
+    <!-- https://mvnrepository.com/artifact/com.auth0/auth0 -->
+    <dependency>
+        <groupId>com.auth0</groupId>
+        <artifactId>auth0</artifactId>
+        <version>1.7.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+    <dependency>
+        <groupId>com.auth0</groupId>
+        <artifactId>java-jwt</artifactId>
+        <version>3.4.0</version>
+    </dependency>   
  </dependencies>
   <build>
     <finalName>lds-pdi</finalName>

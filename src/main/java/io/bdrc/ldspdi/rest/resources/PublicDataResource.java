@@ -53,6 +53,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -307,6 +308,15 @@ public class PublicDataResource {
             builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
         }
         return builder.build();                
+    }
+    
+    @GET
+    @Path("/authmodel")
+    public Response getAuthModel(@Context Request request) {        
+        log.info("Call to getOntologyHomePage()"); 
+        return Response.ok(ResponseOutputStream.getModelStream(
+                RdfAuthModel.getFullModel()),MediaTypeUtils.getMediaTypeFromExt("ttl"))
+                .build();                 
     }
     
     @POST

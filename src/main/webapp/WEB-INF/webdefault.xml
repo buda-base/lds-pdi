@@ -30,7 +30,11 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     </context-param>
     <context-param>
         <param-name>queryPath</param-name>
-        <param-value>PATH_TO_LDS_QUERIES</param-value>
+        <param-value>/home/marc/lds-queries/</param-value>
+    </context-param>
+    <context-param>
+        <param-name>propertyPath</param-name>
+        <param-value>/home/marc/</param-value>
     </context-param>        
 </web-app>
 
