@@ -320,6 +320,16 @@ public class PublicDataResource {
     }
     
     @POST
+    @Path("/callbacks/github/bdrc-auth") 
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateAuthModel() throws RestException{        
+        log.info("updating Auth model() >>");
+        Thread t=new Thread(new RdfAuthModel());
+        t.start(); 
+        return Response.ok("Auth Model was updated").build();       
+    }
+    
+    @POST
     @Path("/callbacks/github/owl-schema") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException{        

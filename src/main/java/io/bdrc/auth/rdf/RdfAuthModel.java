@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.model.AuthModel;
 
-public class RdfAuthModel {
+public class RdfAuthModel implements Runnable{
     
     static Model authMod; 
     static AuthModel auth;
@@ -32,6 +32,7 @@ public class RdfAuthModel {
             stream.close();
             auth=new AuthModel(authMod);
             authMod.add(auth.getModel());
+            log.info("Done updating rdfAuth Model"); 
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
         }
@@ -48,6 +49,11 @@ public class RdfAuthModel {
     public static void main(String[] args) {
         RdfAuthModel.init();
         RdfAuthModel.authMod.write(System.out,"TURTLE");
+    }
+
+    @Override
+    public void run() {
+        init();        
     }
     
 
