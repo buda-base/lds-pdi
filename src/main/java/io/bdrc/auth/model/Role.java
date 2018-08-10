@@ -24,15 +24,15 @@ public class Role {
     Model model;
     
     public Role(JsonNode json) throws JsonProcessingException {
-        id=json.findValue("_id").asText();
-        name=json.findValue("name").asText();
-        desc=json.findValue("description").asText();
-        appType=json.findValue("applicationType").asText();
-        appId=json.findValue("applicationId").asText();
+        id=getJsonValue(json,"_id");
+        name=getJsonValue(json,"name");
+        desc=getJsonValue(json,"description");
+        appType=getJsonValue(json,"applicationType");
+        appId=getJsonValue(json,"applicationId");
         permissions=new ArrayList<>();
         ArrayNode array=(ArrayNode)json.findValue("permissions");
         if(array!=null) {
-            Iterator<JsonNode> it=(array).iterator();
+            Iterator<JsonNode> it=array.iterator();
             while(it.hasNext()) {
                 permissions.add(it.next().asText());
             }
@@ -40,6 +40,14 @@ public class Role {
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         model=buildModel();
+    }
+    
+    String getJsonValue(JsonNode json,String key) {
+        JsonNode tmp=json.findValue(key);
+        if(tmp!=null) {
+            return tmp.asText();
+        }
+        return "";
     }
     
     Model buildModel() {

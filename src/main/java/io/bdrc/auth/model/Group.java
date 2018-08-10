@@ -23,9 +23,9 @@ public class Group {
     Model model;
     
     public Group(JsonNode json) throws IOException {        
-        id=json.findValue("_id").asText();
-        name=json.findValue("name").asText();
-        desc=json.findValue("description").asText();
+        id=getJsonValue(json,"_id");
+        name=getJsonValue(json,"name");
+        desc=getJsonValue(json,"description");
         members=new ArrayList<>();
         ArrayNode array=(ArrayNode)json.findValue("members");
         if(array!=null) {
@@ -45,6 +45,14 @@ public class Group {
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         model=buildModel();
+    }
+    
+    String getJsonValue(JsonNode json,String key) {
+        JsonNode tmp=json.findValue(key);
+        if(tmp!=null) {
+            return tmp.asText();
+        }
+        return "";
     }
     
     Model buildModel() {

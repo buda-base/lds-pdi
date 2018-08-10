@@ -53,7 +53,7 @@ public class AuthModel {
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         response.getEntity().writeTo(baos);
-        String json_resp=baos.toString();
+        String json_resp=baos.toString();        
         baos.close();
         JsonNode node=mapper.readTree(json_resp);
         String token=node.findValue("access_token").asText();

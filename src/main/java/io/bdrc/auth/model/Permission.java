@@ -20,14 +20,22 @@ public class Permission {
     Model model;
     
     public Permission(JsonNode json) throws JsonProcessingException {
-        id=json.findValue("_id").asText();
-        name=json.findValue("name").asText();
-        desc=json.findValue("description").asText();
-        appType=json.findValue("applicationType").asText();
-        appId=json.findValue("applicationId").asText();
+        id=getJsonValue(json,"_id");
+        name=getJsonValue(json,"name");
+        desc=getJsonValue(json,"description");
+        appType=getJsonValue(json,"applicationType");
+        appId=getJsonValue(json,"applicationId");
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         model=buildModel();
+    }
+    
+    String getJsonValue(JsonNode json,String key) {
+        JsonNode tmp=json.findValue(key);
+        if(tmp!=null) {
+            return tmp.asText();
+        }
+        return "";
     }
     
     Model buildModel() {

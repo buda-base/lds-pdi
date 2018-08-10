@@ -21,13 +21,13 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 @PreMatching
 public class RdfAuthFilter implements ContainerRequestFilter {
     
-    public final static Logger log=LoggerFactory.getLogger(AuthFilter.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(RdfAuthFilter.class.getName());
     AuthModel auth=RdfAuthModel.getAuthModel();
  
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
         
-        /*String path=ctx.getUriInfo().getPath();
+        String path=ctx.getUriInfo().getPath();
         log.info("SecuredEndpoint paths >> "+auth.getPaths().contains(path.trim()));
         log.info("IsSecuredEndpoint >> "+path+ " >> "+auth.isSecuredEndpoint(path));
         if(auth.isSecuredEndpoint(path)) {
@@ -50,7 +50,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
                 ctx.setProperty("endpoint", auth.getEndpoint(path));
                 ctx.setProperty("user", validation.getUser());
             }
-        }*/
+        }
     }
     
     void abort(ContainerRequestContext ctx) {

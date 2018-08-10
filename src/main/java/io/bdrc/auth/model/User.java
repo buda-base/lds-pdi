@@ -17,9 +17,9 @@ public class User {
     Model model;
     
     public User(JsonNode json) throws JsonProcessingException {
-        id=json.findValue("user_id").asText();
-        name=json.findValue("name").asText();
-        email=json.findValue("email").asText();
+        id=getJsonValue(json,"user_id");
+        name=getJsonValue(json,"name");
+        email=getJsonValue(json,"email");
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         model=buildModel();
@@ -44,6 +44,14 @@ public class User {
                 ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasEmail"), 
                 ResourceFactory.createPlainLiteral(email)));
         return model;
+    }
+    
+    String getJsonValue(JsonNode json,String key) {
+        JsonNode tmp=json.findValue(key);
+        if(tmp!=null) {
+            return tmp.asText();
+        }
+        return "";
     }
     
     public Model getModel() {

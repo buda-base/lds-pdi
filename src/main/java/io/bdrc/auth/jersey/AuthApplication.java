@@ -5,7 +5,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class AuthApplication extends ResourceConfig {
     
     public AuthApplication() {
-        register(AuthFilter.class);
+        register(RdfAuthFilter.class);
     }
 
 }

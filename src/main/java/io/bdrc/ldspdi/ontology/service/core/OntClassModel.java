@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
-import java.util.AbstractMap;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
