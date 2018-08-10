@@ -61,7 +61,7 @@ public class DocFileModel {
 
     public static ArrayList<String> getQueryTemplates() throws RestException {
         ArrayList<String> files=new ArrayList<>();
-        Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");      
+        Path dpath = Paths.get(ServiceConfig.getProperty("queryPath")+"public");      
         if (Files.isDirectory(dpath)) { 
             String tmp=null;
             try {

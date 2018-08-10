@@ -45,14 +45,13 @@ public class BootClass implements javax.servlet.ServletContextListener{
     public void contextInitialized(ServletContextEvent arg0) {
         try {
             
-            String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
-            String queryPath=arg0.getServletContext().getInitParameter("queryPath");
-            String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
+            final String fuseki=arg0.getServletContext().getInitParameter("fuseki");            
+            final String queryPath=arg0.getServletContext().getInitParameter("queryPath");
+            final String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
             HashMap<String,String> params=new HashMap<>();            
-            params.put(QueryConstants.QUERY_PATH,queryPath);
+            params.put("queryPath",queryPath);
             params.put("fusekiUrl",fuseki);
             params.put("propertyPath",propertyPath);
-            log.info("QUERY PATH >> "+queryPath);
             GitService.update(queryPath);
             ServiceConfig.init(params); 
             OntData.init();

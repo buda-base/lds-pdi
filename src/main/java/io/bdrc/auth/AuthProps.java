@@ -19,7 +19,6 @@ public class AuthProps {
             props.load(input);
             input.close();            
             String propFile=ServiceConfig.getProperty("propertyPath")+props.getProperty("testPropFile");
-            System.out.println("PATH >> "+ServiceConfig.getProperty("propertyPath"));
             InputStream authInput = new FileInputStream(propFile);
             authProp.load(authInput);
             authInput.close();
@@ -30,7 +29,7 @@ public class AuthProps {
     }
     
     public static String getProperty(String prop) {
-        ServiceConfig.initForTests();
+        
         return authProp.getProperty(prop);
     }
     

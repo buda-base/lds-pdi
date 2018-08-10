@@ -30,38 +30,38 @@ import org.slf4j.LoggerFactory;
 
 
 public class ServiceConfig {
-	
-	static Properties prop = new Properties();	
-	public static HashMap<String,String> params;
-	public final static String FUSEKI_URL="fusekiUrl";
-	public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
-	
-	public static void init(HashMap<String,String> params) {
-	    ServiceConfig.params=params;
-	    
-	    try {
-			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
-			// load a properties file
-			prop.load(input);
-			input.close();
-			/** 
-			 * sets the PROD values of fuseki and queryPath properties 
-			 * Overrides test queryPath value			 * 
-			**/
-			Set<String> set=params.keySet();
+    
+    static Properties prop = new Properties();  
+    public static HashMap<String,String> params;
+    public final static String FUSEKI_URL="fusekiUrl";
+    public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
+    
+    public static void init(HashMap<String,String> params) {
+        ServiceConfig.params=params;
+        
+        try {
+            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            // load a properties file
+            prop.load(input);
+            input.close();
+            /** 
+             * sets the PROD values of fuseki and queryPath properties 
+             * Overrides test queryPath value            * 
+            **/
+            Set<String> set=params.keySet();
             for(String st:set) {
                 prop.setProperty(st, params.get(st));
             } 
-			InputStream in = ServiceConfig.class.getClassLoader().getResourceAsStream("taxTreeContext.jsonld");
-			in.close();
-			
-	    } catch (IOException ex) {
-		    log.error("ServiceConfig init error", ex);
-			ex.printStackTrace();
-		}
-	}
-	
-	public static void initForTests() {
+            InputStream in = ServiceConfig.class.getClassLoader().getResourceAsStream("taxTreeContext.jsonld");
+            in.close();
+            
+        } catch (IOException ex) {
+            log.error("ServiceConfig init error", ex);
+            ex.printStackTrace();
+        }
+    }
+    
+    public static void initForTests() {
         
         try {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
@@ -72,14 +72,14 @@ public class ServiceConfig {
             ex.printStackTrace();
         }
     }
-	
-	public static String getProperty(String key){
-		return prop.getProperty(key);
-	}
-	
+    
+    public static String getProperty(String key){
+        return prop.getProperty(key);
+    }
+    
     public static String getRobots() {
-	    return "User-agent: *"+System.lineSeparator()+"Disallow: /";
-	}
-	
-	
+        return "User-agent: *"+System.lineSeparator()+"Disallow: /";
+    }
+    
+    
 }
