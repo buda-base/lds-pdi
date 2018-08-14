@@ -53,7 +53,7 @@ public class AuthModel {
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         response.getEntity().writeTo(baos);
-        String json_resp=baos.toString();        
+        String json_resp=baos.toString();
         baos.close();
         JsonNode node=mapper.readTree(json_resp);
         String token=node.findValue("access_token").asText();
@@ -146,7 +146,7 @@ public class AuthModel {
         paths=new ArrayList<>();
         Triple t=new Triple(org.apache.jena.graph.Node.ANY,
                 NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                NodeFactory.createURI("http://purl.bdrc.io/ontology/core/Endpoint"));
+                NodeFactory.createURI("http://purl.bdrc.io/ontology/ext/auth/Endpoint"));
         ExtendedIterator<Triple> ext=authMod.getGraph().find(t);
         //System.out.println("TRIPLE LIST >>> "+ext.toList());
         while(ext.hasNext()) {

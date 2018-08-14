@@ -9,12 +9,12 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 
 public class Endpoint {
     
-    public final static String APP="http://purl.bdrc.io/auth/app";
-    public final static String APPID="http://purl.bdrc.io/auth/appId";
-    public final static String PATH="http://purl.bdrc.io/auth/path";
-    public final static String ROLE="http://purl.bdrc.io/auth/forRole";
-    public final static String GROUP="http://purl.bdrc.io/auth/forGroup";
-    public final static String PERM="http://purl.bdrc.io/auth/forPerm";
+    public final static String APP="http://purl.bdrc.io/ontology/ext/auth/appType";
+    public final static String APPID="http://purl.bdrc.io/ontology/ext/auth/appId";
+    public final static String PATH="http://purl.bdrc.io/ontology/ext/auth/path";
+    public final static String ROLE="http://purl.bdrc.io/ontology/ext/auth/forRole";
+    public final static String GROUP="http://purl.bdrc.io/ontology/ext/auth/forGroup";
+    public final static String PERM="http://purl.bdrc.io/ontology/ext/auth/forPermission";
     
     String applicationId;
     String path;

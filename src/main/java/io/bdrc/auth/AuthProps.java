@@ -28,8 +28,7 @@ public class AuthProps {
         }
     }
     
-    public static String getProperty(String prop) {
-        
+    public static String getProperty(String prop) {        
         return authProp.getProperty(prop);
     }
     

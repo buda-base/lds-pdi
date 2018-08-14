@@ -26,6 +26,7 @@ public class RdfAuthModel implements Runnable{
             log.info("URL >> "+AuthProps.getPublicProperty("policiesUrl"));
             HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getPublicProperty("policiesUrl")).openConnection();
             InputStream stream=connection.getInputStream();
+            //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("fullModel.ttl");    
             authMod = ModelFactory.createDefaultModel();
             //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("fullModel.ttl");           
             authMod.read(stream, "", "TURTLE");

@@ -16,7 +16,7 @@ public class User {
     String asJson;
     Model model;
     
-    public User(JsonNode json) throws JsonProcessingException {
+    public User(JsonNode json) throws JsonProcessingException {        
         id=getJsonValue(json,"user_id");
         name=getJsonValue(json,"name");
         email=getJsonValue(json,"email");
@@ -28,20 +28,20 @@ public class User {
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
                 ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/core/User")));
+                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/User")));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/id"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/authId"), 
                 ResourceFactory.createPlainLiteral(id)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasName"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/name"), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasEmail"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/email"), 
                 ResourceFactory.createPlainLiteral(email)));
         return model;
     }

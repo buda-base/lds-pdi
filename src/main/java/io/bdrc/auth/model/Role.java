@@ -53,33 +53,33 @@ public class Role {
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
                 ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/core/Role")));
+                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ontology/ext/auth/Role")));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/id"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/id"), 
                 ResourceFactory.createPlainLiteral(id)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasName"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/name"), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasDesc"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc"), 
                 ResourceFactory.createPlainLiteral(desc)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/appType"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType"), 
                 ResourceFactory.createPlainLiteral(appType)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/auth/appId"), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
                 ResourceFactory.createPlainLiteral(appId)));
         for(String perm: permissions) {
             model.add(ResourceFactory.createStatement(
-                    ResourceFactory.createResource("http://purl.bdrc.io/resource/"+id), 
-                    ResourceFactory.createProperty("http://purl.bdrc.io/auth/hasMember"), 
+                    ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                    ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasMember"), 
                     ResourceFactory.createPlainLiteral(perm)));
         }
         return model;

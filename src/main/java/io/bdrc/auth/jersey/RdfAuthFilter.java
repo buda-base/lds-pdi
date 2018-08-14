@@ -27,7 +27,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
         
-        /*String path=ctx.getUriInfo().getPath();
+        String path=ctx.getUriInfo().getPath();
         log.info("SecuredEndpoint paths >> "+auth.getPaths().contains(path.trim()));
         log.info("IsSecuredEndpoint >> "+path+ " >> "+auth.isSecuredEndpoint(path));
         if(auth.isSecuredEndpoint(path)) {
@@ -50,7 +50,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
                 ctx.setProperty("endpoint", auth.getEndpoint(path));
                 ctx.setProperty("user", validation.getUser());
             }
-        }*/
+        }
     }
     
     void abort(ContainerRequestContext ctx) {
