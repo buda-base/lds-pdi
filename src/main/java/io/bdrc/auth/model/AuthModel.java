@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -34,6 +36,7 @@ public class AuthModel {
     ArrayList<Permission> permissions;
     ArrayList<User> users;
     ArrayList<Endpoint> endpoints;
+    ArrayList<Application> apps;
     ArrayList<String> paths;
     Model model;
     
@@ -44,7 +47,7 @@ public class AuthModel {
         json.put("grant_type","client_credentials");
         json.put("client_id",AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret",AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience","urn:auth0-authz-api"); 
+        json.put("audience","urn:auth0-authz-api");
         ObjectMapper mapper=new ObjectMapper();
         String post_data=mapper.writer().writeValueAsString(json);
         StringEntity se = new StringEntity(post_data);
@@ -53,7 +56,7 @@ public class AuthModel {
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         response.getEntity().writeTo(baos);
-        String json_resp=baos.toString();
+        String json_resp=baos.toString();        
         baos.close();
         JsonNode node=mapper.readTree(json_resp);
         String token=node.findValue("access_token").asText();
@@ -63,6 +66,45 @@ public class AuthModel {
         setPermissions(token);
         setUsers(token);
         setEndpoints(authMod);
+        //Apps require a call with a different audience
+        client=HttpClientBuilder.create().build();
+        post=new HttpPost("https://bdrc-io.auth0.com/oauth/token");
+        json = new HashMap<>();
+        json.put("grant_type","client_credentials");
+        json.put("client_id",AuthProps.getProperty("lds-pdiClientID"));
+        json.put("client_secret",AuthProps.getProperty("lds-pdiClientSecret"));
+        json.put("audience","https://bdrc-io.auth0.com/api/v2/");
+        post_data=mapper.writer().writeValueAsString(json);
+        se = new StringEntity(post_data);
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        post.setEntity(se);
+        response = client.execute(post);
+        baos=new ByteArrayOutputStream();
+        response.getEntity().writeTo(baos);
+        json_resp=baos.toString();        
+        baos.close();
+        node=mapper.readTree(json_resp);
+        token=node.findValue("access_token").asText();
+        setApps(token);
+    }
+    
+    private void setApps(String token) throws ClientProtocolException, IOException {
+        apps=new ArrayList<>();
+        HttpClient client=HttpClientBuilder.create().build();
+        HttpGet get=new HttpGet("https://bdrc-io.auth0.com/api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
+        get.addHeader("Authorization", "Bearer "+token);
+        HttpResponse resp=client.execute(get);
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        resp.getEntity().writeTo(baos);
+        ObjectMapper mapper=new ObjectMapper();
+        JsonNode node=mapper.readTree(baos.toString());
+        Iterator<JsonNode> it=node.elements();
+        while(it.hasNext()) {
+            Application app=new Application(it.next());
+            apps.add(app);
+            model.add(app.getModel());
+        }
+        baos.close();
     }
     
     private void setGroups(String token) throws ClientProtocolException, IOException {

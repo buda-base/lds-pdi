@@ -37,7 +37,7 @@ public class User {
                 ResourceFactory.createPlainLiteral(id)));
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/name"), 
+                ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
