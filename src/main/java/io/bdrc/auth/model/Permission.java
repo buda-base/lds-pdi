@@ -4,6 +4,8 @@ package io.bdrc.auth.model;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,11 +42,11 @@ public class Permission {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
+                ResourceFactory.createProperty(RDF.type.getURI()), 
                 ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Permission")));
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
+                ResourceFactory.createProperty(RDFS.label.getURI()), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 

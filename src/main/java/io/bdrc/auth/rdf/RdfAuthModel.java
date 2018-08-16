@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
@@ -12,11 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.model.AuthModel;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 
 public class RdfAuthModel implements Runnable{
     
     static Model authMod; 
-    static AuthModel auth;
+    static AuthModel auth;    
     
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
         
@@ -53,7 +57,9 @@ public class RdfAuthModel implements Runnable{
 
     @Override
     public void run() {
-        init();        
+        String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        OntModel authModel=OntData.ontAuthMod;
+        QueryProcessor.updateAuthOntology(authModel, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
     }
     
 

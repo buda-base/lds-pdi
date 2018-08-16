@@ -3,6 +3,7 @@ package io.bdrc.auth.model;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.RDF;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,7 +42,7 @@ public class User {
         model.getNsPrefixMap().put("foaf", "http://xmlns.com/foaf/0.1/");
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
+                ResourceFactory.createProperty(RDF.type.getURI()), 
                 ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/User")));
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 

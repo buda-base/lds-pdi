@@ -52,7 +52,8 @@ public class OntData implements Runnable{
     
     
     public static InfModel infMod;    
-    public static OntModel ontMod;    
+    public static OntModel ontMod; 
+    public static OntModel ontAuthMod; 
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
     public static String JSONLD_CONTEXT;
     static EntityTag update;
@@ -69,6 +70,13 @@ public class OntData implements Runnable{
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m); 
             rdf10tordf11(ontMod); 
             readGithubJsonLDContext();
+            log.info("URL >> "+ServiceConfig.getProperty("owlAuthURL"));
+            connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlAuthURL")).openConnection();
+            stream=connection.getInputStream();
+            Model auth = ModelFactory.createDefaultModel();
+            auth.read(stream, "", "RDF/XML");
+            stream.close();
+            ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth); 
     
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
@@ -113,6 +121,7 @@ public class OntData implements Runnable{
             InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);            
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
             readGithubJsonLDContext();
+            
         }        
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);

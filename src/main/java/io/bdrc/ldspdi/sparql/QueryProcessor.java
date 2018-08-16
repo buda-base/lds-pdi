@@ -113,6 +113,17 @@ public class QueryProcessor {
 	    access.putModel(ServiceConfig.getProperty("ontGraph"), mod);	    
 	}
 	
+	public static void updateAuthOntology(Model mod, String fusekiUrl) {
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        log.info("Service fuseki >> "+fusekiUrl);
+        log.info("AuthGraph >> "+ServiceConfig.getProperty("authGraph"));
+        log.info("InfModel Size >> "+mod.size());       
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        access.putModel(ServiceConfig.getProperty("authGraph"), mod);         
+    }
+	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
         ResultSetWrapper res;
         
