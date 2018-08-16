@@ -1,0 +1,23 @@
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix adr:   <http://purl.bdrc.io/resource-auth/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+@prefix foaf:  <http://xmlns.com/foaf/0.1/>
+
+# BDRC-AUTH POLICIES
+
+adr:EDP2 a aut:Endpoint ;
+	aut:path "auth/rdf/private" ;
+	aut:forGroup adr:f0f95a54-56cf-4bce-bf9d-8d2df6779b60,adr:2c46df88-6302-4c9e-b7ff-52d07c3190c6, adr:e7c73ad6-9580-4c2c-bdfd-88b14bc5d266 ;
+	aut:forRole adr:7edbd29c-f4cc-43aa-819c-53e4aac0d7a5;
+	aut:app adr:WQ1WD5fRtieraybXqT9zNU342YXBIwsS .
+
+adr:EDP3 a aut:Endpoint ;
+	aut:path "auth/rdf/staff" ;
+	aut:forGroup adr:f0f95a54-56cf-4bce-bf9d-8d2df6779b60,"staff",adr:2c46df88-6302-4c9e-b7ff-52d07c3190c6 ;
+	aut:forRole adr:d1739813-e745-4336-a9cb-a493ddac7f83;
+	aut:app adr:WQ1WD5fRtieraybXqT9zNU342YXBIwsS .
+
+adr:EDP4 a aut:Endpoint ;
+	aut:path "auth/rdf/admin" ;
+	aut:forGroup adr:f0f95a54-56cf-4bce-bf9d-8d2df6779b60 ;
+	aut:app adr:WQ1WD5fRtieraybXqT9zNU342YXBIwsS .

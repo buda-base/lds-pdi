@@ -28,7 +28,6 @@ import java.util.HashMap;
 
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
-import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 

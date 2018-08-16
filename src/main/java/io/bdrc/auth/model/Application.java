@@ -31,23 +31,19 @@ public class Application {
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+appId), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId), 
                 ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
                 ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Application")));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+appId), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
-                ResourceFactory.createPlainLiteral(appId)));
-        model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+appId), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId), 
                 ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+appId), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType"), 
                 ResourceFactory.createPlainLiteral(appType)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+appId), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc"), 
                 ResourceFactory.createPlainLiteral(desc)));
         return model;

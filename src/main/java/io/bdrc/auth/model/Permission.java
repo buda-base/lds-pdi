@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Permission {
     
     String id;
-    String appType;
     String appId;
     String name;
     String desc;
@@ -23,7 +22,6 @@ public class Permission {
         id=getJsonValue(json,"_id");
         name=getJsonValue(json,"name");
         desc=getJsonValue(json,"description");
-        appType=getJsonValue(json,"applicationType");
         appId=getJsonValue(json,"applicationId");
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
@@ -41,29 +39,21 @@ public class Permission {
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
                 ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Permission")));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/id"), 
-                ResourceFactory.createPlainLiteral(id)));
-        model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc"), 
                 ResourceFactory.createPlainLiteral(desc)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType"), 
-                ResourceFactory.createPlainLiteral(appType)));
-        model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource/auth/"+id), 
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
-                ResourceFactory.createPlainLiteral(appId)));        
+                ResourceFactory.createPlainLiteral("http://purl.bdrc.io/resource-auth/"+appId)));        
         return model;
     }
 
@@ -73,14 +63,6 @@ public class Permission {
 
     public String getAsJson() {
         return asJson;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getAppType() {
-        return appType;
     }
 
     public String getAppId() {
@@ -97,7 +79,7 @@ public class Permission {
     
     @Override
     public String toString() {
-        return "Permission [id=" + id + ", appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc="
+        return "Permission [ appId=" + appId + ", name=" + name + ", desc="
                 + desc + ", asJson=" + asJson + ", model=" + model + "]";
     }
 
