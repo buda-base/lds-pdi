@@ -71,12 +71,12 @@ public class Role {
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
-                ResourceFactory.createPlainLiteral(appId)));
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId)));
         for(String perm: permissions) {
             model.add(ResourceFactory.createStatement(
                     ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                     ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasPermission"), 
-                    ResourceFactory.createPlainLiteral("http://purl.bdrc.io/resource-auth/"+perm)));
+                    ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+perm)));
         }
         return model;
     }

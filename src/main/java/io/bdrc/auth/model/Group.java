@@ -79,7 +79,7 @@ public class Group {
             model.add(ResourceFactory.createStatement(
                     ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                     ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasRole"), 
-                    ResourceFactory.createPlainLiteral("http://purl.bdrc.io/resource-auth/"+role)));
+                    ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+role)));
         }
         return model;
     }

@@ -53,7 +53,7 @@ public class Permission {
         model.add(ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
                 ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
-                ResourceFactory.createPlainLiteral("http://purl.bdrc.io/resource-auth/"+appId)));        
+                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId)));        
         return model;
     }
 
