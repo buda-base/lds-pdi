@@ -118,8 +118,13 @@ public class OntData implements Runnable{
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             log.info("OntModel Size >> "+ontMod.size());
-            InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);            
+            InfModel infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m); 
+            log.info("updating core ont model() >>");
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+            OntModel ontAuthModel=OntData.ontAuthMod;
+            log.info("updating Auth ont model() >>");
+            QueryProcessor.updateAuthOntology(ontAuthModel, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+            log.info("Done updating ont models >>");
             readGithubJsonLDContext();
             
         }        

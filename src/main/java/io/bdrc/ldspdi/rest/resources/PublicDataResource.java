@@ -323,7 +323,7 @@ public class PublicDataResource {
     @Path("/callbacks/github/bdrc-auth") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAuthModel() throws RestException{        
-        log.info("updating Auth model() >>");
+        log.info("updating Auth data model() >>");
         Thread t=new Thread(new RdfAuthModel());
         t.start(); 
         return Response.ok("Auth Model was updated").build();       
@@ -333,10 +333,10 @@ public class PublicDataResource {
     @Path("/callbacks/github/owl-schema") 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException{        
-        log.info("updating Ontology model() >>");
+        log.info("updating Ontology models() >>");
         Thread t=new Thread(new OntData());
-        t.start();               
-        return Response.ok().build();       
+        t.start();  
+        return Response.ok("Ontologies were updated").build();       
     }
     
     private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn) {

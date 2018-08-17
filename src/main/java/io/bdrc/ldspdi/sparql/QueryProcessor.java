@@ -32,6 +32,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -122,6 +123,17 @@ public class QueryProcessor {
         log.info("InfModel Size >> "+mod.size());       
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
         access.putModel(ServiceConfig.getProperty("authGraph"), mod);         
+    }
+	
+	public static void updateAuthData(String fusekiUrl) {
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        log.info("Service fuseki >> "+fusekiUrl);
+        log.info("authDataGraph >> "+ServiceConfig.getProperty("authDataGraph"));
+        log.info("authData Model Size >> "+RdfAuthModel.getFullModel().size());       
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        access.putModel(ServiceConfig.getProperty("authDataGraph"), RdfAuthModel.getFullModel());         
     }
 	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {

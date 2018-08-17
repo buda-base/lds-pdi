@@ -36,7 +36,7 @@ public class RdfAuthModel implements Runnable{
             stream.close();
             auth=new AuthModel(authMod);
             authMod.add(auth.getModel());
-            log.info("Done updating rdfAuth Model"); 
+            log.info("Done loading rdfAuth Model"); 
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);            
         }
@@ -58,8 +58,9 @@ public class RdfAuthModel implements Runnable{
     @Override
     public void run() {
         String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        OntModel authModel=OntData.ontAuthMod;
-        QueryProcessor.updateAuthOntology(authModel, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+        log.info("Updating rdfAuthData Model"); 
+        QueryProcessor.updateAuthData(fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+        log.info("Done updating rdfAuthData Model");
     }
     
 

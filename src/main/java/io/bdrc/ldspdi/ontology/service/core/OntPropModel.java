@@ -2,7 +2,6 @@ package io.bdrc.ldspdi.ontology.service.core;
 
 import java.util.ArrayList;
 
-import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
