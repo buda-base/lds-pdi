@@ -1,66 +1,37 @@
 package io.bdrc.auth.rdf;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.auth.AuthProps;
-import io.bdrc.auth.model.AuthModel;
-import io.bdrc.ldspdi.ontology.service.core.OntData;
-import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.restapi.exceptions.RestException;
 
 public class RdfAuthModel implements Runnable{
     
-    static Model authMod; 
-    static AuthModel auth;    
+    static Model authMod;       
     
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
+    public final static String query="\n SELECT ?s ?p ?o \n" + 
+            "WHERE {\n" + 
+            "  GRAPH <http://purl.bdrc.io/ontology/ext/authData> { \n" + 
+            "    ?s ?p ?o .\n" + 
+            "    }\n" + 
+            "}";
         
-    public static void init() {
-        
-        try {
-            log.info("URL >> "+AuthProps.getPublicProperty("policiesUrl"));
-            HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getPublicProperty("policiesUrl")).openConnection();
-            InputStream stream=connection.getInputStream();
-            //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
-            authMod = ModelFactory.createDefaultModel();                      
-            authMod.read(stream, "", "TURTLE");
-            stream.close();
-            auth=new AuthModel(authMod);
-            authMod.add(auth.getModel());
-            log.info("Done loading rdfAuth Model"); 
-        } catch (IOException io) {
-            log.error("Error initializing OntModel", io);            
-        }
-    }
-    
-    public static AuthModel getAuthModel() {
-        return auth;
+    public static void init() throws RestException {        
+        authMod=QueryProcessor.getAuthDataGraph(query);
     }
     
     public static Model getFullModel() {
         return authMod;
     }
         
-    public static void main(String[] args) {
-        RdfAuthModel.init();
-        RdfAuthModel.authMod.write(System.out,"TURTLE");
-    }
-
     @Override
     public void run() {
-        String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        log.info("Updating rdfAuthData Model"); 
-        QueryProcessor.updateAuthData(fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
-        log.info("Done updating rdfAuthData Model");
+        QueryProcessor.updateAuthData(null);
+        log.info("Done loading rdfAuth Model");
     }
     
 

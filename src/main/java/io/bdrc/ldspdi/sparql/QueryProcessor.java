@@ -1,8 +1,13 @@
 package io.bdrc.ldspdi.sparql;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Objects;
 
+import org.apache.http.client.ClientProtocolException;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 
@@ -31,7 +36,9 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
+import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
@@ -70,11 +77,14 @@ public class QueryProcessor {
 	public static Model getGraph(String query,String fusekiUrl, String prefixes) throws RestException{           
 	    if(prefixes==null) {
             prefixes=loadPrefixes();
-        }	    
+        }
+	    if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
         int hash=Objects.hashCode(query);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
-            Query q=QueryFactory.create(prefixes+" "+query);
+            Query q=QueryFactory.create(prefixes+" "+query);            
             QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
             model = qe.execConstruct();
@@ -82,6 +92,17 @@ public class QueryProcessor {
             ResultsCache.addToCache(model, hash);
         }
         return model;       
+    }
+	
+	public static Model getAuthDataGraph(String query) throws RestException{  
+	    
+        String prefixes=loadPrefixes();
+        String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        Query q=QueryFactory.create(prefixes+" "+query);
+        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        Model m=access.getModel(ServiceConfig.getProperty("authDataGraph"));
+        return m;        
     }
 		
 	public static QueryExecution getResultSet(String query,String fusekiUrl){               
@@ -121,7 +142,7 @@ public class QueryProcessor {
         log.info("Service fuseki >> "+fusekiUrl);
         log.info("AuthGraph >> "+ServiceConfig.getProperty("authGraph"));
         log.info("InfModel Size >> "+mod.size());       
-        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);        
         access.putModel(ServiceConfig.getProperty("authGraph"), mod);         
     }
 	
@@ -129,11 +150,17 @@ public class QueryProcessor {
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
+        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         log.info("Service fuseki >> "+fusekiUrl);
-        log.info("authDataGraph >> "+ServiceConfig.getProperty("authDataGraph"));
-        log.info("authData Model Size >> "+RdfAuthModel.getFullModel().size());       
+        log.info("authDataGraph >> "+ServiceConfig.getProperty("authDataGraph"));              
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        access.putModel(ServiceConfig.getProperty("authDataGraph"), RdfAuthModel.getFullModel());         
+        try {
+            AuthDataModelBuilder auth=new AuthDataModelBuilder();
+            access.putModel(ServiceConfig.getProperty("authDataGraph"), auth.getModel());  
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }      
     }
 	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
@@ -194,7 +221,9 @@ public class QueryProcessor {
                     " PREFIX text: <http://jena.apache.org/text#>\n" + 
                     " PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" + 
                     " PREFIX dcterms: <http://purl.org/dc/terms/>\n" + 
-                    " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>";
+                    " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>"+
+                    " PREFIX aut:   <http://purl.bdrc.io/ontology/ext/auth/>"+
+                    " PREFIX adr:   <http://purl.bdrc.io/resource-auth/>";
         }
 	}
 }

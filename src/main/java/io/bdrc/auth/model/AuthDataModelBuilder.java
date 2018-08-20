@@ -2,6 +2,9 @@ package io.bdrc.auth.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +23,8 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bdrc.auth.AuthProps;
 
 
-public class AuthModel {
+public class AuthDataModelBuilder {
     
     ArrayList<Group> groups;
     ArrayList<Role> roles;
@@ -38,7 +43,16 @@ public class AuthModel {
     ArrayList<String> paths;
     Model model;
     
-    public AuthModel(Model authMod) throws ClientProtocolException, IOException {
+    public final static Logger log=LoggerFactory.getLogger(AuthDataModelBuilder.class.getName());
+    
+    public AuthDataModelBuilder() throws ClientProtocolException, IOException {
+        log.info("URL >> "+AuthProps.getPublicProperty("policiesUrl"));
+        HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getPublicProperty("policiesUrl")).openConnection();
+        InputStream stream=connection.getInputStream();
+        //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
+        Model authMod = ModelFactory.createDefaultModel();                      
+        authMod.read(stream, "", "TURTLE");
+        stream.close();
         HttpClient client=HttpClientBuilder.create().build();
         HttpPost post=new HttpPost("https://bdrc-io.auth0.com/oauth/token");
         HashMap<String,String> json = new HashMap<>();
@@ -59,6 +73,7 @@ public class AuthModel {
         JsonNode node=mapper.readTree(json_resp);
         String token=node.findValue("access_token").asText();
         model=ModelFactory.createDefaultModel();
+        model.add(authMod);
         setGroups(token);
         setRoles(token);
         setPermissions(token);
@@ -188,7 +203,6 @@ public class AuthModel {
                 NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                 NodeFactory.createURI("http://purl.bdrc.io/ontology/ext/auth/Endpoint"));
         ExtendedIterator<Triple> ext=authMod.getGraph().find(t);
-        //System.out.println("TRIPLE LIST >>> "+ext.toList());
         while(ext.hasNext()) {
             String st=ext.next().getSubject().getURI();
             Endpoint end=new Endpoint(authMod,st);

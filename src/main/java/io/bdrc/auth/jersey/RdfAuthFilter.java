@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.auth.Access;
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.TokenValidation;
-import io.bdrc.auth.model.AuthModel;
+import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.rdf.RdfAuthModel;
 
 @Provider
@@ -22,13 +22,13 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 public class RdfAuthFilter implements ContainerRequestFilter {
     
     public final static Logger log=LoggerFactory.getLogger(RdfAuthFilter.class.getName());
-    AuthModel auth=RdfAuthModel.getAuthModel();
+    //AuthDataModelBuilder auth=RdfAuthModel.getAuthModel();
  
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
         
         String path=ctx.getUriInfo().getPath();
-        log.info("SecuredEndpoint paths >> "+auth.getPaths().contains(path.trim()));
+        /*log.info("SecuredEndpoint paths >> "+auth.getPaths().contains(path.trim()));
         log.info("IsSecuredEndpoint >> "+path+ " >> "+auth.isSecuredEndpoint(path));
         if(auth.isSecuredEndpoint(path)) {
             //log.info("Prematching filter headers >> "+token);
@@ -50,7 +50,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
                 ctx.setProperty("endpoint", auth.getEndpoint(path));
                 ctx.setProperty("user", validation.getUser());
             }
-        }
+        }*/
     }
     
     void abort(ContainerRequestContext ctx) {

@@ -26,7 +26,6 @@ public class Application {
         appId=getJsonValue(json,"client_id");
         ObjectMapper mapper = new ObjectMapper();
         asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        System.out.println("APPS >>"+asJson);
         model=buildModel();
     }
     

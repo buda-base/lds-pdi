@@ -64,16 +64,16 @@ public class AuthTestResource {
     @Path("/auth/rdf/public")       
     public Response authRdfPublicTest(@Context ContainerRequestContext crc) {
         log.info("auth/rdf/public ENDPOINT PATH>> "+crc.getUriInfo().getPath());
-        log.info("auth/rdf/public ENDPOINT >> "+RdfAuthModel.getAuthModel().getEndpoint(crc.getUriInfo().getPath()));
+        //log.info("auth/rdf/public ENDPOINT >> "+RdfAuthModel.getAuthModel().getEndpoint(crc.getUriInfo().getPath()));
         return Response.status(200).entity("test auth rdf public done").header("Content-Type", "text/html").build();
     }
     
     @GET 
     @Path("/auth/rdf/private")       
     public Response authRdfPrivateTest(@Context ContainerRequestContext crc) {
-        log.info("auth/rdf/private ENDPOINTS >> "+RdfAuthModel.getAuthModel().getEndpoints());
+        //log.info("auth/rdf/private ENDPOINTS >> "+RdfAuthModel.getAuthModel().getEndpoints());
         log.info("auth/rdf/private ENDPOINT PATH>> "+crc.getUriInfo().getPath());
-        log.info("auth/rdf/private ENDPOINT >> "+RdfAuthModel.getAuthModel().getEndpoint(crc.getUriInfo().getPath()));       
+        //log.info("auth/rdf/private ENDPOINT >> "+RdfAuthModel.getAuthModel().getEndpoint(crc.getUriInfo().getPath()));       
         return Response.status(200).entity("test auth rdf private done").header("Content-Type", "text/html").build();         
     }
     
