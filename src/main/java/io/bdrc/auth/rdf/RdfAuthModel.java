@@ -22,6 +22,7 @@ public class RdfAuthModel implements Runnable{
         
     public static void init() throws RestException {        
         authMod=QueryProcessor.getAuthDataGraph(query);
+        authMod.write(System.out,"TURTLE");
     }
     
     public static Model getFullModel() {
@@ -31,6 +32,12 @@ public class RdfAuthModel implements Runnable{
     @Override
     public void run() {
         QueryProcessor.updateAuthData(null);
+        try {
+            init();
+        } catch (RestException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         log.info("Done loading rdfAuth Model");
     }
     
