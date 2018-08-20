@@ -49,6 +49,15 @@ public class Group {
         model=buildModel();
     }
     
+    public Group() {
+        id="";
+        name="";
+        desc="";
+        asJson="";
+        members=new ArrayList<>();
+        roles=new ArrayList<>();
+    }
+
     String getJsonValue(JsonNode json,String key) {
         JsonNode tmp=json.findValue(key);
         if(tmp!=null) {
@@ -94,6 +103,26 @@ public class Group {
     public String toString() {
         return "Group [id=" + id + ", name=" + name + ", desc=" + desc + ", members=" + members + ", roles=" + roles
                 + ", asJson=" + asJson + ", model=" + model + "]";
+    }
+
+    public void setMembers(ArrayList<String> members) {
+        this.members = members;
+    }
+
+    public void setRoles(ArrayList<String> roles) {
+        this.roles = roles;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public String getId() {

@@ -160,7 +160,7 @@ public class PublicDataResource {
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }
@@ -201,7 +201,7 @@ public class PublicDataResource {
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }
@@ -229,7 +229,7 @@ public class PublicDataResource {
             fusekiUrl=fuseki;            
         }
         MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
-        Model model=QueryProcessor.getResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
         }

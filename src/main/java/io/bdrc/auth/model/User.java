@@ -37,6 +37,18 @@ public class User {
         model=buildModel();
     }
     
+    public User() {
+        authId="";
+        name="";
+        email="";
+        isSocial="";
+        id="";
+        provider="";
+        connection="";
+        asJson="";
+        model=null;
+    }
+
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.getNsPrefixMap().put("foaf", "http://xmlns.com/foaf/0.1/");
@@ -79,6 +91,34 @@ public class User {
         return "";
     }
     
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setAuthId(String authId) {
+        this.authId = authId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setIsSocial(String isSocial) {
+        this.isSocial = isSocial;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public void setConnection(String connection) {
+        this.connection = connection;
+    }
+
     public String getIsSocial() {
         return isSocial;
     }
@@ -114,8 +154,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", name=" + name + ", email=" + email + ", asJson=" + asJson + ", model=" + model
-                + "]";
+        return "User [id=" + id + ", authId=" + authId + ", name=" + name + ", email=" + email + ", asJson=" + asJson
+                + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", model="
+                + model + "]";
     }
 
 }

@@ -53,7 +53,7 @@ public class QueryProcessor {
 	
     public final static Logger log=LoggerFactory.getLogger(QueryProcessor.class.getName());
     
-	public static Model getResourceGraph(String resID,String fusekiUrl,String prefixes) throws RestException{			
+	public static Model getCoreResourceGraph(String resID,String fusekiUrl,String prefixes) throws RestException{			
 	    if(prefixes==null) {
 	        prefixes=loadPrefixes();
 	    }
@@ -94,10 +94,12 @@ public class QueryProcessor {
         return model;       
     }
 	
-	public static Model getAuthDataGraph(String query) throws RestException{  
-	    
+	public static Model getAuthDataGraph(String query,String fusekiUrl) throws RestException{  
+	    if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        } 
         String prefixes=loadPrefixes();
-        String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        
         Query q=QueryFactory.create(prefixes+" "+query);
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
