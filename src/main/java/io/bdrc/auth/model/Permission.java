@@ -30,6 +30,13 @@ public class Permission {
         model=buildModel();
     }
     
+    public Permission() {
+        id="";
+        name="";
+        desc="";
+        appId="";
+    }
+
     String getJsonValue(JsonNode json,String key) {
         JsonNode tmp=json.findValue(key);
         if(tmp!=null) {
@@ -58,6 +65,28 @@ public class Permission {
                 ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId)));        
         return model;
     }
+    
+    
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
     public Model getModel() {
         return model;
@@ -81,8 +110,8 @@ public class Permission {
     
     @Override
     public String toString() {
-        return "Permission [ appId=" + appId + ", name=" + name + ", desc="
-                + desc + ", asJson=" + asJson + ", model=" + model + "]";
+        return "Permission [id=" + id + ", appId=" + appId + ", name=" + name + ", desc=" + desc + ", asJson=" + asJson
+                + ", model=" + model + "]";
     }
 
 }

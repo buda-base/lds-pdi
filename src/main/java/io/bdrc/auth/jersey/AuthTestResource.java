@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.UserProfile;
-import io.bdrc.auth.rdf.RdfAuthModel;
 
 @Path("/")
 public class AuthTestResource {

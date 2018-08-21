@@ -29,6 +29,13 @@ public class Application {
         model=buildModel();
     }
     
+    public Application() {
+        name="";
+        desc="";
+        appType="";
+        appId="";
+    }
+
     Model buildModel() {
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
@@ -52,6 +59,22 @@ public class Application {
     
     
     
+    public void setAppType(String appType) {
+        this.appType = appType;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     public String getAppType() {
         return appType;
     }
@@ -83,5 +106,13 @@ public class Application {
         }
         return "";
     }
+
+    @Override
+    public String toString() {
+        return "Application [appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc=" + desc
+                + ", asJson=" + asJson + ", model=" + model + "]";
+    }
+    
+    
 
 }

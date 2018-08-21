@@ -44,6 +44,15 @@ public class Role {
         model=buildModel();
     }
     
+    public Role() {
+        id="";
+        name="";
+        desc="";
+        appType="";
+        appId="";
+        permissions=new ArrayList<>();
+    }
+
     String getJsonValue(JsonNode json,String key) {
         JsonNode tmp=json.findValue(key);
         if(tmp!=null) {
@@ -83,6 +92,31 @@ public class Role {
         return model;
     }
     
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public void setPermissions(ArrayList<String> permissions) {
+        this.permissions = permissions;
+    }
+
     public Model getModel() {
         return model;
     }

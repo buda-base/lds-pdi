@@ -2,12 +2,8 @@ package io.bdrc.ldspdi.sparql;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Objects;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 
@@ -36,10 +32,8 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 
 import io.bdrc.auth.model.AuthDataModelBuilder;
-import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -98,9 +92,6 @@ public class QueryProcessor {
 	    if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         } 
-        String prefixes=loadPrefixes();
-        
-        Query q=QueryFactory.create(prefixes+" "+query);
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
         Model m=access.getModel(ServiceConfig.getProperty("authDataGraph"));
