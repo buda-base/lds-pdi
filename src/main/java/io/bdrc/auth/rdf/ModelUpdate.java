@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class ModelUpdate extends TimerTask{
@@ -27,7 +28,7 @@ public class ModelUpdate extends TimerTask{
         }
         //System.out.println("TIME >>"+time);
         HttpClient client=HttpClientBuilder.create().build();
-        HttpGet get=new HttpGet("http://localhost:8080/authmodel/updated");
+        HttpGet get=new HttpGet(ServiceConfig.getProperty("authUpdatePath"));
         long lastUpdate=1;
         try {
             HttpResponse resp=client.execute(get);
