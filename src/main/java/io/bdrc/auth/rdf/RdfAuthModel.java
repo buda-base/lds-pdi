@@ -2,6 +2,7 @@ package io.bdrc.auth.rdf;
 
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
@@ -33,6 +34,8 @@ public class RdfAuthModel implements Runnable{
     static ArrayList<Endpoint> endpoints;
     static ArrayList<Application> applications;
     
+    private static final int PERIOD_MS = 30000;
+    private static final int DELAY_MS = 5000;    
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
     public final static String query="\n SELECT ?s ?p ?o \n" + 
             "WHERE {\n" + 
@@ -42,7 +45,14 @@ public class RdfAuthModel implements Runnable{
             "}";
         
     public static void init() throws RestException {        
-        authMod=QueryProcessor.getAuthDataGraph(query,null);        
+        authMod=QueryProcessor.getAuthDataGraph(query,null); 
+        ModelUpdate task = new ModelUpdate();
+        Timer timer = new Timer();
+        timer.schedule(task, DELAY_MS, PERIOD_MS);
+    }
+    
+    public static void update() throws RestException {
+        authMod=QueryProcessor.getAuthDataGraph(query,null); 
     }
     
     public static Model getFullModel() {
@@ -213,12 +223,12 @@ public class RdfAuthModel implements Runnable{
     public void run() {
         QueryProcessor.updateAuthData(null);
         try {
-            init();
+            update();
         } catch (RestException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        log.info("Done loading rdfAuth Model");
+        log.info("Done loading and updating rdfAuth Model");
     }
     
     public static void main(String[] args) throws RestException {

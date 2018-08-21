@@ -60,6 +60,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
+import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
@@ -74,7 +75,8 @@ import io.bdrc.restapi.exceptions.RestException;
 public class PublicDataResource {   
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);     
+    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    private static long UPDATED=System.currentTimeMillis();
     
     @GET   
     @JerseyCacheControl()
@@ -313,10 +315,17 @@ public class PublicDataResource {
     @GET
     @Path("/authmodel")
     public Response getAuthModel(@Context Request request) {        
-        log.info("Call to getOntologyHomePage()"); 
+        log.info("Call to getAuthModel()"); 
         return Response.ok(ResponseOutputStream.getModelStream(
                 RdfAuthModel.getFullModel()),MediaTypeUtils.getMediaTypeFromExt("ttl"))
                 .build();                 
+    }
+    
+    @GET
+    @Path("/authmodel/updated")
+    public long getAuthModelUpdated(@Context Request request) {        
+        //log.info("Call to getAuthModelUpdated()"); 
+        return UPDATED;                 
     }
     
     @POST
@@ -325,7 +334,9 @@ public class PublicDataResource {
     public Response updateAuthModel() throws RestException{        
         log.info("updating Auth data model() >>");
         Thread t=new Thread(new RdfAuthModel());
-        t.start(); 
+        t.start();
+        UPDATED=System.currentTimeMillis();
+        ResultsCache.addToCache(UPDATED, new String("AuthDataUpdateTime()").hashCode());
         return Response.ok("Auth Model was updated").build();       
     }
     
