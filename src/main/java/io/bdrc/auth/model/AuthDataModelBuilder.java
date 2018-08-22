@@ -67,7 +67,7 @@ public class AuthDataModelBuilder {
         log.info("URL >> "+AuthProps.getPublicProperty("policiesUrl"));
         HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getPublicProperty("policiesUrl")).openConnection();
         InputStream stream=connection.getInputStream();
-        //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
+        //InputStream stream=AuthDataModelBuilder.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
         Model authMod = ModelFactory.createDefaultModel();                      
         authMod.read(stream, "", "TURTLE");
         stream.close();

@@ -42,25 +42,17 @@ public class ModelUpdate extends TimerTask{
         if(obj!=null) {
             time=(long)obj;
         }
-        System.out.println("TIME >>"+time);
         HttpClient client=HttpClientBuilder.create().build();
-        HttpGet get=new HttpGet(ServiceConfig.getProperty("authUpdatePath"));
-        //HttpGet get=new HttpGet("http://localhost:8080/authmodel/updated");
+        HttpGet get=new HttpGet(ServiceConfig.getProperty("authUpdatePath"));        
         long lastUpdate=1;
         try {
             HttpResponse resp=client.execute(get);
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             resp.getEntity().writeTo(baos);
             lastUpdate = Long.parseLong(baos.toString());
-            System.out.println("UPDATED >>"+lastUpdate);
-            if(lastUpdate > time) {
-                System.out.println("<< UPDATE NEEDED >>");
+            if(lastUpdate > time) {                
                 //do update
                 RdfAuthModel.update(lastUpdate);
-            }
-            else {
-                //test purpose only
-                System.out.println("<< Model is up to date >>");
             }
         } catch (IOException | RestException e) {            
             e.printStackTrace();

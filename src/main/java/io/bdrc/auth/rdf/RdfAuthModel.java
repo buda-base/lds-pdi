@@ -93,18 +93,18 @@ public class RdfAuthModel implements Runnable{
         }
         users=new ArrayList<>();
         ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/User"));
+                ResourceFactory.createResource(RdfConstants.USER));
         while(it.hasNext()) {
             Resource rs=it.next();
             User user=new User();
-            user.setAuthId(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/id")).getObject().toString());
-            user.setName(rs.getProperty(ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/name")).getObject().toString());
-            user.setEmail(rs.getProperty(ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/mbox")).getObject().toString());
-            user.setIsSocial(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/isSocial")).getObject().toString());
+            user.setAuthId(rs.getProperty(ResourceFactory.createProperty(RdfConstants.ID)).getObject().toString());
+            user.setName(rs.getProperty(ResourceFactory.createProperty(RdfConstants.FOAF_NAME)).getObject().toString());
+            user.setEmail(rs.getProperty(ResourceFactory.createProperty(RdfConstants.FOAF_MBOX)).getObject().toString());
+            user.setIsSocial(rs.getProperty(ResourceFactory.createProperty(RdfConstants.IS_SOCIAL)).getObject().toString());
             String id=rs.getURI();
             user.setId(id.substring(0, id.lastIndexOf("/")));
-            user.setProvider(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/provider")).getObject().toString());
-            user.setConnection(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/connection")).getObject().toString());
+            user.setProvider(rs.getProperty(ResourceFactory.createProperty(RdfConstants.PROVIDER)).getObject().toString());
+            user.setConnection(rs.getProperty(ResourceFactory.createProperty(RdfConstants.CONNECTION)).getObject().toString());
             users.add(user);
             System.out.println(user);
         }
@@ -116,25 +116,25 @@ public class RdfAuthModel implements Runnable{
             return groups;
         }
         groups=new ArrayList<>();
-        ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Group"));
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.GROUP));
         while(it.hasNext()) {
             Group gp=new Group();
             Resource rs=it.next();
-            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasMember"));
+            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.HAS_MEMBER));
             while(sit.hasNext()) {
                 String member=sit.next().getObject().toString();
                 gp.getMembers().add(member.substring(member.lastIndexOf("/")+1));                   
             }
-            sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasRole"));
+            sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.HAS_ROLE));
             while(sit.hasNext()) {
                 String role=sit.next().getObject().toString();
                 gp.getRoles().add(role.substring(role.lastIndexOf("/")+1));                   
             }
             String id=rs.getURI();
             gp.setId(id.substring(id.lastIndexOf("/")+1));
-            gp.setName(rs.getProperty(ResourceFactory.createProperty(RDFS.label.getURI())).getObject().toString());
-            gp.setDesc(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc")).getObject().toString());
+            gp.setName(rs.getProperty(RDFS.label).getObject().toString());
+            gp.setDesc(rs.getProperty(ResourceFactory.createProperty(RdfConstants.DESC)).getObject().toString());
             groups.add(gp);
             System.out.println(gp);
         }
@@ -146,23 +146,23 @@ public class RdfAuthModel implements Runnable{
             return roles;
         }
         roles=new ArrayList<>();
-        ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Role"));
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.ROLE));
         while(it.hasNext()) {
             Role role=new Role();
             Resource rs=it.next();
-            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasPermission"));
+            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.HAS_PERMISSION));
             while(sit.hasNext()) {
                 String perm=sit.next().getObject().toString();
                 role.getPermissions().add(perm.substring(perm.lastIndexOf("/")+1));                   
             }
             String id=rs.getURI();
             role.setId(id.substring(id.lastIndexOf("/")+1));
-            role.setName(rs.getProperty(ResourceFactory.createProperty(RDFS.label.getURI())).getObject().toString());
-            role.setDesc(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc")).getObject().toString());
-            String appId=rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId")).getObject().toString();
+            role.setName(rs.getProperty(RDFS.label).getObject().toString());
+            role.setDesc(rs.getProperty(ResourceFactory.createProperty(RdfConstants.DESC)).getObject().toString());
+            String appId=rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPID)).getObject().toString();
             role.setAppId(appId.substring(id.lastIndexOf("/")+1));
-            role.setAppType(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType")).getObject().toString());
+            role.setAppType(rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPTYPE)).getObject().toString());
             
             roles.add(role);
             System.out.println(role);
@@ -175,16 +175,16 @@ public class RdfAuthModel implements Runnable{
             return permissions;
         }
         permissions=new ArrayList<>();
-        ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Permission"));
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.PERMISSION));
         while(it.hasNext()) {
             Permission perm=new Permission();
             Resource rs=it.next();            
             String id=rs.getURI();
             perm.setId(id.substring(id.lastIndexOf("/")+1));
-            perm.setName(rs.getProperty(ResourceFactory.createProperty(RDFS.label.getURI())).getObject().toString());
-            perm.setDesc(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc")).getObject().toString());
-            String appId=rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId")).getObject().toString();
+            perm.setName(rs.getProperty(RDFS.label).getObject().toString());
+            perm.setDesc(rs.getProperty(ResourceFactory.createProperty(RdfConstants.DESC)).getObject().toString());
+            String appId=rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPID)).getObject().toString();
             perm.setAppId(appId.substring(id.lastIndexOf("/")+1));
             permissions.add(perm);
             System.out.println(perm);
@@ -197,28 +197,28 @@ public class RdfAuthModel implements Runnable{
             return endpoints;
         }
         endpoints=new ArrayList<>();
-        ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Endpoint"));
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.ENDPOINT));
         while(it.hasNext()) {
             Endpoint endp=new Endpoint();
             Resource rs=it.next();
-            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/forGroup"));
+            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.FOR_GROUP));
             while(sit.hasNext()) {
                 String gp=sit.next().getObject().toString();
                endp.getGroups().add(gp.substring(gp.lastIndexOf("/")+1));                   
             }
-            sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/forRole"));
+            sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.FOR_ROLE));
             while(sit.hasNext()) {
                 String role=sit.next().getObject().toString();
                 endp.getRoles().add(role.substring(role.lastIndexOf("/")+1));                   
             }
-            sit=rs.listProperties(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/forPermission"));
+            sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.FOR_PERM));
             while(sit.hasNext()) {
                 String perm=sit.next().getObject().toString();
                 endp.getPermissions().add(perm.substring(perm.lastIndexOf("/")+1));                   
             }
-            endp.setPath(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/path")).getObject().toString());
-            String appId=rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId")).getObject().toString();
+            endp.setPath(rs.getProperty(ResourceFactory.createProperty(RdfConstants.PATH)).getObject().toString());
+            String appId=rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPID)).getObject().toString();
             endp.setAppId(appId.substring(appId.lastIndexOf("/")+1));
             endpoints.add(endp);
             System.out.println(endp);
@@ -231,16 +231,16 @@ public class RdfAuthModel implements Runnable{
             return applications;
         }
         applications=new ArrayList<>();
-        ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Application"));
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.APPLICATION));
         while(it.hasNext()) {
             Resource rs=it.next();
             Application app=new Application();
-            app.setName(rs.getProperty(ResourceFactory.createProperty(RDFS.label.getURI())).getObject().toString());
+            app.setName(rs.getProperty(RDFS.label).getObject().toString());
             String id=rs.getURI();
             app.setAppId(id.substring(0, id.lastIndexOf("/")));
-            app.setAppType(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType")).getObject().toString());
-            app.setDesc(rs.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc")).getObject().toString());
+            app.setAppType(rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPTYPE)).getObject().toString());
+            app.setDesc(rs.getProperty(ResourceFactory.createProperty(RdfConstants.DESC)).getObject().toString());
             applications.add(app);
             System.out.println(app);
         }
@@ -291,7 +291,7 @@ public class RdfAuthModel implements Runnable{
         log.info("Done loading and updating rdfAuth Model");
     }
     
-    public static void main(String[] args) throws RestException {
+    /*public static void main(String[] args) throws RestException {
         ServiceConfig.initForTests();
         reloadModel();
         getUsers();
@@ -300,7 +300,7 @@ public class RdfAuthModel implements Runnable{
         getPermissions();
         getEndpoints();
         getApplications();
-      //Test
+        //Test
         HttpURLConnection connection;
         try {
             connection = (HttpURLConnection) new URL("http://purl.bdrc.io/authmodel").openConnection();
@@ -315,7 +315,7 @@ public class RdfAuthModel implements Runnable{
             e.printStackTrace();
         }
         //end test
-    }
+    }*/
     
 
 }

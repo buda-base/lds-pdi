@@ -27,6 +27,7 @@ public class RdfConstants {
     public static final String ROLE="http://purl.bdrc.io/ontology/ext/auth/Role";    
     public static final String GROUP="http://purl.bdrc.io/ontology/ext/auth/Group";
     public static final String USER="http://purl.bdrc.io/ontology/ext/auth/User";
+    public static final String ENDPOINT="http://purl.bdrc.io/ontology/ext/auth/Endpoint";
     
     public final static String APPID="http://purl.bdrc.io/ontology/ext/auth/appId";
     public final static String APPTYPE="http://purl.bdrc.io/ontology/ext/auth/appType";
