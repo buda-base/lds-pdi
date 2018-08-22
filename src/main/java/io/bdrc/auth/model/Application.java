@@ -2,6 +2,7 @@ package io.bdrc.auth.model;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -58,27 +59,20 @@ public class Application {
     }
 
     Model buildModel() {
+        Resource app= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId);
         model = ModelFactory.createDefaultModel();
+        model.add(ResourceFactory.createStatement(app,RDF.type,ResourceFactory.createResource(RdfConstants.APPLICATION)));
+        model.add(ResourceFactory.createStatement(app,RDFS.label,ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId), 
-                ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource(RdfConstants.APPLICATION)));
-        model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId), 
-                ResourceFactory.createProperty(RDFS.label.getURI()), 
-                ResourceFactory.createPlainLiteral(name)));
-        model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId), 
+                app, 
                 ResourceFactory.createProperty(RdfConstants.APPTYPE), 
                 ResourceFactory.createPlainLiteral(appType)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId), 
+                app, 
                 ResourceFactory.createProperty(RdfConstants.DESC), 
                 ResourceFactory.createPlainLiteral(desc)));
         return model;
     }
-    
-    
     
     public void setAppType(String appType) {
         this.appType = appType;

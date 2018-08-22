@@ -86,14 +86,8 @@ public class Role {
     Model buildModel() {
         Resource role= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
-        model.add(ResourceFactory.createStatement(
-                role, 
-                ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource(RdfConstants.ROLE)));        
-        model.add(ResourceFactory.createStatement(
-                role, 
-                ResourceFactory.createProperty(RDFS.label.getURI()), 
-                ResourceFactory.createPlainLiteral(name)));
+        model.add(ResourceFactory.createStatement(role,RDF.type,ResourceFactory.createResource(RdfConstants.ROLE)));        
+        model.add(ResourceFactory.createStatement(role,RDFS.label,ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
                 role, 
                 ResourceFactory.createProperty(RdfConstants.DESC), 

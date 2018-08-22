@@ -70,14 +70,8 @@ public class Permission {
     Model buildModel() {
         Resource perm= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
-        model.add(ResourceFactory.createStatement(
-                perm, 
-                ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource(RdfConstants.PERMISSION)));
-        model.add(ResourceFactory.createStatement(
-                perm, 
-                ResourceFactory.createProperty(RDFS.label.getURI()), 
-                ResourceFactory.createPlainLiteral(name)));
+        model.add(ResourceFactory.createStatement(perm,RDF.type,ResourceFactory.createResource(RdfConstants.PERMISSION)));
+        model.add(ResourceFactory.createStatement(perm,RDFS.label,ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
                 perm, 
                 ResourceFactory.createProperty(RdfConstants.DESC), 

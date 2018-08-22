@@ -75,10 +75,7 @@ public class User {
         Resource usr= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
         model.getNsPrefixMap().put("foaf", "http://xmlns.com/foaf/0.1/");
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource(RdfConstants.USER)));
+        model.add(ResourceFactory.createStatement(usr,RDF.type,ResourceFactory.createResource(RdfConstants.USER)));
         model.add(ResourceFactory.createStatement(
                 usr, 
                 ResourceFactory.createProperty(RdfConstants.IS_SOCIAL), 

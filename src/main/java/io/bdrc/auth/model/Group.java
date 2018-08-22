@@ -91,14 +91,8 @@ public class Group {
     Model buildModel() {
         Resource gp= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
-        model.add(ResourceFactory.createStatement(
-                gp, 
-                ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource(RdfConstants.GROUP)));
-        model.add(ResourceFactory.createStatement(
-                gp, 
-                ResourceFactory.createProperty(RDFS.label.getURI()), 
-                ResourceFactory.createPlainLiteral(name)));
+        model.add(ResourceFactory.createStatement(gp,RDF.type,ResourceFactory.createResource(RdfConstants.GROUP)));
+        model.add(ResourceFactory.createStatement(gp,RDFS.label,ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
                 gp, 
                 ResourceFactory.createProperty(RdfConstants.DESC), 
