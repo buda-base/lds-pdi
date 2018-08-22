@@ -7,14 +7,29 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
+import io.bdrc.auth.rdf.RdfConstants;
+
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+
 public class Endpoint {
-    
-    public final static String APPID="http://purl.bdrc.io/ontology/ext/auth/appId";
-    public final static String PATH="http://purl.bdrc.io/ontology/ext/auth/path";
-    public final static String ROLE="http://purl.bdrc.io/ontology/ext/auth/forRole";
-    public final static String GROUP="http://purl.bdrc.io/ontology/ext/auth/forGroup";
-    public final static String PERM="http://purl.bdrc.io/ontology/ext/auth/forPermission";
-    
+        
     String path;
     String appId;
     ArrayList<String> groups;
@@ -34,19 +49,19 @@ public class Endpoint {
             String value=tmp.getObject().toString().replaceAll("\"", "");
             String prop=tmp.getPredicate().getURI();
             switch (prop) {               
-                case APPID:
+                case RdfConstants.APPID:
                     appId=value;
                     break;
-                case PATH:
+                case RdfConstants.PATH:
                     path=value;
                     break;
-                case ROLE:
+                case RdfConstants.FOR_ROLE:
                     roles.add(value);
                     break;
-                case GROUP:
+                case RdfConstants.FOR_GROUP:
                     groups.add(value);
                     break;
-                case PERM:
+                case RdfConstants.FOR_PERM:
                     permissions.add(value);
                     break;
             }

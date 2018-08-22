@@ -2,12 +2,34 @@ package io.bdrc.auth.model;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.bdrc.auth.rdf.RdfConstants;
+
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 
 public class User {
     
@@ -50,35 +72,36 @@ public class User {
     }
 
     Model buildModel() {
+        Resource usr= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
         model.getNsPrefixMap().put("foaf", "http://xmlns.com/foaf/0.1/");
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
+                usr, 
                 ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/User")));
+                ResourceFactory.createResource(RdfConstants.USER)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/isSocial"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.IS_SOCIAL), 
                 ResourceFactory.createPlainLiteral(isSocial)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/provider"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.PROVIDER), 
                 ResourceFactory.createPlainLiteral(provider)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/connection"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.CONNECTION), 
                 ResourceFactory.createPlainLiteral(connection)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/name"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.FOAF_NAME), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/id"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.ID), 
                 ResourceFactory.createPlainLiteral(authId)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/mbox"), 
+                usr, 
+                ResourceFactory.createProperty(RdfConstants.FOAF_MBOX), 
                 ResourceFactory.createPlainLiteral(email)));
         return model;
     }

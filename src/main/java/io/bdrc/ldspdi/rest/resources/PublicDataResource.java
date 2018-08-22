@@ -313,10 +313,10 @@ public class PublicDataResource {
     
     @GET
     @Path("/authmodel")
-    public Response getAuthModel(@Context Request request) {        
+    public Response getAuthModel(@Context Request request) throws RestException {        
         log.info("Call to getAuthModel()"); 
         return Response.ok(ResponseOutputStream.getModelStream(
-                RdfAuthModel.getFullModel()),MediaTypeUtils.getMediaTypeFromExt("ttl"))
+                QueryProcessor.getAuthDataGraph(fusekiUrl)),MediaTypeUtils.getMediaTypeFromExt("ttl"))
                 .build();                 
     }
     

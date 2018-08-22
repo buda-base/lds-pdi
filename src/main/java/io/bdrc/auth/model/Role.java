@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -13,6 +14,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import io.bdrc.auth.rdf.RdfConstants;
+
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 
 public class Role {
     
@@ -62,32 +84,33 @@ public class Role {
     }
     
     Model buildModel() {
+        Resource role= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
         model = ModelFactory.createDefaultModel();
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
+                role, 
                 ResourceFactory.createProperty(RDF.type.getURI()), 
-                ResourceFactory.createResource("http://purl.bdrc.io/ontology/ext/auth/Role")));        
+                ResourceFactory.createResource(RdfConstants.ROLE)));        
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
+                role, 
                 ResourceFactory.createProperty(RDFS.label.getURI()), 
                 ResourceFactory.createPlainLiteral(name)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/desc"), 
+                role, 
+                ResourceFactory.createProperty(RdfConstants.DESC), 
                 ResourceFactory.createPlainLiteral(desc)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appType"), 
+                role, 
+                ResourceFactory.createProperty(RdfConstants.APPTYPE), 
                 ResourceFactory.createPlainLiteral(appType)));
         model.add(ResourceFactory.createStatement(
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/appId"), 
-                ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+appId)));
+                role, 
+                ResourceFactory.createProperty(RdfConstants.APPID), 
+                ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId)));
         for(String perm: permissions) {
             model.add(ResourceFactory.createStatement(
-                    ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+id), 
-                    ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/auth/hasPermission"), 
-                    ResourceFactory.createResource("http://purl.bdrc.io/resource-auth/"+perm)));
+                    role, 
+                    ResourceFactory.createProperty(RdfConstants.HAS_PERMISSION), 
+                    ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+perm)));
         }
         return model;
     }

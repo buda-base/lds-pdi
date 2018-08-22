@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -33,7 +32,6 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
-import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -88,7 +86,7 @@ public class QueryProcessor {
         return model;       
     }
 	
-	public static Model getAuthDataGraph(String query,String fusekiUrl) throws RestException{  
+	public static Model getAuthDataGraph(String fusekiUrl) throws RestException{  
 	    if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         } 
@@ -137,23 +135,6 @@ public class QueryProcessor {
         log.info("InfModel Size >> "+mod.size());       
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);        
         access.putModel(ServiceConfig.getProperty("authGraph"), mod);         
-    }
-	
-	public static void updateAuthData(String fusekiUrl) {
-        if(fusekiUrl == null) {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        }
-        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        log.info("Service fuseki >> "+fusekiUrl);
-        log.info("authDataGraph >> "+ServiceConfig.getProperty("authDataGraph"));              
-        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        try {
-            AuthDataModelBuilder auth=new AuthDataModelBuilder();
-            access.putModel(ServiceConfig.getProperty("authDataGraph"), auth.getModel());  
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }      
     }
 	
 	public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {

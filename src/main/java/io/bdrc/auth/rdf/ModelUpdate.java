@@ -12,6 +12,25 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+
 public class ModelUpdate extends TimerTask{
     
     long time;
@@ -23,7 +42,7 @@ public class ModelUpdate extends TimerTask{
         if(obj!=null) {
             time=(long)obj;
         }
-        //System.out.println("TIME >>"+time);
+        System.out.println("TIME >>"+time);
         HttpClient client=HttpClientBuilder.create().build();
         HttpGet get=new HttpGet(ServiceConfig.getProperty("authUpdatePath"));
         //HttpGet get=new HttpGet("http://localhost:8080/authmodel/updated");
@@ -33,15 +52,15 @@ public class ModelUpdate extends TimerTask{
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             resp.getEntity().writeTo(baos);
             lastUpdate = Long.parseLong(baos.toString());
-            //System.out.println("UPDATED >>"+lastUpdate);
+            System.out.println("UPDATED >>"+lastUpdate);
             if(lastUpdate > time) {
-                //System.out.println("<< UPDATE NEEDED >>");
+                System.out.println("<< UPDATE NEEDED >>");
                 //do update
                 RdfAuthModel.update(lastUpdate);
             }
             else {
                 //test purpose only
-                //System.out.println("<< Model is up to date >>");
+                System.out.println("<< Model is up to date >>");
             }
         } catch (IOException | RestException e) {            
             e.printStackTrace();

@@ -1,10 +1,17 @@
 package io.bdrc.auth.rdf;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Timer;
 
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -16,14 +23,33 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.model.Application;
+import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.Group;
 import io.bdrc.auth.model.Permission;
 import io.bdrc.auth.model.Role;
 import io.bdrc.auth.model.User;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
+
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ * 
+ * If this file is a derivation of another work the license header will appear below; 
+ * otherwise, this work is licensed under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with the License.
+ * 
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 
 public class RdfAuthModel implements Runnable{
     
@@ -39,15 +65,9 @@ public class RdfAuthModel implements Runnable{
     private static final int PERIOD_MS = Integer.parseInt(AuthProps.getPublicProperty("updatePeriod"));
     private static final int DELAY_MS = 5000;    
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
-    public final static String query="\n SELECT ?s ?p ?o \n" + 
-            "WHERE {\n" + 
-            "  GRAPH <http://purl.bdrc.io/ontology/ext/authData> { \n" + 
-            "    ?s ?p ?o .\n" + 
-            "    }\n" + 
-            "}";
         
     public static void init() throws RestException {        
-        authMod=QueryProcessor.getAuthDataGraph(query,null); 
+        reloadModel();        
         ModelUpdate task = new ModelUpdate();
         Timer timer = new Timer();
         timer.schedule(task, DELAY_MS, PERIOD_MS);
@@ -59,7 +79,7 @@ public class RdfAuthModel implements Runnable{
     }
 
     public static void update(long updatedTime) throws RestException {
-        authMod=QueryProcessor.getAuthDataGraph(query,null);
+        reloadModel();
         updated=updatedTime;
     }
     
@@ -225,12 +245,44 @@ public class RdfAuthModel implements Runnable{
             System.out.println(app);
         }
         return applications;
-    }    
+    } 
+    
+    static void reloadModel() {
+        HttpURLConnection connection;
+        Model m = ModelFactory.createDefaultModel();
+        try {
+            connection = (HttpURLConnection) new URL(AuthProps.getPublicProperty("updateModelUrl")).openConnection();
+            InputStream stream=connection.getInputStream();
+            m = ModelFactory.createDefaultModel();                      
+            m.read(stream, "", "TURTLE");
+            stream.close(); 
+            authMod=m;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void updateAuthData(String fusekiUrl) {
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
+        log.info("Service fuseki >> "+fusekiUrl);
+        log.info("authDataGraph >> "+ServiceConfig.getProperty("authDataGraph"));              
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        try {
+            AuthDataModelBuilder auth=new AuthDataModelBuilder();
+            access.putModel(ServiceConfig.getProperty("authDataGraph"), auth.getModel());  
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }      
+    }
         
     @Override
     public void run() {
-        QueryProcessor.updateAuthData(null);
         try {
+            updateAuthData(null);
             update(System.currentTimeMillis());
         } catch (RestException e) {
             // TODO Auto-generated catch block
@@ -241,13 +293,28 @@ public class RdfAuthModel implements Runnable{
     
     public static void main(String[] args) throws RestException {
         ServiceConfig.initForTests();
-        authMod=QueryProcessor.getAuthDataGraph(query,"http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        reloadModel();
         getUsers();
         getGroups();
         getRoles();
         getPermissions();
         getEndpoints();
         getApplications();
+      //Test
+        HttpURLConnection connection;
+        try {
+            connection = (HttpURLConnection) new URL("http://purl.bdrc.io/authmodel").openConnection();
+            InputStream stream=connection.getInputStream();
+            //InputStream stream=RdfAuthModel.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
+            Model test = ModelFactory.createDefaultModel();                      
+            test.read(stream, "", "TURTLE");
+            stream.close();
+            test.write(System.out, "TURTLE");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        //end test
     }
     
 
