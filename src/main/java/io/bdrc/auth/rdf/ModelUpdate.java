@@ -9,7 +9,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -20,15 +19,14 @@ public class ModelUpdate extends TimerTask{
     @Override
     public void run() {
         long time=1;
-        Object obj=ResultsCache.getObjectFromCache(new String("AuthDataUpdateTime()").hashCode());
+        Long obj=Long.valueOf(RdfAuthModel.getUpdated());
         if(obj!=null) {
             time=(long)obj;
-        }else {
-            time=System.currentTimeMillis();            
         }
         //System.out.println("TIME >>"+time);
         HttpClient client=HttpClientBuilder.create().build();
         HttpGet get=new HttpGet(ServiceConfig.getProperty("authUpdatePath"));
+        //HttpGet get=new HttpGet("http://localhost:8080/authmodel/updated");
         long lastUpdate=1;
         try {
             HttpResponse resp=client.execute(get);
@@ -38,9 +36,12 @@ public class ModelUpdate extends TimerTask{
             //System.out.println("UPDATED >>"+lastUpdate);
             if(lastUpdate > time) {
                 //System.out.println("<< UPDATE NEEDED >>");
-                // do update
-                RdfAuthModel.update();
-                ResultsCache.addToCache(lastUpdate, new String("AuthDataUpdateTime()").hashCode());
+                //do update
+                RdfAuthModel.update(lastUpdate);
+            }
+            else {
+                //test purpose only
+                //System.out.println("<< Model is up to date >>");
             }
         } catch (IOException | RestException e) {            
             e.printStackTrace();

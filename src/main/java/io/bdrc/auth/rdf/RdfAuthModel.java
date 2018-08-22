@@ -14,6 +14,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.model.Application;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.Group;
@@ -33,8 +34,9 @@ public class RdfAuthModel implements Runnable{
     static ArrayList<Permission> permissions;
     static ArrayList<Endpoint> endpoints;
     static ArrayList<Application> applications;
+    static long updated;
     
-    private static final int PERIOD_MS = 30000;
+    private static final int PERIOD_MS = Integer.parseInt(AuthProps.getPublicProperty("updatePeriod"));
     private static final int DELAY_MS = 5000;    
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
     public final static String query="\n SELECT ?s ?p ?o \n" + 
@@ -51,8 +53,14 @@ public class RdfAuthModel implements Runnable{
         timer.schedule(task, DELAY_MS, PERIOD_MS);
     }
     
-    public static void update() throws RestException {
-        authMod=QueryProcessor.getAuthDataGraph(query,null); 
+    
+    public static long getUpdated() {
+        return updated;
+    }
+
+    public static void update(long updatedTime) throws RestException {
+        authMod=QueryProcessor.getAuthDataGraph(query,null);
+        updated=updatedTime;
     }
     
     public static Model getFullModel() {
@@ -223,7 +231,7 @@ public class RdfAuthModel implements Runnable{
     public void run() {
         QueryProcessor.updateAuthData(null);
         try {
-            update();
+            update(System.currentTimeMillis());
         } catch (RestException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

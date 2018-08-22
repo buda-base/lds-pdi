@@ -60,7 +60,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
-import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
@@ -76,7 +75,7 @@ public class PublicDataResource {
     
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-    private static long UPDATED=System.currentTimeMillis();
+    
     
     @GET   
     @JerseyCacheControl()
@@ -325,7 +324,7 @@ public class PublicDataResource {
     @Path("/authmodel/updated")
     public long getAuthModelUpdated(@Context Request request) {        
         //log.info("Call to getAuthModelUpdated()"); 
-        return UPDATED;                 
+        return RdfAuthModel.getUpdated();                 
     }
     
     @POST
@@ -335,8 +334,6 @@ public class PublicDataResource {
         log.info("updating Auth data model() >>");
         Thread t=new Thread(new RdfAuthModel());
         t.start();
-        UPDATED=System.currentTimeMillis();
-        ResultsCache.addToCache(UPDATED, new String("AuthDataUpdateTime()").hashCode());
         return Response.ok("Auth Model was updated").build();       
     }
     
