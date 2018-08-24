@@ -102,6 +102,10 @@ public class Group {
                     gp, 
                     ResourceFactory.createProperty(RdfConstants.HAS_MEMBER), 
                     ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+memb.substring(memb.indexOf("|")+1))));
+            model.add(ResourceFactory.createStatement(
+                    ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+memb.substring(memb.indexOf("|")+1)), 
+                    ResourceFactory.createProperty(RdfConstants.FOR_GROUP), 
+                    gp));
         }
         for(String role: roles) {
             model.add(ResourceFactory.createStatement(

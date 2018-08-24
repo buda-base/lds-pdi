@@ -1,5 +1,7 @@
 package io.bdrc.auth.model;
 
+import java.util.ArrayList;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -41,12 +43,16 @@ public class User {
     String isSocial;
     String provider;
     String connection;
+    ArrayList<String> roles;
+    ArrayList<String> groups;
     Model model;
     
-    public User(JsonNode json) throws JsonProcessingException {        
+    public User(JsonNode json,ArrayList<String> roles) throws JsonProcessingException {        
         authId=getJsonValue(json,"user_id");
         name=getJsonValue(json,"name");
         email=getJsonValue(json,"email");
+        this.roles=roles; 
+        groups=new ArrayList<>();
         JsonNode ids=json.findValue("identities");
         if(ids!=null) {
             isSocial=getJsonValue(ids,"isSocial");
@@ -68,6 +74,8 @@ public class User {
         provider="";
         connection="";
         asJson="";
+        roles=new ArrayList<>();
+        groups=new ArrayList<>();
         model=null;
     }
 
@@ -100,8 +108,16 @@ public class User {
                 usr, 
                 ResourceFactory.createProperty(RdfConstants.FOAF_MBOX), 
                 ResourceFactory.createPlainLiteral(email)));
+        for(String role:roles) {
+            model.add(ResourceFactory.createStatement(
+                    usr, 
+                    ResourceFactory.createProperty(RdfConstants.HAS_ROLE), 
+                    ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+role)));
+        }
         return model;
     }
+    
+    
     
     String getJsonValue(JsonNode json,String key) {
         JsonNode tmp=json.findValue(key);
@@ -139,6 +155,14 @@ public class User {
         this.connection = connection;
     }
 
+    public ArrayList<String> getRoles() {
+        return roles;
+    }
+    
+    public ArrayList<String> getGroups() {
+        return groups;
+    }
+
     public String getIsSocial() {
         return isSocial;
     }
@@ -172,11 +196,15 @@ public class User {
         return email;
     }
 
+    public String getAuthId() {
+        return authId;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", authId=" + authId + ", name=" + name + ", email=" + email + ", asJson=" + asJson
-                + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", model="
-                + model + "]";
+                + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles="
+                + roles + ", groups=" + groups + ", model=" + model + "]";
     }
 
 }

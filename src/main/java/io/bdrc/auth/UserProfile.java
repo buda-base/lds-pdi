@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -32,47 +34,19 @@ public class UserProfile {
     String name;
     
     public UserProfile(DecodedJWT decodedJwt) {
-        super();
-        this.groups = getGroups(decodedJwt);
-        this.roles = getRoles(decodedJwt);
-        this.permissions = getPermissions(decodedJwt);
+        this.groups = RdfAuthModel.getUser(getId(decodedJwt)).getGroups();
+        this.roles = RdfAuthModel.getUser(getId(decodedJwt)).getRoles();
+        this.permissions = RdfAuthModel.getPermissions(roles, groups);
         this.name=getName(decodedJwt);
-    }
-    
-    @SuppressWarnings("unchecked")
-    ArrayList<String> getGroups(DecodedJWT decodedJwt) {
-        Claim claim=decodedJwt.getClaims().get("https://purl.bdrc.io/user_authorization");
-        
-        if(claim!=null) {
-            return (ArrayList<String>)claim.asMap().get("groups");
-        }
-        return new ArrayList<String>();       
     }
 
     public ArrayList<String> getGroups() {
         return groups;
     }
     
-    @SuppressWarnings("unchecked")
-    ArrayList<String> getRoles(DecodedJWT decodedJwt) {
-        Claim claim=decodedJwt.getClaims().get("https://purl.bdrc.io/user_authorization");
-        if(claim!=null) {
-            return (ArrayList<String>)claim.asMap().get("roles");
-        }
-        return new ArrayList<String>();       
-    }
     public ArrayList<String> getRoles() {
         return roles;
     }
-    
-    @SuppressWarnings("unchecked")
-    ArrayList<String> getPermissions(DecodedJWT decodedJwt) {
-        Claim claim=decodedJwt.getClaims().get("https://purl.bdrc.io/user_authorization");
-        if(claim!=null) {
-            return (ArrayList<String>)claim.asMap().get("permissions");
-        }
-        return new ArrayList<String>();       
-    }    
     
     String getName(DecodedJWT decodedJwt) {
         Claim claim=decodedJwt.getClaims().get("name");
@@ -80,6 +54,15 @@ public class UserProfile {
             return claim.asString();
         }
         return null;       
+    }
+    
+    String getId(DecodedJWT decodedJwt) {
+        Claim claim=decodedJwt.getClaims().get("sub");
+        if(claim!=null) {
+            String id=claim.asString();
+            return id.substring(id.lastIndexOf("/")+1);
+        }
+        return "";       
     }
     
     public ArrayList<String> getPermissions() {

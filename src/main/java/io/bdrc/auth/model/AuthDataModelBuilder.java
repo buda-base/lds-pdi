@@ -207,11 +207,33 @@ public class AuthDataModelBuilder {
         JsonNode node1=mapper.readTree(baos.toString());
         baos.close();
         Iterator<JsonNode> it=node1.at("/users").elements();
-        while(it.hasNext()) { 
-            User user=new User(it.next());
+        while(it.hasNext()) {
+            JsonNode tmp=it.next();
+            String authId=tmp.findValue("user_id").asText();
+            User user=new User(tmp,getUserRoles(token,authId.replace("|", "%7C")));
+            getUserRoles(token,user.getAuthId().replace("|", "%7C"));
             users.add(user);
             model.add(user.getModel());       
         }
+    }
+    
+    private ArrayList<String> getUserRoles(String token,String id) throws ClientProtocolException, IOException {
+        ArrayList<String> roleList=new ArrayList<>();
+        ObjectMapper mapper=new ObjectMapper();
+        HttpClient client=HttpClientBuilder.create().build();
+        HttpGet get=new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/users/"
+        +id+"/roles/calculate");
+        get.addHeader("Authorization", "Bearer "+token);
+        HttpResponse resp=client.execute(get);
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        resp.getEntity().writeTo(baos);
+        JsonNode node1=mapper.readTree(baos.toString());
+        baos.close();       
+        Iterator<JsonNode> it=node1.elements();
+        while(it.hasNext()) { 
+            roleList.add(getJsonValue(it.next(),"_id"));
+        }
+        return roleList;
     }
     
     private void setEndpoints(Model authMod) throws ClientProtocolException, IOException {
@@ -233,6 +255,14 @@ public class AuthDataModelBuilder {
         return model;
     }
 
+    String getJsonValue(JsonNode json,String key) {
+        JsonNode tmp=json.findValue(key);
+        if(tmp!=null) {
+            return tmp.asText();
+        }
+        return "";
+    }
+    
     @Override
     public String toString() {
         return "AuthModel [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", users=" + users

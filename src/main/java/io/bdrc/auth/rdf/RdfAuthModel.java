@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -55,9 +56,9 @@ import io.bdrc.restapi.exceptions.RestException;
 public class RdfAuthModel implements Runnable{
     
     static Model authMod; 
-    static ArrayList<User> users;
-    static ArrayList<Group> groups;
-    static ArrayList<Role> roles;
+    static HashMap<String,User> users;
+    static HashMap<String,Group> groups;
+    static HashMap<String,Role> roles;
     static ArrayList<Permission> permissions;
     static ArrayList<Endpoint> endpoints;
     static ArrayList<Application> applications;
@@ -96,34 +97,45 @@ public class RdfAuthModel implements Runnable{
         return false;
     }
        
-    public static ArrayList<User> getUsers(){
+    public static HashMap<String,User> getUsers(){
         if(users!=null) {
             return users;
         }
-        users=new ArrayList<>();
+        users=new HashMap<String,User>();
         ResIterator it=authMod.listResourcesWithProperty(ResourceFactory.createProperty(RDF.type.getURI()),
                 ResourceFactory.createResource(RdfConstants.USER));
         while(it.hasNext()) {
-            Resource rs=it.next();
+            Resource rs=it.next();            
             User user=new User();
             user.setAuthId(rs.getProperty(ResourceFactory.createProperty(RdfConstants.ID)).getObject().toString());
             user.setName(rs.getProperty(ResourceFactory.createProperty(RdfConstants.FOAF_NAME)).getObject().toString());
             user.setEmail(rs.getProperty(ResourceFactory.createProperty(RdfConstants.FOAF_MBOX)).getObject().toString());
             user.setIsSocial(rs.getProperty(ResourceFactory.createProperty(RdfConstants.IS_SOCIAL)).getObject().toString());
             String id=rs.getURI();
-            user.setId(id.substring(0, id.lastIndexOf("/")));
+            user.setId(id.substring(id.lastIndexOf("/")+1));
             user.setProvider(rs.getProperty(ResourceFactory.createProperty(RdfConstants.PROVIDER)).getObject().toString());
             user.setConnection(rs.getProperty(ResourceFactory.createProperty(RdfConstants.CONNECTION)).getObject().toString());
-            users.add(user);
+            StmtIterator sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.HAS_ROLE));
+            for(Statement st:sit.toList()) {
+                String role=st.getObject().toString();
+                user.getRoles().add(role.substring(role.lastIndexOf("/")+1));
+            }
+            sit=rs.listProperties(ResourceFactory.createProperty(RdfConstants.FOR_GROUP));
+            for(Statement st:sit.toList()) {
+                String gp=st.getObject().toString();
+                user.getGroups().add(gp.substring(gp.lastIndexOf("/")+1));
+            }
+            users.put(id.substring(id.lastIndexOf("/")+1),user);            
         }
+        System.out.println(users);
         return users;
     }    
        
-    public static ArrayList<Group> getGroups(){
+    public static HashMap<String,Group> getGroups(){
         if(groups!=null) {
             return groups;
         }
-        groups=new ArrayList<>();
+        groups=new HashMap<String,Group>();
         ResIterator it=authMod.listResourcesWithProperty(RDF.type,
                 ResourceFactory.createResource(RdfConstants.GROUP));
         while(it.hasNext()) {
@@ -143,16 +155,16 @@ public class RdfAuthModel implements Runnable{
             gp.setId(id.substring(id.lastIndexOf("/")+1));
             gp.setName(rs.getProperty(RDFS.label).getObject().toString());
             gp.setDesc(rs.getProperty(ResourceFactory.createProperty(RdfConstants.DESC)).getObject().toString());
-            groups.add(gp);
+            groups.put(id,gp);
         }
         return groups;
     }
     
-    public static ArrayList<Role> getRoles(){
+    public static HashMap<String,Role> getRoles(){
         if(roles!=null) {
             return roles;
         }
-        roles=new ArrayList<>();
+        roles=new HashMap<String,Role>();
         ResIterator it=authMod.listResourcesWithProperty(RDF.type,
                 ResourceFactory.createResource(RdfConstants.ROLE));
         while(it.hasNext()) {
@@ -170,8 +182,7 @@ public class RdfAuthModel implements Runnable{
             String appId=rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPID)).getObject().toString();
             role.setAppId(appId.substring(id.lastIndexOf("/")+1));
             role.setAppType(rs.getProperty(ResourceFactory.createProperty(RdfConstants.APPTYPE)).getObject().toString());
-            
-            roles.add(role);
+            roles.put(id,role);
         }
         return roles;
     }
@@ -197,6 +208,32 @@ public class RdfAuthModel implements Runnable{
         return permissions;
     }
     
+    public static ArrayList<String> getPermissions(ArrayList<String> rls, ArrayList<String> gps){
+        ArrayList<String> perm=new ArrayList<>();
+        for(String rl:rls) {
+            Role role=roles.get(rl);
+            if(role!=null) {
+                for(String p:role.getPermissions()) {
+                    perm.add(p);   
+                }
+            }
+        }
+        for(String rl:rls) {
+            Group gp=groups.get(rl);
+            if(gp!=null) {
+                for(String p:gp.getRoles()) {
+                    Role role=roles.get(p);
+                    if(role!=null) {
+                        for(String pp:role.getPermissions()) {
+                            perm.add(pp);   
+                        }
+                    }  
+                }
+            }
+        }
+        return perm;
+    }
+     
     public static ArrayList<Endpoint> getEndpoints(){
         if(endpoints!=null) {
             return endpoints;
@@ -255,6 +292,10 @@ public class RdfAuthModel implements Runnable{
             applications.add(app);
         }
         return applications;
+    }
+    
+    public static User getUser(String userId) {
+        return users.get(userId);
     }
     
     public static HashMap<String, ArrayList<String>> getPaths() {

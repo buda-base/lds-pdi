@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.auth.Access;
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.TokenValidation;
-import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.rdf.RdfAuthModel;
 
 @Provider
