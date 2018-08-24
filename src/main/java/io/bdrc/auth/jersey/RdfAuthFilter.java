@@ -21,36 +21,33 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 @PreMatching
 public class RdfAuthFilter implements ContainerRequestFilter {
     
-    public final static Logger log=LoggerFactory.getLogger(RdfAuthFilter.class.getName());
-    //AuthDataModelBuilder auth=RdfAuthModel.getAuthModel();
+    public final static Logger log=LoggerFactory.getLogger(RdfAuthFilter.class.getName());    
  
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
-        
+        String appId=AuthProps.getPublicProperty("appId");
         String path=ctx.getUriInfo().getPath();
-        /*log.info("SecuredEndpoint paths >> "+auth.getPaths().contains(path.trim()));
-        log.info("IsSecuredEndpoint >> "+path+ " >> "+auth.isSecuredEndpoint(path));
-        if(auth.isSecuredEndpoint(path)) {
-            //log.info("Prematching filter headers >> "+token);
+        log.info("IsSecuredEndpoint >> "+path+ " >> "+RdfAuthModel.isSecuredEndpoint(appId,path));
+        if(RdfAuthModel.isSecuredEndpoint(appId,path)) {
             String token=getToken(ctx.getHeaderString("Authorization"));            
             if(token==null) {
                 abort(ctx);
             }else {        
                 TokenValidation validation=new TokenValidation(token,AuthProps.getProperty("lds-pdiClientID"));
-                Access access=new Access(validation.getUser(),auth.getEndpoint(path));
+                Access access=new Access(validation.getUser(),RdfAuthModel.getEndpoint(path));
                 System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
                 System.out.println("FILTER Access matchRole >> "+access.matchRole());
                 System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());
                 if(!access.hasAccess()) {
                     abort(ctx);
                 }
-                System.out.println("FILTER endpoint >> "+auth.getEndpoint(path));
+                System.out.println("FILTER endpoint >> "+RdfAuthModel.getEndpoint(path));
                 System.out.println("FILTER user >> "+validation.getUser());
                 
-                ctx.setProperty("endpoint", auth.getEndpoint(path));
+                ctx.setProperty("endpoint", RdfAuthModel.getEndpoint(path));
                 ctx.setProperty("user", validation.getUser());
             }
-        }*/
+        }
     }
     
     void abort(ContainerRequestContext ctx) {

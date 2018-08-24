@@ -228,46 +228,9 @@ public class AuthDataModelBuilder {
             paths.add(end.getPath());
         }
     }
-    
-    public ArrayList<Group> getGroups() {
-        return groups;
-    }
-
-    public ArrayList<Role> getRoles() {
-        return roles;
-    }
-
-    public ArrayList<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public ArrayList<User> getUsers() {
-        return users;
-    }
-
-    public ArrayList<Endpoint> getEndpoints() {
-        return endpoints;
-    }
-    
-    public ArrayList<String> getPaths() {
-        return paths;
-    }
-    
-    public Endpoint getEndpoint(String path) {
-        for(Endpoint e:endpoints) {
-            if(e.getPath().equals(path)) {
-                return e;
-            }
-        }
-        return null;
-    }
 
     public Model getModel() {
         return model;
-    }
-    
-    public boolean isSecuredEndpoint(String path) {
-        return paths.contains(path);
     }
 
     @Override
