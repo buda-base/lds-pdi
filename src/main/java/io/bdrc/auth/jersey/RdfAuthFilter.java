@@ -37,7 +37,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
                 System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
                 System.out.println("FILTER Access matchRole >> "+access.matchRole());
                 System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());
-                if(!access.hasAccess()) {
+                if(!access.hasEndpointAccess()) {
                     abort(ctx);
                 }
                 System.out.println("FILTER endpoint >> "+RdfAuthModel.getEndpoint(path));

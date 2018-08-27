@@ -23,6 +23,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.auth.AuthProps;
+import io.bdrc.auth.rdf.RdfConstants;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -57,6 +59,7 @@ public class AuthDataModelBuilder {
     ArrayList<Permission> permissions;
     ArrayList<User> users;
     ArrayList<Endpoint> endpoints;
+    ArrayList<ResourceAccess> access;
     ArrayList<Application> apps;
     ArrayList<String> paths;
     Model model;
@@ -97,6 +100,7 @@ public class AuthDataModelBuilder {
         setPermissions(token);
         setUsers(token);
         setEndpoints(authMod);
+        setResourceAccess(authMod);
         //Apps require a call with a different audience
         client=HttpClientBuilder.create().build();
         post=new HttpPost("https://bdrc-io.auth0.com/oauth/token");
@@ -250,6 +254,18 @@ public class AuthDataModelBuilder {
             paths.add(end.getPath());
         }
     }
+    
+    private void setResourceAccess(Model authMod) throws ClientProtocolException, IOException {
+        access=new ArrayList<>();
+        Triple t=new Triple(org.apache.jena.graph.Node.ANY,RDF.type.asNode(),
+                NodeFactory.createURI(RdfConstants.RES_ACCESS));
+        ExtendedIterator<Triple> ext=authMod.getGraph().find(t);
+        while(ext.hasNext()) {
+            String st=ext.next().getSubject().getURI();
+            ResourceAccess acc=new ResourceAccess(authMod,st);
+            access.add(acc); 
+        }
+    }
 
     public Model getModel() {
         return model;
@@ -265,8 +281,9 @@ public class AuthDataModelBuilder {
     
     @Override
     public String toString() {
-        return "AuthModel [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", users=" + users
-                + ", endpoints=" + endpoints + ", model=" + model + "]";
+        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions
+                + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths="
+                + paths + ", model=" + model + "]";
     }
 
 }

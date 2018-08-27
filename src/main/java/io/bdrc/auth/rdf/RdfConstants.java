@@ -28,6 +28,7 @@ public class RdfConstants {
     public static final String GROUP="http://purl.bdrc.io/ontology/ext/auth/Group";
     public static final String USER="http://purl.bdrc.io/ontology/ext/auth/User";
     public static final String ENDPOINT="http://purl.bdrc.io/ontology/ext/auth/Endpoint";
+    public static final String RES_ACCESS="http://purl.bdrc.io/ontology/ext/auth/ResourceAccess";
     
     public final static String APPID="http://purl.bdrc.io/ontology/ext/auth/appId";
     public final static String APPTYPE="http://purl.bdrc.io/ontology/ext/auth/appType";
@@ -43,6 +44,7 @@ public class RdfConstants {
     public final static String PROVIDER="http://purl.bdrc.io/ontology/ext/auth/provider";
     public final static String CONNECTION="http://purl.bdrc.io/ontology/ext/auth/connection";
     public final static String ID="http://purl.bdrc.io/ontology/ext/auth/id";
+    public final static String POLICY="http://purl.bdrc.io/ontology/ext/auth/policy";
     
     public final static String FOAF_NAME="http://xmlns.com/foaf/0.1/name";
     public final static String FOAF_MBOX="http://xmlns.com/foaf/0.1/mbox";

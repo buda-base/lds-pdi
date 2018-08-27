@@ -29,6 +29,7 @@ import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.Group;
 import io.bdrc.auth.model.Permission;
+import io.bdrc.auth.model.ResourceAccess;
 import io.bdrc.auth.model.Role;
 import io.bdrc.auth.model.User;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -61,6 +62,7 @@ public class RdfAuthModel implements Runnable{
     static HashMap<String,Role> roles;
     static ArrayList<Permission> permissions;
     static ArrayList<Endpoint> endpoints;
+    static ArrayList<ResourceAccess> access;
     static ArrayList<Application> applications;
     static HashMap<String,ArrayList<String>> paths;
     static long updated;
@@ -127,7 +129,6 @@ public class RdfAuthModel implements Runnable{
             }
             users.put(id.substring(id.lastIndexOf("/")+1),user);            
         }
-        System.out.println(users);
         return users;
     }    
        
@@ -274,6 +275,23 @@ public class RdfAuthModel implements Runnable{
         return endpoints;
     }
     
+    public static ArrayList<ResourceAccess> getResourceAccess(){
+        if(access!=null) {
+            return access;
+        }
+        access=new ArrayList<>();
+        ResIterator it=authMod.listResourcesWithProperty(RDF.type,
+                ResourceFactory.createResource(RdfConstants.RES_ACCESS));
+        while(it.hasNext()) {
+            ResourceAccess acc=new ResourceAccess();
+            Resource rs=it.next(); 
+            acc.setPermission(rs.getProperty(ResourceFactory.createProperty(RdfConstants.FOR_PERM)).getObject().toString());            
+            acc.setPolicy(rs.getProperty(ResourceFactory.createProperty(RdfConstants.POLICY)).getObject().toString());            
+            access.add(acc);
+        }
+        return access;
+    }
+    
     public static ArrayList<Application> getApplications(){
         if(applications!=null) {
             return applications;
@@ -310,6 +328,15 @@ public class RdfAuthModel implements Runnable{
         }
         return null;
     }
+    
+    public static ResourceAccess getResourceAccess(String accessType) {
+        for(ResourceAccess acc:access) {
+            if(acc.getPolicy().equals(accessType)) {
+                return acc;
+            }
+        }
+        return null;
+    }
 
     static void reloadModel() {
         HttpURLConnection connection;
@@ -327,6 +354,7 @@ public class RdfAuthModel implements Runnable{
             getPermissions();
             getEndpoints();
             getApplications();
+            getResourceAccess();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -364,12 +392,6 @@ public class RdfAuthModel implements Runnable{
     public static void main(String[] args) throws RestException {
         ServiceConfig.initForTests();
         reloadModel();
-        getUsers();
-        getGroups();
-        getRoles();
-        getPermissions();
-        getEndpoints();
-        getApplications();
         //Test
         HttpURLConnection connection;
         try {
@@ -384,7 +406,6 @@ public class RdfAuthModel implements Runnable{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println(paths);
         //end test
     }
     

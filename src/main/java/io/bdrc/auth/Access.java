@@ -1,6 +1,8 @@
 package io.bdrc.auth;
 
 import io.bdrc.auth.model.Endpoint;
+import io.bdrc.auth.model.ResourceAccess;
+import io.bdrc.auth.rdf.RdfAuthModel;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -24,7 +26,7 @@ import io.bdrc.auth.model.Endpoint;
 public class Access {
     
     UserProfile user;
-    Endpoint endpoint;    
+    Endpoint endpoint; 
         
     public Access(UserProfile user, Endpoint endpoint) {
         super();
@@ -32,8 +34,12 @@ public class Access {
         this.endpoint = endpoint;
     }
     
-    public boolean hasAccess() {
+    public boolean hasEndpointAccess() {
         return matchGroup() || matchRole() || matchPermissions();        
+    }
+    
+    public boolean hasResourceAccess(String accessType) {
+        return matchResourcePermissions(accessType);        
     }
     
     public boolean matchGroup() {
@@ -61,6 +67,19 @@ public class Access {
         for(String pm:user.getPermissions()) {
             if(endpoint.getPermissions().contains(pm)) {
                 return true;
+            }
+        }
+        return match;
+    }
+    
+    public boolean matchResourcePermissions(String accessType) {
+        boolean match=false;
+        ResourceAccess access=RdfAuthModel.getResourceAccess(accessType);
+        if(access!=null) {
+            for(String pm:user.getPermissions()) {
+                if(access.getPermission().equals(pm)) {
+                    return true;
+                }
             }
         }
         return match;
