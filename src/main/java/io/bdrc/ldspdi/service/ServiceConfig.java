@@ -61,16 +61,16 @@ public class ServiceConfig {
         }
     }
     
-    public static void initForTests() {
-        
+    public static void initForTests(String fusekiUrl) {
         try {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
-            prop.load(input);            
-            input.close();                       
+            prop.load(input);
+            input.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        prop.setProperty(FUSEKI_URL, fusekiUrl);
     }
     
     public static String getProperty(String key){

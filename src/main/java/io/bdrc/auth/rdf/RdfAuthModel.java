@@ -390,7 +390,7 @@ public class RdfAuthModel implements Runnable{
     }
     
     public static void main(String[] args) throws RestException {
-        ServiceConfig.initForTests();
+        ServiceConfig.initForTests(null);
         reloadModel();
         //Test
         HttpURLConnection connection;

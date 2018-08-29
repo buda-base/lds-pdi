@@ -2,9 +2,6 @@ package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.jena.atlas.io.StringWriterI;
@@ -19,20 +17,14 @@ import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.fuseki.embedded.FusekiServer;
-import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFParser;
-import org.apache.jena.riot.RDFParserBuilder;
-import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
-import org.apache.jena.riot.system.StreamRDFLib;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -59,16 +51,16 @@ public class ResServiceTest extends JerseyTest{
     public final static String[] methods= {"GET", "POST"};
     
     @BeforeClass
-    public static void init() {        
-        ServiceConfig.initForTests();
-        loadData();     
+    public static void init() {
+        fusekiUrl="http://localhost:2244/bdrcrw"; 
+        ServiceConfig.initForTests(fusekiUrl);
+        Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
                 .setPort(2244)
                 .add("/bdrcrw", srvds)
-                .build() ;
-        fusekiUrl="http://localhost:2244/bdrcrw";       
+                .build() ;      
         server.start() ;         
     }
     
@@ -114,7 +106,6 @@ public class ResServiceTest extends JerseyTest{
         for(String method:methods) {
             Response res = target("/resource/P1AG29").request()
                     .accept("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                    .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .method(method);
             assertTrue(res.getStatus() == 303);
@@ -130,7 +121,6 @@ public class ResServiceTest extends JerseyTest{
         for(String method:methods) {
             Response res = target("/resource/test").request()
                     .accept("application/xhtml+xml")
-                    .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .method(method);
             if(method.equals("GET")) {
@@ -148,13 +138,11 @@ public class ResServiceTest extends JerseyTest{
         Set<String> map=MediaTypeUtils.getExtensionMimeMap().keySet();
         for(String ent:map) {                
             Response res = target("/resource/P1AG29."+ent).request()
-                    .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .get();
             assertTrue(res.getStatus() == 200);
-            assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent)));
+            assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
             assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
-            assertTrue(res.getHeaderString("TCN").equals("Choice"));
             assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
         }
     }
@@ -162,7 +150,6 @@ public class ResServiceTest extends JerseyTest{
     @Test
     public void WrongResource() {
         Response res = target("/resource/wrong.ttl").request()
-                .header("fusekiUrl", fusekiUrl)
                 .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                 .get();
         assertTrue(res.getStatus() == 404);
@@ -171,7 +158,6 @@ public class ResServiceTest extends JerseyTest{
     @Test
     public void WrongExt() throws RestException {
         Response res = target("/resource/C68.wrong").request()
-                .header("fusekiUrl", fusekiUrl)
                 .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                 .get();
         assertTrue(res.getStatus() == 300);
@@ -183,7 +169,6 @@ public class ResServiceTest extends JerseyTest{
         for(String method:methods) {
             Response res = target("/resource/nonexistant").request()
                     .accept("text/turtle")
-                    .header("fusekiUrl", fusekiUrl)
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .method(method);
             assertTrue(res.getStatus() == 404);
@@ -244,15 +229,6 @@ public class ResServiceTest extends JerseyTest{
         
     }
     
-    static void loadData(){
-        //Loads the test dataset/
-        ArrayList<String> list=TestUtils.getResourcesList();
-        for(String res : list){
-            Model m=getModelFromFileName(TestUtils.TESTDIR+res+".ttl", Lang.TURTLE);
-            model.add(m);
-        }       
-    }
-    
     static void logResponse(Response res) {
         log.info(" Status >> "+res.getStatus());
         log.info(" Vary >> "+res.getHeaderString("Vary"));
@@ -263,27 +239,11 @@ public class ResServiceTest extends JerseyTest{
         log.info(" Entity >> "+res.getEntity());
     }
     
-    static Model getModelFromFileName(String fname, Lang lang) {
-        Model m = ModelFactory.createDefaultModel();
-        Graph g = m.getGraph();
-        try {
-            RDFParserBuilder pb = RDFParser.create()
-                     .source(fname)
-                     .lang(lang);                    
-            pb.parse(StreamRDFLib.graph(g));
-        } catch (RiotException e) {
-            log.error("error reading "+fname);
-            e.printStackTrace();
-            return null;
-        }       
-        return m;
-    }
-    
     public boolean checkAlternates(String url,String alternates) {
-        HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,MediaType> map =MediaTypeUtils.getExtensionMimeMap();
         StringBuilder sb=new StringBuilder("");
-        for(Entry<String,String> e :map.entrySet()) {
-            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
+        for(Entry<String,MediaType> e :map.entrySet()) {
+            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");               
         }
         String alt=sb.toString().substring(0, sb.toString().length()-1);
         List<String> alt1=Arrays.asList(alternates.split(","));        

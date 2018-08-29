@@ -13,7 +13,7 @@ public class MediaTypeUtils {
     public static final ArrayList<String> MIMES;
     public static final HashMap<String,String> JENAFORMAT;
     public static final HashMap<String,String> MIMEFORMAT;
-    public static final HashMap<String,String> EXTENSION;
+    public static final HashMap<String,MediaType> EXTENSION;
     
     public static final MediaType MT_JSONLD = new MediaType("application","ld+json");
     public static final MediaType MT_RT = new MediaType("application","rdf+thrift");
@@ -24,15 +24,24 @@ public class MediaTypeUtils {
     public static final MediaType MT_RDF = new MediaType("application","rdf+xml");
     public static final MediaType MT_OWL = new MediaType("application","owl+xml");
     public static final MediaType MT_TRIX = new MediaType("application","trix+xml");
+    public static final MediaType MT_JSONLD_WA = MediaType.valueOf("application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\"");
+    public static final MediaType MT_JSONLD_OA = MediaType.valueOf("application/ld+json; profile=\"http://www.w3.org/ns/oa.jsonld\"");
     
     public static final List<Variant> resVariants;
     public static final List<Variant> graphVariants;
+    public static final List<Variant> annVariants;
 
     static {
         resVariants = Variant.mediaTypes(MediaType.TEXT_HTML_TYPE,
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
                 MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
                 MT_TRIX).build();
+
+        annVariants = Variant.mediaTypes(MediaType.TEXT_HTML_TYPE,
+                MT_JSONLD_WA, MT_JSONLD_OA, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
+                MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
+                MT_TRIX, MT_JSONLD).add().build();
+        
         graphVariants = Variant.mediaTypes(
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
                 MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
@@ -76,21 +85,21 @@ public class MediaTypeUtils {
         MIMEFORMAT.put("application/trix+xml","trix");
         
         EXTENSION=new HashMap<>();
-        EXTENSION.put("ttl","text/turtle");
-        EXTENSION.put("nt","application/n-triples");
-        EXTENSION.put("nq","application/n-quads");
-        EXTENSION.put("trig","text/trig");
-        EXTENSION.put("rdf","application/rdf+xml");
-        EXTENSION.put("owl","application/owl+xml");
-        EXTENSION.put("jsonld","application/ld+json");
-        EXTENSION.put("rt","application/rdf+thrift");        
-        EXTENSION.put("rj","application/json");
-        EXTENSION.put("json","application/json");
-        EXTENSION.put("trix","application/trix+xml");
+        EXTENSION.put("ttl", MT_TTL);
+        EXTENSION.put("nt", MT_NT);
+        EXTENSION.put("nq", MT_NQ);
+        EXTENSION.put("trig", MT_TRIG);
+        EXTENSION.put("rdf", MT_RDF);
+        EXTENSION.put("owl", MT_OWL);
+        EXTENSION.put("jsonld", MT_JSONLD);
+        EXTENSION.put("rt", MT_RT);        
+        EXTENSION.put("rj", MediaType.APPLICATION_JSON_TYPE);
+        EXTENSION.put("json", MediaType.APPLICATION_JSON_TYPE);
+        EXTENSION.put("trix", MT_TRIX);
 
     }
     
-    public static HashMap<String,String> getExtensionMimeMap(){
+    public static HashMap<String,MediaType> getExtensionMimeMap(){
         return EXTENSION;
     }
     
@@ -102,7 +111,7 @@ public class MediaTypeUtils {
         return MIMEFORMAT.get(mime);
     }
     
-    public static String getMimeFromExtension(String ext) {
+    public static MediaType getMimeFromExtension(String ext) {
         return EXTENSION.get(ext);
     }
     
@@ -122,18 +131,6 @@ public class MediaTypeUtils {
             }
         }
         return valid ;  
-    }
-    
-    public static MediaType getMediaTypeFromExt(String format) {
-        MediaType media=null;        
-        String tmp=getMimeFromExtension(format);
-        if(tmp!=null){
-            if(isMime(tmp)){
-                String[] parts=tmp.split(Pattern.quote("/"));
-                media = new MediaType(parts[0],parts[1]); 
-            }
-        }
-        return media;
     }
     
     public static MediaType getMediaTypeFromMime(String mime) {

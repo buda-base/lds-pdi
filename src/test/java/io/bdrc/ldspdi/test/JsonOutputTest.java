@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
-
 import org.apache.jena.fuseki.embedded.FusekiServer;
-import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
@@ -23,13 +20,8 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFParser;
-import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.ResultSetMgr;
-import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.resultset.ResultSetLang;
-import org.apache.jena.riot.system.StreamRDFLib;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -109,18 +101,18 @@ public class JsonOutputTest {
       
     @BeforeClass
     public static void init() {
-        ServiceConfig.initForTests();
+        fusekiUrl="http://localhost:2245/bdrcrw";
+        ServiceConfig.initForTests(fusekiUrl);
         datasets.put("W_chos_yin","W_Chos_Yin.ttl");
         datasets.put("literal1","literal1.ttl");
         datasets.put("literal3","literal3.ttl");
-        loadData();     
+        Utils.loadDataInModel(model);     
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
                 .setPort(2245)
                 .add("/bdrcrw", srvds)
-                .build() ;
-        fusekiUrl="http://localhost:2245/bdrcrw";       
+                .build() ;       
         server.start() ;        
     }
       
@@ -288,29 +280,4 @@ public class JsonOutputTest {
             return res;
        
     }
-    
-    static void loadData(){
-        //Loads the test dataset/
-        Set<String> list=datasets.keySet();
-        for(String data : list){
-            Model m=getModelFromFileName(TestUtils.TESTDIR+datasets.get(data), Lang.TURTLE);
-            model.add(m);
-        }       
-    }
-    
-    static Model getModelFromFileName(String fname, Lang lang) {
-        Model m = ModelFactory.createDefaultModel();
-        Graph g = m.getGraph();
-        try {
-            RDFParserBuilder pb = RDFParser.create()
-                     .source(fname)
-                     .lang(lang);                    
-            pb.parse(StreamRDFLib.graph(g));
-        } catch (RiotException e) {
-            log.error("error reading "+fname, e);
-            e.printStackTrace();
-            return null;
-        }       
-        return m;
-    } 
 }

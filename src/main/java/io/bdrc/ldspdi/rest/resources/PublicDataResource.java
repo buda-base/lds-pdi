@@ -229,7 +229,7 @@ public class PublicDataResource {
         if(fuseki !=null){
             fusekiUrl=fuseki;            
         }
-        MediaType media=MediaTypeUtils.getMediaTypeFromExt(format);
+        MediaType media=MediaTypeUtils.getMimeFromExtension(format);
         Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
@@ -290,7 +290,7 @@ public class PublicDataResource {
         EntityTag tag=OntData.getEntityTag();
         ResponseBuilder builder = request.evaluatePreconditions(tag);
         if(builder == null){
-            builder = Response.ok(stream,MediaTypeUtils.getMediaTypeFromExt(ext));
+            builder = Response.ok(stream,MediaTypeUtils.getMimeFromExtension(ext));
             builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
         }
         return builder.build();        
@@ -316,7 +316,7 @@ public class PublicDataResource {
     public Response getAuthModel(@Context Request request) throws RestException {        
         log.info("Call to getAuthModel()"); 
         return Response.ok(ResponseOutputStream.getModelStream(
-                QueryProcessor.getAuthDataGraph(fusekiUrl)),MediaTypeUtils.getMediaTypeFromExt("ttl"))
+                QueryProcessor.getAuthDataGraph(fusekiUrl)),MediaTypeUtils.getMimeFromExtension("ttl"))
                 .build();                 
     }
     
@@ -348,7 +348,7 @@ public class PublicDataResource {
     }
     
     private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn) {
-        HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
             if(url.indexOf(".")<0) {
@@ -358,8 +358,8 @@ public class PublicDataResource {
             }
         }
         StringBuilder sb=new StringBuilder("");
-        for(Entry<String,String> e :map.entrySet()) {
-            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
+        for(Entry<String,MediaType> e :map.entrySet()) {
+            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");               
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
         headers.put("TCN", tcn);

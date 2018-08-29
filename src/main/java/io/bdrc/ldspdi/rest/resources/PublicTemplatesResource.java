@@ -227,7 +227,7 @@ public class PublicTemplatesResource {
         QueryFileParser qfp=new QueryFileParser(file+".arq");        
         String query=qfp.getParametizedQuery(hm,false);        
         //format is prevalent
-        MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
+        MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
         if(mediaType==null) {
             mediaType=variant.getMediaType();
         }
@@ -267,7 +267,7 @@ public class PublicTemplatesResource {
         QueryFileParser qfp=new QueryFileParser(file+".arq");
         String query=qfp.getParametizedQuery(map,false);     
         //format is prevalent
-        MediaType mediaType = MediaTypeUtils.getMediaTypeFromExt(format);
+        MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
         if(mediaType==null) {
             mediaType=variant.getMediaType();
         }
@@ -295,7 +295,7 @@ public class PublicTemplatesResource {
     }
     
     private static HashMap<String,String> getGraphResourceHeaders(String url,String ext, String tcn) {
-        HashMap<String,String> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
             if(url.indexOf(".")<0) {
@@ -305,8 +305,8 @@ public class PublicTemplatesResource {
             }
         }
         StringBuilder sb=new StringBuilder("");
-        for(Entry<String,String> e :map.entrySet()) {
-            sb.append("{\""+url+"&format="+e.getKey()+"\" 1.000 {type "+e.getValue()+"}},");               
+        for(Entry<String,MediaType> e :map.entrySet()) {
+            sb.append("{\""+url+"&format="+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");               
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
         headers.put("TCN", tcn);

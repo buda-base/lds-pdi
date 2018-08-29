@@ -60,13 +60,13 @@ public class DatasetBuilder {
     
     public static void writeModel(String construct,String filename) throws IOException, RestException {
         Model model=QueryProcessor.getGraph(construct, fusekiUrl,prefixes);
-        FileWriter fw=new FileWriter(new File(TestUtils.TESTDIR+filename));
+        FileWriter fw=new FileWriter(new File(Utils.TESTDIR+filename));
         model.write(fw, Lang.TURTLE.getName());
         fw.close();
     }
     
     public static void main(String[] args) throws IOException, RestException {
-        ServiceConfig.initForTests();
+        ServiceConfig.initForTests(fusekiUrl);
         //DatasetBuilder.writeModel(Work_chos_dbyings, "W_Chos_Yin.ttl");
         //DatasetBuilder.writeModel(literal1, "literal1.ttl");
         DatasetBuilder.writeModel(literal3, "literal3.ttl");

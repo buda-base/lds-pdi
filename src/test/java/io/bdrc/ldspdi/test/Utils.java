@@ -24,9 +24,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TestUtils {
+import org.apache.jena.graph.Graph;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFParser;
+import org.apache.jena.riot.RDFParserBuilder;
+import org.apache.jena.riot.RiotException;
+import org.apache.jena.riot.system.StreamRDFLib;
+
+public class Utils {
 	
-	final static String TESTDIR = "src/test/";
+	final static String TESTDIR = "src/test/resources/ttl/";
 	final static String TmpDIR = "/tmp";
 	
 	public static String prefixes=
@@ -89,5 +98,29 @@ public class TestUtils {
 		
 		return res;
 	}
+
+    public static void loadDataInModel(Model model){
+        //Loads the test dataset
+        ArrayList<String> list = getResourcesList();
+        for(String res : list){
+            final Model m = getModelFromFileName(Utils.TESTDIR+res+".ttl", Lang.TURTLE);
+            model.add(m);
+        }       
+    }
+    
+    public static Model getModelFromFileName(String fname, Lang lang) {
+        final Model m = ModelFactory.createDefaultModel();
+        final Graph g = m.getGraph();
+        try {
+            RDFParserBuilder pb = RDFParser.create()
+                     .source(fname)
+                     .lang(lang);                    
+            pb.parse(StreamRDFLib.graph(g));
+        } catch (RiotException e) {
+            e.printStackTrace();
+            return null;
+        }       
+        return m;
+    }
 
 }

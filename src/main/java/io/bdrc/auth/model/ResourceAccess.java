@@ -1,7 +1,5 @@
 package io.bdrc.auth.model;
 
-import java.util.ArrayList;
-
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
