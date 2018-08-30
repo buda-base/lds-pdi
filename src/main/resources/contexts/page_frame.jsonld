@@ -1,0 +1,12 @@
+{
+  "@context" : [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://purl.bdrc.io/context.jsonld"
+  ],
+  "@omitDefault": true,
+  "type": "AnnotationPage",
+  "next": {"@embed": false},
+  "prev": {"@embed": false},
+  "partOf": {"@embed": false},
+  "items": {"@embed": true}
+}

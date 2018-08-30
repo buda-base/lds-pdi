@@ -1,6 +1,8 @@
 package io.bdrc.ldspdi.utils;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,6 +48,25 @@ public class Helpers {
     
     public final static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
 	
+    public static InputStream getResourceOrFile(final String baseName) {
+        InputStream stream = null;
+        stream = Helpers.class.getClassLoader().getResourceAsStream("/"+baseName);
+        if (stream != null) {
+            return stream;
+        }
+        stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/"+baseName);
+        if (stream != null) {
+            return stream;
+        }
+        final String fileBaseName = "src/main/resources/"+baseName;
+        try {
+            stream = new FileInputStream(fileBaseName);
+            return stream;
+        } catch (FileNotFoundException e) {
+            return null;
+        }  
+    }
+    
 	public static String removeAccents(String text) {		
 		String f=text;
 		return f == null ? null :

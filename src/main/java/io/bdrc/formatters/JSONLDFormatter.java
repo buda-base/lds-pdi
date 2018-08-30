@@ -1,6 +1,7 @@
 package io.bdrc.formatters;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -34,6 +35,8 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
+import io.bdrc.ldspdi.utils.Helpers;
+
 /*******************************************************************************
  * Copyright (c) 2017-2018 Buddhist Digital Resource Center (BDRC)
  * 
@@ -57,9 +60,13 @@ public class JSONLDFormatter {
     
     protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
-    public static final Map<String,Object> jsonldcontext = getJsonLdContext();
+    public static final Map<String,Object> bdocontext = getBDOContext();
+    public static final Map<String,Object> anncontext = getAnnMergedContext();
     public static final String BDR = "http://purl.bdrc.io/resource/";
     public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
+    static {
+        initializeAnnFrameObjects();
+    }
     
     public static enum DocType {
 	    CORPORATION,
@@ -74,8 +81,12 @@ public class JSONLDFormatter {
 	    ITEM,
 	    WORK,
 	    PRODUCT,
-	    TEST
-	    ;  
+	    TEST,
+	    ANN,
+	    ANC,
+	    ANP,
+	    OA
+	    ;
 	  }
     
     protected static final HashMap<String,DocType> initialToDocType = new HashMap<>();
@@ -106,7 +117,7 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.OFFICE, "Role");        
     }
     
-    public static Map<String,Object> getJsonLdContext() {
+    public static Map<String,Object> getBDOContext() {
         Map<String, Map<String,Object>> map = null;
         try {
             URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
@@ -117,6 +128,47 @@ public class JSONLDFormatter {
             return null;
         }
         return map.get("@context");
+    }
+
+    // return the object corresponding to the context that needs to
+    // be associated with an annotation type for framing. It's a merge
+    // of the json file in src/main/resources/context/ and the BDO context
+    public static Map<String,Object> getAnnMergedContext() {
+        Map<String,Object> res = new HashMap<>();
+        res.putAll(bdocontext);
+        Map<String, Map<String,Object>> map = null;
+        try {
+            InputStream is = Helpers.getResourceOrFile("contexts/ldp.jsonld");
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.putAll(map.get("@context"));
+            is = Helpers.getResourceOrFile("contexts/anno.jsonld");
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.putAll(map.get("@context"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    private static void initializeAnnFrameObjects() {
+        Map<String,Object> res = null;
+        try {
+            InputStream is = Helpers.getResourceOrFile("contexts/annotation_frame.jsonld");
+            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.put("@context", anncontext);
+            typeToFrameObject.put(DocType.ANN, res);
+            typeToFrameObject.put(DocType.OA, res);
+            is = Helpers.getResourceOrFile("contexts/collection_frame.jsonld");
+            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.put("@context", anncontext);
+            typeToFrameObject.put(DocType.ANC, res);
+            is = Helpers.getResourceOrFile("contexts/page_frame.jsonld");
+            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.put("@context", anncontext);
+            typeToFrameObject.put(DocType.ANP, res);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public static Object getFrameObject(DocType type, String mainResourceName) {
@@ -131,7 +183,7 @@ public class JSONLDFormatter {
             jsonObject.put("@type", typeToRootShortUri.get(type));
             typeToFrameObject.put(type, jsonObject);
         }
-        jsonObject.put("@context", jsonldcontext);
+        jsonObject.put("@context", bdocontext);
         return jsonObject;
     }
     
@@ -208,7 +260,7 @@ public class JSONLDFormatter {
      }
 
      @SuppressWarnings("unchecked")
-    public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format, boolean reorder) {
+     public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format, boolean reorder) {
          JsonLDWriteContext ctx = new JsonLDWriteContext();
          JSONLDVariant variant;
          if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) { 
@@ -216,7 +268,7 @@ public class JSONLDFormatter {
              ctx.setFrame(frameObj);
          }
          variant = (RDFFormat.JSONLDVariant) format.getVariant();
-         ctx.setJsonLDContext(jsonldcontext);
+         ctx.setJsonLDContext(bdocontext);
          JsonLdOptions opts = new JsonLdOptions();
          opts.setUseNativeTypes(true);
          opts.setCompactArrays(true);
