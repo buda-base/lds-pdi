@@ -92,7 +92,7 @@ public class TemplatesTest extends JerseyTest{
             assertTrue(code==LdsError.PARSE_ERR);
     }
     
-    @Test
+    /*@Test
     public void TemplateGet() throws JsonProcessingException, IOException {
             Response res = target("/query/missingArg")
                     .queryParam("L_NAME", "rgyal")
@@ -100,7 +100,7 @@ public class TemplatesTest extends JerseyTest{
                     .get();
             System.out.println("STATUS >>"+res.getStatus());
             assertTrue(res.getStatus() == 200);   
-    }
+    }*/
     
     @Test
     public void TemplatePost() throws JsonProcessingException, IOException {
