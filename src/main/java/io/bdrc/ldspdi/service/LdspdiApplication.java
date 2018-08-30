@@ -6,7 +6,7 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 
-import io.bdrc.auth.jersey.RdfAuthFilter;
+//import io.bdrc.auth.jersey.RdfAuthFilter;
 import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CharsetResponseFilter;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
@@ -22,6 +22,6 @@ public class LdspdiApplication extends ResourceConfig {
         property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
         register(CacheControlFilterFactory.class);
         register(CharsetResponseFilter.class);
-        register(RdfAuthFilter.class);
+        //register(RdfAuthFilter.class);
     }
 }

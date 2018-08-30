@@ -247,13 +247,7 @@
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
         <version>3.4.0</version>
-    </dependency>  
-    <!-- local jar (must run mvn initialize before mvn package) -->
-    <dependency>
-        <groupId>io.bdrc.auth</groupId>
-        <artifactId>bdrc-auth</artifactId>
-        <version>0.0.1</version>
-    </dependency> 
+    </dependency>
  </dependencies>
   <build>
     <finalName>lds-pdi</finalName>
@@ -313,26 +307,7 @@
             </dependency>
           </dependencies>
         </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-install-plugin</artifactId>
-            <version>2.5.2</version>
-            <executions>
-                <execution>
-                    <phase>initialize</phase>
-                    <goals>
-                        <goal>install-file</goal>
-                    </goals>
-                    <configuration>
-                        <file>target/bdrc-auth.jar</file>
-                        <groupId>io.bdrc.auth</groupId>
-                        <artifactId>bdrc-auth</artifactId>
-                        <version>0.0.1</version>
-                        <packaging>jar</packaging>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+        
      </plugins>
   </build>
 </project>

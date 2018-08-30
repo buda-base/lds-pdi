@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
@@ -55,7 +54,7 @@ public class BootClass implements javax.servlet.ServletContextListener{
             ServiceConfig.init(params); 
             OntData.init();
             TaxModel.init();
-            RdfAuthModel.init();
+            //RdfAuthModel.init();
         } 
         catch (IllegalArgumentException e) {
             log.error("BootClass init error", e);

@@ -98,6 +98,7 @@ public class TemplatesTest extends JerseyTest{
                     .queryParam("L_NAME", "rgyal")
                     .request()
                     .get();
+            System.out.println("STATUS >>"+res.getStatus());
             assertTrue(res.getStatus() == 200);   
     }
     
