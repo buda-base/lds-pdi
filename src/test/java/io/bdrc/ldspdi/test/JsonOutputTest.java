@@ -103,11 +103,12 @@ public class JsonOutputTest {
     public static void init() {
         fusekiUrl="http://localhost:2245/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
-        datasets.put("W_chos_yin","W_Chos_Yin.ttl");
+        /*datasets.put("W_chos_yin","W_Chos_Yin.ttl");
         datasets.put("literal1","literal1.ttl");
-        datasets.put("literal3","literal3.ttl");
+        datasets.put("literal3","literal3.ttl");*/
         Utils.loadDataInModel(model);     
         srvds.setDefaultModel(model);
+        model.write(System.out, "TURTLE");
         //Creating a fuseki server
         server = FusekiServer.create()
                 .setPort(2245)
@@ -115,7 +116,7 @@ public class JsonOutputTest {
                 .build() ;       
         server.start() ;        
     }
-      
+    
     @Test
     public void testBdrcJsonResultParsing() throws IOException{      
                 
@@ -178,37 +179,39 @@ public class JsonOutputTest {
         HashMap<String,String> params=new HashMap<>();
         params.put(QueryConstants.PAGE_NUMBER, "1");
         params.put(QueryConstants.REQ_METHOD, "POST");
-        ResultSetWrapper rsw=getResults(query1+" limit "+limit, fusekiUrl);
+        ResultSetWrapper rsw=getResults(literal1+" limit "+limit, fusekiUrl);        
         Results rp=new Results(rsw,params);
         ObjectMapper mapper = new ObjectMapper();
-        String json=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rp);
+        String json=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rp);        
         ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes());
         ResultSet rs1=ResultSetFactory.fromJSON(is);
         is=new ByteArrayInputStream(json.getBytes());
         ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.SPARQLResultSetJSON);
         ResultSetRewindable rwd1=ResultSetFactory.copyResults(rs1);
-        ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);        
+        ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);
         assertEquals(rwd1.size(),limit);
         assertEquals(rwd2.size(),limit);
         assertEquals(rwd1.getResultVars(), rwd2.getResultVars());        
         is.close();
     }
     
-    @Test
+    /*@Test
     public void testJsonLiteral3() throws IOException {
         ResultSetWrapper rsw=getResults(literal3+" limit "+limit, fusekiUrl);
         FusekiResultSet frs=new FusekiResultSet(rsw);
         ObjectMapper mapper = new ObjectMapper();
-        String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(frs); 
+        String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(frs);
+        System.out.println("JSON1 >>"+json1);
         ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(literal3+" limit "+limit)).execSelect(); 
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
-        String json2=new String(baos.toByteArray());        
+        String json2=new String(baos.toByteArray());
+        System.out.println("JSON2 >>"+json2);
         JsonNode node1=mapper.readTree(json1);
         JsonNode node2=mapper.readTree(json2);
         baos.close();
         assertEquals(node1, node2);
-    }
+    }*/
     
     @Test
     public void testJsonLiteral2() throws IOException {
@@ -269,7 +272,8 @@ public class JsonOutputTest {
     }
     
     public static ResultSetWrapper getResults(String query, String fuseki) {
-            ResultSetWrapper res;
+        System.out.println("QUERY  >>"+query);    
+        ResultSetWrapper res;
             long start=System.currentTimeMillis(); 
             QueryExecution qe=QueryExecutionFactory.sparqlService(fuseki,QueryFactory.create(query));
             ResultSet jrs=qe.execSelect();           
@@ -280,4 +284,5 @@ public class JsonOutputTest {
             return res;
        
     }
+    
 }

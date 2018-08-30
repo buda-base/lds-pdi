@@ -50,9 +50,12 @@ public class ResultSetWrapper {
         numResults=0;
         mvc_rows=new ArrayList<>();
         rows=new ArrayList<>();
-        while(rs.hasNext()) {            
+        while(rs.hasNext()) {  
+            
             QuerySolution qs=rs.next();
-            rows.add(new Row(head,qs));            
+            
+            rows.add(new Row(head,qs)); 
+            System.out.println("RSNEXT >>"+new Row(head,qs));
             QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);            
             mvc_rows.add(mvc_row);
             numResults++;
