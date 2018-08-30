@@ -54,13 +54,19 @@ public class AnnotationEndpoint {
     public final static int W3C_ANN_MODE = 0;
     public final static int OA_ANN_MODE = 1;
     public final static int DEFAULT_ANN_MODE = W3C_ANN_MODE;
+    
+    public static final String ANN_PREFIX = "bdan";
+    public static final String ANC_PREFIX = "bdac";
+    public static final String ANN_URL = "http://purl.bdrc.io/annotation/";
+    public static final String ANC_URL = "http://purl.bdrc.io/anncollection/";
 
     @GET
     @Path("/{res}")
-    public Response getResourceGraph(@PathParam("res") final String res, @HeaderParam("Accept") String format,
+    public Response getResourceGraph(@PathParam("res") String res, @HeaderParam("Accept") String format,
             @Context UriInfo info, @Context Request request, @Context HttpHeaders headers) throws RestException {
         log.info("Call to getResourceGraphGET() with URL: " + info.getPath() + " Accept >> " + format);
         final MediaType mediaType = getMediaType(request, format);
+        res = ANN_PREFIX+':'+res;
         if (mediaType == null)
             return mediaTypeChoiceResponse(info);
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))

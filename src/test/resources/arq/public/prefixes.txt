@@ -3,6 +3,12 @@ prefix adm:   <http://purl.bdrc.io/ontology/admin/>
 prefix bdd:   <http://purl.bdrc.io/data/>
 prefix bdo:   <http://purl.bdrc.io/ontology/core/>
 prefix bdr:   <http://purl.bdrc.io/resource/>
+prefix bdan:  <http://purl.bdrc.io/annotation/>
+prefix bdac:  <http://purl.bdrc.io/anncollection/>
+prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/>
+prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>
+prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/>
+prefix adr:   <http://purl.bdrc.io/resource-auth/>
 prefix bf:    <http://id.loc.gov/ontologies/bibframe/>
 prefix dcterms: <http://purl.org/dc/terms/>
 prefix f:     <java:io.bdrc.ldspdi.sparql.functions.>
@@ -13,7 +19,9 @@ prefix owl:   <http://www.w3.org/2002/07/owl#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos:  <http://www.w3.org/2004/02/skos/core#>
-prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/>
 prefix vcard: <http://www.w3.org/2006/vcard/ns#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
-prefix text: <http://jena.apache.org/text#>
+prefix text:  <http://jena.apache.org/text#>
+prefix oa:    <http://www.w3.org/ns/oa#>
+prefix as:    <http://www.w3.org/ns/activitystreams#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>

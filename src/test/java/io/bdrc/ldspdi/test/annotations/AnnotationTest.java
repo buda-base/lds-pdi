@@ -5,13 +5,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.jena.fuseki.embedded.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
@@ -60,17 +63,13 @@ public class AnnotationTest extends JerseyTest {
 
     @Test
     public void basicContentType() throws JsonProcessingException, IOException {
-        //String complexaccept = "application/ld+json, application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\";q=0.1";
-        //String complexaccept = "application/ld+json, application/ld+json;other=2;q=0.1";
-        //complexaccept = "application/ld+j2son; q=0.8 , text/turtle; q=0.1";
-        // this thing is very good but has a lot of crappy bugs, as Request.selectVariant ignores the quality factors in Jetty
-        // the bug has been fixed in CXF recently, it should be reported to the jetty people
-        // see https://github.com/apache/cxf/pull/335/files for the fix in CXF
-        final Response res = target("/annotation/C68")
+        // this thing is very good but has a lot of bugs
+        // see https://github.com/eclipse-ee4j/jersey/issues/3923
+        final Response res = target("/annotation/AN123")
                 .request()
                 .header("Accept", JsonLdCTWithProfile)
                 .get();
-        System.out.println(res.getStatus());
+        //System.out.println(res.readEntity(String.class));
         assertTrue(res.getStatus() == 200);
         assertTrue(res.getHeaderString("Content-Type").equals(JsonLdCTWithProfile));
     }

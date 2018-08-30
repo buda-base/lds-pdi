@@ -95,7 +95,7 @@ public class Utils {
 		res.add("P1AG29");
 		res.add("G1KR1355");
 		res.add("W1FPL3356");
-		
+		res.add("AN123");
 		return res;
 	}
 

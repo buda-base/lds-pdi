@@ -76,6 +76,8 @@ public class PublicDataResource {
     public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());  
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     
+    public static final String RES_PREFIX = "bdr";
+    
     
     @GET   
     @JerseyCacheControl()
@@ -133,7 +135,8 @@ public class PublicDataResource {
         @HeaderParam("fusekiUrl") final String fuseki,
         @HeaderParam("Accept") String format,
         @Context UriInfo info,
-        @Context Request request) throws RestException{        
+        @Context Request request) throws RestException {
+        final String prefixedRes = RES_PREFIX+':'+res;
         log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept >> "+format); 
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         if(format == null) {
@@ -151,7 +154,7 @@ public class PublicDataResource {
         final MediaType mediaType = variant.getMediaType();
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
             try {
-                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+prefixedRes));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).
@@ -161,9 +164,9 @@ public class PublicDataResource {
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
-        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(prefixedRes,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -178,7 +181,7 @@ public class PublicDataResource {
         @HeaderParam("Accept") String format,
         @Context UriInfo info,        
         @Context Request request) throws RestException{ 
-        
+        final String prefixedRes = RES_PREFIX+':'+res;
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+ " Variant >> "+variant+ " Accept >> "+format); 
         if(format== null) {
@@ -193,7 +196,7 @@ public class PublicDataResource {
         final MediaType mediaType = variant.getMediaType();
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {            
             try {
-                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+res));
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+prefixedRes));
                 return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()",e));
@@ -202,9 +205,9 @@ public class PublicDataResource {
         if(fuseki !=null){ 
             fusekiUrl=fuseki;            
         }            
-        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(prefixedRes,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
@@ -219,7 +222,8 @@ public class PublicDataResource {
             @DefaultValue("ttl") @PathParam("ext") final String format,
             @HeaderParam("fusekiUrl") final String fuseki,
             @Context UriInfo info) throws RestException{
-        log.info("Call to getFormattedResourceGraph()"); 
+        log.info("Call to getFormattedResourceGraph()");
+        final String prefixedRes = RES_PREFIX+':'+res;
         if(MediaTypeUtils.getMimeFromExtension(format)==null) {
             final String html=Helpers.getMultiChoicesHtml("/resource/"+res,true);
             final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
@@ -230,9 +234,9 @@ public class PublicDataResource {
             fusekiUrl=fuseki;            
         }
         MediaType media=MediaTypeUtils.getMimeFromExtension(format);
-        Model model=QueryProcessor.getCoreResourceGraph(res,fusekiUrl,null);
+        Model model=QueryProcessor.getCoreResourceGraph(prefixedRes,fusekiUrl,null);
         if(model.size()==0) {
-            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
+            throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, res),media);
         return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();                     

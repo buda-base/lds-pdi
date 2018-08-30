@@ -54,7 +54,7 @@ public class QueryProcessor {
 	    if(model==null) {
 	        QueryFileParser qfp=new QueryFileParser("Resgraph.arq","library"); 
 	        HashMap<String,String> map=new HashMap<>();
-	        map.put("R_RES","bdr:"+resID);
+	        map.put("R_RES", resID);
 	        String query=qfp.getParametizedQuery(map,false);
     		Query q=QueryFactory.create(prefixes+" "+query);
     		QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
@@ -184,6 +184,8 @@ public class QueryProcessor {
                     " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" + 
                     " PREFIX adm: <http://purl.bdrc.io/ontology/admin/>\n" + 
                     " PREFIX bdr: <http://purl.bdrc.io/resource/>\n" + 
+                    " PREFIX bdan: <http://purl.bdrc.io/annotation/>\n" +
+                    " PREFIX bdac: <http://purl.bdrc.io/anncollection/>\n" +
                     " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
                     " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" + 
                     " PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" + 
