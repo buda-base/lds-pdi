@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -43,25 +42,25 @@ import io.bdrc.ldspdi.utils.Helpers;
 
 /*******************************************************************************
  * Copyright (c) 2017-2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class JSONLDFormatter {
-    
+
     protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
     public static final Map<String,Object> bdoContextObject = getBDOContext();
@@ -83,27 +82,27 @@ public class JSONLDFormatter {
     static {
         initializeAnnFrameObjects();
     }
-    
+
     public static enum DocType {
-	    CORPORATION,
-	    LINEAGE,
-	    ETEXT,
-	    ETEXTCONTENT,
-	    ROLE,
-	    PERSON,
-	    VOLUME,
-	    PLACE,
-	    TOPIC,
-	    ITEM,
-	    WORK,
-	    PRODUCT,
-	    TEST,
-	    ANN,
-	    ANC,
-	    ANP,
-	    OA
-	    ;
-	  }
+        CORPORATION,
+        LINEAGE,
+        ETEXT,
+        ETEXTCONTENT,
+        ROLE,
+        PERSON,
+        VOLUME,
+        PLACE,
+        TOPIC,
+        ITEM,
+        WORK,
+        PRODUCT,
+        TEST,
+        ANN,
+        ANC,
+        ANP,
+        OA
+        ;
+    }
 
     public final static Map<DocType,Object> docTypeToSimpleContext = new HashMap<>();
     static {
@@ -118,7 +117,7 @@ public class JSONLDFormatter {
         docTypeToSimpleContext.put(DocType.CORPORATION, simpleContext);
         docTypeToSimpleContext.put(DocType.PRODUCT, simpleContext);
         docTypeToSimpleContext.put(DocType.ITEM, simpleContext);
-        docTypeToSimpleContext.put(DocType.ROLE, simpleContext);        
+        docTypeToSimpleContext.put(DocType.ROLE, simpleContext);
         docTypeToSimpleContext.put(DocType.ANN, Arrays.asList(simpleContext, annoContext));
         // this is what's in the context, so not OrderedCollection
         docTypeToSimpleContext.put(DocType.ANC, Arrays.asList(simpleContext, annoContext, ldpContext));
@@ -138,13 +137,13 @@ public class JSONLDFormatter {
         docTypeToContextObject.put(DocType.CORPORATION, bdoContextObject);
         docTypeToContextObject.put(DocType.PRODUCT, bdoContextObject);
         docTypeToContextObject.put(DocType.ITEM, bdoContextObject);
-        docTypeToContextObject.put(DocType.ROLE, bdoContextObject);        
+        docTypeToContextObject.put(DocType.ROLE, bdoContextObject);
         docTypeToContextObject.put(DocType.ANN, annContextObject);
         docTypeToContextObject.put(DocType.ANC, annContextObject);
         docTypeToContextObject.put(DocType.ANP, annContextObject);
         docTypeToContextObject.put(DocType.OA, oaContextObject);
     }
-    
+
     public static final Map<String,DocType> typeToDocType = new HashMap<>();
     static {
         typeToDocType.put("Person", DocType.PERSON);
@@ -161,8 +160,8 @@ public class JSONLDFormatter {
         typeToDocType.put("OrderedCollection", DocType.ANC);
         typeToDocType.put("OrderedCollectionPage", DocType.ANP);
     }
-    
-    
+
+
     public static final Map<DocType,Object> typeToRootShortUri = new EnumMap<>(DocType.class);
     static {
         typeToRootShortUri.put(DocType.PERSON, "Person");
@@ -174,18 +173,18 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.CORPORATION, "Corporation");
         typeToRootShortUri.put(DocType.PRODUCT, "adm:Product");
         typeToRootShortUri.put(DocType.ITEM, Arrays.asList("Item", "ItemImageAsset", "ItemInputEtext", "ItemOCREtext", "ItemPhysicalAsset"));
-        typeToRootShortUri.put(DocType.ROLE, "Role");        
+        typeToRootShortUri.put(DocType.ROLE, "Role");
         typeToRootShortUri.put(DocType.ANN, "Annotation");
         // this is what's in the context, so not OrderedCollection
         typeToRootShortUri.put(DocType.ANC, "AnnotationCollection");
         typeToRootShortUri.put(DocType.ANP, "AnnotationPage");
     }
-    
+
     public static Map<String,Object> getBDOContext() {
         Map<String, Map<String,Object>> map = null;
         try {
             URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
-            map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});                       
+            map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});
         } catch (Exception e) {
             log.error("Error reading context file :"+ e);
             e.printStackTrace();
@@ -248,13 +247,13 @@ public class JSONLDFormatter {
             e.printStackTrace();
         }
     }
-    
+
     public static Object getFrameObject(DocType type, String mainResourceUri) {
         // for works, we frame by @id, for cases with outlines
-        boolean needsId = (type == DocType.WORK || type == DocType.TEST);  
+        boolean needsId = (type == DocType.WORK || type == DocType.TEST);
         if (!needsId && typeToFrameObject.containsKey(type))
             return typeToFrameObject.get(type);
-        Map<String,Object> jsonObject = new HashMap<>(); 
+        Map<String,Object> jsonObject = new HashMap<>();
         if (needsId) {
             jsonObject.put("@id", BDR+mainResourceUri);
         } else {
@@ -264,133 +263,134 @@ public class JSONLDFormatter {
         jsonObject.put("@context", bdoContextObject);
         return jsonObject;
     }
-    
+
     static class JsonLDComparator implements Comparator<String>
-     {
-         public int compare(String s1, String s2)
-         {
-             if(s1.equals("adm:logEntry")) return 1;
-             if(s2.equals("adm:logEntry")) return -1;
-             if(s1.startsWith("adm:")) return 1;
-             if(s1.startsWith("tbr:")) return 1;
-             if(s2.startsWith("adm:")) return -1;
-             if(s2.startsWith("tbr:")) return -1;
-             if(s1.equals("@context")) return 1;
-             if(s1.equals("@graph")) return -1;
-             if(s1.equals("rdfs:label")) return -1;
-             if(s1.equals("skos:prefLabel")) return -1;
-             if(s1.equals("skos:altLabel")) return -1;
-             return s1.compareTo(s2);
-         }
-     }
-     
-     @SuppressWarnings("unchecked")
-     protected static void insertRec(String k, Object v, SortedMap<String,Object> tm) throws IllegalArgumentException {
-         if (k.equals("@graph")) {
-             if (v instanceof ArrayList) {
-                 if (((ArrayList<Object>) v).size() == 0) {
-                     tm.put(k,v);
-                     //throw new IllegalArgumentException("empty graph, shouldn't happen!");
-                     return;
-                 }
-                 Object o = ((ArrayList<Object>) v).get(0);
-                 if (o instanceof Map) {
-                     Map<String,Object> orderedo = orderEntries((Map<String,Object>) o);
-                     ((ArrayList<Object>) v).set(0, orderedo);
-                 }
-                 tm.put(k, v);
-             } else {// supposing v instance of Map
-                 tm.put(k, orderEntries( (Map<String,Object>) v));
-             }
-         } else {
-             tm.put(k, v);
-         }
-     }
-     
-     // reorder list
-     protected static Map<String,Object> orderEntries(Map<String,Object> input) throws IllegalArgumentException
-     {
-         SortedMap<String,Object> res = new TreeMap<>(new JsonLDComparator());
-         // TODO: maybe it should be recursive? at least for outlines...
-         input.forEach( (k,v) ->  insertRec(k, v, res) );
-         return res; 
-     }
+    {
+        @Override
+        public int compare(String s1, String s2)
+        {
+            if(s1.equals("adm:logEntry")) return 1;
+            if(s2.equals("adm:logEntry")) return -1;
+            if(s1.startsWith("adm:")) return 1;
+            if(s1.startsWith("tbr:")) return 1;
+            if(s2.startsWith("adm:")) return -1;
+            if(s2.startsWith("tbr:")) return -1;
+            if(s1.equals("@context")) return 1;
+            if(s1.equals("@graph")) return -1;
+            if(s1.equals("rdfs:label")) return -1;
+            if(s1.equals("skos:prefLabel")) return -1;
+            if(s1.equals("skos:altLabel")) return -1;
+            return s1.compareTo(s2);
+        }
+    }
 
-     public static DocType getDocType(final Model m, final String mainResourceUri) {
-         final NodeIterator ni = m.listObjectsOfProperty(m.getResource(mainResourceUri), RDF.type);
-         DocType res = null;
-         while (ni.hasNext()) {
-             final RDFNode n = ni.next();
-             final String t = n.asResource().getLocalName();
-             res = typeToDocType.get(t);
-             if (res != null)
-                 return res;
-         }
-         return res;
-     }
-     
-     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri) {
-    	 final DocType type  = getDocType(m, mainResourceUri);
-    	 if (type == null) {
-    	     log.error("not able to determine type of resource "+mainResourceUri);
-    	     return null;
-    	 }
-    	 return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
-     }
+    @SuppressWarnings("unchecked")
+    protected static void insertRec(String k, Object v, SortedMap<String,Object> tm) throws IllegalArgumentException {
+        if (k.equals("@graph")) {
+            if (v instanceof ArrayList) {
+                if (((ArrayList<Object>) v).size() == 0) {
+                    tm.put(k,v);
+                    //throw new IllegalArgumentException("empty graph, shouldn't happen!");
+                    return;
+                }
+                Object o = ((ArrayList<Object>) v).get(0);
+                if (o instanceof Map) {
+                    Map<String,Object> orderedo = orderEntries((Map<String,Object>) o);
+                    ((ArrayList<Object>) v).set(0, orderedo);
+                }
+                tm.put(k, v);
+            } else {// supposing v instance of Map
+                tm.put(k, orderEntries( (Map<String,Object>) v));
+            }
+        } else {
+            tm.put(k, v);
+        }
+    }
 
-     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {
-         if (type == null) {
-             type  = getDocType(m, mainResourceUri);
-             if (type == null) {
-                 log.error("not able to determine type of resource "+mainResourceUri);
-                 return null;
-             }
-         }
-         return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
-     }
+    // reorder list
+    protected static Map<String,Object> orderEntries(Map<String,Object> input) throws IllegalArgumentException
+    {
+        SortedMap<String,Object> res = new TreeMap<>(new JsonLDComparator());
+        // TODO: maybe it should be recursive? at least for outlines...
+        input.forEach( (k,v) ->  insertRec(k, v, res) );
+        return res;
+    }
 
-     @SuppressWarnings("unchecked")
-     public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
-         JsonLDWriteContext ctx = new JsonLDWriteContext();
-         JSONLDVariant variant;
-         if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) { 
-             Object frameObj = getFrameObject(type, mainResourceUri);
-             ctx.setFrame(frameObj);
-         }
-         variant = (RDFFormat.JSONLDVariant) format.getVariant();
-         ctx.setJsonLDContext(docTypeToContextObject.get(type));
-         ctx.setOptions(jsonLdOptions);
-         DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
-         PrefixMap pm = RiotLib.prefixMap(g);
-         Map<String,Object> tm;
-         try {
-             tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
-             // replacing context with URI
-             tm.replace("@context", docTypeToSimpleContext.get(type));
-             if (reorder)
-                 tm = orderEntries(tm);
-         } catch (JsonLdError | IOException e) {
-             e.printStackTrace();
-             return null;
-         }
-         return tm;
-     }
-     
-     public static void jsonObjectToOutputStream(Object jsonObject, OutputStream out) {
-         Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8) ;
-         try {
-             JsonUtils.writePrettyPrint(wr, jsonObject) ;
-             wr.write("\n");
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-         IO.flush(wr) ;
-     } 
-     
-     public static void writeModelAsCompact(Model m, OutputStream out) {
-         Object jsonO = modelToJsonObject(m, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
-         jsonObjectToOutputStream(jsonO, out);
-     }
-     
+    public static DocType getDocType(final Model m, final String mainResourceUri) {
+        final NodeIterator ni = m.listObjectsOfProperty(m.getResource(mainResourceUri), RDF.type);
+        DocType res = null;
+        while (ni.hasNext()) {
+            final RDFNode n = ni.next();
+            final String t = n.asResource().getLocalName();
+            res = typeToDocType.get(t);
+            if (res != null)
+                return res;
+        }
+        return res;
+    }
+
+    public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri) {
+        final DocType type  = getDocType(m, mainResourceUri);
+        if (type == null) {
+            log.error("not able to determine type of resource "+mainResourceUri);
+            return null;
+        }
+        return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
+    }
+
+    public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {
+        if (type == null) {
+            type  = getDocType(m, mainResourceUri);
+            if (type == null) {
+                log.error("not able to determine type of resource "+mainResourceUri);
+                return null;
+            }
+        }
+        return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
+        JsonLDWriteContext ctx = new JsonLDWriteContext();
+        JSONLDVariant variant;
+        if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) {
+            Object frameObj = getFrameObject(type, mainResourceUri);
+            ctx.setFrame(frameObj);
+        }
+        variant = (RDFFormat.JSONLDVariant) format.getVariant();
+        ctx.setJsonLDContext(docTypeToContextObject.get(type));
+        ctx.setOptions(jsonLdOptions);
+        DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
+        PrefixMap pm = RiotLib.prefixMap(g);
+        Map<String,Object> tm;
+        try {
+            tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
+            // replacing context with URI
+            tm.replace("@context", docTypeToSimpleContext.get(type));
+            if (reorder)
+                tm = orderEntries(tm);
+        } catch (JsonLdError | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return tm;
+    }
+
+    public static void jsonObjectToOutputStream(Object jsonObject, OutputStream out) {
+        Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8) ;
+        try {
+            JsonUtils.writePrettyPrint(wr, jsonObject) ;
+            wr.write("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        IO.flush(wr) ;
+    }
+
+    public static void writeModelAsCompact(Model m, OutputStream out) {
+        Object jsonO = modelToJsonObject(m, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
+        jsonObjectToOutputStream(jsonO, out);
+    }
+
 }
 
