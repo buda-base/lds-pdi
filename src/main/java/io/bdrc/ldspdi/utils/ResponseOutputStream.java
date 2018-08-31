@@ -32,6 +32,7 @@ import org.apache.jena.riot.RDFWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
+import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.formatters.TTLRDFWriter;
 
 public class ResponseOutputStream {
@@ -56,20 +57,20 @@ public class ResponseOutputStream {
         return stream;
     }
     
-    public static StreamingOutput getModelStream(final Model model, String format, final String res) {
+    public static StreamingOutput getModelStream(final Model model, String format, final String res, DocType docType) {
         StreamingOutput stream = new StreamingOutput() {
-            public void write(OutputStream os){                
-                 
+            public void write(OutputStream os){
+                // might be very inefficient is write is called multiple times (?)
                 if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
                     if(format.equalsIgnoreCase("jsonld")) {      
-                        Object json = JSONLDFormatter.modelToJsonObject(model, res);
+                        Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
                         JSONLDFormatter.jsonObjectToOutputStream(json, os);
                     } else {
                         model.write(os,MediaTypeUtils.getJenaFromExtension(format));
                     }
                 } else {
-                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);                   
-                    writer.output(os);                                      
+                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                    writer.output(os);
                 }                
             }
         };

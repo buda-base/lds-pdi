@@ -22,6 +22,7 @@ import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -55,10 +56,10 @@ public class AnnotationEndpoint {
     public final static int OA_ANN_MODE = 1;
     public final static int DEFAULT_ANN_MODE = W3C_ANN_MODE;
     
-    public static final String ANN_PREFIX = "bdan";
-    public static final String ANC_PREFIX = "bdac";
-    public static final String ANN_URL = "http://purl.bdrc.io/annotation/";
-    public static final String ANC_URL = "http://purl.bdrc.io/anncollection/";
+    public static final String ANN_PREFIX_SHORT = "bdan";
+    public static final String ANC_PREFIX_SHORT = "bdac";
+    public static final String ANN_PREFIX = "http://purl.bdrc.io/annotation/";
+    public static final String ANC_PREFIX = "http://purl.bdrc.io/anncollection/";
 
     @GET
     @Path("/{res}")
@@ -66,28 +67,32 @@ public class AnnotationEndpoint {
             @Context UriInfo info, @Context Request request, @Context HttpHeaders headers) throws RestException {
         log.info("Call to getResourceGraphGET() with URL: " + info.getPath() + " Accept >> " + format);
         final MediaType mediaType = getMediaType(request, format);
-        res = ANN_PREFIX+':'+res;
+        String prefixedRes = ANN_PREFIX_SHORT+':'+res;
         if (mediaType == null)
             return mediaTypeChoiceResponse(info);
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
-            return htmlResponse(info, res);
+            return htmlResponse(info, prefixedRes);
         int mode = DEFAULT_ANN_MODE;
         String contentType = mediaType.toString();
+        DocType docType = DocType.ANN;
         System.out.println(mediaType.getParameters());
+        String ext = null;
         if (mediaType.getSubtype().equals("ld+json")) {
+            ext = "jsonld";
             mode = getJsonLdMode(mediaType);
             if (mode == OA_ANN_MODE) {
                 contentType = OA_CT;
+                docType = DocType.OA;
             } else {
                 contentType = W3C_CT;
             }
+        } else {
+            ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         }
-        
-        Model model = QueryProcessor.getCoreResourceGraph(res, fusekiUrl, null);
+        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null);
         if (model.size() == 0)
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, docType));
         return setHeaders(builder, getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
     }
 

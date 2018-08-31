@@ -37,7 +37,8 @@ public class AnnotationTest extends JerseyTest {
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
     public final static Logger log = LoggerFactory.getLogger(AnnotationTest.class.getName());
-    public final static String JsonLdCTWithProfile = "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\"";
+    public final static String JsonLdCTWithAnnoProfile = "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\"";
+    public final static String JsonLdCTWithOaProfile = "application/ld+json; profile=\"http://www.w3.org/ns/oa.jsonld\"";
 
     @BeforeClass
     public static void init() {
@@ -63,15 +64,13 @@ public class AnnotationTest extends JerseyTest {
 
     @Test
     public void basicContentType() throws JsonProcessingException, IOException {
-        // this thing is very good but has a lot of bugs
-        // see https://github.com/eclipse-ee4j/jersey/issues/3923
         final Response res = target("/annotation/AN123")
                 .request()
-                .header("Accept", JsonLdCTWithProfile)
+                .header("Accept", JsonLdCTWithAnnoProfile)
                 .get();
-        //System.out.println(res.readEntity(String.class));
+        System.out.println(res.readEntity(String.class));
         assertTrue(res.getStatus() == 200);
-        assertTrue(res.getHeaderString("Content-Type").equals(JsonLdCTWithProfile));
+        assertTrue(res.getHeaderString("Content-Type").equals(JsonLdCTWithAnnoProfile));
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -19,6 +20,8 @@ import org.apache.jena.atlas.io.IO;
 import org.apache.jena.atlas.lib.Chars;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFFormat.JSONLDVariant;
@@ -26,6 +29,7 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +64,22 @@ public class JSONLDFormatter {
     
     protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
-    public static final Map<String,Object> bdocontext = getBDOContext();
-    public static final Map<String,Object> anncontext = getAnnMergedContext();
+    public static final Map<String,Object> bdoContextObject = getBDOContext();
+    public static final Map<String,Object> annContextObject = getAnnMergedContext();
+    public static final Map<String,Object> oaContextObject = getOaMergedContext();
     public static final String BDR = "http://purl.bdrc.io/resource/";
     public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
+    public final static String simpleContext = "http://purl.bdrc.io/context.jsonld";
+    public final static String annoContext = "http://www.w3.org/ns/anno.jsonld";
+    public final static String oaContext = "http://www.w3.org/ns/oa.jsonld";
+    public final static String ldpContext = "http://www.w3.org/ns/ldp.jsonld";
+    public final static JsonLdOptions jsonLdOptions = new JsonLdOptions();
+    static {
+        jsonLdOptions.setUseNativeTypes(true);
+        jsonLdOptions.setCompactArrays(true);
+        jsonLdOptions.setPruneBlankNodeIdentifiers(true);
+    }
+
     static {
         initializeAnnFrameObjects();
     }
@@ -73,7 +89,7 @@ public class JSONLDFormatter {
 	    LINEAGE,
 	    ETEXT,
 	    ETEXTCONTENT,
-	    OFFICE,
+	    ROLE,
 	    PERSON,
 	    VOLUME,
 	    PLACE,
@@ -88,20 +104,64 @@ public class JSONLDFormatter {
 	    OA
 	    ;
 	  }
-    
-    protected static final HashMap<String,DocType> initialToDocType = new HashMap<>();
+
+    public final static Map<DocType,Object> docTypeToSimpleContext = new HashMap<>();
     static {
-    	initialToDocType.put("P", DocType.PERSON);
-    	initialToDocType.put("V", DocType.VOLUME);
-    	initialToDocType.put("W", DocType.WORK);
-    	initialToDocType.put("G", DocType.PLACE);
-    	initialToDocType.put("T", DocType.TOPIC);
-    	initialToDocType.put("L", DocType.LINEAGE);
-    	initialToDocType.put("C", DocType.CORPORATION);
-    	initialToDocType.put("PR", DocType.PRODUCT);
-    	initialToDocType.put("I", DocType.ITEM);
-    	initialToDocType.put("R", DocType.OFFICE);    	
+        // these are what will appear in the @context property of the output,
+        // just URIs replacing the whole context
+        docTypeToSimpleContext.put(DocType.PERSON, simpleContext);
+        docTypeToSimpleContext.put(DocType.VOLUME, simpleContext);
+        docTypeToSimpleContext.put(DocType.WORK, simpleContext);
+        docTypeToSimpleContext.put(DocType.PLACE, simpleContext);
+        docTypeToSimpleContext.put(DocType.TOPIC, simpleContext);
+        docTypeToSimpleContext.put(DocType.LINEAGE, simpleContext);
+        docTypeToSimpleContext.put(DocType.CORPORATION, simpleContext);
+        docTypeToSimpleContext.put(DocType.PRODUCT, simpleContext);
+        docTypeToSimpleContext.put(DocType.ITEM, simpleContext);
+        docTypeToSimpleContext.put(DocType.ROLE, simpleContext);        
+        docTypeToSimpleContext.put(DocType.ANN, Arrays.asList(simpleContext, annoContext));
+        // this is what's in the context, so not OrderedCollection
+        docTypeToSimpleContext.put(DocType.ANC, Arrays.asList(simpleContext, annoContext, ldpContext));
+        docTypeToSimpleContext.put(DocType.ANP, Arrays.asList(simpleContext, annoContext));
+        docTypeToSimpleContext.put(DocType.OA, Arrays.asList(simpleContext, oaContext));
     }
+
+    public final static Map<DocType,Object> docTypeToContextObject = new HashMap<>();
+    static {
+        // these are what will be passed to the json-ld api, the complete context objects
+        docTypeToContextObject.put(DocType.PERSON, bdoContextObject);
+        docTypeToContextObject.put(DocType.VOLUME, bdoContextObject);
+        docTypeToContextObject.put(DocType.WORK, bdoContextObject);
+        docTypeToContextObject.put(DocType.PLACE, bdoContextObject);
+        docTypeToContextObject.put(DocType.TOPIC, bdoContextObject);
+        docTypeToContextObject.put(DocType.LINEAGE, bdoContextObject);
+        docTypeToContextObject.put(DocType.CORPORATION, bdoContextObject);
+        docTypeToContextObject.put(DocType.PRODUCT, bdoContextObject);
+        docTypeToContextObject.put(DocType.ITEM, bdoContextObject);
+        docTypeToContextObject.put(DocType.ROLE, bdoContextObject);        
+        docTypeToContextObject.put(DocType.ANN, annContextObject);
+        docTypeToContextObject.put(DocType.ANC, annContextObject);
+        docTypeToContextObject.put(DocType.ANP, annContextObject);
+        docTypeToContextObject.put(DocType.OA, oaContextObject);
+    }
+    
+    public static final Map<String,DocType> typeToDocType = new HashMap<>();
+    static {
+        typeToDocType.put("Person", DocType.PERSON);
+        typeToDocType.put("Volume", DocType.VOLUME);
+        typeToDocType.put("Work", DocType.WORK);
+        typeToDocType.put("Place", DocType.PLACE);
+        typeToDocType.put("Topic", DocType.TOPIC);
+        typeToDocType.put("Lineage", DocType.LINEAGE);
+        typeToDocType.put("Corporation", DocType.CORPORATION);
+        typeToDocType.put("Product", DocType.PRODUCT);
+        typeToDocType.put("Item", DocType.ITEM);
+        typeToDocType.put("Role", DocType.ROLE);
+        typeToDocType.put("Annotation", DocType.ANN);
+        typeToDocType.put("OrderedCollection", DocType.ANC);
+        typeToDocType.put("OrderedCollectionPage", DocType.ANP);
+    }
+    
     
     public static final Map<DocType,Object> typeToRootShortUri = new EnumMap<>(DocType.class);
     static {
@@ -114,7 +174,11 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.CORPORATION, "Corporation");
         typeToRootShortUri.put(DocType.PRODUCT, "adm:Product");
         typeToRootShortUri.put(DocType.ITEM, Arrays.asList("Item", "ItemImageAsset", "ItemInputEtext", "ItemOCREtext", "ItemPhysicalAsset"));
-        typeToRootShortUri.put(DocType.OFFICE, "Role");        
+        typeToRootShortUri.put(DocType.ROLE, "Role");        
+        typeToRootShortUri.put(DocType.ANN, "Annotation");
+        // this is what's in the context, so not OrderedCollection
+        typeToRootShortUri.put(DocType.ANC, "AnnotationCollection");
+        typeToRootShortUri.put(DocType.ANP, "AnnotationPage");
     }
     
     public static Map<String,Object> getBDOContext() {
@@ -135,7 +199,7 @@ public class JSONLDFormatter {
     // of the json file in src/main/resources/context/ and the BDO context
     public static Map<String,Object> getAnnMergedContext() {
         Map<String,Object> res = new HashMap<>();
-        res.putAll(bdocontext);
+        res.putAll(bdoContextObject);
         Map<String, Map<String,Object>> map = null;
         try {
             InputStream is = Helpers.getResourceOrFile("contexts/ldp.jsonld");
@@ -150,48 +214,55 @@ public class JSONLDFormatter {
         return res;
     }
 
+    public static Map<String,Object> getOaMergedContext() {
+        Map<String,Object> res = new HashMap<>();
+        res.putAll(bdoContextObject);
+        Map<String, Map<String,Object>> map = null;
+        try {
+            InputStream is = Helpers.getResourceOrFile("contexts/oa.jsonld");
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            res.putAll(map.get("@context"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     private static void initializeAnnFrameObjects() {
         Map<String,Object> res = null;
         try {
             InputStream is = Helpers.getResourceOrFile("contexts/annotation_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
-            res.put("@context", anncontext);
+            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANN, res);
             typeToFrameObject.put(DocType.OA, res);
             is = Helpers.getResourceOrFile("contexts/collection_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
-            res.put("@context", anncontext);
+            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANC, res);
             is = Helpers.getResourceOrFile("contexts/page_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
-            res.put("@context", anncontext);
+            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANP, res);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    public static Object getFrameObject(DocType type, String mainResourceName) {
+    public static Object getFrameObject(DocType type, String mainResourceUri) {
         // for works, we frame by @id, for cases with outlines
         boolean needsId = (type == DocType.WORK || type == DocType.TEST);  
         if (!needsId && typeToFrameObject.containsKey(type))
             return typeToFrameObject.get(type);
         Map<String,Object> jsonObject = new HashMap<>(); 
         if (needsId) {
-            jsonObject.put("@id", BDR+mainResourceName);
+            jsonObject.put("@id", BDR+mainResourceUri);
         } else {
             jsonObject.put("@type", typeToRootShortUri.get(type));
             typeToFrameObject.put(type, jsonObject);
         }
-        jsonObject.put("@context", bdocontext);
+        jsonObject.put("@context", bdoContextObject);
         return jsonObject;
-    }
-    
-    // should be replaced by a proper mapping from the type of a resource,
-    // the URI shouldn't carry semantics...
-    public static Object getFrameObject(String mainResourceName) {
-    	DocType type = initialToDocType.get(mainResourceName.substring(0,1));
-        return getFrameObject(type, mainResourceName);
     }
     
     static class JsonLDComparator implements Comparator<String>
@@ -244,44 +315,58 @@ public class JSONLDFormatter {
          input.forEach( (k,v) ->  insertRec(k, v, res) );
          return res; 
      }
-     
-     public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName) {
-         return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY, true);
+
+     public static DocType getDocType(final Model m, final String mainResourceUri) {
+         final NodeIterator ni = m.listObjectsOfProperty(m.getResource(mainResourceUri), RDF.type);
+         DocType res = null;
+         while (ni.hasNext()) {
+             final RDFNode n = ni.next();
+             final String t = n.asResource().getLocalName();
+             res = typeToDocType.get(t);
+             if (res != null)
+                 return res;
+         }
+         return res;
      }
      
-     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceName) {
-    	 DocType type;
-    	 if (mainResourceName.startsWith("PR")) {
-    		 type = initialToDocType.get("PR");
-    	 } else {
-    		 type = initialToDocType.get(mainResourceName.substring(0,1));
-    	 }    	 
-    	 return modelToJsonObject(m, type, mainResourceName, RDFFormat.JSONLD_FRAME_PRETTY, true);
+     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri) {
+    	 final DocType type  = getDocType(m, mainResourceUri);
+    	 if (type == null) {
+    	     log.error("not able to determine type of resource "+mainResourceUri);
+    	     return null;
+    	 }
+    	 return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
+     }
+
+     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {
+         if (type == null) {
+             type  = getDocType(m, mainResourceUri);
+             if (type == null) {
+                 log.error("not able to determine type of resource "+mainResourceUri);
+                 return null;
+             }
+         }
+         return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
      }
 
      @SuppressWarnings("unchecked")
-     public static Map<String,Object> modelToJsonObject(Model m, DocType type, String mainResourceName, RDFFormat format, boolean reorder) {
+     public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
          JsonLDWriteContext ctx = new JsonLDWriteContext();
          JSONLDVariant variant;
          if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) { 
-             Object frameObj = getFrameObject(type, mainResourceName);
+             Object frameObj = getFrameObject(type, mainResourceUri);
              ctx.setFrame(frameObj);
          }
          variant = (RDFFormat.JSONLDVariant) format.getVariant();
-         ctx.setJsonLDContext(bdocontext);
-         JsonLdOptions opts = new JsonLdOptions();
-         opts.setUseNativeTypes(true);
-         opts.setCompactArrays(true);
-         opts.setPruneBlankNodeIdentifiers(true);
-         ctx.setOptions(opts);
+         ctx.setJsonLDContext(docTypeToContextObject.get(type));
+         ctx.setOptions(jsonLdOptions);
          DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
          PrefixMap pm = RiotLib.prefixMap(g);
-         String base = null;
          Map<String,Object> tm;
          try {
-             tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, base, ctx);
+             tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
              // replacing context with URI
-             tm.replace("@context", "http://purl.bdrc.io/context.jsonld");
+             tm.replace("@context", docTypeToSimpleContext.get(type));
              if (reorder)
                  tm = orderEntries(tm);
          } catch (JsonLdError | IOException e) {

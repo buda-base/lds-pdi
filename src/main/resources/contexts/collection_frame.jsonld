@@ -4,7 +4,7 @@
     "http://www.w3.org/ns/ldp.jsonld",
     "http://purl.bdrc.io/context.jsonld"
   ],
-  "type": "Collection",
-  "first": [{"@embed": "False"}],
-  "last": [{"@embed": "False"}]
+  "type": "AnnotationCollection",
+  "first": [{"@embed": false}],
+  "last": [{"@embed": false}]
 }
