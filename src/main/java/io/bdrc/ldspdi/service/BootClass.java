@@ -26,6 +26,7 @@ import javax.servlet.ServletContextEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
@@ -56,14 +57,15 @@ public class BootClass implements javax.servlet.ServletContextListener{
             ServiceConfig.init(params);
             OntData.init();
             TaxModel.init();
-            //RdfAuthModel.init();
+            RdfAuthModel.init();
+            log.info("BootClass has been properly initialized");
         }
         catch (IllegalArgumentException e) {
             log.error("BootClass init error", e);
             e.printStackTrace();
         }
         catch (RestException e) {
-            log.error("BootClass init error - Tax Model loading failed", e);
+            log.error("BootClass init error >> ", e);
             e.printStackTrace();
         }
 

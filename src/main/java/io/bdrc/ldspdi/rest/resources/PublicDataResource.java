@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -334,7 +335,7 @@ public class PublicDataResource {
         return RdfAuthModel.getUpdated();
     }
 
-    /*@POST
+    @POST
     @Path("/callbacks/github/bdrc-auth")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAuthModel() throws RestException{
@@ -352,7 +353,7 @@ public class PublicDataResource {
         Thread t=new Thread(new OntData());
         t.start();
         return Response.ok("Ontologies were updated").build();
-    }*/
+    }
 
     private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn) {
         HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
