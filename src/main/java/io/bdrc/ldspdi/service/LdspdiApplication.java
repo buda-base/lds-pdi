@@ -13,7 +13,6 @@ import io.bdrc.ldspdi.rest.features.CacheControlFilterFactory;
 import io.bdrc.ldspdi.rest.features.CharsetResponseFilter;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
-import io.bdrc.ldspdi.rest.features.RdfAuthFilter;
 
 @ApplicationPath("/")
 public class LdspdiApplication extends ResourceConfig {
@@ -27,7 +26,7 @@ public class LdspdiApplication extends ResourceConfig {
         property(JspMvcFeature.TEMPLATE_BASE_PATH, "").register(JspMvcFeature.class);
         register(CacheControlFilterFactory.class);
         register(CharsetResponseFilter.class);
-        register(RdfAuthFilter.class);
+        //register(RdfAuthFilter.class);
         log.info("LdspdiApplication features have been properly registered");
     }
 }
