@@ -41,10 +41,24 @@
     <c:set var="val" value="${k}"/>
     <tr>
 	    <td>${RdfAuthModel.getUser(val).getName()}</td>
-	    <td>${RdfAuthModel.getUser(val).getId()}</td>	    
+	    <td><a href="/resource-auth/${RdfAuthModel.getUser(val).getId().trim()}">${RdfAuthModel.getUser(val).getId()}</a></td>	    
 	    <td>${RdfAuthModel.getUser(val).getEmail()}</td>
-	    <td>${RdfAuthModel.getUser(val).getGroups()}</td>
-	    <td>${RdfAuthModel.getUser(val).getRoles()}</td>
+	    <td>
+        <c:if test = "${RdfAuthModel.getUser(val).getGroups()!=null}">
+        <c:forEach items="${RdfAuthModel.getUser(val).getGroups()}" var="kg">
+            <c:set var="valg" value="${kg}"/>
+            <a href="/resource-auth/${kg}">${kg}</a><br> 
+        </c:forEach> 
+        </c:if>
+        </td>
+	    <td>
+	    <c:if test = "${RdfAuthModel.getUser(val).getRoles()!=null}">
+	    <c:forEach items="${RdfAuthModel.getUser(val).getRoles()}" var="kr">
+            <c:set var="valr" value="${kr}"/>
+            <a href="/resource-auth/${kr}">${kr}</a><br> 
+        </c:forEach> 
+        </c:if>
+	    </td>
     </tr>
 </c:forEach> 
 </table>
@@ -55,9 +69,23 @@
     <c:set var="val" value="${k}"/>
     <tr>
         <td>${RdfAuthModel.getGroups().get(val).getName()}</td> 
-        <td>${RdfAuthModel.getGroups().get(val).getId()}</td>
-        <td>${RdfAuthModel.getGroups().get(val).getMembers()}</td>
-        <td>${RdfAuthModel.getGroups().get(val).getRoles()}</td>       
+        <td><a href="/resource-auth/${RdfAuthModel.getGroups().get(val).getId()}">${RdfAuthModel.getGroups().get(val).getId()}</a></td>
+        <td>
+        <c:if test = "${RdfAuthModel.getGroups().get(val).getMembers()!=null}">
+        <c:forEach items="${RdfAuthModel.getGroups().get(val).getMembers()}" var="km">
+            <c:set var="valm" value="${km}"/>
+            <a href="/resource-auth/${km}">${km}</a><br> 
+        </c:forEach> 
+        </c:if>
+        </td>
+        <td>
+        <c:if test = "${RdfAuthModel.getGroups().get(val).getRoles()!=null}">
+        <c:forEach items="${RdfAuthModel.getGroups().get(val).getRoles()}" var="kmr">
+            <c:set var="valmr" value="${kmr}"/>
+            <a href="/resource-auth/${kmr}">${kmr}</a><br> 
+        </c:forEach> 
+        </c:if>
+        </td>     
     </tr>
 </c:forEach> 
 </table>
@@ -69,10 +97,17 @@
     <tr>
        <td>${RdfAuthModel.getRoles().get(val).getName()}</td>
        <td>${RdfAuthModel.getRoles().get(val).getDesc()}</td>
-       <td>${RdfAuthModel.getRoles().get(val).getId()}</td>
-       <td>${RdfAuthModel.getRoles().get(val).getAppId()}</td>
+       <td><a href="/resource-auth/${RdfAuthModel.getRoles().get(val).getId()}">${RdfAuthModel.getRoles().get(val).getId()}</a></td>
+       <td><a href="/resource-auth/${RdfAuthModel.getRoles().get(val).getAppId()}">${RdfAuthModel.getRoles().get(val).getAppId()}</a></td>
        <td>${RdfAuthModel.getRoles().get(val).getAppType()}</td>
-       <td>${RdfAuthModel.getRoles().get(val).getPermissions()}</td>
+       <td>
+        <c:if test = "${RdfAuthModel.getRoles().get(val).getPermissions()!=null}">
+        <c:forEach items="${RdfAuthModel.getRoles().get(val).getPermissions()}" var="krp">
+            <c:set var="valrp" value="${krp}"/>
+            <a href="/resource-auth/${krp}">${krp}</a><br> 
+        </c:forEach> 
+        </c:if>
+        </td>    
     </tr>
 </c:forEach> 
 </table>
@@ -83,8 +118,9 @@
     <c:set var="val" value="${k}"/>
     <tr>
        <td>${val.getName()}</td>
-       <td>${val.getDesc()}</td>
-       <td>${val.getAppId()}</td>
+       <td>${val.getDesc()}</td>       
+       <td><a href="/resource-auth/${val.getAppId()}">${val.getAppId()}</a></td>
+       
     </tr>
 </c:forEach> 
 </table>
@@ -95,8 +131,8 @@
     <c:set var="val" value="${k}"/>
     <tr>
        <td>${val.getName()}</td>
-       <td>${val.getDesc()}</td>
-       <td>${val.getAppId()}</td>
+       <td>${val.getDesc()}</td>       
+       <td><a href="/resource-auth/${val.getAppId()}">${val.getAppId()}</a></td>
        <td>${val.getAppType()}</td>
     </tr>
 </c:forEach> 
@@ -108,10 +144,31 @@
     <c:set var="val" value="${k}"/>
     <tr>
        <td>${val.getPath()}</td>
-       <td>${val.getAppId()}</td>
-       <td>${val.getGroups()}</td>
-       <td>${val.getRoles()}</td>
-       <td>${val.getPermissions()}</td>
+       <td><a href="/resource-auth/${val.getAppId()}">${val.getAppId()}</a></td>       
+       <td>
+        <c:if test = "${val.getGroups()!=null}">
+        <c:forEach items="${val.getGroups()}" var="keg">
+            <c:set var="valeg" value="${keg}"/>
+            <a href="/resource-auth/${keg}">${keg}</a><br> 
+        </c:forEach> 
+        </c:if>
+       </td> 
+       <td>
+        <c:if test = "${val.getRoles()!=null}">
+        <c:forEach items="${val.getRoles()}" var="ker">
+            <c:set var="valer" value="${ker}"/>
+            <a href="/resource-auth/${ker}">${ker}</a><br> 
+        </c:forEach> 
+        </c:if>
+       </td>
+       <td>
+        <c:if test = "${val.getPermissions()!=null}">
+        <c:forEach items="${val.getPermissions()}" var="kep">
+            <c:set var="valep" value="${kep}"/>
+            <a href="/resource-auth/${kep}">${kep}</a><br> 
+        </c:forEach> 
+        </c:if>
+        </td>  
     </tr>
 </c:forEach> 
 </table>
@@ -121,8 +178,8 @@
 <c:forEach items="${RdfAuthModel.getResourceAccess()}" var="k">
     <c:set var="val" value="${k}"/>
     <tr>
-       <td>${val.getPolicy()}</td>
-       <td>${val.getPermission()}</td>
+       <td>${val.getPolicy()}</td>       
+       <td><a href="/resource-auth/${val.getPermission()}">${val.getPermission()}</a></td>
     </tr>
 </c:forEach> 
 </table>
