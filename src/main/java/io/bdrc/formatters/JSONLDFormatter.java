@@ -74,6 +74,7 @@ public class JSONLDFormatter {
     public final static String ldpContext = "http://www.w3.org/ns/ldp.jsonld";
     public final static JsonLdOptions jsonLdOptions = new JsonLdOptions();
     static {
+        jsonLdOptions.setProcessingMode("json-ld-1.1");
         jsonLdOptions.setUseNativeTypes(true);
         jsonLdOptions.setCompactArrays(true);
         jsonLdOptions.setPruneBlankNodeIdentifiers(true);
