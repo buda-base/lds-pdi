@@ -47,7 +47,7 @@
         <c:if test = "${RdfAuthModel.getUser(val).getGroups()!=null}">
         <c:forEach items="${RdfAuthModel.getUser(val).getGroups()}" var="kg">
             <c:set var="valg" value="${kg}"/>
-            <a href="/resource-auth/${kg}">${kg}</a><br> 
+            <a href="/resource-auth/${kg}">${kg}</a> / (${RdfAuthModel.getGroups().get(valg).getName()})<br> 
         </c:forEach> 
         </c:if>
         </td>
@@ -55,7 +55,7 @@
 	    <c:if test = "${RdfAuthModel.getUser(val).getRoles()!=null}">
 	    <c:forEach items="${RdfAuthModel.getUser(val).getRoles()}" var="kr">
             <c:set var="valr" value="${kr}"/>
-            <a href="/resource-auth/${kr}">${kr}</a><br> 
+            <a href="/resource-auth/${kr}">${kr} </a> / (${RdfAuthModel.getRoles().get(valr).getName()})<br> 
         </c:forEach> 
         </c:if>
 	    </td>
@@ -74,7 +74,7 @@
         <c:if test = "${RdfAuthModel.getGroups().get(val).getMembers()!=null}">
         <c:forEach items="${RdfAuthModel.getGroups().get(val).getMembers()}" var="km">
             <c:set var="valm" value="${km}"/>
-            <a href="/resource-auth/${km}">${km}</a><br> 
+            <a href="/resource-auth/${km}">${km}</a> / ${RdfAuthModel.getUser(valm).getName()}<br> 
         </c:forEach> 
         </c:if>
         </td>
@@ -82,7 +82,7 @@
         <c:if test = "${RdfAuthModel.getGroups().get(val).getRoles()!=null}">
         <c:forEach items="${RdfAuthModel.getGroups().get(val).getRoles()}" var="kmr">
             <c:set var="valmr" value="${kmr}"/>
-            <a href="/resource-auth/${kmr}">${kmr}</a><br> 
+            <a href="/resource-auth/${kmr}">${kmr}</a> / ${RdfAuthModel.getRoles().get(valmr).getName()}<br> 
         </c:forEach> 
         </c:if>
         </td>     
@@ -149,7 +149,7 @@
         <c:if test = "${val.getGroups()!=null}">
         <c:forEach items="${val.getGroups()}" var="keg">
             <c:set var="valeg" value="${keg}"/>
-            <a href="/resource-auth/${keg}">${keg}</a><br> 
+            <a href="/resource-auth/${keg}">${keg}</a> / (${RdfAuthModel.getGroups().get(valeg).getName()})<br> 
         </c:forEach> 
         </c:if>
        </td> 
@@ -157,7 +157,7 @@
         <c:if test = "${val.getRoles()!=null}">
         <c:forEach items="${val.getRoles()}" var="ker">
             <c:set var="valer" value="${ker}"/>
-            <a href="/resource-auth/${ker}">${ker}</a><br> 
+            <a href="/resource-auth/${ker}">${ker}</a>  / ${RdfAuthModel.getRoles().get(valer).getName()}<br> 
         </c:forEach> 
         </c:if>
        </td>
