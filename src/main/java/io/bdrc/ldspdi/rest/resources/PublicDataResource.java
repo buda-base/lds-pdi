@@ -53,6 +53,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 //import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
@@ -327,7 +328,7 @@ public class PublicDataResource {
                 .build();
     }
 
-    /*@GET
+    @GET
     @Path("/authmodel/updated")
     public long getAuthModelUpdated(@Context Request request) {
         //log.info("Call to getAuthModelUpdated()");
@@ -342,7 +343,7 @@ public class PublicDataResource {
         Thread t=new Thread(new RdfAuthModel());
         t.start();
         return Response.ok("Auth Model was updated").build();
-    }*/
+    }
 
     @POST
     @Path("/callbacks/github/owl-schema")
