@@ -14,9 +14,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -48,14 +48,14 @@ public class AnnotationEndpoint {
     public final static String LDP_PCI = "http://www.w3.org/ns/oa#PreferContainedIRIs";
     public final static String LDP_PCD = "http://www.w3.org/ns/oa#PreferContainedDescriptions";
     public final static String OA_CONTEXT = "https://www.w3.org/ns/oa.jsonld";
-    
+
     public final static String OA_CT = "application/ld+json; profile=\"http://www.w3.org/ns/oa.jsonld\"";
     public final static String W3C_CT = "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\"";
-    
+
     public final static int W3C_ANN_MODE = 0;
     public final static int OA_ANN_MODE = 1;
     public final static int DEFAULT_ANN_MODE = W3C_ANN_MODE;
-    
+
     public static final String ANN_PREFIX_SHORT = "bdan";
     public static final String ANC_PREFIX_SHORT = "bdac";
     public static final String ANN_PREFIX = "http://purl.bdrc.io/annotation/";
@@ -89,7 +89,7 @@ public class AnnotationEndpoint {
         } else {
             ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         }
-        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null);
+        Model model = QueryProcessor.getSimpleResourceGraph(prefixedRes, "AnnGraph.arq", fusekiUrl, null);
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, docType));
@@ -102,22 +102,22 @@ public class AnnotationEndpoint {
             return OA_ANN_MODE;
         return W3C_ANN_MODE;
     }
-    
-//    @GET
-//    @Path("/{res}.{ext}")
-//    @JerseyCacheControl()
-//    public Response getFormattedResourceGraph(@PathParam("res") final String res,
-//            @DefaultValue("") @PathParam("ext") final String format, @Context UriInfo info) throws RestException {
-//        log.info("Call to getFormattedResourceGraph()");
-//        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
-//        if (mediaType == null)
-//            return mediaTypeChoiceResponse(info);
-//        Model model = QueryProcessor.getCoreResourceGraph(res, fusekiUrl, null);
-//        if (model.size() == 0)
-//            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
-//        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, format, res), mediaType);
-//        return setHeaders(builder, getAnnotationHeaders(info.getPath(), format, null, null)).build();
-//    }
+
+    //    @GET
+    //    @Path("/{res}.{ext}")
+    //    @JerseyCacheControl()
+    //    public Response getFormattedResourceGraph(@PathParam("res") final String res,
+    //            @DefaultValue("") @PathParam("ext") final String format, @Context UriInfo info) throws RestException {
+    //        log.info("Call to getFormattedResourceGraph()");
+    //        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
+    //        if (mediaType == null)
+    //            return mediaTypeChoiceResponse(info);
+    //        Model model = QueryProcessor.getCoreResourceGraph(res, fusekiUrl, null);
+    //        if (model.size() == 0)
+    //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
+    //        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, format, res), mediaType);
+    //        return setHeaders(builder, getAnnotationHeaders(info.getPath(), format, null, null)).build();
+    //    }
 
     public static MediaType getMediaType(Request request, String format) {
         if (format == null)
