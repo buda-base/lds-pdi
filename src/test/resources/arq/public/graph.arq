@@ -8,36 +8,7 @@
 #param.R_RES.subtype=bdo:Work
 #param.R_RES.desc=the work on which info is needed
 
-PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
-
-construct { ?s ?p ?o }
-where {
-  { 
-    ?R_RES ?p ?o .
-    BIND (?R_RES as ?s)
-    FILTER (!isBlank(?o) || ?p = :workLocation)
-  } union {
-    ?R_RES :workCreator/skos:prefLabel ?o .
-    BIND (?R_RES as ?s)
-    BIND (tmp:workCreatorLit as ?p)
-  } union {
-    ?R_RES :workLocation ?s .
-    ?s ?p ?o .
-  } union {
-    ?R_RES :workLocation/:workLocationWork/:workHasItemImageAsset ?s .
-    ?s ?p ?o .
-    FILTER (!isBlank(?o))
-  } union {
-    ?R_RES :workLocation/:workLocationWork/:workHasItemImageAsset ?o .
-    BIND (?R_RES as ?s)
-    BIND (tmp:inItem as ?p)
-  } union {
-    ?R_RES :workLocation/:workLocationWork/:workHasItemImageAsset/:itemHasVolume ?s .
-    ?s ?p ?o .
-    FILTER (sameTerm(?p, adm:access) || sameTerm(?p, adm:license) || sameTerm(?p, :volumeNumber) || sameTerm(?p, skos:prefLabel) || sameTerm(?p, :hasIIIFManifest))
-  } union {
-    ?R_RES :workHasPart ?s .
-    ?s ?p ?o .
-    FILTER (!isBlank(?o))
-  }
+construct { ?R_RES adm:status ?o }
+where { 
+    ?R_RES adm:status ?o .
 }
