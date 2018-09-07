@@ -2,45 +2,45 @@ package io.bdrc.ldspdi.results;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 import java.util.HashMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPageLinks {
-    
+
     public String prevGet;
     public String nextGet;
     public String currJsonParams;
     public String prevJsonParams;
-    public String nextJsonParams;    
-    
-    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());    
-    
+    public String nextJsonParams;
+
+    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());
+
     public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
         String method=hm.get(QueryConstants.REQ_METHOD);
@@ -58,15 +58,15 @@ public class ResultPageLinks {
                         }
                         else {
                             int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);                           
+                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
                         }
                     }else {
                         int prev=page.getPageNumber()-1;
                         prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
-                        
+
                         if(!page.isLastPage()) {
                             int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);                        
+                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
                         }
                     }
                 }
@@ -87,13 +87,14 @@ public class ResultPageLinks {
                     setContext(" in ResultPageLinks constructor ",ex));
         }
     }
-    
+
     public ResultPageLinks(Results page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
         String method=hm.get(QueryConstants.REQ_METHOD);
         if(method !=null) {
             if(method.equals("GET")) {
                 String URL=hm.get(QueryConstants.REQ_URI);
+                System.out.println("PAGE in RES_LINKS >> "+page.getPageNumber());
                 if( page.numberOfPages>1) {
                     if(page.getPageNumber()==1 ) {
                         if(!URL.contains("&pageNumber=")) {
@@ -101,15 +102,16 @@ public class ResultPageLinks {
                         }
                         else {
                             int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);                           
+                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
                         }
                     }else {
                         int prev=page.getPageNumber()-1;
                         prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
-                        
+                        System.out.println("prevGet in RES_LINKS >> "+prevGet);
                         if(page.getPageNumber()!=page.getNumberOfPages()) {
                             int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);                        
+                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                            System.out.println("nextGet in RES_LINKS >> "+nextGet);
                         }
                     }
                 }
@@ -132,7 +134,7 @@ public class ResultPageLinks {
                     setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor ",ex));
         }
     }
-    
+
     public String getPrevGet() {
         return prevGet;
     }
@@ -149,6 +151,10 @@ public class ResultPageLinks {
         return nextJsonParams;
     }
 
-    
-    
+    @Override
+    public String toString() {
+        return "ResultPageLinks [prevGet=" + prevGet + ", nextGet=" + nextGet + ", currJsonParams=" + currJsonParams
+                + ", prevJsonParams=" + prevJsonParams + ", nextJsonParams=" + nextJsonParams + "]";
+    }
+
 }

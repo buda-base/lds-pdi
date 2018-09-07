@@ -2,19 +2,19 @@ package io.bdrc.ldspdi.results;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -29,22 +29,22 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class Results {
-    
+
     public final static Logger log=LoggerFactory.getLogger(Results.class.getName());
-    
+
     public int pageNumber;
     public int numberOfPages;
     public int pageSize;
     public int numResults;
     public long execTime;
-    public int hash;    
+    public int hash;
     public boolean lastPage;
-    public boolean firstPage;    
+    public boolean firstPage;
     public ResultPageLinks pLinks;
     public Head head;
     public HashMap<String,ArrayList<Row>> results;
-    
-    public Results(ResultSetWrapper res,HashMap<String,String> hm) 
+
+    public Results(ResultSetWrapper res,HashMap<String,String> hm)
             throws RestException{
         String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
         if(pageNum!=null) {
@@ -55,11 +55,11 @@ public class Results {
         pageSize=res.getPageSize();
         numResults=res.getNumResults();
         execTime=res.getExecTime();
-        hash=res.getHash(); 
-        head=new Head(res.getHead());        
-        numberOfPages=res.getNumberOfPages();        
-        int offset=(pageNumber-1)*pageSize; 
-        results=new HashMap<>();         
+        hash=res.getHash();
+        head=new Head(res.getHead());
+        numberOfPages=res.getNumberOfPages();
+        int offset=(pageNumber-1)*pageSize;
+        results=new HashMap<>();
         ArrayList<Row> rows=res.getRows();
         ArrayList<Row> bindings=new ArrayList<>();;
         if(pageNumber<=numberOfPages) {
@@ -67,7 +67,7 @@ public class Results {
                 try {
                     bindings.add(rows.get(x));
                 }
-                catch(Exception ex) {                    
+                catch(Exception ex) {
                     break;
                 }
             }
@@ -127,10 +127,19 @@ public class Results {
     public Head getHead() {
         return head;
     }
-    
+
     public HashMap<String, ArrayList<Row>> getResults() {
         return results;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Results [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize
+                + ", numResults=" + numResults + ", execTime=" + execTime + ", hash=" + hash + ", lastPage=" + lastPage
+                + ", firstPage=" + firstPage + ", pLinks=" + pLinks + ", head=" + head + ", results=" + results + "]";
+    }
+
+
+
+
 }

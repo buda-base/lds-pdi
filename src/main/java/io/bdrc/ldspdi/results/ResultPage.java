@@ -2,19 +2,19 @@ package io.bdrc.ldspdi.results;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -35,20 +35,20 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPage {
-    
+
     public final static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
-    
+
     public int pageNumber,numberOfPages,pageSize,numResults, hash;
     public long execTime;
-    public String id,query;    
+    public String id,query;
     public boolean isLastPage,isFirstPage,isUrlQuery=false;
     public ResultPageLinks pLinks;
-    public List<String> head;    
+    public List<String> head;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
     HashMap<String,String> hm;
-    private QueryTemplate temp;    
+    private QueryTemplate temp;
 
-    public ResultPage(ResultSetWrapper res,String pageNum,HashMap<String,String> hm,QueryTemplate temp) 
+    public ResultPage(ResultSetWrapper res,String pageNum,HashMap<String,String> hm,QueryTemplate temp)
             throws RestException{
         if(pageNum!=null) {
             this.pageNumber=Integer.parseInt(pageNum);
@@ -65,11 +65,11 @@ public class ResultPage {
         id=temp.getId();
         query=hm.get("query");
         String tmp=hm.get(QueryConstants.QUERY_TYPE);
-        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}        
-        int offset=(pageNumber-1)*pageSize; 
+        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}
+        int offset=(pageNumber-1)*pageSize;
         this.temp=temp;
         mvc_rows=new ArrayList<>();
-        ArrayList<QueryMvcSolutionItem> allRows=res.getMvc_rows();        
+        ArrayList<QueryMvcSolutionItem> allRows=res.getMvc_rows();
         if(pageNumber<=numberOfPages) {
             for (int x=(offset); x<(offset+pageSize);x++) {
                 try {
@@ -123,7 +123,7 @@ public class ResultPage {
     public boolean isLastPage() {
         return isLastPage;
     }
-    
+
     public boolean isFirstPage() {
         return isFirstPage;
     }
@@ -146,11 +146,11 @@ public class ResultPage {
     public String getQuery() {
         return query;
     }
-    
+
     public static Logger getLog() {
         return log;
     }
-    
+
     public boolean isUrlQuery() {
         return isUrlQuery;
     }
@@ -160,16 +160,16 @@ public class ResultPage {
     }
 
     public void setQuery(String query) {
-        this.query = query;        
+        this.query = query;
     }
-    
+
     public List<String> getParamList(){
-        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));             
+        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
         return list;
     }
-    
+
     public String getParamValue(String param) {
-        String val=hm.get(param);        
+        String val=hm.get(param);
         if(val!=null) {
             return val;
         }
@@ -183,7 +183,14 @@ public class ResultPage {
     public ArrayList<Output> getOutputs() {
         return temp.getOutputs();
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "ResultPage [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize
+                + ", numResults=" + numResults + ", hash=" + hash + ", execTime=" + execTime + ", id=" + id + ", query="
+                + query + ", isLastPage=" + isLastPage + ", isFirstPage=" + isFirstPage + ", isUrlQuery=" + isUrlQuery
+                + ", pLinks=" + pLinks + ", head=" + head + ", hm=" + hm + ", temp=" + temp
+                + "]";
+    }
+
 }
