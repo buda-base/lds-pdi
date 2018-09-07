@@ -109,6 +109,7 @@ public class JSONLDFormatter {
     static {
         // these are what will appear in the @context property of the output,
         // just URIs replacing the whole context
+        docTypeToSimpleContext.put(null, simpleContext);
         docTypeToSimpleContext.put(DocType.PERSON, simpleContext);
         docTypeToSimpleContext.put(DocType.VOLUME, simpleContext);
         docTypeToSimpleContext.put(DocType.WORK, simpleContext);
@@ -129,6 +130,7 @@ public class JSONLDFormatter {
     public final static Map<DocType,Object> docTypeToContextObject = new HashMap<>();
     static {
         // these are what will be passed to the json-ld api, the complete context objects
+        docTypeToContextObject.put(null, bdoContextObject);
         docTypeToContextObject.put(DocType.PERSON, bdoContextObject);
         docTypeToContextObject.put(DocType.VOLUME, bdoContextObject);
         docTypeToContextObject.put(DocType.WORK, bdoContextObject);
@@ -328,15 +330,6 @@ public class JSONLDFormatter {
                 return res;
         }
         return res;
-    }
-
-    public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri) {
-        final DocType type  = getDocType(m, mainResourceUri);
-        if (type == null) {
-            log.error("not able to determine type of resource "+mainResourceUri);
-            return null;
-        }
-        return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);
     }
 
     public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {

@@ -1,0 +1,39 @@
+#QueryScope=Annotation
+#QueryReturnType=Graph
+#QueryResults=A graph for the given Annotation
+#QueryParams=R_RES
+#QueryUrl=/lib/Resgraph?R_RES=bdr:ANWCBC2237_AN001
+#param.R_RES.type=resource
+#param.R_RES.subtype=a Resource ID
+#param.R_RES.desc=the URI of the annotation
+construct {
+  ?R_RES ?annp ?anno .
+  ?annb ?annbp ?annbo .
+  ?ant ?antp ?anto .
+  ?annbloc ?annblocp ?annbloco .
+  ?annba ?annbap ?annbao .
+  ?annbaloc ?annbalocp ?annbaloco .
+}
+where {
+    ?R_RES ?annp ?anno .
+    ?R_RES oa:hasTarget ?ant .
+    ?ant ?antp ?anto .
+    optional {
+      ?R_RES oa:hasBody ?annb .
+      ?annb ?annbp ?annbo .
+      optional {
+        ?annbo a :WorkLocation ;
+        BIND(?annbo as ?annbloc )
+        ?annbloc ?annblocp ?annbloco .
+      }
+      optional {
+        ?annbo a adm:Assertion ;
+        BIND(?annbo as ?annba )
+        ?annba ?annbap ?annbao .
+        optional {
+           ?annba :workLocation ?annbaloc .
+           ?annbaloc ?annbalocp ?annbaloco .
+        }
+      }
+    }
+}
