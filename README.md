@@ -186,7 +186,7 @@ Ex GET: http://localhost:8080/query/Res_byName?L_NAME=("mkhan chen" AND ("'od ze
 Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/Res_byName
 ```
 
-**NOTE:** You can get this json output format using GET requests by adding &jsonOut or ?jsonOut to your URL request.
+**NOTE: You can get this json output format using GET requests by adding &jsonOut or ?jsonOut to your URL request.**
 
 Ex Testing POST JSON : 
 
