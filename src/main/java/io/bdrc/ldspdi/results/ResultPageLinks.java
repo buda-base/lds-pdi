@@ -43,40 +43,37 @@ public class ResultPageLinks {
 
     public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
-        String method=hm.get(QueryConstants.REQ_METHOD);
-        if(method !=null) {
-            if(method.equals("GET")) {
-                String URL=hm.get(QueryConstants.REQ_URI);
-                if( page.numberOfPages>1) {
-                    if(page.getPageNumber()==1 ) {
-                        if(!URL.contains("&pageNumber=")) {
-                            if(URL.indexOf("?")!=-1) {
-                                nextGet=URL+"&pageNumber=2&hash="+page.getHash();
-                            }else {
-                                nextGet=URL+"?pageNumber=2&hash="+page.getHash();
-                            }
-                        }
-                        else {
-                            int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                        }
+        String URL=hm.get(QueryConstants.REQ_URI);
+        if( page.numberOfPages>1) {
+            if(page.getPageNumber()==1 ) {
+                if(!URL.contains("&pageNumber=")) {
+                    if(URL.indexOf("?")!=-1) {
+                        nextGet=URL+"&pageNumber=2&hash="+page.getHash();
                     }else {
-                        int prev=page.getPageNumber()-1;
-                        prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
-
-                        if(!page.isLastPage()) {
-                            int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                        }
+                        nextGet=URL+"?pageNumber=2&hash="+page.getHash();
                     }
+                }
+                else {
+                    int next=page.getPageNumber()+1;
+                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                }
+            }else {
+                int prev=page.getPageNumber()-1;
+                prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
+
+                if(!page.isLastPage()) {
+                    int next=page.getPageNumber()+1;
+                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
                 }
             }
         }
         try {
             currJsonParams=mapper.writer().writeValueAsString(hm);
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-            hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
-            nextJsonParams=mapper.writer().writeValueAsString(hm);
+            if(page.getPageNumber()>=1 && (page.getPageNumber()<page.getNumberOfPages())) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
+                nextJsonParams=mapper.writer().writeValueAsString(hm);
+            }
             if(page.getPageNumber()!=1) {
                 hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
                 prevJsonParams=mapper.writer().writeValueAsString(hm);
@@ -90,37 +87,30 @@ public class ResultPageLinks {
 
     public ResultPageLinks(Results page, HashMap<String,String> hm) throws RestException{
         ObjectMapper mapper = new ObjectMapper();
-        String method=hm.get(QueryConstants.REQ_METHOD);
-        if(method !=null) {
-            if(method.equals("GET")) {
-                String URL=hm.get(QueryConstants.REQ_URI);
-                System.out.println("PAGE in RES_LINKS >> "+page.getPageNumber());
-                if( page.numberOfPages>1) {
-                    if(page.getPageNumber()==1 ) {
-                        if(!URL.contains("&pageNumber=")) {
-                        nextGet=URL+"&pageNumber=2&hash="+page.getHash();
-                        }
-                        else {
-                            int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                        }
-                    }else {
-                        int prev=page.getPageNumber()-1;
-                        prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
-                        System.out.println("prevGet in RES_LINKS >> "+prevGet);
-                        if(page.getPageNumber()!=page.getNumberOfPages()) {
-                            int next=page.getPageNumber()+1;
-                            nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                            System.out.println("nextGet in RES_LINKS >> "+nextGet);
-                        }
-                    }
+        String URL=hm.get(QueryConstants.REQ_URI);
+        if( page.numberOfPages>1) {
+            if(page.getPageNumber()==1 ) {
+                if(!URL.contains("&pageNumber=")) {
+                nextGet=URL+"&pageNumber=2&hash="+page.getHash();
+                }
+                else {
+                    int next=page.getPageNumber()+1;
+                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                }
+            }else {
+                int prev=page.getPageNumber()-1;
+                prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
+
+                if(page.getPageNumber()!=page.getNumberOfPages()) {
+                    int next=page.getPageNumber()+1;
+                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
                 }
             }
         }
         try {
             currJsonParams=mapper.writer().writeValueAsString(hm);
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-            if(page.getPageNumber()>1 && (page.getPageNumber()<page.getNumberOfPages())) {
+            if(page.getPageNumber()>=1 && (page.getPageNumber()<page.getNumberOfPages())) {
                 hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
                 nextJsonParams=mapper.writer().writeValueAsString(hm);
             }

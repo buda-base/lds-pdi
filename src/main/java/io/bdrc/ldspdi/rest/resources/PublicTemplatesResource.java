@@ -21,6 +21,7 @@ package io.bdrc.ldspdi.rest.resources;
 
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -146,7 +147,8 @@ public class PublicTemplatesResource {
     public Response getQueryTemplateResultsPost(
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file,
-            MultivaluedMap<String,String> mp) throws RestException{
+            MultivaluedMap<String,String> mp,
+            @Context UriInfo info) throws RestException{
         log.info("Call to getQueryTemplateResultsPost()");
         if(mp==null || mp.size()==0) {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsPost() : Map ="+mp));
@@ -167,6 +169,7 @@ public class PublicTemplatesResource {
                     hm.get(QueryConstants.PAGE_SIZE));
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
             hm.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+            hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
             rp=new Results(res,hm);
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
         }
@@ -179,7 +182,8 @@ public class PublicTemplatesResource {
     public Response getQueryTemplateResultsJsonPost(
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file,
-            HashMap<String,String> map) throws RestException{
+            HashMap<String,String> map,
+            @Context UriInfo info) throws RestException{
         log.info("Call to getQueryTemplateResultsJsonPost()");
         if(map==null || map.size()==0) {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).
@@ -195,6 +199,8 @@ public class PublicTemplatesResource {
             ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,map.get(QueryConstants.RESULT_HASH),map.get(QueryConstants.PAGE_SIZE));
             map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
             map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
+            map.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
+
             rp=new Results(res,map);
             return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
         }
@@ -248,10 +254,9 @@ public class PublicTemplatesResource {
             @PathParam("file") String file,
             @Context UriInfo info,
             @Context Request request,
-            HashMap<String,String> args) throws RestException{
+            HashMap<String,String> map) throws RestException{
         String path=info.getPath()+info.relativize(info.getRequestUri());
         Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
-<<<<<<< HEAD
         log.info("Call to getGraphTemplateResultsPost() with URL: "+path+" Accept: "+format+ " Selected Variant >> "+variant+ " Map>>"+map);
         if(fuseki !=null){fusekiUrl=fuseki;}
         String params="";
@@ -280,27 +285,6 @@ public class PublicTemplatesResource {
                         MediaTypeUtils.getExtFormatFromMime(mediaType.toString())),
                         mediaType)
                         .build();
-=======
-        MediaType mediaType;
-        if (variant == null) {
-            if (format == null) {
-                mediaType = MediaTypeUtils.MT_JSONLD;
-            } else {
-                return Response.status(406).build();
-            }
-        } else {
-            mediaType = variant.getMediaType();
-        }
-        log.info("Call to getGraphTemplateResultsPost() with URL: "+path+" Accept: "+format+ " Selected MediaType >> "+mediaType+ " Map>>"+args);
-        if (fuseki != null) { fusekiUrl = fuseki; }
-        //process
-        final QueryFileParser qfp = new QueryFileParser(file+".arq");
-        final String query = qfp.getParametizedQuery(args,false);
-        final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext), mediaType);
-        return setHeaders(builder, getGraphResourceHeaders(null, null, "Choice")).build();
->>>>>>> 4020f8d6df3d5b3a938a0672741fa5a99cabf495
     }
 
     @POST
@@ -314,15 +298,10 @@ public class PublicTemplatesResource {
         return Response.ok().build();
     }
 
-<<<<<<< HEAD
-    private static HashMap<String,String> getGraphResourceHeaders(String url,String ext, String tcn) {
-        HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
-        HashMap<String,String> headers=new HashMap<>();
-=======
     private static HashMap<String,String> getGraphResourceHeaders(String url, final String ext, final String tcn) {
         final HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         final HashMap<String,String> headers=new HashMap<>();
->>>>>>> 4020f8d6df3d5b3a938a0672741fa5a99cabf495
+
         if(ext!=null) {
             if (url.indexOf(".")<0) {
                 headers.put("Content-Location", url+"&format="+ext);
@@ -330,14 +309,12 @@ public class PublicTemplatesResource {
                 url=url.substring(0, url.lastIndexOf("."));
             }
         }
-<<<<<<< HEAD
+
         StringBuilder sb=new StringBuilder("");
         for(Entry<String,MediaType> e :map.entrySet()) {
             sb.append("{\""+url+"&format="+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
-=======
->>>>>>> 4020f8d6df3d5b3a938a0672741fa5a99cabf495
         headers.put("TCN", tcn);
         headers.put("Vary", "Negotiate, Accept");
         return headers;
