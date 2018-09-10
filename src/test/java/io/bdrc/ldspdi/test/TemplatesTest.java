@@ -47,13 +47,13 @@ public class TemplatesTest extends JerseyTest{
 
     @BeforeClass
     public static void init() {
-        fusekiUrl="http://localhost:2244/bdrcrw";
+        fusekiUrl="http://localhost:2144/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2244)
+                .setPort(2144)
                 .add("/bdrcrw", srvds)
                 .build() ;
         server.start() ;
