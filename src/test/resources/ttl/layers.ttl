@@ -1,0 +1,38 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bdan:   <http://purl.bdrc.io/annotation/> .
+@prefix bdac:   <http://purl.bdrc.io/anncollection/> .
+@prefix oa:	   <http://www.w3.org/ns/oa#> .
+
+bdan:ANCRDF1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on some RDF"@en ;
+	:layerForResource bdr:W2237 ;
+	:layerSubsettingMethod bdr:SubsettingNone .
+
+bdan:ANNVOL1_1 a oa:Annotation ;
+	oa:hasTarget [ 
+		oa:hasSource [
+			:sourceVolume bdr:V23703_I1421 ;
+			:sourceImageSeq 4
+		] ;
+		oa:hasSelector [ a oa:FragmentSelector ;
+			dcterms:conformsTo "http://www.w3.org/TR/media-frags/" ;
+			rdf:value "xywh=100,100,100,100"
+		]
+	] ;
+	:annInCollection bdan:ANCVOL1 ;
+    oa:motivatedBy oa:assessing ;
+	oa:hasBody [
+		...
+	] .
+
+bdan:ANCVOL1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on an image volume"@en ;
+	:layerForResource bdr:W2237 ;
+	:layerSubsettingMethod bdr:SubsettingImageVolume .

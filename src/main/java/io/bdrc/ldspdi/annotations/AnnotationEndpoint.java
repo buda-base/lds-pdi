@@ -145,7 +145,7 @@ public class AnnotationEndpoint {
         }
     }
 
-    public static HashMap<String, String> getAnnotationHeaders(String url, final String ext, final String tcn,
+    static HashMap<String, String> getAnnotationHeaders(String url, final String ext, final String tcn,
             final String profile, final String contentType) {
         final HashMap<String, MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         final HashMap<String, String> headers = new HashMap<>();
@@ -176,7 +176,7 @@ public class AnnotationEndpoint {
         return headers;
     }
 
-    private static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
+    static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
         for (String key : headers.keySet()) {
             builder.header(key, headers.get(key));
         }
