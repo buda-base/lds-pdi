@@ -186,7 +186,7 @@ Ex GET: http://localhost:8080/query/Res_byName?L_NAME=("mkhan chen" AND ("'od ze
 Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/Res_byName
 ```
 
-##JSON and CVS output
+## JSON and CVS output
 
 You can get json or cvs output formats (using GET on the /query endpoints) by adding &format=json or ?jsonOut to your URL request:
 
