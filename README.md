@@ -188,7 +188,7 @@ Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&L
 
 ## JSON and CVS output
 
-You can get json or cvs output formats (using GET on the /query endpoints) by adding &format=json or ?jsonOut to your URL request:
+You can get json or cvs output formats (using GET on the /query endpoints) by adding &format=json or &format=csv to your URL request:
 
 **Ex :**
 ```
