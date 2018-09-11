@@ -8,6 +8,8 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.Util;
 
+import io.bdrc.ldspdi.sparql.Prefixes;
+
 public class CsvRow {
 
     public final static String DEL=",";
@@ -19,7 +21,7 @@ public class CsvRow {
     public CsvRow(List<String> headers,QuerySolution qs) {
 
         for(String key:headers) {
-            s_csvCols=s_csvCols+key+"-value"+DEL;
+            s_csvCols=s_csvCols+key+DEL;
             csvCols=csvCols+key+"-value"+DEL;
             csvCols=csvCols+key+"-type"+DEL;
             RDFNode node=qs.get(key);
@@ -27,7 +29,7 @@ public class CsvRow {
                 if(node.isResource()) {
                     csv=csv+node.asResource().getURI()+DEL;
                     csv=csv+"uri"+DEL;
-                    s_csv=s_csv+getShortName(node.asResource().getURI())+DEL;
+                    s_csv=s_csv+getPrefix(node.asResource().getURI())+node.asResource().getLocalName()+DEL;
                 }
                 if(node.isLiteral()) {
                     Literal lit=node.asLiteral();
@@ -85,9 +87,9 @@ public class CsvRow {
         this.csv = csv;
     }
 
-    public static String getShortName(String st) {
+    public static String getPrefix(String st) {
         if(st!=null) {
-            return st.substring(st.lastIndexOf("/")+1);
+            return Prefixes.getPrefix(st.substring(0,st.lastIndexOf("/")+1));
         }
         return "";
     }
