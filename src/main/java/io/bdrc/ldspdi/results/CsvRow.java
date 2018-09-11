@@ -29,7 +29,7 @@ public class CsvRow {
                 if(node.isResource()) {
                     csv=csv+node.asResource().getURI()+DEL;
                     csv=csv+"uri"+DEL;
-                    s_csv=s_csv+getPrefix(node.asResource().getURI())+node.asResource().getLocalName()+DEL;
+                    s_csv=s_csv+Prefixes.getPrefixedIRI(node.asResource().getURI())+DEL;
                 }
                 if(node.isLiteral()) {
                     Literal lit=node.asLiteral();
@@ -85,13 +85,6 @@ public class CsvRow {
 
     public void setCsv(String csv) {
         this.csv = csv;
-    }
-
-    public static String getPrefix(String st) {
-        if(st!=null) {
-            return Prefixes.getPrefix(st.substring(0,st.lastIndexOf("/")+1));
-        }
-        return "";
     }
 
 }

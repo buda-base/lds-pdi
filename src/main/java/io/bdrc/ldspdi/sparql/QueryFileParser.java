@@ -275,8 +275,8 @@ public class QueryFileParser {
                         if(parts[0]==null) {
                             parts[0]="";
                         }
-                        if(Prefixes.getFullIRI(parts[0]+":")!=null) {
-                            queryStr.setIri(st, Prefixes.getFullIRI(parts[0]+":")+parts[1]);
+                        if(Prefixes.getFullIRI(parts[0])!=null) {
+                            queryStr.setIri(st, Prefixes.getFullIRI(parts[0])+parts[1]);
                         }else {
                             throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param +
                                     " Unknown prefix"));
