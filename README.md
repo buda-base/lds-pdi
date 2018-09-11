@@ -186,8 +186,23 @@ Ex GET: http://localhost:8080/query/Res_byName?L_NAME=("mkhan chen" AND ("'od ze
 Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/Res_byName
 ```
 
-**NOTE: You can get this json output format using GET requests by adding &jsonOut or ?jsonOut to your URL request.**
+##JSON and CVS output
 
+You can get json or cvs output formats (using GET on the /query endpoints) by adding &format=json or ?jsonOut to your URL request:
+
+**Ex :**
+```
+http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=json&pageSize=50&pageNumber=1
+```
+or (for a csv detailed response - values + datatypes)
+```
+http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1
+```
+or (for a csv simplified response - values only)
+
+```
+http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1&profile=simple
+```
 Ex Testing POST JSON : 
 
 
