@@ -24,6 +24,13 @@ public class CsvResults {
 
     public CsvResults(ResultSetWrapper res,HashMap<String,String> hm)
             throws RestException{
+        String profile=hm.get("profile");
+        System.out.println("PROFILE >> "+profile);
+        //default is detailed
+        boolean simple=false;
+        if("simple".equals(profile)) {
+            simple=true;
+        }
         String csvCols=null;
         String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
         if(pageNum!=null) {
@@ -42,10 +49,20 @@ public class CsvResults {
                 try {
                     CsvRow csv=csvrows.get(x);
                     if(csvCols==null) {
-                        csvCols=csv.getCsvCols()+System.lineSeparator();
-                        csvRes=csvCols+System.lineSeparator();
+                        if(simple) {
+                            csvCols=csv.getSimpleCols();
+                            csvRes=csvCols+System.lineSeparator();
+                        }
+                        else {
+                            csvCols=csv.getCsvCols();
+                            csvRes=csvCols+System.lineSeparator();
+                        }
                     }
-                    csvRes=csvRes+csv.getCsv()+System.lineSeparator();
+                    if(simple) {
+                        csvRes=csvRes+csv.getSimpleCsv()+System.lineSeparator();
+                    }else {
+                        csvRes=csvRes+csv.getCsv()+System.lineSeparator();
+                    }
                 }
                 catch(Exception ex) {
                     break;

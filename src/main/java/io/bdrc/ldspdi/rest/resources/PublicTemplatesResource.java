@@ -78,12 +78,11 @@ public class PublicTemplatesResource {
     @GET
     @Path("/query/{file}")
     @JerseyCacheControl()
-    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     public Response getQueryTemplateResults(@Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{
 
-        log.info("Call to getQueryTemplateResults()"+file+ " Params >>"+info.getQueryParameters());
+        log.info("Call to getQueryTemplateResults()"+file);
         if(fuseki !=null){fusekiUrl=fuseki;}
 
         //Settings
@@ -97,25 +96,16 @@ public class PublicTemplatesResource {
             throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).
                     setContext(" in getQueryTemplateResults() "+query));
         }
-        ResultSetWrapper res = null;
+        ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         ResultPage model=null;
         try {
             String fmt=hm.get(QueryConstants.FORMAT);
             if(fmt!=null && fmt.equals("json")) {
-                res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-                Results mod=new Results(res,hm);
-                hm.remove("query");
-                String it=new ObjectMapper().writeValueAsString(mod);
-                return Response.ok(new Viewable("/json.jsp",it)).build();
+                return Response.ok(new ObjectMapper().writeValueAsString(new Results(res,hm)),MediaTypeUtils.MT_JSON).build();
             }
             if(fmt!=null && fmt.equals("csv")) {
-                res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-                CsvResults csvmod=new CsvResults(res,hm);
-                hm.remove("query");
-                String it=csvmod.getCsvRes();
-                return Response.ok(it).build();
+                return Response.ok(new CsvResults(res,hm).getCsvRes(),MediaTypeUtils.MT_CSV).build();
             }
-            res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
             hm.put(QueryConstants.REQ_METHOD, "GET");
             hm.put("query", qfp.getQueryHtml());
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
@@ -124,7 +114,7 @@ public class PublicTemplatesResource {
         catch (IOException jx) {
             throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()"+jx.getMessage()));
         }
-        return Response.ok(new Viewable("/resPage.jsp",model)).build();
+        return Response.ok(new Viewable("/resPage.jsp",model),MediaType.TEXT_HTML_TYPE).build();
     }
 
     @GET

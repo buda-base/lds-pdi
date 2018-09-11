@@ -56,7 +56,7 @@ public class ResultSetWrapper {
             QuerySolution qs=rs.next();
             rows.add(new Row(head,qs));
             //TEST
-            csvrows.add(new CsvRow(head,qs,""));
+            csvrows.add(new CsvRow(head,qs));
             QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);
             mvc_rows.add(mvc_row);
             numResults++;
