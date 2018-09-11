@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.IOException;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -46,10 +48,10 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.results.CsvResults;
 import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
@@ -95,22 +97,32 @@ public class PublicTemplatesResource {
             throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).
                     setContext(" in getQueryTemplateResults() "+query));
         }
-        ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+        ResultSetWrapper res = null;
         ResultPage model=null;
         try {
-            if(hm.get(QueryConstants.JSON_OUT)!=null) {
+            String fmt=hm.get(QueryConstants.FORMAT);
+            if(fmt!=null && fmt.equals("json")) {
+                res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
                 Results mod=new Results(res,hm);
                 hm.remove("query");
                 String it=new ObjectMapper().writeValueAsString(mod);
                 return Response.ok(new Viewable("/json.jsp",it)).build();
             }
+            if(fmt!=null && fmt.equals("csv")) {
+                res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+                CsvResults csvmod=new CsvResults(res,hm);
+                hm.remove("query");
+                String it=csvmod.getCsvRes();
+                return Response.ok(it).build();
+            }
+            res=QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
             hm.put(QueryConstants.REQ_METHOD, "GET");
             hm.put("query", qfp.getQueryHtml());
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
 
         }
-        catch (JsonProcessingException jx) {
-            throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()+jx.getMessage()"));
+        catch (IOException jx) {
+            throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()"+jx.getMessage()));
         }
         return Response.ok(new Viewable("/resPage.jsp",model)).build();
     }
@@ -137,7 +149,6 @@ public class PublicTemplatesResource {
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         FusekiResultSet model=new FusekiResultSet(res);
         return Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build();
-
     }
 
     @POST

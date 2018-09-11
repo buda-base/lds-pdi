@@ -2,19 +2,19 @@ package io.bdrc.ldspdi.results;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -22,18 +22,17 @@ package io.bdrc.ldspdi.results;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-
 
 public class ResultSetWrapper {
-    
-    
+
+
     public final static Logger log=LoggerFactory.getLogger(ResultSetWrapper.class.getName());
-    
+
     public long execTime;
     public int numResults;
     public int pageSize;
@@ -41,26 +40,31 @@ public class ResultSetWrapper {
     public int hash;
     public List<String> head;
     public ArrayList<Row> rows;
-    public ArrayList<QueryMvcSolutionItem> mvc_rows;    
-    
+    public ArrayList<CsvRow> csvrows;
+    public ArrayList<QueryMvcSolutionItem> mvc_rows;
+    public static final String DEL=",";
+
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
         this.pageSize=pageSize;
         head =rs.getResultVars();
         this.execTime=execTime;
         numResults=0;
         mvc_rows=new ArrayList<>();
+        csvrows=new ArrayList<>();
         rows=new ArrayList<>();
-        while(rs.hasNext()) { 
+        while(rs.hasNext()) {
             QuerySolution qs=rs.next();
-            rows.add(new Row(head,qs)); 
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);            
+            rows.add(new Row(head,qs));
+            //TEST
+            csvrows.add(new CsvRow(head,qs,""));
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);
             mvc_rows.add(mvc_row);
             numResults++;
         }
         numberOfPages=(numResults/pageSize);
         if(numberOfPages*pageSize<numResults) {numberOfPages++;}
     }
-    
+
     public List<String> getHead() {
         return head;
     }
@@ -100,5 +104,9 @@ public class ResultSetWrapper {
     public ArrayList<Row> getRows() {
         return rows;
     }
-    
+
+    public ArrayList<CsvRow> getCsvRows() {
+        return csvrows;
+    }
+
 }

@@ -28,6 +28,13 @@ public class BdrcAuthResource {
     }
 
     @GET
+    @Path("/auth/location")
+    public Response getLocation() {
+        log.info("Call getLocation()");
+        return Response.ok(new Viewable("/auth.jsp")).build();
+    }
+
+    @GET
     @Path("/resource-auth/{res}")
     public Response getAuthResource(@PathParam("res") final String res) throws RestException {
         log.info("Call getAuthResource()");

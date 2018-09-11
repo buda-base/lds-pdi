@@ -13,14 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.Prefixes;
 
-public class QueryMvcSolutionItem {    
-        
-    public final static Logger log=LoggerFactory.getLogger(QueryMvcSolutionItem.class.getName());    
+public class QueryMvcSolutionItem {
+
+    public final static Logger log=LoggerFactory.getLogger(QueryMvcSolutionItem.class.getName());
     public HashMap<String,String> dataRow;
-    
+
     public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {
         NodeFormatterTTL nf=new NodeFormatterTTL(null,Prefixes.getPrefixMap());
-        dataRow=new HashMap<>();                
+        dataRow=new HashMap<>();
         for(String key:headers) {
             RDFNode node=qs.get(key);
             if(node !=null) {
@@ -36,35 +36,41 @@ public class QueryMvcSolutionItem {
                             tmp="<a href=/resource/"+res.getLocalName()+"> "+res.getLocalName()+"</a>  "+
                                     "<a href=/resource/"+res.getLocalName()+".ttl> (ttl)</a>";
                         }else if(Uri.startsWith("http://purl.bdrc.io/ontology/core/")){
-                            tmp="<a href=\""+Uri+"\"> "+res.getLocalName()+"</a>"; 
+                            tmp="<a href=\""+Uri+"\"> "+res.getLocalName()+"</a>";
                         }
                     }
-                    dataRow.put(key, tmp);                    
-                } 
-                if(node.isLiteral()) {                                      
+                    dataRow.put(key, tmp);
+                }
+                if(node.isLiteral()) {
                     StringWriterI sw=new StringWriterI();
                     nf.formatLiteral(sw, node.asNode());
                     sw.flush();
-                    dataRow.put(key, sw.toString());                       
+                    dataRow.put(key, sw.toString());
                 }
                 if(node.isAnon()) {
                     StringWriterI sw=new StringWriterI();
                     nf.formatBNode(sw, node.asNode());
-                    dataRow.put(key, sw.toString());                    
-                }                
+                    dataRow.put(key, sw.toString());
+                }
             }else {
                 dataRow.put(key, "");
             }
-        }        
+        }
     }
-        
+
     public HashMap<String, String> getDataRow() {
         return dataRow;
     }
-    
+
     public String getValue(String key) {
         return dataRow.get(key);
     }
+
+    @Override
+    public String toString() {
+        return "QueryMvcSolutionItem [dataRow=" + dataRow + "]";
+    }
+
 
 
 }

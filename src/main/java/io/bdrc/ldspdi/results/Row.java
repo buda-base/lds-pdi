@@ -11,21 +11,20 @@ import org.apache.jena.rdf.model.impl.Util;
 
 @SuppressWarnings("serial")
 public class Row extends HashMap<String,HashMap<String,String>>{
-    
-    
+
     public Row(List<String> headers,QuerySolution qs) {
-        //See specs at : https://www.w3.org/TR/sparql11-results-json/ 
+        //See specs at : https://www.w3.org/TR/sparql11-results-json/
         for(String key:headers) {
-            RDFNode node=qs.get(key);            
+            RDFNode node=qs.get(key);
             if(node !=null) {
                 if(node.isResource()) {
-                    this.put(key, new Field("uri",node.asResource().getURI()));                    
-                }                
-                if(node.isLiteral()) { 
+                    this.put(key, new Field("uri",node.asResource().getURI()));
+                }
+                if(node.isLiteral()) {
                     Literal lit=node.asLiteral();
                     if ( Util.isSimpleString(lit) || Util.isLangString(lit) ) {
                         if(node.asNode().getLiteralDatatype().equals(RDFLangString.rdfLangString)) {
-                            this.put(key, new LiteralStringField("literal",                                                          
+                            this.put(key, new LiteralStringField("literal",
                                     node.asNode().getLiteralLanguage(),
                                     node.asLiteral().getValue().toString()));
                         }else {
@@ -33,15 +32,14 @@ public class Row extends HashMap<String,HashMap<String,String>>{
                         }
                     }else {
                         this.put(key, new LiteralOtherField("literal",
-                                node.asLiteral().getDatatypeURI(),                                
+                                node.asLiteral().getDatatypeURI(),
                                 node.asLiteral().getValue().toString()));
                     }
                 }
-                if(node.isAnon()) {                    
-                    this.put(key, new Field("bnode",node.toString()));                    
-                }                
+                if(node.isAnon()) {
+                    this.put(key, new Field("bnode",node.toString()));
+                }
             }
-        }        
+        }
     }
-
 }
