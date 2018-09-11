@@ -86,7 +86,10 @@ public class CsvRow {
     }
 
     public static String getShortName(String st) {
-        return st.substring(st.lastIndexOf("/")+1);
+        if(st!=null) {
+            return st.substring(st.lastIndexOf("/")+1);
+        }
+        return "";
     }
 
 }

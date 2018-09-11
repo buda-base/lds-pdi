@@ -25,7 +25,6 @@ public class CsvResults {
     public CsvResults(ResultSetWrapper res,HashMap<String,String> hm)
             throws RestException{
         String profile=hm.get("profile");
-        System.out.println("PROFILE >> "+profile);
         //default is detailed
         boolean simple=false;
         if("simple".equals(profile)) {
