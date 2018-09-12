@@ -58,6 +58,8 @@ public class BootClass implements javax.servlet.ServletContextListener{
             OntData.init();
             TaxModel.init();
             RdfAuthModel.updateAuthData(fuseki);
+            //For applications
+            //RdfAuthModel.readAuthModel();
             log.info("BootClass has been properly initialized");
         }
         catch (IllegalArgumentException e) {
