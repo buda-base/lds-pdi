@@ -1,4 +1,6 @@
 @prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
 @prefix bdr:   <http://purl.bdrc.io/resource/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -10,7 +12,7 @@
 @prefix bdac:   <http://purl.bdrc.io/anncollection/> .
 @prefix oa:	   <http://www.w3.org/ns/oa#> .
 
-bdan:ANCRDF1 a bdo:AnnotationLayer ;
+bdac:ANCRDF1 a bdo:AnnotationLayer ;
 	rdfs:label "This is an annotation layer on some RDF"@en ;
 	:layerForResource bdr:W2237 ;
 	:layerSubsettingMethod bdr:SubsettingNone .
@@ -22,17 +24,36 @@ bdan:ANNVOL1_1 a oa:Annotation ;
 			:sourceImageSeq 4
 		] ;
 		oa:hasSelector [ a oa:FragmentSelector ;
-			dcterms:conformsTo "http://www.w3.org/TR/media-frags/" ;
+			dcterms:conformsTo <http://www.w3.org/TR/media-frags/> ;
 			rdf:value "xywh=100,100,100,100"
 		]
-	] ;
-	:annInCollection bdan:ANCVOL1 ;
+	] , <http://presentation.bdrc.io/2.1.1/bdr:V23703_I1421/canvas/4#xywh=100,100,100,100> ;
+	:annInCollection bdac:ANCVOL1 ;
     oa:motivatedBy oa:assessing ;
-	oa:hasBody [
-		...
-	] .
+	oa:hasBody "this is a test annotation" .
 
-bdan:ANCVOL1 a bdo:AnnotationLayer ;
+bdac:ANCVOL1 a bdo:AnnotationLayer ;
 	rdfs:label "This is an annotation layer on an image volume"@en ;
-	:layerForResource bdr:W2237 ;
+	:layerForResource bdr:V23703_I1421 ;
 	:layerSubsettingMethod bdr:SubsettingImageVolume .
+
+bdan:ANNETEXT1_1 a oa:Annotation ;
+	oa:hasTarget [ 
+		oa:hasSource [
+			:sourceVolume bdr:UT29307_008_0000 ;
+			:sourcecharstart 4 ;
+			:sourcecharend 40
+		] ;
+		oa:hasSelector [ a oa:FragmentSelector ;
+			dcterms:conformsTo <http://tools.ietf.org/rfc/rfc5147> ;
+			rdf:value "char=4,40"
+		]
+	] , <http://purl.bdrc.io/resource/UT29307_008_0000.txt#char=4,40> ;
+	:annInCollection bdac:ANCETEXT1 ;
+    oa:motivatedBy oa:assessing ;
+	oa:hasBody "this is a test annotation" .
+
+bdac:ANCETEXT1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on an etext"@en ;
+	:layerForResource bdr:UT29307_008_0000 ;
+	:layerSubsettingMethod bdr:SubsettingChars .

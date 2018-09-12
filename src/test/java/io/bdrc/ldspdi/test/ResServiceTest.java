@@ -42,65 +42,65 @@ import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class ResServiceTest extends JerseyTest{
-    
+
     private static FusekiServer server ;
     private static Dataset srvds = DatasetFactory.createTxnMem();
-    private static Model model = ModelFactory.createDefaultModel(); 
+    private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
     public final static Logger log=LoggerFactory.getLogger(ResServiceTest.class.getName());
     public final static String[] methods= {"GET", "POST"};
-    
+
     @BeforeClass
     public static void init() {
-        fusekiUrl="http://localhost:2244/bdrcrw"; 
+        fusekiUrl="http://localhost:2246/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2244)
+                .setPort(2246)
                 .add("/bdrcrw", srvds)
-                .build() ;      
-        server.start() ;         
+                .build() ;
+        server.start() ;
     }
-    
+
     @AfterClass
     public static void close() {
         server.stop();
         server.join();
     }
-    
+
     @Override
     protected Application configure() {
         return new ResourceConfig(PublicDataResource.class).register(RestExceptionMapper.class);
     }
-    
+
     /*@Test
     public void normalResource() throws IOException {
-        
+
         Set<Entry<String,String>> fmt=MediaTypeUtils.JENAFORMAT.entrySet();
         for(String method:methods) {
-            for(Entry<String,String> ent:fmt) {            
+            for(Entry<String,String> ent:fmt) {
                 String mime=MediaTypeUtils.getMimeFromExtension(ent.getKey());
-                Response res = target("/resource/P1AG29").request()                    
+                Response res = target("/resource/P1AG29").request()
                         .accept(mime)
                         .header("fusekiUrl", fusekiUrl)
                         .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                        .method(method);                
+                        .method(method);
                 assertTrue(res.getStatus() == 200);
                 assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
                 assertTrue(res.getHeaderString("TCN").equals("Choice"));
-                assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));                       
+                assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
                 assertTrue(res.getHeaderString("Content-Type").equals(mime));
                 assertTrue(res.getHeaderString("Content-Location").equals("resource/P1AG29."+MediaTypeUtils.getExtFormatFromMime(mime)));
                 Model dist = getModelFromFileName(TestUtils.TESTDIR+"P1AG29.ttl",Lang.TURTLE);
                 Model returned=ModelFactory.createDefaultModel();
                 returned.read(res.readEntity(InputStream.class),"",ent.getValue());
-                assertTrue(dist.isIsomorphicWith(returned));            
+                assertTrue(dist.isIsomorphicWith(returned));
             }
         }
     }*/
-    
+
     @Test
     public void html() {
         for(String method:methods) {
@@ -115,7 +115,7 @@ public class ResServiceTest extends JerseyTest{
             assertTrue(res.getHeaderString("Location").equals("http://library.bdrc.io/show/bdr:P1AG29"));
         }
     }
-    
+
     @Test
     public void wrongAccept() {
         for(String method:methods) {
@@ -128,15 +128,15 @@ public class ResServiceTest extends JerseyTest{
                 assertTrue(res.getHeaderString("TCN").equals("List"));
             }
             if(method.equals("POST")) {
-                assertTrue(res.getStatus() == 406);                
+                assertTrue(res.getStatus() == 406);
             }
         }
     }
-    
+
     @Test
     public void GetResourceByExtension() {
         Set<String> map=MediaTypeUtils.getExtensionMimeMap().keySet();
-        for(String ent:map) {                
+        for(String ent:map) {
             Response res = target("/resource/P1AG29."+ent).request()
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .get();
@@ -146,7 +146,7 @@ public class ResServiceTest extends JerseyTest{
             assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
         }
     }
-    
+
     @Test
     public void WrongResource() {
         Response res = target("/resource/wrong.ttl").request()
@@ -154,7 +154,7 @@ public class ResServiceTest extends JerseyTest{
                 .get();
         assertTrue(res.getStatus() == 404);
     }
-    
+
     @Test
     public void WrongExt() throws RestException {
         Response res = target("/resource/C68.wrong").request()
@@ -163,7 +163,7 @@ public class ResServiceTest extends JerseyTest{
         assertTrue(res.getStatus() == 300);
         assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
     }
-    
+
     @Test
     public void nores() {
         for(String method:methods) {
@@ -174,14 +174,14 @@ public class ResServiceTest extends JerseyTest{
             assertTrue(res.getStatus() == 404);
         }
     }
-    
+
     @Test
     public void testHtmlLitFormatter(){
         PrefixMap pm = PrefixMapFactory.create();
         pm.add("xsd", "http://www.w3.org/2001/XMLSchema#");
         pm.add("owl", "http://www.w3.org/2002/07/owl#");
         pm.add("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        
+
         NodeFormatterTTL nfttl = new NodeFormatterTTL(null, pm, null);
         Model m = ModelFactory.createDefaultModel();
         Literal l = m.createTypedLiteral("2009-10-22T18:31:49.12Z", XSDDatatype.XSDdateTime);
@@ -190,45 +190,45 @@ public class ResServiceTest extends JerseyTest{
         Literal l3=m.createTypedLiteral("true", XSDDatatype.XSDboolean);
         Literal l4=m.createLiteral("rgyud bla ma", "bo-x-ewts");
         Literal l5=m.createTypedLiteral("buddha is goodness", XSDDatatype.XSDstring);
-        Literal l6=m.createTypedLiteral(-5, XSDDatatype.XSDinteger);        
-        
-        StringWriterI sw = new StringWriterI();        
+        Literal l6=m.createTypedLiteral(-5, XSDDatatype.XSDinteger);
+
+        StringWriterI sw = new StringWriterI();
         nfttl.formatLiteral(sw, l.asNode());
-        sw.flush();        
+        sw.flush();
         assertTrue(sw.toString().equals("\"2009-10-22T18:31:49.12Z\"^^xsd:dateTime"));
-        
-        sw = new StringWriterI();        
+
+        sw = new StringWriterI();
         nfttl.formatLiteral(sw, l1.asNode());
-        sw.flush();        
-        assertTrue(sw.toString().equals("\"3.141592\"^^owl:real"));        
-           
-        sw = new StringWriterI();        
+        sw.flush();
+        assertTrue(sw.toString().equals("\"3.141592\"^^owl:real"));
+
+        sw = new StringWriterI();
         nfttl.formatLiteral(sw, l2.asNode());
-        sw.flush();        
+        sw.flush();
         assertTrue(sw.toString().equals("\"Dharma is beautiful\"^^rdf:XMLLiteral"));
-        
+
         sw = new StringWriterI();
         nfttl.formatLiteral(sw, l3.asNode());
         sw.flush();
         assertTrue(sw.toString().equals("true"));
-        
+
         sw = new StringWriterI();
         nfttl.formatLiteral(sw, l4.asNode());
         sw.flush();
         assertTrue(sw.toString().equals("\"rgyud bla ma\"@bo-x-ewts"));
-        
+
         sw = new StringWriterI();
         nfttl.formatLiteral(sw, l5.asNode());
-        sw.flush();        
+        sw.flush();
         assertTrue(sw.toString().equals("\"buddha is goodness\""));
-        
+
         sw = new StringWriterI();
         nfttl.formatLiteral(sw, l6.asNode());
-        sw.flush();        
+        sw.flush();
         assertTrue(sw.toString().equals("-5"));
-        
+
     }
-    
+
     static void logResponse(Response res) {
         log.info(" Status >> "+res.getStatus());
         log.info(" Vary >> "+res.getHeaderString("Vary"));
@@ -238,17 +238,17 @@ public class ResServiceTest extends JerseyTest{
         log.info(" Content-Location >> "+res.getHeaderString("Content-Location"));
         log.info(" Entity >> "+res.getEntity());
     }
-    
+
     public boolean checkAlternates(String url,String alternates) {
         HashMap<String,MediaType> map =MediaTypeUtils.getExtensionMimeMap();
         StringBuilder sb=new StringBuilder("");
         for(Entry<String,MediaType> e :map.entrySet()) {
-            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");               
+            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");
         }
         String alt=sb.toString().substring(0, sb.toString().length()-1);
-        List<String> alt1=Arrays.asList(alternates.split(","));        
-        List<String> alt2=Arrays.asList(alt.split(","));        
-        for(String test:alt2) {            
+        List<String> alt1=Arrays.asList(alternates.split(","));
+        List<String> alt2=Arrays.asList(alt.split(","));
+        for(String test:alt2) {
             if(!alt1.contains(test)) {
                 log.error("Alternates check failed >>> "+test + alt1.contains(test));
                 return false;
