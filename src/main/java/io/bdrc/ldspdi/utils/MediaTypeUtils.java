@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Variant;
 
 public class MediaTypeUtils {
@@ -142,6 +143,16 @@ public class MediaTypeUtils {
             media = new MediaType(parts[0],parts[1]);
         }
         return media;
+    }
+
+    public static MediaType getMediaType(final Request request, final String format, final List<Variant> variants) {
+        if (format == null)
+            return null;
+        final Variant variant = request.selectVariant(variants);
+        if (variant == null) {
+            return null;
+        }
+        return variant.getMediaType();
     }
 
 }

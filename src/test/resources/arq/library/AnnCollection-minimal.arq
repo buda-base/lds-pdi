@@ -1,0 +1,27 @@
+#QueryScope=Annotation Collection
+#QueryReturnType=Graph
+#QueryResults=A graph for the given Annotation collection, in the minimal profile
+#QueryParams=R_RES
+#QueryUrl=/lib/Resgraph?R_RES=bdr:ANCWCBC2237_AN001
+
+#param.R_RES.type=resource
+#param.R_RES.subtype=a Resource ID
+#param.R_RES.desc=the URI of the annotation collection
+
+CONSTRUCT {
+    ?R_RES ?p ?o .
+    ?o1 ?p1 ?o2 .
+    ?R_RES as:totalItems ?nbAnnotations .
+} where {
+    {
+        ?R_RES ?p ?o .
+    } union {
+        ?R_RES ?p1 ?o1 .
+        FILTER(isBlank(?o1))
+        ?o1 ?p1 ?o2 .
+    } union {
+        SELECT (count(?ann) AS ?nbAnnotations) WHERE { 
+            ?ann :annInCollection ?R_RES .
+        }
+    }
+}

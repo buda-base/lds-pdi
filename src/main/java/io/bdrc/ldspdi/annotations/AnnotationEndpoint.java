@@ -16,7 +16,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -66,10 +65,16 @@ public class AnnotationEndpoint {
     public Response getResourceGraph(@PathParam("res") String res, @HeaderParam("Accept") String format,
             @Context UriInfo info, @Context Request request, @Context HttpHeaders headers) throws RestException {
         log.info("Call to getResourceGraphGET() with URL: " + info.getPath() + " Accept >> " + format);
-        final MediaType mediaType = getMediaType(request, format);
+        final MediaType mediaType;
+        // spec says that when the Accept: header is absent, JSON-LD should be answered
+        if (format == null) {
+            mediaType = MediaTypeUtils.MT_JSONLD;
+        } else {
+            mediaType = MediaTypeUtils.getMediaType(request, format, MediaTypeUtils.annVariants);
+            if (mediaType == null)
+                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+        }
         String prefixedRes = ANN_PREFIX_SHORT+':'+res;
-        if (mediaType == null)
-            return mediaTypeChoiceResponse(info);
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
             return htmlResponse(info, prefixedRes);
         int mode = DEFAULT_ANN_MODE;
@@ -103,32 +108,6 @@ public class AnnotationEndpoint {
         return W3C_ANN_MODE;
     }
 
-    //    @GET
-    //    @Path("/{res}.{ext}")
-    //    @JerseyCacheControl()
-    //    public Response getFormattedResourceGraph(@PathParam("res") final String res,
-    //            @DefaultValue("") @PathParam("ext") final String format, @Context UriInfo info) throws RestException {
-    //        log.info("Call to getFormattedResourceGraph()");
-    //        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
-    //        if (mediaType == null)
-    //            return mediaTypeChoiceResponse(info);
-    //        Model model = QueryProcessor.getCoreResourceGraph(res, fusekiUrl, null);
-    //        if (model.size() == 0)
-    //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(res));
-    //        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, format, res), mediaType);
-    //        return setHeaders(builder, getAnnotationHeaders(info.getPath(), format, null, null)).build();
-    //    }
-
-    public static MediaType getMediaType(Request request, String format) {
-        if (format == null)
-            return null;
-        final Variant variant = request.selectVariant(MediaTypeUtils.annVariants);
-        if (variant == null) {
-            return null;
-        }
-        return variant.getMediaType();
-    }
-
     public static Response mediaTypeChoiceResponse(final UriInfo info) throws RestException {
         final String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
         final ResponseBuilder rb = Response.status(300).entity(html)
@@ -145,7 +124,7 @@ public class AnnotationEndpoint {
         }
     }
 
-    public static HashMap<String, String> getAnnotationHeaders(String url, final String ext, final String tcn,
+    static HashMap<String, String> getAnnotationHeaders(String url, final String ext, final String tcn,
             final String profile, final String contentType) {
         final HashMap<String, MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         final HashMap<String, String> headers = new HashMap<>();
@@ -176,7 +155,7 @@ public class AnnotationEndpoint {
         return headers;
     }
 
-    private static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
+    static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
         for (String key : headers.keySet()) {
             builder.header(key, headers.get(key));
         }

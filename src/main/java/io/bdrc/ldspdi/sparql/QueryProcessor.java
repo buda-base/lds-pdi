@@ -52,7 +52,7 @@ public class QueryProcessor {
         if(prefixes==null) {
             prefixes=loadPrefixes();
         }
-        int hash=Objects.hashCode(URI);
+        int hash=Objects.hashCode(queryName+"::"+URI);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
             QueryFileParser qfp=new QueryFileParser(queryName,"library");

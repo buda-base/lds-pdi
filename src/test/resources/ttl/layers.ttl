@@ -1,0 +1,59 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bdan:   <http://purl.bdrc.io/annotation/> .
+@prefix bdac:   <http://purl.bdrc.io/anncollection/> .
+@prefix oa:	   <http://www.w3.org/ns/oa#> .
+
+bdac:ANCRDF1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on some RDF"@en ;
+	:layerForResource bdr:W2237 ;
+	:layerSubsettingMethod bdr:SubsettingNone .
+
+bdan:ANNVOL1_1 a oa:Annotation ;
+	oa:hasTarget [ 
+		oa:hasSource [
+			:sourceVolume bdr:V23703_I1421 ;
+			:sourceImageSeq 4
+		] ;
+		oa:hasSelector [ a oa:FragmentSelector ;
+			dcterms:conformsTo <http://www.w3.org/TR/media-frags/> ;
+			rdf:value "xywh=100,100,100,100"
+		]
+	] , <http://presentation.bdrc.io/2.1.1/bdr:V23703_I1421/canvas/4#xywh=100,100,100,100> ;
+	:annInCollection bdac:ANCVOL1 ;
+    oa:motivatedBy oa:assessing ;
+	oa:hasBody "this is a test annotation" .
+
+bdac:ANCVOL1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on an image volume"@en ;
+	:layerForResource bdr:V23703_I1421 ;
+	:layerSubsettingMethod bdr:SubsettingImageVolume .
+
+bdan:ANNETEXT1_1 a oa:Annotation ;
+	oa:hasTarget [ 
+		oa:hasSource [
+			:sourceVolume bdr:UT29307_008_0000 ;
+			:sourcecharstart 4 ;
+			:sourcecharend 40
+		] ;
+		oa:hasSelector [ a oa:FragmentSelector ;
+			dcterms:conformsTo <http://tools.ietf.org/rfc/rfc5147> ;
+			rdf:value "char=4,40"
+		]
+	] , <http://purl.bdrc.io/resource/UT29307_008_0000.txt#char=4,40> ;
+	:annInCollection bdac:ANCETEXT1 ;
+    oa:motivatedBy oa:assessing ;
+	oa:hasBody "this is a test annotation" .
+
+bdac:ANCETEXT1 a bdo:AnnotationLayer ;
+	rdfs:label "This is an annotation layer on an etext"@en ;
+	:layerForResource bdr:UT29307_008_0000 ;
+	:layerSubsettingMethod bdr:SubsettingChars .
