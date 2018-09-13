@@ -60,7 +60,6 @@ public class CsvRow {
                 }
             }
         }
-
         csvCols=csvCols.substring(0, csvCols.length()-1);
         csv=csv.substring(0, csv.length()-1);
         s_csvCols=s_csvCols.substring(0, s_csvCols.length()-1);

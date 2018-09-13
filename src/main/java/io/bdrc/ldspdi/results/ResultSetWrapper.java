@@ -20,6 +20,7 @@ package io.bdrc.ldspdi.results;
  ******************************************************************************/
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
@@ -38,7 +39,7 @@ public class ResultSetWrapper {
     public int pageSize;
     public int numberOfPages;
     public int hash;
-    public List<String> head;
+    public HashMap<String,List<String>> head;
     public ArrayList<Row> rows;
     public ArrayList<CsvRow> csvrows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
@@ -46,7 +47,8 @@ public class ResultSetWrapper {
 
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
         this.pageSize=pageSize;
-        head =rs.getResultVars();
+        head=new HashMap<>();
+        head.put("vars",rs.getResultVars());
         this.execTime=execTime;
         numResults=0;
         mvc_rows=new ArrayList<>();
@@ -54,10 +56,10 @@ public class ResultSetWrapper {
         rows=new ArrayList<>();
         while(rs.hasNext()) {
             QuerySolution qs=rs.next();
-            rows.add(new Row(head,qs));
+            rows.add(new Row(rs.getResultVars(),qs));
             //TEST
-            csvrows.add(new CsvRow(head,qs));
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,head);
+            csvrows.add(new CsvRow(rs.getResultVars(),qs));
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,rs.getResultVars());
             mvc_rows.add(mvc_row);
             numResults++;
         }
@@ -65,7 +67,7 @@ public class ResultSetWrapper {
         if(numberOfPages*pageSize<numResults) {numberOfPages++;}
     }
 
-    public List<String> getHead() {
+    public HashMap<String,List<String>> getHead() {
         return head;
     }
 
@@ -107,6 +109,15 @@ public class ResultSetWrapper {
 
     public ArrayList<CsvRow> getCsvRows() {
         return csvrows;
+    }
+
+    public HashMap<String,Object> getFusekiResultSet(){
+        HashMap<String,Object> res=new HashMap<>();
+        HashMap<String,ArrayList<Row>> results=new HashMap<>();
+        results.put("bindings", getRows());
+        res.put("head", head);
+        res.put("results",results);
+        return res;
     }
 
 }

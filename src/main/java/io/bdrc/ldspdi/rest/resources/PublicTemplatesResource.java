@@ -52,7 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CsvResults;
-import io.bdrc.ldspdi.results.FusekiResultSet;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
@@ -78,11 +77,12 @@ public class PublicTemplatesResource {
     @GET
     @Path("/query/{file}")
     @JerseyCacheControl()
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON,"text/csv"})
     public Response getQueryTemplateResults(@Context UriInfo info,
             @HeaderParam("fusekiUrl") final String fuseki,
             @PathParam("file") String file) throws RestException{
 
-        log.info("Call to getQueryTemplateResults()"+file);
+        log.info("Call to getQueryTemplateResults()"+file+ " "+info.getQueryParameters());
         if(fuseki !=null){fusekiUrl=fuseki;}
 
         //Settings
@@ -114,7 +114,7 @@ public class PublicTemplatesResource {
         catch (IOException jx) {
             throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()"+jx.getMessage()));
         }
-        return Response.ok(new Viewable("/resPage.jsp",model),MediaType.TEXT_HTML_TYPE).build();
+        return Response.ok(new Viewable("/resPage.jsp",model)/*,MediaType.TEXT_HTML_TYPE*/).build();
     }
 
     @GET
@@ -137,7 +137,8 @@ public class PublicTemplatesResource {
         String query=qfp.getParametizedQuery(hm,true);
         //The output we build using jackson
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
-        FusekiResultSet model=new FusekiResultSet(res);
+        //FusekiResultSet model=new FusekiResultSet(res);
+        HashMap<String,Object> model=res.getFusekiResultSet();
         return Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build();
     }
 

@@ -21,6 +21,7 @@ package io.bdrc.ldspdi.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,8 @@ public class Results {
     public boolean lastPage;
     public boolean firstPage;
     public ResultPageLinks pLinks;
-    public Head head;
+    public HashMap<String,List<String>> head;
+    //public Head head;
     public HashMap<String,ArrayList<Row>> results;
 
     public Results(ResultSetWrapper res,HashMap<String,String> hm)
@@ -56,7 +58,7 @@ public class Results {
         numResults=res.getNumResults();
         execTime=res.getExecTime();
         hash=res.getHash();
-        head=new Head(res.getHead());
+        head=res.getHead();
         numberOfPages=res.getNumberOfPages();
         int offset=(pageNumber-1)*pageSize;
         results=new HashMap<>();
@@ -124,7 +126,7 @@ public class Results {
         return pLinks;
     }
 
-    public Head getHead() {
+    public HashMap<String,List<String>> getHead() {
         return head;
     }
 

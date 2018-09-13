@@ -43,7 +43,8 @@ public class ResultPage {
     public String id,query;
     public boolean isLastPage,isFirstPage,isUrlQuery=false;
     public ResultPageLinks pLinks;
-    public List<String> head;
+    public HashMap<String,List<String>> head;
+    //public List<String> head;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
     HashMap<String,String> hm;
     private QueryTemplate temp;
@@ -128,7 +129,7 @@ public class ResultPage {
         return isFirstPage;
     }
 
-    public List<String> getHead() {
+    public HashMap<String,List<String>> getHead() {
         return head;
     }
 

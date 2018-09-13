@@ -37,7 +37,7 @@ public class Row extends HashMap<String,HashMap<String,String>>{
                     }
                 }
                 if(node.isAnon()) {
-                    this.put(key, new Field("bnode",node.toString()));
+                    this.put(key, new Field("bnode",node.asNode().getBlankNodeId().getLabelString()));
                 }
             }
         }
