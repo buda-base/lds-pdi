@@ -48,6 +48,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFWriter;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
@@ -146,19 +148,19 @@ public class PublicDataResource {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
             final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List",null)).build();
         }
         if(variant == null) {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
             final ResponseBuilder rb=Response.status(406).entity(html).header("Content-Type", "text/html").
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List")).build();
+            return setHeaders(rb,getResourceHeaders(info.getPath(),null,"List",null)).build();
         }
         final MediaType mediaType = variant.getMediaType();
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+prefixedRes));
-                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice",null)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).
                         setContext("getResourceGraphGet()",e));
@@ -168,12 +170,13 @@ public class PublicDataResource {
             fusekiUrl=fuseki;
         }
         Model model=QueryProcessor.getCoreResourceGraph(prefixedRes,fusekiUrl,null);
+
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX+res, null), mediaType);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice")).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice",getEtag(model,res))).build();
     }
 
     @POST
@@ -200,7 +203,7 @@ public class PublicDataResource {
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
                 ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+prefixedRes));
-                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice")).build();
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,"Choice",null)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()",e));
             }
@@ -214,7 +217,7 @@ public class PublicDataResource {
         }
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX+res, null), mediaType);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice")).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice",getEtag(model,res))).build();
     }
 
     @GET
@@ -238,11 +241,12 @@ public class PublicDataResource {
         }
         MediaType media=MediaTypeUtils.getMimeFromExtension(format);
         Model model=QueryProcessor.getCoreResourceGraph(prefixedRes,fusekiUrl,null);
+
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, format, RES_PREFIX+res, null),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice")).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),format,"Choice",getEtag(model,res))).build();
     }
 
     @GET
@@ -360,7 +364,7 @@ public class PublicDataResource {
         return Response.ok("Ontologies were updated").build();
     }
 
-    private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn) {
+    private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn, String eTag) {
         HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
@@ -377,6 +381,9 @@ public class PublicDataResource {
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
         headers.put("TCN", tcn);
         headers.put("Vary", "Negotiate, Accept");
+        if(eTag!=null) {
+            headers.put("ETag", eTag);
+        }
         return headers;
     }
 
@@ -385,6 +392,15 @@ public class PublicDataResource {
             builder.header(key, headers.get(key));
         }
         return builder;
+    }
+
+    private static String getEtag(Model model,String res) {
+        Statement smt=model.getProperty(ResourceFactory.createResource("http://purl.bdrc.io/resource/"+res),
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/gitRevision"));
+        if(smt!=null) {
+            return smt.getObject().toString();
+        }
+        return null;
     }
 
 }
