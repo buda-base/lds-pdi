@@ -3,6 +3,7 @@
 <%@page import="io.bdrc.ldspdi.sparql.QueryConstants"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<% {String test=request.getRequestURI();} %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -116,10 +117,13 @@ input[type=submit]:hover {
 </table>
 </div>
 </c:if>
+<br>
+<b>Other formats:</b> <a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=json">Json format</a>
+<a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=csv">CSV format</a>
 <br><br>
 <c:if test="${!model.isFirstPage()}"><a href="${model.getpLinks().getPrevGet()}">Prev</a></c:if>
 <c:if test="${!model.isLastPage()}"><a href="${model.getpLinks().getNextGet()}">Next</a></c:if>
-<br><br>
+
 <table>
 <tr>
 <c:forEach items="${model.headrows}" var="h">
