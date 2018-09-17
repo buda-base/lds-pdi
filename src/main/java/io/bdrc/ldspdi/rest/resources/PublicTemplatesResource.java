@@ -97,6 +97,7 @@ public class PublicTemplatesResource {
                     setContext(" in getQueryTemplateResults() "+query));
         }
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+
         ResultPage model=null;
         try {
             String fmt=hm.get(QueryConstants.FORMAT);
@@ -109,12 +110,11 @@ public class PublicTemplatesResource {
             hm.put(QueryConstants.REQ_METHOD, "GET");
             hm.put("query", qfp.getQueryHtml());
             model=new ResultPage(res,hm.get(QueryConstants.PAGE_NUMBER),hm,qfp.getTemplate());
-
         }
         catch (IOException jx) {
             throw new RestException(500,new LdsError(LdsError.JSON_ERR).setContext(" in getQueryTemplateResults()"+jx.getMessage()));
         }
-        return Response.ok(new Viewable("/resPage.jsp",model)/*,MediaType.TEXT_HTML_TYPE*/).build();
+        return Response.ok(new Viewable("/resPage.jsp",model)).build();
     }
 
     @GET

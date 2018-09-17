@@ -44,7 +44,7 @@ public class ResultPage {
     public boolean isLastPage,isFirstPage,isUrlQuery=false;
     public ResultPageLinks pLinks;
     public HashMap<String,List<String>> head;
-    //public List<String> head;
+    public List<String> headrows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
     HashMap<String,String> hm;
     private QueryTemplate temp;
@@ -62,6 +62,7 @@ public class ResultPage {
         execTime=res.getExecTime();
         hash=res.getHash();
         head=res.getHead();
+        headrows=head.get("vars");
         numberOfPages=res.getNumberOfPages();
         id=temp.getId();
         query=hm.get("query");
@@ -107,6 +108,10 @@ public class ResultPage {
 
     public int getPageSize() {
         return pageSize;
+    }
+
+    public List<String> getHeadrows() {
+        return headrows;
     }
 
     public int getNumResults() {
