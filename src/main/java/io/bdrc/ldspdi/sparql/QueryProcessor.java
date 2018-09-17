@@ -164,6 +164,19 @@ public class QueryProcessor {
         }
     }
 
+    public static Model getGraphFromModel(String query, Model model) throws RestException {
+
+        try {
+            QueryExecution qexec = QueryExecutionFactory.create(query, model);
+            Model m = qexec.execDescribe() ;
+            return m;
+        }
+        catch(Exception ex) {
+            throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).
+                    setContext(" in QueryProcessor.getResultsFromModel(query, model)) \""+query+"\"",ex));
+        }
+    }
+
     public static ResultSet getResultsFromModel(String query, Model model) throws RestException {
 
         try {

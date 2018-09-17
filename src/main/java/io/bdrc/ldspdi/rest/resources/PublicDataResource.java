@@ -328,32 +328,6 @@ public class PublicDataResource {
         return builder.build();
     }
 
-    @GET
-    @Path("/authmodel")
-    public Response getAuthModel(@Context Request request) throws RestException {
-        log.info("Call to getAuthModel()");
-        return Response.ok(ResponseOutputStream.getModelStream(
-                QueryProcessor.getAuthDataGraph(fusekiUrl)),MediaTypeUtils.getMimeFromExtension("ttl"))
-                .build();
-    }
-
-    @GET
-    @Path("/authmodel/updated")
-    public long getAuthModelUpdated(@Context Request request) {
-        //log.info("Call to getAuthModelUpdated()");
-        return RdfAuthModel.getUpdated();
-    }
-
-    @POST
-    @Path("/callbacks/github/bdrc-auth")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateAuthModel() throws RestException{
-        log.info("updating Auth data model() >>");
-        Thread t=new Thread(new RdfAuthModel());
-        t.start();
-        return Response.ok("Auth Model was updated").build();
-    }
-
     @POST
     @Path("/callbacks/github/owl-schema")
     @Consumes(MediaType.APPLICATION_JSON)
