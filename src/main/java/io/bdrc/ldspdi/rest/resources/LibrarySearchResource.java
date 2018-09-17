@@ -110,6 +110,9 @@ public class LibrarySearchResource {
             case "chunksFacetGraph":
                 res=ChunksResults.getResultsMap(model);
                 break;
+            case "roleAllAssociations":
+                res=ResourceResults.getResultsMap(model);
+                break;
             default:
                 throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
         }
@@ -183,6 +186,9 @@ public class LibrarySearchResource {
                 break;
             case "chunksFacetGraph":
                 res=ChunksResults.getResultsMap(model);
+                break;
+            case "roleAllAssociations":
+                res=ResourceResults.getResultsMap(model);
                 break;
             default:
                 throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
