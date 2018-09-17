@@ -32,8 +32,8 @@
 }
 </style>
 <script type="text/javascript">
-function onto(){
-    var x = "ontology."+document.getElementById("format").value;
+function onto(val){
+    var x = "ontology/"+val+"."+document.getElementById("format").value;
     window.location.assign(x);
 }
 </script>
@@ -53,13 +53,13 @@ function onto(){
   <option value="json">application/json=json</option>
   <option value="nt">application/n-triples=nt</option>
   <option value="trix">application/trix+xml=trix</option>
-</select> <button onclick="javascript:onto();" type="button"> View </button>
+</select> <button onclick="javascript:onto('core');" type="button"> View </button>
 </div>
 
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 
 using this general url format:</p>
-<p><a href="/resource/P1583">http://serverName:portNumber/resource/P1583</a></p>
+<p><a href="/resource/P1583.ttl">http://serverName:portNumber/resource/P1583</a></p>
 <p>where P1583 is a BDRC resource ID</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center">

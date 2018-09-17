@@ -44,7 +44,7 @@ public class LibrarySearchResource {
 
     public final static Logger log=LoggerFactory.getLogger(LibrarySearchResource.class.getName());
     public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-    
+
     @POST
     @Path("/lib/{file}")
     @JerseyCacheControl()
@@ -73,7 +73,7 @@ public class LibrarySearchResource {
                 if(t!=null) {
                     try {
                         t.join();
-                        ResultSet rs=async.res;
+                        ResultSet rs=async.getRes();
                         etext_count=rs.next().getLiteral("?c").getInt();
                     } catch (InterruptedException e) {
                         throw new RestException(500,new LdsError(LdsError.ASYNC_ERR).
@@ -82,10 +82,10 @@ public class LibrarySearchResource {
                 }
                 res=RootResults.getResultsMap(model,etext_count);
                 break;
-            case "personFacetGraph":            
+            case "personFacetGraph":
                 res=PersonResults.getResultsMap(model);
                 break;
-            case "workFacetGraph":            
+            case "workFacetGraph":
             case "workAllAssociations":
                 res=WorkAllResults.getResultsMap(model);
                 break;
@@ -111,7 +111,7 @@ public class LibrarySearchResource {
                 res=ChunksResults.getResultsMap(model);
                 break;
             default:
-                throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));                
+                throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
         }
         return Response.ok(ResponseOutputStream.getJsonResponseStream(res),MediaType.APPLICATION_JSON_TYPE).build();
     }
@@ -125,7 +125,7 @@ public class LibrarySearchResource {
             @PathParam("file") String file
             ) throws RestException {
 
-        log.info("Call to getLibGraphGet() with template name >> "+file);        
+        log.info("Call to getLibGraphGet() with template name >> "+file);
         HashMap<String,String> map=Helpers.convertMulti(info.getQueryParameters());
         Thread t=null;
         AsyncSparql async=null;
@@ -133,34 +133,34 @@ public class LibrarySearchResource {
             async=new AsyncSparql(fusekiUrl,"Etexts_count.arq",map);
             t=new Thread(async);
             t.run();
-        }        
+        }
         QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String query=qfp.getParametizedQuery(map,false); 
+        String query=qfp.getParametizedQuery(map,false);
         Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
-            case "rootSearchGraph":                
+            case "rootSearchGraph":
                 int etext_count=0;
                 if(t!=null) {
-                    try {                        
+                    try {
                         t.join();
-                        ResultSet rs=async.res;
-                        etext_count=rs.next().getLiteral("?c").getInt(); 
+                        ResultSet rs=async.getRes();
+                        etext_count=rs.next().getLiteral("?c").getInt();
                     } catch (InterruptedException e) {
                         throw new RestException(500,new LdsError(LdsError.ASYNC_ERR).
                                 setContext("getLibGraphGet()",e));
                     }
                 }
-                
+
                 res=RootResults.getResultsMap(model,etext_count);
                 break;
-            case "personFacetGraph":            
+            case "personFacetGraph":
                 res=PersonResults.getResultsMap(model);
                 break;
             case "workAllAssociations":
                 res=WorkAllResults.getResultsMap(model);
                 break;
-            case "workFacetGraph":                        
+            case "workFacetGraph":
                 res=WorkResults.getResultsMap(model);
                 break;
             case "allAssocResource":

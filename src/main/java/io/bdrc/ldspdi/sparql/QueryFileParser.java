@@ -79,7 +79,6 @@ public class QueryFileParser {
                 getQuery());
 	}
 
-
 	public QueryFileParser(String filename,String type) throws RestException{
 
         metaInf= new HashMap<>();

@@ -9,19 +9,19 @@ import java.io.InputStreamReader;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -32,12 +32,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.MultivaluedMap;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 import io.bdrc.restapi.exceptions.LdsError;
@@ -45,9 +45,9 @@ import io.bdrc.restapi.exceptions.RestException;
 
 
 public class Helpers {
-    
+
     public final static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
-	
+
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
         stream = Helpers.class.getClassLoader().getResourceAsStream("/"+baseName);
@@ -63,40 +63,42 @@ public class Helpers {
             stream = new FileInputStream(fileBaseName);
             return stream;
         } catch (FileNotFoundException e) {
+            log.debug("FileNotFound: "+baseName);
             return null;
-        }  
+        }
     }
-    
-	public static String removeAccents(String text) {		
+
+	public static String removeAccents(String text) {
 		String f=text;
 		return f == null ? null :
 	        Normalizer.normalize(f, Form.NFD)
 	            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 	}
-	public static boolean isTibUni(String s) {		
+
+	public static boolean isTibUni(String s) {
 		return s.matches("[\u0f00-\u0fff]+");
 	}
-	
-	public static boolean isWylie(String s) {		
+
+	public static boolean isWylie(String s) {
 		 Wylie wl = new Wylie(true, false, false, true);
 		 ArrayList<String> warn=new ArrayList<>();
 		 wl.fromWylie(s, warn);
 		 return warn.size()==0;
 	}
-	
+
 	public static String bdrcEncode(String url) {
 		String encoded=url.replace("\"", "%22");
 		encoded=encoded.replace(' ', '+');
 		encoded=encoded.replace("\'", "%27");
 		return encoded;
 	}
-	
+
 	public static boolean isValidURI(String uri) {
 	    String[] schemes = {"http","https"};
 	    UrlValidator urlValidator = new UrlValidator(schemes);
-	    return urlValidator.isValid(uri);                
+	    return urlValidator.isValid(uri);
     }
-	
+
 	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
         HashMap<String,String> copy=new HashMap<>();
         Set<String> set=map.keySet();
@@ -105,12 +107,7 @@ public class Helpers {
         }
         return copy;
     }
-	
-	public static String relativizeURL(String uri) {
-        uri=uri.substring(8);
-        return uri.substring(uri.indexOf("/"));
-    }
-	
+
 	public static String getMultiChoicesHtml(String path,boolean resource) throws RestException {
 	    InputStream stream = Helpers.class.getClassLoader().getResourceAsStream("multiChoice.tpl");
 	    BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
@@ -120,11 +117,12 @@ public class Helpers {
     	    while(line!=null) {
     	        sb.append(line+System.lineSeparator());
     	        line=buffer.readLine();
-                
+
     	    }
 	    } catch (IOException e) {
+	        log.debug("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)");
 	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).
-	                setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)",e));         
+	                setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)",e));
         }
 	    String rows="";
 	    if(resource) {

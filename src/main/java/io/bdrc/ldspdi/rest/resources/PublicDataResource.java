@@ -275,14 +275,19 @@ public class PublicDataResource {
     }
 
     @GET
-    @Path("/ontology.{ext}")
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext,@Context Request request) {
+    @Path("/ontology/{ont}.{ext}")
+    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext,@PathParam("ont") String ont, @Context Request request) {
         log.info("getOntology()");
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
-
-                Model model=OntData.ontMod;
+                Model model=null;
+                if(ont.equals("core")) {
+                    model=OntData.ontMod;
+                }
+                if(ont.equals("auth")) {
+                    model=RdfAuthModel.getFullModel();
+                }
                 if(MediaTypeUtils.getJenaFromExtension(ext)!=null && !ext.equalsIgnoreCase("ttl")){
                     if(ext.equalsIgnoreCase("jsonld")) {
                         model.write(os,MediaTypeUtils.getJenaFromExtension("json"));

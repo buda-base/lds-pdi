@@ -14,33 +14,31 @@ import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
 public class ChunksResults {
-    
+
     public static final String CHUNK_ABOUT="http://purl.bdrc.io/ontology/tmp/etextAbout";
     public static final String CHUNK_GENRE="http://purl.bdrc.io/ontology/tmp/etextGenre";
-    public static final String CHUNK_FOR_WORK="http://purl.bdrc.io/ontology/tmp/forWork";
-    public static final String CHUNK_FOR_ETEXT="http://purl.bdrc.io/ontology/tmp/forEtext";
-    
+
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> chunks=new HashMap<>();
         HashMap<String,Integer> topics=new HashMap<>();
         HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
         HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
-        HashSet<String> tops=new HashSet<>(); 
+        HashSet<String> tops=new HashSet<>();
         HashSet<String> authors=new HashSet<>();
         StmtIterator iter=mod.listStatements();
         while(iter.hasNext()) {
             Statement st=iter.next();
-            
+
             String type=mod.getProperty(st.getSubject(), mod.getProperty(Taxonomy.TYPE)).getObject().asResource().getURI().toString();
             switch (type) {
                 case Taxonomy.ETEXT_CHUNK:
-                    ArrayList<Field> chunksl=chunks.get(st.getSubject().toString()); 
+                    ArrayList<Field> chunksl=chunks.get(st.getSubject().toString());
                     String pred_uri=st.getPredicate().getURI();
-                    if(pred_uri.equals(CHUNK_ABOUT) || pred_uri.equals(CHUNK_GENRE)) {                        
+                    if(pred_uri.equals(CHUNK_ABOUT) || pred_uri.equals(CHUNK_GENRE)) {
                         Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                     }
-                    if(pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {                        
+                    if(pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {
                         authors.add(st.getObject().asResource().getURI());
                     }
                     if(chunksl==null) {

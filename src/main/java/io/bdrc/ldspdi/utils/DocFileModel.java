@@ -19,29 +19,29 @@ import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class DocFileModel {    
-    
+public class DocFileModel {
+
     ArrayList<String> files;
     public final static Logger log=LoggerFactory.getLogger(DocFileModel.class.getName());
     public Set<String> keys;
     HashMap<String,ArrayList<QueryTemplate>> templ;
-    
+
     public DocFileModel() throws RestException{
         this.files=getQueryTemplates();
-        setContentModel();        
+        setContentModel();
     }
-    
+
     public void setContentModel() throws RestException{
-                
-        templ=new HashMap<>();        
-        
-            for(String file:files) {                
-                QueryFileParser qfp=new QueryFileParser(file);              
+
+        templ=new HashMap<>();
+
+            for(String file:files) {
+                QueryFileParser qfp=new QueryFileParser(file);
                 QueryTemplate qt=qfp.getTemplate();
                 String queryScope=qt.getQueryScope();
-                   
+
                 if(templ.containsKey(queryScope)) {
-                    templ.get(queryScope).add(qt);                    
+                    templ.get(queryScope).add(qt);
                 }else {
                     ArrayList<QueryTemplate> qtlist=new ArrayList<>();
                     qtlist.add(qt);
@@ -50,19 +50,19 @@ public class DocFileModel {
             }
             this.keys=templ.keySet();
     }
-    
+
     public ArrayList<QueryTemplate> getTemplates(String key){
         return templ.get(key);
     }
-    
+
     public Set<String> getKeys() {
         return keys;
     }
 
     public static ArrayList<String> getQueryTemplates() throws RestException {
         ArrayList<String> files=new ArrayList<>();
-        Path dpath = Paths.get(ServiceConfig.getProperty("queryPath")+"public");      
-        if (Files.isDirectory(dpath)) { 
+        Path dpath = Paths.get(ServiceConfig.getProperty("queryPath")+"public");
+        if (Files.isDirectory(dpath)) {
             String tmp=null;
             try {
                 DirectoryStream<Path> stream = Files.newDirectoryStream(dpath);
@@ -73,7 +73,7 @@ public class DocFileModel {
                         files.add(tmp.substring(tmp.lastIndexOf("/")+1));
                     }
                 }
-            } catch (IOException e) {                
+            } catch (IOException e) {
                 log.error("Error while getting query templates", e);
                 e.printStackTrace();
                 throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+tmp+
@@ -84,7 +84,7 @@ public class DocFileModel {
             throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/ is an invalid path"+
                     " in DocFileModel.getQueryTemplates()"));
         }
-        return files;       
+        return files;
     }
 
 }

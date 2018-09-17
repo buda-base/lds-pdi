@@ -9,12 +9,12 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class AsyncSparql implements Runnable{
-    
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-    public String file;
-    public HashMap<String,String> map;
-    public ResultSet res;
-    
+
+    private String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    private String file;
+    private HashMap<String,String> map;
+    private ResultSet res;
+
     public AsyncSparql(String fusekiUrl, String file, HashMap<String, String> map) {
         super();
         this.fusekiUrl = fusekiUrl;
@@ -22,10 +22,14 @@ public class AsyncSparql implements Runnable{
         this.map = map;
     }
 
-    public void getTemplateResults() throws RestException {        
+    private void getTemplateResults() throws RestException {
         String etext_query=new QueryFileParser(file).getParametizedQuery(map,false);
         QueryExecution qexec=QueryProcessor.getResultSet(etext_query, fusekiUrl);
-        res= qexec.execSelect();        
+        res= qexec.execSelect();
+    }
+
+    public ResultSet getRes() {
+        return res;
     }
 
     @Override

@@ -14,33 +14,29 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Provider
 public class GZIPWriterInterceptor implements WriterInterceptor{
 
-    public final static Logger log=LoggerFactory.getLogger(GZIPWriterInterceptor.class.getName());
     private HttpHeaders httpHeaders;
 
-    
+
     public GZIPWriterInterceptor(@Context @NotNull HttpHeaders httpHeaders) {
         this.httpHeaders = httpHeaders;
     }
-    
+
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
         MultivaluedMap<String,String> requestHeaders =  httpHeaders.getRequestHeaders();
         List<String> acceptEncoding = requestHeaders.get(HttpHeaders.ACCEPT_ENCODING);
         boolean process=false;
-        if(acceptEncoding !=null) {                        
-            for(String st:acceptEncoding) {                  
+        if(acceptEncoding !=null) {
+            for(String st:acceptEncoding) {
                 if(st.contains("gzip")) {process=true;}
             }
         }
-        MultivaluedMap<String,Object> headers = context.getHeaders();              
-        List<Object> l=headers.get("Vary");        
-        if(process) {            
+        MultivaluedMap<String,Object> headers = context.getHeaders();
+        List<Object> l=headers.get("Vary");
+        if(process) {
             headers.add("Content-Encoding", "gzip");
             if(l!=null) {
                 headers.putSingle("Vary", "Negociate, Accept, Accept-Encoding");
@@ -50,7 +46,7 @@ public class GZIPWriterInterceptor implements WriterInterceptor{
             final OutputStream outputStream = context.getOutputStream();
             context.setOutputStream(new GZIPOutputStream(outputStream));
             context.proceed();
-        }else {            
+        }else {
             context.proceed();
         }
     }

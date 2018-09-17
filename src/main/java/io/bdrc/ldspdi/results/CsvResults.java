@@ -102,18 +102,6 @@ public class CsvResults {
         return hash;
     }
 
-    public boolean lastPage() {
-        return lastPage;
-    }
-
-    public boolean firstPage() {
-        return firstPage;
-    }
-
-    public static Logger getLog() {
-        return log;
-    }
-
     public boolean isLastPage() {
         return lastPage;
     }
