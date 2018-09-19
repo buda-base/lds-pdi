@@ -2,7 +2,9 @@ package io.bdrc.ldspdi.ontology.service.core;
 
 import java.util.ArrayList;
 
+import org.apache.jena.ontology.InverseFunctionalProperty;
 import org.apache.jena.ontology.OntResource;
+import org.apache.jena.ontology.SymmetricProperty;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -15,15 +17,15 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class OntPropModel {
-    
+
     final static Logger log = LoggerFactory.getLogger(OntPropModel.class.getName());
-    
+
     public static final String DOMAIN="http://www.w3.org/2000/01/rdf-schema#domain";
     public static final String RANGE="http://www.w3.org/2000/01/rdf-schema#range";
     public static final String LABEL="http://www.w3.org/2000/01/rdf-schema#label";
     public static final String COMMENT="http://www.w3.org/2000/01/rdf-schema#comment";
     public static final String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    
+
     public String uri;
     public String name;
     public String rdfType;
@@ -36,7 +38,7 @@ public class OntPropModel {
     public String domainUri;
     public String comment;
     public String commentLang;
-    
+
     public OntPropModel(String uri) {
         this.uri=uri;
         this.name=OntData.ontMod.shortForm(uri);
@@ -44,7 +46,7 @@ public class OntPropModel {
         ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
-            String pred=st.getPredicate().getURI();            
+            String pred=st.getPredicate().getURI();
             switch(pred) {
                 case DOMAIN:
                     this.domainUri=st.getObject().asNode().getURI();
@@ -67,9 +69,9 @@ public class OntPropModel {
                     this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
                     break;
             }
-        } 
+        }
     }
-    
+
     public ArrayList<OntPropModel> getAllSubProps() throws RestException{
         ArrayList<OntResource> res= OntData.getSubProps(uri);
         ArrayList<OntPropModel> list=new ArrayList<>();
@@ -78,7 +80,7 @@ public class OntPropModel {
         }
         return list;
     }
-    
+
     public ArrayList<OntPropModel> getParentProps() throws RestException{
         ArrayList<OntResource> res= OntData.getParentProps(uri);
         ArrayList<OntPropModel> list=new ArrayList<>();
@@ -86,6 +88,28 @@ public class OntPropModel {
             list.add(new OntPropModel(r.getURI()));
         }
         return list;
+    }
+
+    public String getSymmetricProp() {
+        SymmetricProperty prop=OntData.ontMod.getSymmetricProperty(getUri());
+        System.out.println("Sym Prop >< "+prop);
+        System.out.println("Sym Prop ? >< "+prop.isSymmetricProperty());
+        System.out.println("Sym Prop datatype ? >< "+prop.asProperty().getRDFType().getURI());
+        if(prop!=null) {
+            return prop.asProperty().getRDFType().getURI();
+        }
+        return null;
+    }
+
+    public String getInverseProp() {
+        InverseFunctionalProperty prop=OntData.ontMod.getInverseFunctionalProperty(getUri());
+        if(prop!=null) {
+            System.out.println("Sym Prop >< "+prop);
+            System.out.println("Sym Prop ? >< "+prop.isInverseFunctionalProperty());
+            System.out.println("Sym Prop datatype ? >< "+prop.getInverse().getURI());
+            return prop.asProperty().getRDFType().getURI();
+        }
+        return null;
     }
 
     public String getUri() {
@@ -117,19 +141,19 @@ public class OntPropModel {
         }
         return domain;
     }
-    
+
     public boolean isDomainInherited() {
         return getDomain().equals("Inherited");
     }
-    
+
     public boolean isRangeInherited() {
         return getRange().equals("Inherited");
     }
-    
+
     public String getComment() {
         return comment;
     }
-    
+
     public String getLabelLang() {
         return labelLang;
     }
@@ -155,5 +179,5 @@ public class OntPropModel {
         return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range="
                 + range + ", domain=" + domain + "]";
     }
-    
+
 }
