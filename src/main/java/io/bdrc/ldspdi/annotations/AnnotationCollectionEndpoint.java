@@ -92,10 +92,14 @@ public class AnnotationCollectionEndpoint {
         final Prefer prefer = getPrefer(preferHeader);
         final String queryFileName = preferToQueryFile.get(prefer);
         Model model = QueryProcessor.getSimpleResourceGraph(prefixedRes, queryFileName, fusekiUrl, null);
-        if (model.size() == 0)
+        if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
-        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, AnnotationEndpoint.ANC_PREFIX+res, DocType.ANC));
-        return AnnotationEndpoint.setHeaders(builder, AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
+        final String fullUri = AnnotationEndpoint.ANC_PREFIX+res;
+        model = CollectionUtils.toW3CCollection(model, fullUri);
+        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, fullUri, DocType.ANC));
+        return AnnotationEndpoint.setHeaders(builder,
+                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
+                .build();
     }
 
 }
