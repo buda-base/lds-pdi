@@ -191,7 +191,7 @@ public class QueryProcessor {
     }
 
     private static String loadPrefixes() throws RestException {
-        String pref=Prefixes.getPrefixes();
+        String pref=Prefixes.getPrefixesString();
         if(pref!=null) {
             return pref;
         }

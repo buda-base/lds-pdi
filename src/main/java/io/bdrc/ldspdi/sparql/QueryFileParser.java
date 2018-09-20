@@ -258,7 +258,7 @@ public class QueryFileParser {
         if(!hasValidParams(converted.keySet(),params)) {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext(" in QueryFileParser.getParametizedQuery() "+converted));
         }
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixes()+" " +query);
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixesString()+" " +query);
         for(String st:converted.keySet()) {
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));

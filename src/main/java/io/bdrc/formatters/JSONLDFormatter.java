@@ -25,7 +25,6 @@ import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFFormat.JSONLDVariant;
 import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
@@ -38,6 +37,7 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.utils.Helpers;
 
 /*******************************************************************************
@@ -179,7 +179,7 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.ROLE, "Role");
         typeToRootShortUri.put(DocType.ANN, "Annotation");
         // this is what's in the context, so not OrderedCollection
-        typeToRootShortUri.put(DocType.ANC, "AnnotationCollection");
+        typeToRootShortUri.put(DocType.ANC, "as:OrderedCollection");
         typeToRootShortUri.put(DocType.ANP, "AnnotationPage");
     }
 
@@ -345,17 +345,16 @@ public class JSONLDFormatter {
 
     @SuppressWarnings("unchecked")
     public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
-        JsonLDWriteContext ctx = new JsonLDWriteContext();
-        JSONLDVariant variant;
+        final JsonLDWriteContext ctx = new JsonLDWriteContext();
         if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) {
-            Object frameObj = getFrameObject(type, mainResourceUri);
+            final Object frameObj = getFrameObject(type, mainResourceUri);
             ctx.setFrame(frameObj);
         }
-        variant = (RDFFormat.JSONLDVariant) format.getVariant();
+        final JSONLDVariant variant = (RDFFormat.JSONLDVariant) format.getVariant();
         ctx.setJsonLDContext(docTypeToContextObject.get(type));
         ctx.setOptions(jsonLdOptions);
         DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
-        PrefixMap pm = RiotLib.prefixMap(g);
+        final PrefixMap pm = Prefixes.getPrefixMap();
         Map<String,Object> tm;
         try {
             tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);

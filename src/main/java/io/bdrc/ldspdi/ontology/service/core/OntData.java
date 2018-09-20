@@ -134,7 +134,7 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntResource> getDomainUsages(String uri) throws RestException {
-        String query=Prefixes.getPrefixes()+ " select distinct ?s where {\n" +
+        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
                 "    ?s rdfs:domain <"+uri+"> .    \n" +
                 "} order by ?p ?s";
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
@@ -149,7 +149,7 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntResource> getRangeUsages(String uri) throws RestException {
-        String query=Prefixes.getPrefixes()+ " select distinct ?s ?p where {\n" +
+        String query=Prefixes.getPrefixesString()+ " select distinct ?s ?p where {\n" +
                 "    ?s rdfs:range <"+uri+"> .    \n" +
                 "} order by ?p ?s";
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
@@ -164,7 +164,7 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntResource> getSubProps(String uri) throws RestException {
-        String query=Prefixes.getPrefixes()+ " select distinct ?s ?p where {\n" +
+        String query=Prefixes.getPrefixesString()+ " select distinct ?s ?p where {\n" +
                 "    ?s rdfs:subPropertyOf <"+uri+"> .    \n" +
                 "} order by ?p ?s";
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
@@ -179,7 +179,7 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntResource> getParentProps(String uri) throws RestException {
-        String query=Prefixes.getPrefixes()+ " select distinct ?s where {\n" +
+        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
                 "   <"+uri+"> rdfs:subPropertyOf ?s .    \n" +
                 "} order by ?s";
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
@@ -194,7 +194,7 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntResource> getSubClassesOf(String uri) throws RestException {
-        String query=Prefixes.getPrefixes()+ " select distinct ?s where {\n" +
+        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
                 "   <"+uri+"> rdfs:subClassOf ?s .    \n" +
                 "} order by ?s";
         QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
