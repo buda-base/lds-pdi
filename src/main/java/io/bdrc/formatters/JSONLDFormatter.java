@@ -37,6 +37,7 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
+import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.utils.Helpers;
 
@@ -201,7 +202,7 @@ public class JSONLDFormatter {
     // be associated with an annotation type for framing. It's a merge
     // of the json file in src/main/resources/context/ and the BDO context
     public static Map<String,Object> getAnnMergedContext() {
-        Map<String,Object> res = new HashMap<>();
+        final Map<String,Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
         Map<String, Map<String,Object>> map = null;
         try {
@@ -214,11 +215,15 @@ public class JSONLDFormatter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // we need to not compact these values, see
+        // https://github.com/json-ld/json-ld.org/issues/679
+        res.remove(AnnotationEndpoint.ANN_PREFIX_SHORT);
+        res.remove(AnnotationEndpoint.ANC_PREFIX_SHORT);
         return res;
     }
 
     public static Map<String,Object> getOaMergedContext() {
-        Map<String,Object> res = new HashMap<>();
+        final Map<String,Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
         Map<String, Map<String,Object>> map = null;
         try {
@@ -228,6 +233,8 @@ public class JSONLDFormatter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        res.remove(AnnotationEndpoint.ANN_PREFIX_SHORT);
+        res.remove(AnnotationEndpoint.ANC_PREFIX_SHORT);
         return res;
     }
 
