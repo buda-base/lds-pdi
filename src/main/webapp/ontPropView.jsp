@@ -62,8 +62,16 @@
 <b>Range:</b> <a href="${model.getRangeUri()}">${model.getRange()}</a><br>
 </c:otherwise>
 </c:choose>
+<c:if test = "${model.getComment()!=null}">
 <b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
-<br>
+</c:if>
+<c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
+<b>Characteristics:</b>
+<c:forEach items="${OntData.getOwlCharacteristics().getOwlProps(model.getUri())}" var="owlprop"> 
+ <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> /
+</c:forEach>
+</c:if>
+
 <!-- SUB PROPS -->
     <c:if test = "${model.getAllSubProps().size()>0}">
         <h3>Sub properties: </h3>

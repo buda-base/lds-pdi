@@ -16,7 +16,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class BdrcOWLProperties {
+public class OWLPropsCharacteristics {
 
     Model propsModel;
     public static final String OWL_FUNCTIONAL="http://www.w3.org/2002/07/owl#FunctionalProperty";
@@ -35,7 +35,7 @@ public class BdrcOWLProperties {
     ArrayList<String> asymmetricProps;
     ArrayList<String> reflexiveProps;
 
-    public BdrcOWLProperties(Model m) throws IOException, RestException {
+    public OWLPropsCharacteristics(Model m) throws IOException, RestException {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(ServiceConfig.class.getClassLoader().getResourceAsStream("arq/OwlProps.arq")));
         StringBuilder out = new StringBuilder();
@@ -127,31 +127,31 @@ public class BdrcOWLProperties {
     }
 
     public boolean isFunctionalProp(String uri) {
-        return functionalProps.contains(uri);
+        return getFunctionalProps().contains(uri);
     }
 
     public boolean isSymmetricProp(String uri) {
-        return symmetricProps.contains(uri);
+        return getSymmetricProps().contains(uri);
     }
 
     public boolean isIrreflexiveProp(String uri) {
-        return irreflexiveProps.contains(uri);
+        return getIrreflexiveProps().contains(uri);
     }
 
     public boolean isInverseFunctionalProp(String uri) {
-        return inverseFunctionalProps.contains(uri);
+        return getInverseFunctionalProps().contains(uri);
     }
 
     public boolean isTransitiveProp(String uri) {
-        return transitiveProps.contains(uri);
+        return getTransitiveProps().contains(uri);
     }
 
     public boolean isAsymmetricProp(String uri) {
-        return asymmetricProps.contains(uri);
+        return getAsymmetricProps().contains(uri);
     }
 
     public boolean isReflexiveProp(String uri) {
-        return reflexiveProps.contains(uri);
+        return getReflexiveProps().contains(uri);
     }
 
     public ArrayList<String> getOwlProps(String uri){
@@ -178,5 +178,12 @@ public class BdrcOWLProperties {
             owlProps.add(OWL_REFLEXIVE);
         }
         return owlProps;
+    }
+
+    public String getPrefixed(String uri) {
+        if(uri !=null) {
+            return "owl:"+uri.substring(uri.lastIndexOf("#")+1);
+        }
+        return uri;
     }
 }

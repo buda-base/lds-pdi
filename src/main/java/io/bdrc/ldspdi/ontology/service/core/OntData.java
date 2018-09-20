@@ -54,6 +54,7 @@ public class OntData implements Runnable{
     public static InfModel infMod;
     public static OntModel ontMod;
     public static OntModel ontAuthMod;
+    public static OWLPropsCharacteristics owlCharacteristics;
     public final static Logger log=LoggerFactory.getLogger(OntData.class.getName());
     public static String JSONLD_CONTEXT;
     static EntityTag update;
@@ -68,6 +69,7 @@ public class OntData implements Runnable{
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
             rdf10tordf11(ontMod);
             readGithubJsonLDContext();
             log.info("updating core ont model() >>");
@@ -117,6 +119,7 @@ public class OntData implements Runnable{
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
             log.info("OntModel Size >> "+ontMod.size());
             infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
             log.info("updating core ont model() >>");
@@ -131,6 +134,10 @@ public class OntData implements Runnable{
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);
         }
+    }
+
+    public static OWLPropsCharacteristics getOwlCharacteristics() {
+        return owlCharacteristics;
     }
 
     public static ArrayList<OntResource> getDomainUsages(String uri) throws RestException {
