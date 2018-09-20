@@ -4,7 +4,7 @@
     "http://purl.bdrc.io/context.jsonld"
   ],
   "@omitDefault": true,
-  "type": "AnnotationPage",
+  "@type": "AnnotationPage",
   "next": {"@embed": false},
   "prev": {"@embed": false},
   "partOf": {"@embed": false},

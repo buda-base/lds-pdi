@@ -43,7 +43,7 @@ public class OWLPropsCharacteristics {
         while ((line = reader.readLine()) != null) {
             out.append(line);
         }
-        String query=Prefixes.getPrefixes()+" "+out.toString();
+        String query=Prefixes.getPrefixesString()+" "+out.toString();
         QueryExecution qexec = QueryExecutionFactory.create(query, m);
         propsModel=qexec.execConstruct();
         reflexiveProps=getReflexiveProps();

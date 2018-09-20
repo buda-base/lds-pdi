@@ -25,3 +25,4 @@ prefix text:  <http://jena.apache.org/text#>
 prefix oa:    <http://www.w3.org/ns/oa#>
 prefix as:    <http://www.w3.org/ns/activitystreams#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
+prefix schema: <http://schema.org/>

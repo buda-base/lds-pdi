@@ -4,7 +4,7 @@
     "http://purl.bdrc.io/context.jsonld"
   ],
   "@omitDefault": true,
-  "type": "Annotation",
+  "@type": "Annotation",
   "via": {"@embed": false},
   "canonical": {"@embed": false},
   "rights": {"@embed": false},

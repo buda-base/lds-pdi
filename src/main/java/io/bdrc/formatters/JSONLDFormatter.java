@@ -25,7 +25,6 @@ import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFFormat.JSONLDVariant;
 import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
@@ -38,6 +37,8 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
+import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.utils.Helpers;
 
 /*******************************************************************************
@@ -72,6 +73,7 @@ public class JSONLDFormatter {
     public final static String annoContext = "http://www.w3.org/ns/anno.jsonld";
     public final static String oaContext = "http://www.w3.org/ns/oa.jsonld";
     public final static String ldpContext = "http://www.w3.org/ns/ldp.jsonld";
+    public static boolean prettyPrint = true;
     public final static JsonLdOptions jsonLdOptions = new JsonLdOptions();
     static {
         jsonLdOptions.setProcessingMode("json-ld-1.1");
@@ -179,7 +181,7 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.ROLE, "Role");
         typeToRootShortUri.put(DocType.ANN, "Annotation");
         // this is what's in the context, so not OrderedCollection
-        typeToRootShortUri.put(DocType.ANC, "AnnotationCollection");
+        typeToRootShortUri.put(DocType.ANC, "as:OrderedCollection");
         typeToRootShortUri.put(DocType.ANP, "AnnotationPage");
     }
 
@@ -200,7 +202,7 @@ public class JSONLDFormatter {
     // be associated with an annotation type for framing. It's a merge
     // of the json file in src/main/resources/context/ and the BDO context
     public static Map<String,Object> getAnnMergedContext() {
-        Map<String,Object> res = new HashMap<>();
+        final Map<String,Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
         Map<String, Map<String,Object>> map = null;
         try {
@@ -213,11 +215,15 @@ public class JSONLDFormatter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // we need to not compact these values, see
+        // https://github.com/json-ld/json-ld.org/issues/679
+        res.remove(AnnotationEndpoint.ANN_PREFIX_SHORT);
+        res.remove(AnnotationEndpoint.ANC_PREFIX_SHORT);
         return res;
     }
 
     public static Map<String,Object> getOaMergedContext() {
-        Map<String,Object> res = new HashMap<>();
+        final Map<String,Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
         Map<String, Map<String,Object>> map = null;
         try {
@@ -227,6 +233,8 @@ public class JSONLDFormatter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        res.remove(AnnotationEndpoint.ANN_PREFIX_SHORT);
+        res.remove(AnnotationEndpoint.ANC_PREFIX_SHORT);
         return res;
     }
 
@@ -344,18 +352,17 @@ public class JSONLDFormatter {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
-        JsonLDWriteContext ctx = new JsonLDWriteContext();
-        JSONLDVariant variant;
-        if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) {
-            Object frameObj = getFrameObject(type, mainResourceUri);
+    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, RDFFormat format, final boolean reorder) {
+        final JsonLDWriteContext ctx = new JsonLDWriteContext();
+        if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY) || format.equals(RDFFormat.JSONLD_FRAME_FLAT)) {
+            final Object frameObj = getFrameObject(type, mainResourceUri);
             ctx.setFrame(frameObj);
         }
-        variant = (RDFFormat.JSONLDVariant) format.getVariant();
+        final JSONLDVariant variant = (RDFFormat.JSONLDVariant) format.getVariant();
         ctx.setJsonLDContext(docTypeToContextObject.get(type));
         ctx.setOptions(jsonLdOptions);
         DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
-        PrefixMap pm = RiotLib.prefixMap(g);
+        final PrefixMap pm = Prefixes.getPrefixMap();
         Map<String,Object> tm;
         try {
             tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
@@ -373,8 +380,12 @@ public class JSONLDFormatter {
     public static void jsonObjectToOutputStream(Object jsonObject, OutputStream out) {
         Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8) ;
         try {
-            JsonUtils.writePrettyPrint(wr, jsonObject) ;
-            wr.write("\n");
+            if (prettyPrint) {
+                JsonUtils.writePrettyPrint(wr, jsonObject) ;
+                wr.write("\n");
+            } else {
+                JsonUtils.write(wr, jsonObject);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

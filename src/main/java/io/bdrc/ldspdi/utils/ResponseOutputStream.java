@@ -36,23 +36,17 @@ import io.bdrc.formatters.TTLRDFWriter;
 
 public class ResponseOutputStream {
 
+    public static final ObjectMapper om = new ObjectMapper();
+    public static boolean prettyPrint = false;
 
     public static StreamingOutput getJsonResponseStream(Object toJson) {
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writerWithDefaultPrettyPrinter().writeValue(os , toJson);
-            }
-        };
-        return stream;
-    }
-
-    public static StreamingOutput getJsonLDResponseStream(Object toJson) {
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                JSONLDFormatter.jsonObjectToOutputStream(toJson, os);
+                if (prettyPrint)
+                    om.writerWithDefaultPrettyPrinter().writeValue(os, toJson);
+                else
+                    om.writeValue(os, toJson);
             }
         };
         return stream;
@@ -103,7 +97,7 @@ public class ResponseOutputStream {
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os){
-                RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                 writer.output(os);
             }
         };

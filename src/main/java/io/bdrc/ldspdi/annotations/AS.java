@@ -13,7 +13,7 @@ public class AS {
     /**
      * The namespace of the vocabulary as a string
      */
-    public static final String NS = "https://www.w3.org/ns/activitystreams#";
+    public static final String NS = "http://www.w3.org/ns/activitystreams#";
 
     /** returns the URI for this schema
         @return the URI for this schema
