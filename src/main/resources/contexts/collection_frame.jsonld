@@ -4,7 +4,7 @@
     "http://www.w3.org/ns/anno.jsonld",
     "http://purl.bdrc.io/context.jsonld"
   ],
-  "type": "AnnotationCollection",
+  "@type": "AnnotationCollection",
   "first": [{"@embed": false}],
   "last": [{"@embed": false}]
 }

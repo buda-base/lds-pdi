@@ -72,6 +72,7 @@ public class JSONLDFormatter {
     public final static String annoContext = "http://www.w3.org/ns/anno.jsonld";
     public final static String oaContext = "http://www.w3.org/ns/oa.jsonld";
     public final static String ldpContext = "http://www.w3.org/ns/ldp.jsonld";
+    public static boolean prettyPrint = true;
     public final static JsonLdOptions jsonLdOptions = new JsonLdOptions();
     static {
         jsonLdOptions.setProcessingMode("json-ld-1.1");
@@ -344,9 +345,9 @@ public class JSONLDFormatter {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, final RDFFormat format, final boolean reorder) {
+    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, RDFFormat format, final boolean reorder) {
         final JsonLDWriteContext ctx = new JsonLDWriteContext();
-        if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY)) {
+        if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY) || format.equals(RDFFormat.JSONLD_FRAME_FLAT)) {
             final Object frameObj = getFrameObject(type, mainResourceUri);
             ctx.setFrame(frameObj);
         }
@@ -372,8 +373,12 @@ public class JSONLDFormatter {
     public static void jsonObjectToOutputStream(Object jsonObject, OutputStream out) {
         Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8) ;
         try {
-            JsonUtils.writePrettyPrint(wr, jsonObject) ;
-            wr.write("\n");
+            if (prettyPrint) {
+                JsonUtils.writePrettyPrint(wr, jsonObject) ;
+                wr.write("\n");
+            } else {
+                JsonUtils.write(wr, jsonObject);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
