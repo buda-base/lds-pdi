@@ -43,31 +43,31 @@ public class OntPropModel {
         this.uri=uri;
         this.name=OntData.ontMod.shortForm(uri);
         StmtIterator it=((Model)OntData.ontMod).listStatements(
-        ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
+                ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
             String pred=st.getPredicate().getURI();
             switch(pred) {
-                case DOMAIN:
-                    this.domainUri=st.getObject().asNode().getURI();
-                    this.domain=OntData.ontMod.shortForm(domainUri);
-                    break;
-                case RANGE:
-                    this.rangeUri=st.getObject().asNode().getURI();
-                    this.range=OntData.ontMod.shortForm(rangeUri);
-                    break;
-                case LABEL:
-                    this.label=st.getObject().asLiteral().getString();
-                    this.labelLang=st.getObject().asLiteral().getLanguage();
-                    break;
-                case COMMENT:
-                    this.comment=st.getObject().asLiteral().getString();
-                    this.commentLang=st.getObject().asLiteral().getLanguage();
-                    break;
-                case TYPE:
-                    this.rdfTypeUri=st.getObject().asNode().getURI();
-                    this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
-                    break;
+            case DOMAIN:
+                this.domainUri=st.getObject().asNode().getURI();
+                this.domain=OntData.ontMod.shortForm(domainUri);
+                break;
+            case RANGE:
+                this.rangeUri=st.getObject().asNode().getURI();
+                this.range=OntData.ontMod.shortForm(rangeUri);
+                break;
+            case LABEL:
+                this.label=st.getObject().asLiteral().getString();
+                this.labelLang=st.getObject().asLiteral().getLanguage();
+                break;
+            case COMMENT:
+                this.comment=st.getObject().asLiteral().getString();
+                this.commentLang=st.getObject().asLiteral().getLanguage();
+                break;
+            case TYPE:
+                this.rdfTypeUri=st.getObject().asNode().getURI();
+                this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
+                break;
             }
         }
     }
@@ -92,9 +92,6 @@ public class OntPropModel {
 
     public String getSymmetricProp() {
         SymmetricProperty prop=OntData.ontMod.getSymmetricProperty(getUri());
-        System.out.println("Sym Prop >< "+prop);
-        System.out.println("Sym Prop ? >< "+prop.isSymmetricProperty());
-        System.out.println("Sym Prop datatype ? >< "+prop.asProperty().getRDFType().getURI());
         if(prop!=null) {
             return prop.asProperty().getRDFType().getURI();
         }
@@ -104,9 +101,6 @@ public class OntPropModel {
     public String getInverseProp() {
         InverseFunctionalProperty prop=OntData.ontMod.getInverseFunctionalProperty(getUri());
         if(prop!=null) {
-            System.out.println("Sym Prop >< "+prop);
-            System.out.println("Sym Prop ? >< "+prop.isInverseFunctionalProperty());
-            System.out.println("Sym Prop datatype ? >< "+prop.getInverse().getURI());
             return prop.asProperty().getRDFType().getURI();
         }
         return null;

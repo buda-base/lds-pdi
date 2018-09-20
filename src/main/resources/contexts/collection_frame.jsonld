@@ -5,6 +5,5 @@
     "http://purl.bdrc.io/context.jsonld"
   ],
   "@type": "AnnotationCollection",
-  "first": [{"@embed": false}],
   "last": [{"@embed": false}]
 }
