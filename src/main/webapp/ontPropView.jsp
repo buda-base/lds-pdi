@@ -68,7 +68,7 @@
 <c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics:</b>
 <c:forEach items="${OntData.getOwlCharacteristics().getOwlProps(model.getUri())}" var="owlprop"> 
- <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> /
+ <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> 
 </c:forEach>
 </c:if>
 

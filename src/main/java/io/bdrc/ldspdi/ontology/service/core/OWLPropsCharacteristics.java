@@ -154,7 +154,7 @@ public class OWLPropsCharacteristics {
         return getReflexiveProps().contains(uri);
     }
 
-    public ArrayList<String> getOwlProps(String uri){
+    public ArrayList<String> getOwlProps(String uri) throws RestException{
         ArrayList<String> owlProps=new ArrayList<>();
         if(isFunctionalProp(uri)) {
             owlProps.add(OWL_FUNCTIONAL);
