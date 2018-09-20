@@ -4,12 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -26,6 +31,7 @@ public class OWLPropsCharacteristics {
     public static final String OWL_TRANSITIVE="http://www.w3.org/2002/07/owl#TransitiveProperty";
     public static final String OWL_ASYMMETRIC="http://www.w3.org/2002/07/owl#AsymmetricProperty";
     public static final String OWL_REFLEXIVE="http://www.w3.org/2002/07/owl#ReflexiveProperty";
+    public static final String OWL_INVERSEOF="http://www.w3.org/2002/07/owl#inverseOf";
 
     ArrayList<String> functionalProps;
     ArrayList<String> symmetricProps;
@@ -34,6 +40,7 @@ public class OWLPropsCharacteristics {
     ArrayList<String> transitiveProps;
     ArrayList<String> asymmetricProps;
     ArrayList<String> reflexiveProps;
+    HashMap<String,String> inverseOfProps;
 
     public OWLPropsCharacteristics(Model m) throws IOException, RestException {
         BufferedReader reader = new BufferedReader(
@@ -46,7 +53,7 @@ public class OWLPropsCharacteristics {
         String query=Prefixes.getPrefixesString()+" "+out.toString();
         QueryExecution qexec = QueryExecutionFactory.create(query, m);
         propsModel=qexec.execConstruct();
-        reflexiveProps=getReflexiveProps();
+        getInverseOfProps();
     }
 
     public ArrayList<String> getFunctionalProps(){
@@ -126,6 +133,27 @@ public class OWLPropsCharacteristics {
         return reflexiveProps;
     }
 
+    public HashMap<String,String> getInverseOfProps(){
+        if(inverseOfProps==null) {
+            StmtIterator it=propsModel.listStatements((Resource)null,ResourceFactory.createProperty(OWL_INVERSEOF),(RDFNode)null);
+            inverseOfProps = new HashMap<>();
+            while(it.hasNext()) {
+                Statement s=it.next();
+                inverseOfProps.put(s.getSubject().getURI(),s.getObject().asNode().getURI());
+                inverseOfProps.put(s.getObject().asNode().getURI(),s.getSubject().getURI());
+            }
+        }
+        return inverseOfProps;
+    }
+
+    public String getInverseOfProp(String uri) {
+        return getInverseOfProps().get(uri);
+    }
+
+    public boolean isInverseOfProp(String uri) {
+        return getInverseOfProps().keySet().contains(uri);
+    }
+
     public boolean isFunctionalProp(String uri) {
         return getFunctionalProps().contains(uri);
     }
@@ -183,6 +211,13 @@ public class OWLPropsCharacteristics {
     public String getPrefixed(String uri) {
         if(uri !=null) {
             return "owl:"+uri.substring(uri.lastIndexOf("#")+1);
+        }
+        return uri;
+    }
+
+    public String getShortInverse(String uri) {
+        if(uri !=null) {
+            return ":"+uri.substring(uri.lastIndexOf("/")+1);
         }
         return uri;
     }

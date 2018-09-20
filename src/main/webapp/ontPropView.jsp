@@ -66,10 +66,14 @@
 <b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
 </c:if>
 <c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
-<b>Characteristics:</b>
+<b>Characteristics: </b>
 <c:forEach items="${OntData.getOwlCharacteristics().getOwlProps(model.getUri())}" var="owlprop"> 
  <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> 
 </c:forEach>
+</c:if>
+<c:if test = "${OntData.getOwlCharacteristics().isInverseOfProp(model.getUri())}">
+<b>Is Inverse of: </b><a href="${OntData.getOwlCharacteristics().getInverseOfProp(model.getUri())}">
+${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics().getInverseOfProp(model.getUri()))}</a>
 </c:if>
 
 <!-- SUB PROPS -->

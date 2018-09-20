@@ -4,39 +4,43 @@ construct {
 where {
 {
   {
-   ?s ?p ?o .
    ?s rdf:type owl:IrreflexiveProperty .
+   ?s ?p ?o .
   } 
   union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:SymmetricProperty .
+   ?s ?p ?o .
    }
    union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:FunctionalProperty .
+   ?s ?p ?o .
    }
    union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:InverseFunctionalProperty .
+   ?s ?p ?o .
    }
    union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:TransitiveProperty .
+   ?s ?p ?o .
    }
    union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:AsymmetricProperty .
+   ?s ?p ?o .
    }
    union
    {
-   ?s ?p ?o .
    ?s rdf:type owl:ReflexiveProperty .
+   ?s ?p ?o .
    }
-
+   union
+   {
+   ?s owl:inverseOf ?o.
+   ?s ?p ?o .
+   }
 }
 }
