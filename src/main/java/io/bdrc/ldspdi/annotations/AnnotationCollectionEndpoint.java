@@ -169,8 +169,6 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
-            return AnnotationEndpoint.htmlResponse(info, prefixedRes);
         final DocType docType = DocType.ANC;
         final String contentType = mediaType.toString();
         final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());

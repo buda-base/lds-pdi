@@ -139,9 +139,6 @@ public class CollectionUtils {
 
     public static Model getSubsetGraph(final String prefixedRes, final Prefer prefer, final String fusekiUrl,
             final String subtypeUrlElt, final String subcoordinates, final String resAlias) throws RestException {
-        if (prefer == Prefer.MINIMAL) {
-            return getSubsetGraph(prefixedRes, prefer, fusekiUrl, SubsetType.NONE, AnnotationCollectionEndpoint.defaultRange, resAlias);
-        }
         final SubsetType subType = subsetUrlEltToSubsetType.get(subtypeUrlElt);
         if (subType == null) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));

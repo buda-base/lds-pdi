@@ -38,15 +38,15 @@ CONSTRUCT {
     } union {
         SELECT (count(?ann) AS ?nbAnnotations) WHERE {
             {
-                FILTER (?R_SUBMETHOD == bdr:SubsettingNone)
+                FILTER (?R_SUBMETHOD = bdr:SubsettingNone)
                 ?ann :annInCollection ?R_RES .
             } union {
-                FILTER (?R_SUBMETHOD == bdr:SubsettingImageVolume)
+                FILTER (?R_SUBMETHOD = bdr:SubsettingImageVolume)
                 ?ann :annInCollection ?R_RES .
                 ?ann oa:hasTarget/oa:hasSource/:sourceImageSeq ?imgseq .
                 FILTER (?imgseq <= ?I_SUBRANGELAST && ?imgseq >= ?I_SUBRANGEFIRST)
             } union {
-                FILTER (?R_SUBMETHOD == bdr:SubsettingChars)
+                FILTER (?R_SUBMETHOD = bdr:SubsettingChars)
                 ?ann :annInCollection ?R_RES .
                 ?ann oa:hasTarget/oa:hasSource ?source .
                 ?source :sourcecharstart ?start ;

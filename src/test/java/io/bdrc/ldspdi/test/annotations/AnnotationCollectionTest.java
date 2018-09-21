@@ -83,10 +83,10 @@ public class AnnotationCollectionTest extends JerseyTest {
 
     @Test
     public void subCollection() throws JsonProcessingException, IOException {
-        final Response res = target("/anncollection/ANCVOL1/sub/1")
+        final Response res = target("/anncollection/ANCVOL1/sub/pages/1")
                 .request()
                 .header("Accept", MediaTypeUtils.MT_JSONLD)
-                .header("Prefer", AnnotationEndpoint.LDP_PCD)
+                .header("Prefer", AnnotationEndpoint.LDP_PMC)
                 .get();
         System.out.println("result:");
         System.out.println(res.getStatus());
