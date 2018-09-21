@@ -296,6 +296,7 @@ public class PublicTemplatesResource {
         Thread t=new Thread(new GitService());
         t.start();
         Prefixes.loadPrefixes();
+        QueryFileParser.clearCache();
         return Response.ok().build();
     }
 

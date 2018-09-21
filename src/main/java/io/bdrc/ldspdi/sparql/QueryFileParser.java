@@ -58,6 +58,7 @@ public class QueryFileParser {
     private QueryTemplate template;
     private ArrayList<Param> params;
     private ArrayList<Output> outputs;
+    private static HashMap<String,File> CACHE= new HashMap<>();
 
     public final static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
 
@@ -66,7 +67,8 @@ public class QueryFileParser {
 
         metaInf= new HashMap<>();
         queryName=filename.substring(0,filename.lastIndexOf("."));
-        parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
+        //parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
+        parseTemplate(getFile(filename,null));
         template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
@@ -84,7 +86,8 @@ public class QueryFileParser {
 
         metaInf= new HashMap<>();
         queryName=filename.substring(0,filename.lastIndexOf("."));
-        parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename));
+        //parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename));
+        parseTemplate(getFile(filename,type));
         template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
@@ -98,6 +101,27 @@ public class QueryFileParser {
                 getQuery());
     }
 
+    private static void cacheFile(String filename,File file) {
+        CACHE.put(filename, file);
+    }
+
+    private static File getFile(String filename,String type) {
+        if(CACHE.get(filename)!=null) {
+            return CACHE.get(filename);
+        }
+        if(type==null) {
+            File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
+            cacheFile(filename, file);
+            return new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
+        }
+        File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename);
+        cacheFile(filename, file);
+        return file;
+    }
+
+    public static void clearCache() {
+        CACHE = new HashMap<>();
+    }
 
     public String getTemplateName() {
         return this.queryName;

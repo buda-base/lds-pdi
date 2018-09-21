@@ -48,7 +48,7 @@
 <b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
-<b>Domain: Inherited</b><br>
+<b>Domain:</b> Inherited<br>
 </c:when>
 <c:otherwise>
 <b>Domain:</b> 

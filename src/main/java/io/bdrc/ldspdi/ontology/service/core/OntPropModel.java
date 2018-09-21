@@ -150,14 +150,18 @@ public class OntPropModel {
 
     public ArrayList<String> getRange() {
         if(range==null) {
-            return new ArrayList<>();
+            range=new ArrayList<>();
+            range.add("Inherited");
+            return range;
         }
         return range;
     }
 
     public ArrayList<String> getDomain() {
        if(domain==null) {
-           return new ArrayList<>();
+           domain=new ArrayList<>();
+           domain.add("Inherited");
+           return domain;
        }
        return domain;
     }
