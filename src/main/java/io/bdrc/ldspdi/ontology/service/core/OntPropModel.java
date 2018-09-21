@@ -1,13 +1,17 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jena.ontology.InverseFunctionalProperty;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.ontology.SymmetricProperty;
+import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -32,9 +36,9 @@ public class OntPropModel {
     public String rdfTypeUri;
     public String label;
     public String labelLang;
-    public String range;
+    public ArrayList<String> range;
     public String rangeUri;
-    public String domain;
+    public ArrayList<String> domain;
     public String domainUri;
     public String comment;
     public String commentLang;
@@ -46,24 +50,13 @@ public class OntPropModel {
                 ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
-            System.out.println("Statement >> "+st);
             String pred=st.getPredicate().getURI();
             switch(pred) {
                 case DOMAIN:
-                    if(st.getObject().isURIResource()) {
-                        this.domainUri=st.getObject().asNode().getURI();
-                        this.domain=OntData.ontMod.shortForm(domainUri);
-                    }else {
-                        this.domain="Inherited";
-                    }
+                    domain=getRdfListElements(st);
                     break;
                 case RANGE:
-                    if(st.getObject().isURIResource()) {
-                        this.rangeUri=st.getObject().asNode().getURI();
-                        this.range=OntData.ontMod.shortForm(rangeUri);
-                    }else {
-                        this.range="Inherited";
-                    }
+                    range=getRdfListElements(st);
                     break;
                 case LABEL:
                     this.label=st.getObject().asLiteral().getString();
@@ -79,6 +72,28 @@ public class OntPropModel {
                     break;
             }
         }
+    }
+
+    public ArrayList<String> getRdfListElements(Statement st){
+        ArrayList<String> elts=new ArrayList<>();
+        if(st.getObject().isURIResource()) {
+            this.domainUri=st.getObject().asNode().getURI();
+            elts.add(OntData.ontMod.shortForm(domainUri));
+            return elts;
+        }
+        if(st.getObject().isAnon()) {
+            Resource rs=OntData.ontMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
+            StmtIterator stmt=rs.listProperties(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#unionOf"));
+            while(stmt.hasNext()) {
+                List<RDFNode> list=stmt.next().getObject().asResource().as(RDFList.class).asJavaList();
+                for(RDFNode node:list) {
+                    elts.add(node.asResource().getURI());
+                }
+            }
+            return elts;
+        }
+        elts.add("Inherited");
+        return elts;
     }
 
     public ArrayList<OntPropModel> getAllSubProps() throws RestException{
@@ -133,26 +148,26 @@ public class OntPropModel {
         return label;
     }
 
-    public String getRange() {
+    public ArrayList<String> getRange() {
         if(range==null) {
-            return "Inherited";
+            return new ArrayList<>();
         }
         return range;
     }
 
-    public String getDomain() {
-        if(domain==null) {
-            return "Inherited";
-        }
-        return domain;
+    public ArrayList<String> getDomain() {
+       if(domain==null) {
+           return new ArrayList<>();
+       }
+       return domain;
     }
 
     public boolean isDomainInherited() {
-        return getDomain().equals("Inherited");
+        return getDomain().contains("Inherited");
     }
 
     public boolean isRangeInherited() {
-        return getRange().equals("Inherited");
+        return getRange().contains("Inherited");
     }
 
     public String getComment() {

@@ -71,6 +71,4 @@ public class QueryMvcSolutionItem {
         return "QueryMvcSolutionItem [dataRow=" + dataRow + "]";
     }
 
-
-
 }
