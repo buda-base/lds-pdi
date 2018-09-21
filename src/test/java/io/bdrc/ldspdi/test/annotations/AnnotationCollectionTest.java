@@ -62,7 +62,7 @@ public class AnnotationCollectionTest extends JerseyTest {
         final Response res = target("/anncollection/ANCVOL1")
                 .request()
                 .header("Accept", MediaTypeUtils.MT_JSONLD)
-                .header("Prefer", AnnotationEndpoint.LDP_PMC)
+                .header("Prefer", AnnotationEndpoint.LDP_PCI)
                 .get();
         System.out.println("result:");
         System.out.println(res.getStatus());

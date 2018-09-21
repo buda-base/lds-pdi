@@ -43,7 +43,7 @@ public class OntPropModel {
         this.uri=uri;
         this.name=OntData.ontMod.shortForm(uri);
         StmtIterator it=((Model)OntData.ontMod).listStatements(
-        ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
+                ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
             System.out.println("Statement >> "+st);
@@ -103,9 +103,6 @@ public class OntPropModel {
 
     public String getSymmetricProp() {
         SymmetricProperty prop=OntData.ontMod.getSymmetricProperty(getUri());
-        System.out.println("Sym Prop >< "+prop);
-        System.out.println("Sym Prop ? >< "+prop.isSymmetricProperty());
-        System.out.println("Sym Prop datatype ? >< "+prop.asProperty().getRDFType().getURI());
         if(prop!=null) {
             return prop.asProperty().getRDFType().getURI();
         }
@@ -115,9 +112,6 @@ public class OntPropModel {
     public String getInverseProp() {
         InverseFunctionalProperty prop=OntData.ontMod.getInverseFunctionalProperty(getUri());
         if(prop!=null) {
-            System.out.println("Sym Prop >< "+prop);
-            System.out.println("Sym Prop ? >< "+prop.isInverseFunctionalProperty());
-            System.out.println("Sym Prop datatype ? >< "+prop.getInverse().getURI());
             return prop.asProperty().getRDFType().getURI();
         }
         return null;
