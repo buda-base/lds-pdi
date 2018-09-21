@@ -78,7 +78,7 @@ public class OntPropModel {
         ArrayList<String> elts=new ArrayList<>();
         if(st.getObject().isURIResource()) {
             this.domainUri=st.getObject().asNode().getURI();
-            elts.add(OntData.ontMod.shortForm(domainUri));
+            elts.add(domainUri);
             return elts;
         }
         if(st.getObject().isAnon()) {
