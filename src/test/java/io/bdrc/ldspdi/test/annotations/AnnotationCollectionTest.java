@@ -58,11 +58,35 @@ public class AnnotationCollectionTest extends JerseyTest {
     }
 
     @Test
-    public void basicContentType() throws JsonProcessingException, IOException {
+    public void wholeCollection() throws JsonProcessingException, IOException {
         final Response res = target("/anncollection/ANCVOL1")
                 .request()
                 .header("Accept", MediaTypeUtils.MT_JSONLD)
-                .header("Prefer", AnnotationEndpoint.LDP_PCI)
+                .header("Prefer", AnnotationEndpoint.LDP_PCD)
+                .get();
+        System.out.println("result:");
+        System.out.println(res.getStatus());
+        System.out.println(res.readEntity(String.class));
+    }
+
+    @Test
+    public void wholeCollectionPage() throws JsonProcessingException, IOException {
+        final Response res = target("/anncollection/ANCVOL1/pi/1")
+                .request()
+                .header("Accept", MediaTypeUtils.MT_JSONLD)
+                .header("Prefer", AnnotationEndpoint.LDP_PCD)
+                .get();
+        System.out.println("result:");
+        System.out.println(res.getStatus());
+        System.out.println(res.readEntity(String.class));
+    }
+
+    @Test
+    public void subCollection() throws JsonProcessingException, IOException {
+        final Response res = target("/anncollection/ANCVOL1/sub/pages/1")
+                .request()
+                .header("Accept", MediaTypeUtils.MT_JSONLD)
+                .header("Prefer", AnnotationEndpoint.LDP_PMC)
                 .get();
         System.out.println("result:");
         System.out.println(res.getStatus());
