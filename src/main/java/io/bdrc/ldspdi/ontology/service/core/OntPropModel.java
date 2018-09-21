@@ -46,15 +46,24 @@ public class OntPropModel {
         ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
             Statement st=it.next();
+            System.out.println("Statement >> "+st);
             String pred=st.getPredicate().getURI();
             switch(pred) {
                 case DOMAIN:
-                    this.domainUri=st.getObject().asNode().getURI();
-                    this.domain=OntData.ontMod.shortForm(domainUri);
+                    if(st.getObject().isURIResource()) {
+                        this.domainUri=st.getObject().asNode().getURI();
+                        this.domain=OntData.ontMod.shortForm(domainUri);
+                    }else {
+                        this.domain="Inherited";
+                    }
                     break;
                 case RANGE:
-                    this.rangeUri=st.getObject().asNode().getURI();
-                    this.range=OntData.ontMod.shortForm(rangeUri);
+                    if(st.getObject().isURIResource()) {
+                        this.rangeUri=st.getObject().asNode().getURI();
+                        this.range=OntData.ontMod.shortForm(rangeUri);
+                    }else {
+                        this.range="Inherited";
+                    }
                     break;
                 case LABEL:
                     this.label=st.getObject().asLiteral().getString();
@@ -85,7 +94,9 @@ public class OntPropModel {
         ArrayList<OntResource> res= OntData.getParentProps(uri);
         ArrayList<OntPropModel> list=new ArrayList<>();
         for(OntResource r:res) {
-            list.add(new OntPropModel(r.getURI()));
+            if(r!=null && r.isURIResource()) {
+                list.add(new OntPropModel(r.getURI()));
+            }
         }
         return list;
     }

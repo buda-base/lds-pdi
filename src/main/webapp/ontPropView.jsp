@@ -106,7 +106,6 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
         </c:forEach>
         
     </c:if> 
-    
     <!-- PARENT PROPS -->
     <c:if test = "${model.getParentProps().size()>0}">
         <h3>Parent properties: </h3>
@@ -137,5 +136,6 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
         </c:forEach>
         
     </c:if>     
+    
 </body>
 </html>

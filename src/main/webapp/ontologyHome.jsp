@@ -85,7 +85,19 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>full URI</th><th>property type</th></tr>
 <c:forEach items="${OntData.getAllProps()}" var="prop">    
-    <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td><td>${prop.getRDFType().getLocalName()}</td></tr>
+    <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td>
+    <td><c:choose>
+                <c:when test="${prop.isObjectProperty() || prop.isInverseFunctionalProperty()}">
+                ObjectProperty
+                </c:when>
+                <c:when test="${prop.isDatatypeProperty()}">
+                DatatypeProperty
+                </c:when>
+                <c:otherwise>    
+                ${prop.getRDFType().getLocalName()}
+                </c:otherwise>
+        </c:choose>
+    </td></tr>
 </c:forEach> 
 </table>
 

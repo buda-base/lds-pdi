@@ -69,7 +69,7 @@ public class OntData implements Runnable{
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
+            //owlCharacteristics=new OWLPropsCharacteristics(ontMod);
             rdf10tordf11(ontMod);
             readGithubJsonLDContext();
             log.info("updating core ont model() >>");
@@ -289,7 +289,6 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntProperty> getAllProps(){
-        System.out.println("ontData >> "+ontMod);
         ExtendedIterator<OntProperty> it=ontMod.listAllOntProperties();
         ArrayList<OntProperty> list=new ArrayList<>();
         while(it.hasNext()) {
