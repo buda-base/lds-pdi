@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
-import io.bdrc.ldspdi.results.CsvResults;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
@@ -101,11 +100,11 @@ public class PublicTemplatesResource {
         ResultPage model=null;
         try {
             String fmt=hm.get(QueryConstants.FORMAT);
-            if(fmt!=null && fmt.equals("json")) {
+            if("json".equals(fmt)) {
                 return Response.ok(new ObjectMapper().writeValueAsString(new Results(res,hm)),MediaTypeUtils.MT_JSON).build();
             }
-            if(fmt!=null && fmt.equals("csv")) {
-                return Response.ok(new CsvResults(res,hm).getCsvRes(),MediaTypeUtils.MT_CSV).build();
+            if("csv".equals(fmt)) {
+                return Response.ok(res.getCsvStreamOutput(hm), MediaTypeUtils.MT_CSV).build();
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");
             hm.put("query", qfp.getQueryHtml());
@@ -283,10 +282,10 @@ public class PublicTemplatesResource {
                     setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         return Response.ok(ResponseOutputStream.getModelStream(
-                        model,
-                        MediaTypeUtils.getExtFormatFromMime(mediaType.toString())),
-                        mediaType)
-                        .build();
+                model,
+                MediaTypeUtils.getExtFormatFromMime(mediaType.toString())),
+                mediaType)
+                .build();
     }
 
     @POST

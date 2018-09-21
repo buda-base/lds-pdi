@@ -1,5 +1,9 @@
 package io.bdrc.ldspdi.results;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -23,10 +27,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.opencsv.CSVWriter;
+
+import io.bdrc.ldspdi.sparql.QueryConstants;
 
 
 public class ResultSetWrapper {
@@ -39,32 +49,35 @@ public class ResultSetWrapper {
     public int pageSize;
     public int numberOfPages;
     public int hash;
+    public List<QuerySolution> querySolutions;
+    public List<String> vars;
     public HashMap<String,List<String>> head;
     public ArrayList<Row> rows;
-    public ArrayList<CsvRow> csvrows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
     public static final String DEL=",";
 
     public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
         this.pageSize=pageSize;
+        vars = rs.getResultVars();
         head=new HashMap<>();
         head.put("vars",rs.getResultVars());
         this.execTime=execTime;
         numResults=0;
-        mvc_rows=new ArrayList<>();
-        csvrows=new ArrayList<>();
-        rows=new ArrayList<>();
+        mvc_rows = new ArrayList<>();
+        querySolutions = new ArrayList<>();
+        rows = new ArrayList<>();
         while(rs.hasNext()) {
-            QuerySolution qs=rs.next();
-            rows.add(new Row(rs.getResultVars(),qs));
-            //TEST
-            csvrows.add(new CsvRow(rs.getResultVars(),qs));
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,rs.getResultVars());
+            QuerySolution qs = rs.next();
+            querySolutions.add(qs);
+            rows.add(new Row(vars,qs));
+            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,vars);
             mvc_rows.add(mvc_row);
             numResults++;
         }
-        numberOfPages=(numResults/pageSize);
-        if(numberOfPages*pageSize<numResults) {numberOfPages++;}
+        numberOfPages = numResults / pageSize;
+        if (numberOfPages * pageSize < numResults) {
+            numberOfPages++;
+        }
     }
 
     public HashMap<String,List<String>> getHead() {
@@ -107,8 +120,53 @@ public class ResultSetWrapper {
         return rows;
     }
 
-    public ArrayList<CsvRow> getCsvRows() {
-        return csvrows;
+    public List<QuerySolution> getQuerySolutions() {
+        return querySolutions;
+    }
+
+    public void writeCsvHeaders(boolean simple, CSVWriter w) {
+        String[] headers;
+        if (simple) {
+            headers = new String[vars.size()];
+        } else {
+            headers = new String[3*vars.size()];
+        }
+        int varIdx = 0;
+        for (String var : vars) {
+            headers[varIdx] = var;
+            if (!simple) {
+                headers[varIdx+1] = var+"-type";
+                headers[varIdx+2] = var+"-lang";
+            }
+            varIdx +=1;
+        }
+        w.writeNext(headers);
+    }
+
+    public Object getCsvStreamOutput(HashMap<String,String> options) {
+        final boolean simple = "simple".equals(options.get("profile"));
+        final String pageNum = options.getOrDefault(QueryConstants.PAGE_NUMBER, "1");
+        final int pageNumber = Integer.parseInt(pageNum);
+        final int offset = (pageNumber-1)*pageSize;
+        if (pageNumber > numberOfPages || pageNumber < 0) {
+            return null;
+        }
+        StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException {
+                CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(os));
+                writeCsvHeaders(simple, csvWriter);
+                for (int x=(offset); x<(offset+pageSize);x++) {
+                    QuerySolution qs = querySolutions.get(x);
+                    if (simple)
+                        QSWriter.writeCsvSimple(qs, vars, csvWriter);
+                    else
+                        QSWriter.writeCsvFull(qs, vars, csvWriter);
+                }
+                csvWriter.flushQuietly();
+            }
+        };
+        return stream;
     }
 
     public HashMap<String,Object> getFusekiResultSet(){
