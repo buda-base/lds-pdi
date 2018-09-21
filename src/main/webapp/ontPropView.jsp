@@ -48,18 +48,26 @@
 <b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
 <c:when test="${model.isDomainInherited()}">
-<b>Domain:</b> ${model.getDomain()}<br>
+<b>Domain: Inherited</b><br>
 </c:when>
 <c:otherwise>
-<b>Domain:</b> <a href="${model.getDomainUri()}">${model.getDomain()}</a><br>
+<b>Domain:</b> 
+<c:forEach items="${model.getDomain()}" var="dom">
+<a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+</c:forEach>
+<br>
 </c:otherwise>
 </c:choose>
 <c:choose>
 <c:when test="${model.isRangeInherited()}">
-<b>Range:</b> ${model.getRange()}<br>
+<b>Range:</b> Inherited<br>
 </c:when>
 <c:otherwise>
-<b>Range:</b> <a href="${model.getRangeUri()}">${model.getRange()}</a><br>
+<b>Range:</b> 
+<c:forEach items="${model.getRange()}" var="range">
+<a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+</c:forEach>
+<br>
 </c:otherwise>
 </c:choose>
 <c:if test = "${model.getComment()!=null}">
@@ -88,18 +96,26 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
             <tr><td><b>Label:</b></td><td>${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
 				<c:when test="${prop.isDomainInherited()}">
-				<tr><td><b>Domain:</b></td><td>${prop.getDomain()}</td></tr>
+				<tr><td><b>Domain:</b></td><td>Inherited</td></tr>
 				</c:when>
 				<c:otherwise>
-                <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomainUri()}">${prop.getDomain()}</a></td></tr>
+                <tr><td><b>Domain:</b></td><td>
+                <c:forEach items="${prop.getDomain()}" var="dom">
+                    <a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+                </c:forEach>
+                </td></tr>
                 </c:otherwise>
             </c:choose> 
             <c:choose>
 				<c:when test="${prop.isRangeInherited()}">
-				<tr><td><b>Range:</b></td><td>${prop.getRange()}</td></tr>
+				<tr><td><b>Range:</b></td><td>Inherited</td></tr>
 				</c:when>
 				<c:otherwise>           
-                <tr><td><b>Range:</b></td><td> <a href="${prop.getRangeUri()}">${prop.getRange()}</a></td></tr>
+                <tr><td><b>Range:</b></td><td> 
+                <c:forEach items="${prop.getRange()}" var="range">
+                <a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+                </c:forEach>
+                </td></tr>
                 </c:otherwise>
             </c:choose>
             </table><br>          
@@ -110,7 +126,7 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
     <c:if test = "${model.getParentProps().size()>0}">
         <h3>Parent properties: </h3>
         
-        <c:forEach items="${model.getParentProps()}" var="prop"> 
+        <c:forEach items="${model.getParentProps()}" var="prop">         
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
@@ -118,18 +134,26 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
             <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
                 <c:when test="${prop.isDomainInherited()}">
-                <tr><td><b>Domain:</b></td><td>${prop.getDomain()}</td></tr>
+                <tr><td><b>Domain:</b></td><td>Inherited</td></tr>
                 </c:when>
                 <c:otherwise>
-                <tr><td><b>Domain:</b></td><td> <a href="${prop.getDomainUri()}">${prop.getDomain()}</a></td></tr>
+                <tr><td><b>Domain:</b></td><td> 
+                <c:forEach items="${prop.getDomain()}" var="dom">
+                    <a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+                </c:forEach>
+                </td></tr>
                 </c:otherwise>
             </c:choose>            
             <c:choose>
                 <c:when test="${prop.isRangeInherited()}">
-                <tr><td><b>Range:</b></td><td>${prop.getRange()}</td></tr>
+                <tr><td><b>Range:</b></td><td>Inherited</td></tr>
                 </c:when>
                 <c:otherwise>           
-                <tr><td><b>Range:</b></td><td> <a href="${prop.getRangeUri()}">${prop.getRange()}</a></td></tr>
+                <tr><td><b>Range:</b></td><td> 
+                <c:forEach items="${prop.getRange()}" var="range">
+                <a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+                </c:forEach>
+                </td></tr>
                 </c:otherwise>
             </c:choose>
             </table><br>          
