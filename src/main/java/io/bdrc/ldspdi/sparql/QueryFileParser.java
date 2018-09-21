@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -49,24 +50,24 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class QueryFileParser {
 
-	private HashMap<String,String> metaInf;
-	private String query;
-	private String queryHtml;
-	private String queryName;
-	private HashMap<String,String> litLangParams=new HashMap<>();
-	private QueryTemplate template;
-	private ArrayList<Param> params;
-	private ArrayList<Output> outputs;
+    private HashMap<String,String> metaInf;
+    private String query;
+    private String queryHtml;
+    private String queryName;
+    private HashMap<String,String> litLangParams=new HashMap<>();
+    private QueryTemplate template;
+    private ArrayList<Param> params;
+    private ArrayList<Output> outputs;
 
-	public final static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
 
 
-	public QueryFileParser(String filename) throws RestException{
+    public QueryFileParser(String filename) throws RestException{
 
-		metaInf= new HashMap<>();
-		queryName=filename.substring(0,filename.lastIndexOf("."));
-		parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
-		template= new QueryTemplate(
+        metaInf= new HashMap<>();
+        queryName=filename.substring(0,filename.lastIndexOf("."));
+        parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
+        template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
                 metaInf.get(QueryConstants.QUERY_URL),
@@ -77,9 +78,9 @@ public class QueryFileParser {
                 params,
                 outputs,
                 getQuery());
-	}
+    }
 
-	public QueryFileParser(String filename,String type) throws RestException{
+    public QueryFileParser(String filename,String type) throws RestException{
 
         metaInf= new HashMap<>();
         queryName=filename.substring(0,filename.lastIndexOf("."));
@@ -98,14 +99,14 @@ public class QueryFileParser {
     }
 
 
-	public String getTemplateName() {
-	    return this.queryName;
-	}
+    public String getTemplateName() {
+        return this.queryName;
+    }
 
-	private void parseTemplate(File file) throws RestException{
-    	try {
-    	    HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
-    	    HashMap<String,HashMap<String,String>> o_map=new HashMap<>();
+    private void parseTemplate(File file) throws RestException{
+        try {
+            HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
+            HashMap<String,HashMap<String,String>> o_map=new HashMap<>();
             String readLine = "";
             query="";
             queryHtml="";
@@ -161,69 +162,69 @@ public class QueryFileParser {
             queryHtml=queryHtml.substring(15);
             params=buildParams(p_map);
             outputs=buildOutputs(o_map);
-    	}
+        }
         catch(Exception ex){
             log.error("QueryFile parsing error", ex);
             throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: "+file.getName()));
         }
-	}
+    }
 
-	private void checkReturnType() throws RestException{
-	    if(! QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
-	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed :"+
-	                metaInf.get(QueryConstants.QUERY_RETURN_TYPE)+" is not a valid query return type"));
-	    }
-	}
+    private void checkReturnType() throws RestException{
+        if(! QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
+            throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed :"+
+                    metaInf.get(QueryConstants.QUERY_RETURN_TYPE)+" is not a valid query return type"));
+        }
+    }
 
-	private ArrayList<Param> buildParams(HashMap<String,HashMap<String,String>> p_map) throws RestException{
-	    ArrayList<Param> p=new ArrayList<>();
-	    Set<String> names=p_map.keySet();
-	    for(String name:names) {
-	        HashMap<String,String> mp=p_map.get(name);
+    private ArrayList<Param> buildParams(HashMap<String,HashMap<String,String>> p_map) throws RestException{
+        ArrayList<Param> p=new ArrayList<>();
+        Set<String> names=p_map.keySet();
+        for(String name:names) {
+            HashMap<String,String> mp=p_map.get(name);
 
-    	    switch (mp.get(QueryConstants.PARAM_TYPE)) {
-    	        case QueryConstants.STRING_PARAM:
-    	            StringParam stp=new StringParam(name);
-    	            stp.setLangTag(mp.get(QueryConstants.PARAM_LANGTAG));
-    	            stp.setIsLuceneParam(mp.get(QueryConstants.PARAM_LUCENE));
-    	            stp.setExample(mp.get(QueryConstants.PARAM_EXAMPLE));
-    	            p.add(stp);
-    	            break;
-    	        case QueryConstants.INT_PARAM:
-    	            IntParam intp=new IntParam(name);
-    	            intp.setDescription(mp.get(QueryConstants.PARAM_DESC));
-    	            p.add(intp);
-    	            break;
-    	        case QueryConstants.RES_PARAM:
-    	            ResParam rtp=new ResParam(name,mp.get(QueryConstants.PARAM_SUBTYPE));
-    	            rtp.setDescription(mp.get(QueryConstants.PARAM_DESC));
-    	            p.add(rtp);
-    	            break;
-    	    }
-	    }
-	    return p;
-	}
+            switch (mp.get(QueryConstants.PARAM_TYPE)) {
+            case QueryConstants.STRING_PARAM:
+                StringParam stp=new StringParam(name);
+                stp.setLangTag(mp.get(QueryConstants.PARAM_LANGTAG));
+                stp.setIsLuceneParam(mp.get(QueryConstants.PARAM_LUCENE));
+                stp.setExample(mp.get(QueryConstants.PARAM_EXAMPLE));
+                p.add(stp);
+                break;
+            case QueryConstants.INT_PARAM:
+                IntParam intp=new IntParam(name);
+                intp.setDescription(mp.get(QueryConstants.PARAM_DESC));
+                p.add(intp);
+                break;
+            case QueryConstants.RES_PARAM:
+                ResParam rtp=new ResParam(name,mp.get(QueryConstants.PARAM_SUBTYPE));
+                rtp.setDescription(mp.get(QueryConstants.PARAM_DESC));
+                p.add(rtp);
+                break;
+            }
+        }
+        return p;
+    }
 
-	private ArrayList<Output> buildOutputs(HashMap<String,HashMap<String,String>> o_map) throws RestException{
-	    ArrayList<Output> o=new ArrayList<>();
+    private ArrayList<Output> buildOutputs(HashMap<String,HashMap<String,String>> o_map) throws RestException{
+        ArrayList<Output> o=new ArrayList<>();
         Set<String> names=o_map.keySet();
         for(String name:names) {
             HashMap<String,String> op=o_map.get(name);
             Output output=new Output(name,
-                                    op.get(QueryConstants.OUTPUT_TYPE),
-                                    op.get(QueryConstants.OUTPUT_DESC));
+                    op.get(QueryConstants.OUTPUT_TYPE),
+                    op.get(QueryConstants.OUTPUT_DESC));
             o.add(output);
         }
         return o;
-	}
+    }
 
-	public String checkQueryArgsSyntax() {
-	    String check="";
-		String[] args=metaInf.get(QueryConstants.QUERY_PARAMS).split(Pattern.compile(",").toString());
-		List<String> params=Arrays.asList(args);
-		for(String arg:args) {
-		    if(!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
-    		    //Param is not a Lang param --> if it's not present in the query --> Send error
+    public String checkQueryArgsSyntax() {
+        String check="";
+        String[] args=metaInf.get(QueryConstants.QUERY_PARAMS).split(Pattern.compile(",").toString());
+        List<String> params=Arrays.asList(args);
+        for(String arg:args) {
+            if(!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
+                //Param is not a Lang param --> if it's not present in the query --> Send error
                 if(!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?"+arg)==-1) {
                     check="Arg syntax is incorrect : query does not have a ?"+arg+" variable";
                     return check;
@@ -234,27 +235,27 @@ public class QueryFileParser {
                     String expectedLiteralParam=QueryConstants.LITERAL_ARGS_PARAMPREFIX+arg.substring(arg.indexOf("_")+1);
                     if(!params.contains(expectedLiteralParam)) {
                         check="Arg syntax is incorrect : query does not have a literal variable "+
-                               expectedLiteralParam+" corresponding to lang "+arg+" variable";
+                                expectedLiteralParam+" corresponding to lang "+arg+" variable";
                         return check;
                     }
                     litLangParams.put(expectedLiteralParam, arg);
                 }
-		    }
-		}
-		return "";
-	}
+            }
+        }
+        return "";
+    }
 
-	public String getQuery() {
+    public String getQuery() {
         return query;
     }
 
-	public String getParametizedQuery(HashMap<String,String> converted,boolean limit) throws RestException {
-	    if (!checkQueryArgsSyntax().trim().equals("")) {
+    public String getParametizedQuery(Map<String,String> converted, boolean limit) throws RestException {
+        if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in File->"+ getTemplateName()+"; ERROR: "+checkQueryArgsSyntax()));
         }
-	    List<String> params=getQueryParams();
-	    HashMap<String,String> litParams=getLitLangParams();
-	    if(converted ==null) { converted=new HashMap<>();}
+        List<String> params = getQueryParams();
+        HashMap<String,String> litParams=getLitLangParams();
+        if(converted ==null) { converted=new HashMap<>();}
         if(!hasValidParams(converted.keySet(),params)) {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext(" in QueryFileParser.getParametizedQuery() "+converted));
         }

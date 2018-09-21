@@ -1,0 +1,41 @@
+#QueryScope=Annotation Collection
+#QueryReturnType=Graph
+#QueryResults=A graph for the given Annotation collection, in the IRI profile
+#QueryParams=R_RES
+#QueryUrl=/lib/Resgraph?R_RES=bdr:ANCWCBC2237_AN001
+
+#param.R_RES.type=resource
+#param.R_RES.subtype=a Resource ID
+#param.R_RES.desc=the URI of the annotation collection
+
+#param.R_RESALIAS.type=resource
+#param.R_RESALIAS.subtype=a Resource IRI
+#param.R_RESALIAS.desc=the URI of the resulting collection (can be different for subsets)
+
+#param.R_SUBMETHOD.type=resource
+#param.R_SUBMETHOD.subtype=a Resource IRI of type subset (to be defined)
+#param.R_SUBMETHOD.desc=the URI of the type of subset that should be used to subset the collection
+
+#param.I_SUBRANGEFIRST.type=int
+#param.I_SUBRANGEFIRST.subtype=the first index of the range
+#param.I_SUBRANGEFIRST.desc=the first index of the range
+
+#param.I_SUBRANGELAST.type=int
+#param.I_SUBRANGELAST.subtype=the last index of the range
+#param.I_SUBRANGELAST.desc=the last index of the range
+
+CONSTRUCT {
+    ?R_RESALIAS ?p ?o .
+    ?o1 ?p1 ?o2 .
+    ?ann :annInCollection ?R_RES .
+} where {
+    {
+        ?R_RES ?p ?o .
+    } union {
+        ?R_RES ?p1 ?o1 .
+        FILTER(isBlank(?o1))
+        ?o1 ?p1 ?o2 .
+    } union {
+        ?ann :annInCollection ?R_RES .
+    }
+}

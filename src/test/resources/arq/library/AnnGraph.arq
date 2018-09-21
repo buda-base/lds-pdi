@@ -21,6 +21,10 @@ where {
     ?R_RES oa:hasTarget ?ant .
     ?ant ?antp ?anto .
     optional {
+      FILTER(isBlank(?anto))
+      ?anto ?antop ?antoo .
+    }
+    optional {
       ?R_RES oa:hasBody ?annb .
       ?annb ?annbp ?annbo .
       optional {

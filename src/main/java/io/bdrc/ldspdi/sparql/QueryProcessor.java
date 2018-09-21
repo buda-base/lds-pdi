@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.sparql;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.jena.query.DatasetAccessor;
@@ -56,7 +57,7 @@ public class QueryProcessor {
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
             QueryFileParser qfp=new QueryFileParser(queryName,"library");
-            HashMap<String,String> map=new HashMap<>();
+            final Map<String,String> map = new HashMap<>();
             map.put("R_RES", URI);
             String query=qfp.getParametizedQuery(map,false);
             Query q=QueryFactory.create(prefixes+" "+query);
