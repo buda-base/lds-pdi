@@ -18,7 +18,8 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.annotations.AnnotationCollectionEndpoint.Prefer;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
@@ -155,7 +156,7 @@ public class CollectionUtils {
     public static Model getSubsetGraph(final String prefixedRes, final Prefer prefer, final String fusekiUrl,
             final SubsetType subType, final Integer[] range, final String resAlias) throws RestException {
         final String queryFileName = AnnotationCollectionEndpoint.preferToQueryFile.get(prefer);
-        final QueryFileParser qfp = new QueryFileParser(queryFileName,"library");
+        final LdsQuery qfp = LdsQueryService.get(queryFileName,"library");
         final Map<String,String> args = new HashMap<>();
         args.put("R_SUBMETHOD", subsetToURI.get(subType));
         args.put("R_RES", prefixedRes);

@@ -31,7 +31,8 @@ import io.bdrc.ldspdi.results.library.WorkAllResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.AsyncSparql;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
@@ -62,9 +63,9 @@ public class LibrarySearchResource {
             t=new Thread(async);
             t.run();
         }
-        QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String query=qfp.getParametizedQuery(map,false);
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq","library");
+        final String query = qfp.getParametizedQuery(map,false);
+        final Model model = QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
         case "rootSearchGraph":
@@ -137,9 +138,9 @@ public class LibrarySearchResource {
             t=new Thread(async);
             t.run();
         }
-        QueryFileParser qfp=new QueryFileParser(file+".arq","library");
-        String query=qfp.getParametizedQuery(map,false);
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq","library");
+        final String query = qfp.getParametizedQuery(map,false);
+        final Model model = QueryProcessor.getGraph(query,fusekiUrl,null);
         HashMap<String,Object> res=null;
         switch (file) {
         case "rootSearchGraph":

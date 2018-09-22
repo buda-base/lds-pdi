@@ -56,11 +56,11 @@ public class QueryProcessor {
         int hash=Objects.hashCode(queryName+"::"+URI);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
         if(model==null) {
-            QueryFileParser qfp=new QueryFileParser(queryName,"library");
+            LdsQuery qfp = LdsQueryService.get(queryName,"library");
             final Map<String,String> map = new HashMap<>();
             map.put("R_RES", URI);
             String query=qfp.getParametizedQuery(map,false);
-            Query q=QueryFactory.create(prefixes+" "+query);
+            Query q=QueryFactory.create(query);
             QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
             model = qe.execDescribe();

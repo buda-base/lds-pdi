@@ -2,19 +2,19 @@ package io.bdrc.ldspdi.rest.resources;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -30,7 +30,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -43,18 +42,19 @@ import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.RestException;
 
 
 @Path("/")
 public class JsonAPIResource {
-    
+
     public final static Logger log=LoggerFactory.getLogger(JsonAPIResource.class.getName());
     private ArrayList<String> fileList;
-    
+
     public JsonAPIResource() {
         super();
         ResourceConfig config=new ResourceConfig( JsonAPIResource.class);
@@ -62,54 +62,55 @@ public class JsonAPIResource {
         config.register(GZIPWriterInterceptor.class);
         fileList=getQueryTemplates();
     }
-    
-    @GET 
+
+    @GET
     @Path("/queries")
-    public Response queriesListGet() throws RestException{        
+    public Response queriesListGet() throws RestException{
         log.info("Call to queriesListGet()");
         return Response.ok(
-                ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();            
+                ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();
     }
-    
+
     @POST
     @Path("/queries")
-    @Produces(MediaType.APPLICATION_JSON)    
+    @Produces(MediaType.APPLICATION_JSON)
     public ArrayList<QueryListItem> queriesListPost() throws RestException{
         log.info("Call to queriesListPost()");
-        return getQueryListItems(fileList);        
+        return getQueryListItems(fileList);
     }
-    
-    @GET 
+
+    @GET
     @Path("/queries/{template}")
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
         log.info("Call to queryDescGet()");
-        QueryFileParser qfp=new QueryFileParser(name+".arq");         
+        final LdsQuery qfp = LdsQueryService.get(name+".arq");
         return Response.ok(
                 ResponseOutputStream.getJsonResponseStream(qfp.getTemplate())).build();
     }
-    
-    @POST 
+
+    @POST
     @Path("/queries/{template}")
-    @Produces(MediaType.APPLICATION_JSON)    
+    @Produces(MediaType.APPLICATION_JSON)
     public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException{
-        log.info("Call to queryDescPost()"); 
-        return new QueryFileParser(name+".arq").getTemplate();        
+        log.info("Call to queryDescPost()");
+        final LdsQuery qfp = LdsQueryService.get(name+".arq");
+        return qfp.getTemplate();
     }
-    
+
     private ArrayList<QueryListItem> getQueryListItems(ArrayList<String> filesList) throws RestException{
-        ArrayList<QueryListItem> items=new ArrayList<>();        
-        for(String file:filesList) {            
-            QueryFileParser qfp=new QueryFileParser(file);              
+        ArrayList<QueryListItem> items=new ArrayList<>();
+        for(String file:filesList) {
+            final LdsQuery qfp = LdsQueryService.get(file+".arq");
             QueryTemplate qt=qfp.getTemplate();
             items.add(new QueryListItem(qt.getId(),"/queries/"+qt.getId(),qt.getQueryResults()));
         }
-        return items;        
+        return items;
     }
-    
+
     private ArrayList<String> getQueryTemplates() {
         ArrayList<String> files=new ArrayList<>();
-        java.nio.file.Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");      
-        if (Files.isDirectory(dpath)) {        
+        java.nio.file.Path dpath = Paths.get(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public");
+        if (Files.isDirectory(dpath)) {
             try (DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(dpath)) {
                 for (java.nio.file.Path path : stream) {
                     String tmp=path.toString();
@@ -122,7 +123,7 @@ public class JsonAPIResource {
                 e.printStackTrace();
             }
         }
-        return files;       
+        return files;
     }
 
 }

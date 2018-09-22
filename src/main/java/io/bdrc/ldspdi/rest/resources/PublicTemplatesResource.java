@@ -56,9 +56,10 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
@@ -89,8 +90,8 @@ public class PublicTemplatesResource {
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
         hm.put(QueryConstants.REQ_METHOD, "GET");
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(hm,true);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq");
+        final String query=qfp.getParametizedQuery(hm,true);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).
                     setContext(" in getQueryTemplateResults() "+query));
@@ -132,8 +133,8 @@ public class PublicTemplatesResource {
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
 
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(hm,true);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq","library");
+        final String query=qfp.getParametizedQuery(hm,true);
         //The output we build using jackson
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         //FusekiResultSet model=new FusekiResultSet(res);
@@ -156,8 +157,8 @@ public class PublicTemplatesResource {
         }
         if(fuseki !=null){fusekiUrl=fuseki;}
         HashMap<String,String> hm=Helpers.convertMulti(mp);
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(hm,true);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq");
+        final String query=qfp.getParametizedQuery(hm,true);
         if(query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
         }
@@ -191,8 +192,8 @@ public class PublicTemplatesResource {
                     setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
         if (fuseki !=null) {fusekiUrl=fuseki;}
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(map,true);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq");
+        final String query=qfp.getParametizedQuery(map,true);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
         } else {
@@ -229,8 +230,8 @@ public class PublicTemplatesResource {
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());
 
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(hm,false);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq");
+        final String query = qfp.getParametizedQuery(hm,false);
         //format is prevalent
         MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
         if(mediaType==null) {
@@ -269,8 +270,8 @@ public class PublicTemplatesResource {
             format="jsonld";
         }
         //process
-        QueryFileParser qfp=new QueryFileParser(file+".arq");
-        String query=qfp.getParametizedQuery(map,false);
+        final LdsQuery qfp = LdsQueryService.get(file+".arq");
+        final String query = qfp.getParametizedQuery(map,false);
         //format is prevalent
         MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
         if(mediaType==null) {
@@ -296,7 +297,7 @@ public class PublicTemplatesResource {
         Thread t=new Thread(new GitService());
         t.start();
         Prefixes.loadPrefixes();
-        QueryFileParser.clearCache();
+        LdsQueryService.clearCache();
         return Response.ok().build();
     }
 

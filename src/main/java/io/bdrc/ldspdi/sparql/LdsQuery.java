@@ -48,7 +48,7 @@ import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class QueryFileParser {
+public class LdsQuery {
 
     private HashMap<String,String> metaInf;
     private String query;
@@ -58,17 +58,16 @@ public class QueryFileParser {
     private QueryTemplate template;
     private ArrayList<Param> params;
     private ArrayList<Output> outputs;
-    private static HashMap<String,File> CACHE= new HashMap<>();
+    private String prefixedQuery;
 
-    public final static Logger log=LoggerFactory.getLogger(QueryFileParser.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(LdsQuery.class.getName());
 
-
-    public QueryFileParser(String filename) throws RestException{
-
+    public LdsQuery(String filePath) throws RestException{
         metaInf= new HashMap<>();
-        queryName=filename.substring(0,filename.lastIndexOf("."));
-        //parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename));
-        parseTemplate(getFile(filename,null));
+        final File f = new File(filePath);
+        final String fileBaseName = f.getName();
+        queryName = fileBaseName.substring(0, fileBaseName.lastIndexOf("."));
+        parseTemplate(f);
         template= new QueryTemplate(
                 getTemplateName(),
                 QueryConstants.QUERY_PUBLIC_DOMAIN,
@@ -80,47 +79,6 @@ public class QueryFileParser {
                 params,
                 outputs,
                 getQuery());
-    }
-
-    public QueryFileParser(String filename,String type) throws RestException{
-
-        metaInf= new HashMap<>();
-        queryName=filename.substring(0,filename.lastIndexOf("."));
-        //parseTemplate(new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename));
-        parseTemplate(getFile(filename,type));
-        template= new QueryTemplate(
-                getTemplateName(),
-                QueryConstants.QUERY_PUBLIC_DOMAIN,
-                metaInf.get(QueryConstants.QUERY_URL),
-                metaInf.get(QueryConstants.QUERY_SCOPE),
-                metaInf.get(QueryConstants.QUERY_RESULTS),
-                metaInf.get(QueryConstants.QUERY_RETURN_TYPE),
-                metaInf.get(QueryConstants.QUERY_PARAMS),
-                params,
-                outputs,
-                getQuery());
-    }
-
-    private static void cacheFile(String filename,File file) {
-        CACHE.put(filename, file);
-    }
-
-    private static File getFile(String filename,String type) {
-        if(CACHE.get(filename)!=null) {
-            return CACHE.get(filename);
-        }
-        if(type==null) {
-            File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
-            cacheFile(filename, file);
-            return new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/"+filename);
-        }
-        File file=new File(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+type+"/"+filename);
-        cacheFile(filename, file);
-        return file;
-    }
-
-    public static void clearCache() {
-        CACHE = new HashMap<>();
     }
 
     public String getTemplateName() {
@@ -128,13 +86,15 @@ public class QueryFileParser {
     }
 
     private void parseTemplate(File file) throws RestException{
+        log.info("parse template at {}", file.getAbsolutePath());
+        BufferedReader brd = null;
+        HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
+        HashMap<String,HashMap<String,String>> o_map=new HashMap<>();
+        String readLine = "";
+        query="";
+        queryHtml="";
         try {
-            HashMap<String,HashMap<String,String>> p_map=new HashMap<>();
-            HashMap<String,HashMap<String,String>> o_map=new HashMap<>();
-            String readLine = "";
-            query="";
-            queryHtml="";
-            BufferedReader brd = new BufferedReader(new FileReader(file));
+            brd = new BufferedReader(new FileReader(file));
             while ((readLine = brd.readLine()) != null) {
                 readLine=readLine.trim();
                 boolean processed=false;
@@ -186,10 +146,16 @@ public class QueryFileParser {
             queryHtml=queryHtml.substring(15);
             params=buildParams(p_map);
             outputs=buildOutputs(o_map);
+            prefixedQuery = Prefixes.getPrefixesString()+" " +query;
         }
         catch(Exception ex){
             log.error("QueryFile parsing error", ex);
             throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: "+file.getName()));
+        }
+        finally {
+            try {
+                brd.close();
+            } catch (Exception e){}
         }
     }
 
@@ -283,7 +249,7 @@ public class QueryFileParser {
         if(!hasValidParams(converted.keySet(),params)) {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).setContext(" in QueryFileParser.getParametizedQuery() "+converted));
         }
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(Prefixes.getPrefixesString()+" " +query);
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(prefixedQuery, Prefixes.getPrefixMapping());
         for(String st:converted.keySet()) {
             if(st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
@@ -299,9 +265,11 @@ public class QueryFileParser {
                         if(parts[0]==null) {
                             parts[0]="";
                         }
-                        if(Prefixes.getFullIRI(parts[0])!=null) {
-                            queryStr.setIri(st, Prefixes.getFullIRI(parts[0])+parts[1]);
-                        }else {
+                        // may be done automatically by parametrizedSparqlString, to be checked
+                        final String fullUri = Prefixes.getFullIRI(parts[0]);
+                        if (fullUri != null) {
+                            queryStr.setIri(st, fullUri+parts[1]);
+                        } else {
                             throw new RestException(500,new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :"+param +
                                     " Unknown prefix"));
                         }

@@ -9,7 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -21,8 +22,7 @@ public class TaxModel {
     public final static Logger log=LoggerFactory.getLogger(TaxModel.class.getName());
 
     public static void init() throws RestException {
-
-        QueryFileParser qfp=new QueryFileParser(ServiceConfig.getProperty("taxtree")+".arq");
+        final LdsQuery qfp = LdsQueryService.get(ServiceConfig.getProperty("taxtree")+".arq","library");
         HashMap<String,String> map=new HashMap<>();
         map.put("R_RES","bdr:O9TAXTBRC201605");
         String query=qfp.getParametizedQuery(map,false);

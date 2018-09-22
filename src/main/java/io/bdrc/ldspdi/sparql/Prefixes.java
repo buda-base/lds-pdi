@@ -71,6 +71,10 @@ public class Prefixes {
         return pMap;
     }
 
+    public static PrefixMapping getPrefixMapping() {
+        return PREFIXES_MAP;
+    }
+
     public static String getFullIRI(String prefix) {
         if(prefix!=null) {
             return PREFIXES_MAP.getNsPrefixURI(prefix);

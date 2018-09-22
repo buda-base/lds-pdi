@@ -23,9 +23,10 @@ public class AsyncSparql implements Runnable{
     }
 
     private void getTemplateResults() throws RestException {
-        String etext_query=new QueryFileParser(file).getParametizedQuery(map,false);
-        QueryExecution qexec=QueryProcessor.getResultSet(etext_query, fusekiUrl);
-        res= qexec.execSelect();
+        final LdsQuery qfp = LdsQueryService.get(file);
+        final String etext_query = qfp.getParametizedQuery(map,false);
+        final QueryExecution qexec = QueryProcessor.getResultSet(etext_query, fusekiUrl);
+        res = qexec.execSelect();
     }
 
     public ResultSet getRes() {

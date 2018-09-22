@@ -14,8 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.ldspdi.sparql.QueryFileParser;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -35,20 +36,20 @@ public class DocFileModel {
 
         templ=new HashMap<>();
 
-            for(String file:files) {
-                QueryFileParser qfp=new QueryFileParser(file);
-                QueryTemplate qt=qfp.getTemplate();
-                String queryScope=qt.getQueryScope();
+        for(String file:files) {
+            final LdsQuery qfp = LdsQueryService.get(file);
+            QueryTemplate qt=qfp.getTemplate();
+            String queryScope=qt.getQueryScope();
 
-                if(templ.containsKey(queryScope)) {
-                    templ.get(queryScope).add(qt);
-                }else {
-                    ArrayList<QueryTemplate> qtlist=new ArrayList<>();
-                    qtlist.add(qt);
-                    templ.put(queryScope,qtlist);
-                }
+            if(templ.containsKey(queryScope)) {
+                templ.get(queryScope).add(qt);
+            }else {
+                ArrayList<QueryTemplate> qtlist=new ArrayList<>();
+                qtlist.add(qt);
+                templ.put(queryScope,qtlist);
             }
-            this.keys=templ.keySet();
+        }
+        this.keys=templ.keySet();
     }
 
     public ArrayList<QueryTemplate> getTemplates(String key){
