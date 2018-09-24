@@ -28,7 +28,7 @@ bdan:ANNVOL1_1 a oa:Annotation ;
 			rdf:value "xywh=100,100,100,100"
 		]
 	] , <http://presentation.bdrc.io/2.1.1/bdr:V23703_I1421/canvas/4#xywh=100,100,100,100> ;
-	:annInCollection bdac:ANCVOL1 ;
+	:annInLayer bdac:ANCVOL1 ;
     oa:motivatedBy oa:assessing ;
 	oa:hasBody "this is a test annotation" .
 
@@ -49,7 +49,7 @@ bdan:ANNETEXT1_1 a oa:Annotation ;
 			rdf:value "char=4,40"
 		]
 	] , <http://purl.bdrc.io/resource/UT29307_008_0000.txt#char=4,40> ;
-	:annInCollection bdac:ANCETEXT1 ;
+	:annInLayer bdac:ANCETEXT1 ;
     oa:motivatedBy oa:assessing ;
 	oa:hasBody "this is a test annotation" .
 

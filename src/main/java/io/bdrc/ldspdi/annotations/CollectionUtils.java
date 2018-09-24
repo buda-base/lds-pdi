@@ -39,6 +39,9 @@ public class CollectionUtils {
     // than 2 billion unicode characters.
     public static final int rangeIdxInfinit = 2000000000;
 
+    // this property links an annotation to a collection in Fuseki
+    public static final Property annToColl = ResourceFactory.createProperty(BDO, "annInLayer");
+
     public static enum SubsetType {
         VOLUMEPAGES,
         ETEXTCHARS,
@@ -98,10 +101,9 @@ public class CollectionUtils {
                 model.add(main, AS.first, firstPage);
             return;
         }
-        final Property annInCollection = model.createProperty(BDO, "annInCollection");
         int total = 0;
         final Set<Resource> items = new TreeSet<Resource>(new SimpleUriResourceComparator());
-        final Selector sel = new SimpleSelector(null, annInCollection, main);
+        final Selector sel = new SimpleSelector(null, annToColl, main);
         final StmtIterator it =  model.listStatements(sel);
         while (it.hasNext()) {
             final Statement currentS = it.next();

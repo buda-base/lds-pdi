@@ -27,7 +27,7 @@
 CONSTRUCT {
     ?R_RESALIAS ?p ?o .
     ?o1 ?p1 ?o2 .
-    ?ann :annInCollection ?R_RESALIAS .
+    ?ann :annInLayer ?R_RESALIAS .
 } where {
     {
         ?R_RES ?p ?o .
@@ -37,15 +37,15 @@ CONSTRUCT {
         ?o1 ?p1 ?o2 .
     } union {
         FILTER (?R_SUBMETHOD = bdr:SubsettingNone)
-        ?ann :annInCollection ?R_RES .
+        ?ann :annInLayer ?R_RES .
     } union {
         FILTER (?R_SUBMETHOD = bdr:SubsettingImageVolume)
-        ?ann :annInCollection ?R_RES .
+        ?ann :annInLayer ?R_RES .
         ?ann oa:hasTarget/oa:hasSource/:sourceImageSeq ?imgseq .
         FILTER (?imgseq <= ?I_SUBRANGELAST && ?imgseq >= ?I_SUBRANGEFIRST)
     } union {
         FILTER (?R_SUBMETHOD = bdr:SubsettingChars)
-        ?ann :annInCollection ?R_RES .
+        ?ann :annInLayer ?R_RES .
         ?ann oa:hasTarget/oa:hasSource ?source .
         ?source :sourcecharstart ?start ;
                 :sourcecharend   ?end .
