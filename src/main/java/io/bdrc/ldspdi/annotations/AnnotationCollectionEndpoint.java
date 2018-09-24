@@ -43,6 +43,10 @@ public class AnnotationCollectionEndpoint {
         ;
     }
 
+    public final static String PREFER_LDP_PMC = "return=representation;include=\"http://www.w3.org/ns/ldp#PreferMinimalContainer\"";
+    public final static String PREFER_OA_PCI = "return=representation;include=\"http://www.w3.org/ns/oa#PreferContainedIRIs\"";
+    public final static String PREFER_OA_PCD = "return=representation;include=\"http://www.w3.org/ns/oa#PreferContainedDescriptions\"";
+
     static final Map<Prefer,String> preferToQueryFile = new HashMap<>();
     static {
         preferToQueryFile.put(Prefer.MINIMAL,     "AnnCollection-minimal.arq");
@@ -54,11 +58,11 @@ public class AnnotationCollectionEndpoint {
         if (preferHeader == null)
             return Prefer.DESCRIPTION;
         switch (preferHeader) {
-        case AnnotationEndpoint.LDP_PMC:
+        case PREFER_LDP_PMC:
             return Prefer.MINIMAL;
-        case AnnotationEndpoint.LDP_PCI:
+        case PREFER_OA_PCI:
             return Prefer.IRI;
-        case AnnotationEndpoint.LDP_PCD:
+        case PREFER_OA_PCD:
             return Prefer.DESCRIPTION;
         default:
             return Prefer.DESCRIPTION; // default in the WAP spec

@@ -44,8 +44,8 @@ public class AnnotationEndpoint {
     public final static String LDP_BC = "http://www.w3.org/ns/ldp#BasicContainer";
     public final static String LDP_CB = "http://www.w3.org/ns/ldp#constrainedBy";
     public final static String LDP_PMC = "http://www.w3.org/ns/ldp#PreferMinimalContainer";
-    public final static String LDP_PCI = "http://www.w3.org/ns/oa#PreferContainedIRIs";
-    public final static String LDP_PCD = "http://www.w3.org/ns/oa#PreferContainedDescriptions";
+    public final static String OA_PCI = "http://www.w3.org/ns/oa#PreferContainedIRIs";
+    public final static String OA_PCD = "http://www.w3.org/ns/oa#PreferContainedDescriptions";
     public final static String OA_CONTEXT = "https://www.w3.org/ns/oa.jsonld";
 
     public final static String OA_CT = "application/ld+json; profile=\"http://www.w3.org/ns/oa.jsonld\"";
