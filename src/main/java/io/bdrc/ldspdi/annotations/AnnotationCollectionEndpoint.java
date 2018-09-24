@@ -87,19 +87,9 @@ public class AnnotationCollectionEndpoint {
         }
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
             return AnnotationEndpoint.htmlResponse(info, prefixedCollectionRes);
-        final DocType docType = DocType.ANC;
-        final String contentType = mediaType.toString();
-        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
-        final String fullUri = AnnotationEndpoint.ANC_PREFIX+res;
-        CollectionUtils.toW3CCollection(model, fullUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, fullUri, docType));
-        return AnnotationEndpoint.setHeaders(builder,
-                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
-                .build();
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
     }
 
     @GET
@@ -130,18 +120,8 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        final String contentType = mediaType.toString();
-        final DocType docType = DocType.ANP;
-        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
-        final String collectionUri = AnnotationEndpoint.ANC_PREFIX+res;
-        CollectionUtils.toW3CCollection(model, collectionUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionUri, docType));
-        return AnnotationEndpoint.setHeaders(builder,
-                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
-                .build();
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
     }
 
     @GET
@@ -159,7 +139,7 @@ public class AnnotationCollectionEndpoint {
             ) throws RestException {
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", info.getPath(), format);
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
-        final String collectionAlias = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (format == null) {
@@ -169,18 +149,9 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        final DocType docType = DocType.ANC;
-        final String contentType = mediaType.toString();
-        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Prefer prefer = getPrefer(preferHeader);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAlias);
-        if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAlias));
-        CollectionUtils.toW3CCollection(model, collectionAlias, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAlias, docType));
-        return AnnotationEndpoint.setHeaders(builder,
-                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
-                .build();
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
+        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath());
     }
 
     @GET
@@ -213,17 +184,23 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        final DocType docType = DocType.ANP;
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
+        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath());
+    }
+
+    private Response getResponse(final Model model, final DocType docType,
+            final String collectionAliasUri, final MediaType mediaType, final Prefer prefer,
+            final String path) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
         final String contentType = mediaType.toString();
         final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAliasUri, docType));
         return AnnotationEndpoint.setHeaders(builder,
-                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
+                AnnotationEndpoint.getAnnotationHeaders(path, ext, "Choice", null, contentType))
                 .build();
+
     }
 
 }
