@@ -62,15 +62,18 @@ public class AnnotationEndpoint {
 
     @GET
     @Path("/{res}")
-    public Response getResourceGraph(@PathParam("res") String res, @HeaderParam("Accept") String format,
-            @Context UriInfo info, @Context Request request, @Context HttpHeaders headers) throws RestException {
-        log.info("Call to getResourceGraphGET() with URL: " + info.getPath() + " Accept >> " + format);
+    public Response getResourceGraph(@PathParam("res") String res,
+            @HeaderParam("Accept") String accept,
+            @Context UriInfo info,
+            @Context Request request,
+            @Context HttpHeaders headers) throws RestException {
+        log.info("Call to getResourceGraph() with URL: {}, accept: {}", info.getPath(), accept);
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
-        if (format == null) {
+        if (accept == null) {
             mediaType = MediaTypeUtils.MT_JSONLD;
         } else {
-            mediaType = MediaTypeUtils.getMediaType(request, format, MediaTypeUtils.annVariants);
+            mediaType = MediaTypeUtils.getMediaType(request, accept, MediaTypeUtils.annVariants);
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
@@ -98,6 +101,33 @@ public class AnnotationEndpoint {
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, docType));
+        return setHeaders(builder, getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
+    }
+
+    @GET
+    @Path("/{res}.{ext}")
+    // these are always W3C web annotations, maybe there could be another endpoint for OA
+    public Response getResourceGraphSuffix(@PathParam("res") String res,
+            @PathParam("ext") final String ext,
+            @Context UriInfo info,
+            @Context Request request,
+            @Context HttpHeaders headers) throws RestException {
+        log.info("Call to getResourceGraph() with URL: {}", info.getPath());
+        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+        if (mediaType == null) {
+            return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+        }
+        final String contentType;
+        if ("jsonld".equals(ext)) {
+            contentType = W3C_CT;
+        } else {
+            contentType = mediaType.toString();
+        }
+        String prefixedRes = ANN_PREFIX_SHORT+':'+res;
+        Model model = QueryProcessor.getSimpleResourceGraph(prefixedRes, "AnnGraph.arq", fusekiUrl, null);
+        if (model.size() == 0)
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, DocType.ANN));
         return setHeaders(builder, getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
     }
 

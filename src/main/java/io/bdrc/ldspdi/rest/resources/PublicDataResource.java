@@ -116,7 +116,7 @@ public class PublicDataResource {
     @Path("choice")
     @Produces(MediaType.TEXT_HTML)
     public Response getMultiChoice(@QueryParam("path") String it,@Context UriInfo info) {
-        log.info("Call to getMultiChoice() with path="+it);
+        log.info("Call to getMultiChoice() with path={}", it);
         return Response.ok(new Viewable("/multiChoice.jsp",info.getBaseUri()+it)).build();
     }
 
@@ -137,12 +137,12 @@ public class PublicDataResource {
     @Path("/resource/{res}")
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @HeaderParam("Accept") String format,
-        @Context UriInfo info,
-        @Context Request request) throws RestException {
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @HeaderParam("Accept") String format,
+            @Context UriInfo info,
+            @Context Request request) throws RestException {
         final String prefixedRes = RES_PREFIX_SHORT+':'+res;
-        log.info("Call to getResourceGraphGET() with URL: "+info.getPath()+" Accept >> "+format);
+        log.info("Call to getResourceGraphGET() with URL: {}, accept: {}", info.getPath(), format);
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         if(format == null) {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
@@ -183,13 +183,13 @@ public class PublicDataResource {
     @Path("/resource/{res}")
     @JerseyCacheControl()
     public Response getResourceGraphPost(@PathParam("res") final String res,
-        @HeaderParam("fusekiUrl") final String fuseki,
-        @HeaderParam("Accept") String format,
-        @Context UriInfo info,
-        @Context Request request) throws RestException{
+            @HeaderParam("fusekiUrl") final String fuseki,
+            @HeaderParam("Accept") String format,
+            @Context UriInfo info,
+            @Context Request request) throws RestException{
         final String prefixedRes = RES_PREFIX_SHORT+':'+res;
         Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        log.info("Call to getResourceGraphPost() with URL: "+info.getPath()+ " Variant >> "+variant+ " Accept >> "+format);
+        log.info("Call to getResourceGraphPost() with URL: {}, variant: {}, accept: {}", info.getPath(), variant, format);
         if(format== null) {
             final String html=Helpers.getMultiChoicesHtml(info.getPath(),true);
             final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
