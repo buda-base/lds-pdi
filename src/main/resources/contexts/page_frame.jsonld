@@ -7,6 +7,6 @@
   "@type": "AnnotationPage",
   "next": {"@embed": false},
   "prev": {"@embed": false},
-  "partOf": {"@embed": false},
+  "partOf": {"@embed": true},
   "items": {"@embed": true}
 }

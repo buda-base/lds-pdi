@@ -75,7 +75,7 @@ public class AnnotationCollectionEndpoint {
             @Context final HttpHeaders headers
             ) throws RestException {
         log.info("Call to getWholeCollection() with URL: {}, accept: {}", info.getPath(), format);
-        final String prefixedRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (format == null) {
@@ -86,14 +86,14 @@ public class AnnotationCollectionEndpoint {
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
-            return AnnotationEndpoint.htmlResponse(info, prefixedRes);
+            return AnnotationEndpoint.htmlResponse(info, prefixedCollectionRes);
         final DocType docType = DocType.ANC;
         final String contentType = mediaType.toString();
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Prefer prefer = getPrefer(preferHeader);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedRes);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         final String fullUri = AnnotationEndpoint.ANC_PREFIX+res;
         CollectionUtils.toW3CCollection(model, fullUri, prefer);
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, fullUri, docType));
@@ -116,10 +116,10 @@ public class AnnotationCollectionEndpoint {
             @Context final HttpHeaders headers
             ) throws RestException {
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", info.getPath(), format);
-        final String prefixedRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
         if (prefer == null || pnum != 1) { // all collections currently have 1 page
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
@@ -132,13 +132,13 @@ public class AnnotationCollectionEndpoint {
         }
         final String contentType = mediaType.toString();
         final DocType docType = DocType.ANP;
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
-        final Model model = CollectionUtils.getSubsetGraph(prefixedRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedRes);
+        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
-        final String fullUri = AnnotationEndpoint.ANC_PREFIX+res;
-        CollectionUtils.toW3CCollection(model, fullUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, fullUri, docType));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
+        final String collectionUri = AnnotationEndpoint.ANC_PREFIX+res;
+        CollectionUtils.toW3CCollection(model, collectionUri, prefer);
+        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionUri, docType));
         return AnnotationEndpoint.setHeaders(builder,
                 AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
                 .build();
@@ -158,8 +158,8 @@ public class AnnotationCollectionEndpoint {
             @Context final HttpHeaders headers
             ) throws RestException {
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", info.getPath(), format);
-        final String prefixedRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
-        final String alias = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+        final String collectionAlias = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (format == null) {
@@ -171,14 +171,57 @@ public class AnnotationCollectionEndpoint {
         }
         final DocType docType = DocType.ANC;
         final String contentType = mediaType.toString();
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Prefer prefer = getPrefer(preferHeader);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedRes, prefer, fusekiUrl, subtype, subcoordinates, alias);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAlias);
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
-        final String fullUri = AnnotationEndpoint.ANC_PREFIX+res;
-        CollectionUtils.toW3CCollection(model, fullUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, fullUri, docType));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAlias));
+        CollectionUtils.toW3CCollection(model, collectionAlias, prefer);
+        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAlias, docType));
+        return AnnotationEndpoint.setHeaders(builder,
+                AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
+                .build();
+    }
+
+    @GET
+    @Path("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
+    // Collection subset
+    // a subcollection corresponding to a page or character range
+    public Response getCollectionSubsetPage(@PathParam("res") final String res,
+            @HeaderParam("Accept") final String format,
+            @PathParam("subtype") final String subtype,
+            @PathParam("subcoordinates") final String subcoordinates,
+            @PathParam("ptype") final char ptype,
+            @PathParam("pnum") final int pnum,
+            @Context final UriInfo info,
+            @Context final Request request,
+            @Context final HttpHeaders headers
+            ) throws RestException {
+        log.info("Call to getCollectionSubsetPage() with URL: {}, accept: {}", info.getPath(), format);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+        final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
+        if (prefer == null || pnum != 1) { // all collections currently have 1 page
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
+        }
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
+        final MediaType mediaType;
+        // spec says that when the Accept: header is absent, JSON-LD should be answered
+        if (format == null) {
+            mediaType = MediaTypeUtils.MT_JSONLD;
+        } else {
+            mediaType = MediaTypeUtils.getMediaType(request, format, MediaTypeUtils.resVariantsNoHtml);
+            if (mediaType == null)
+                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+        }
+        final String contentType = mediaType.toString();
+        final DocType docType = DocType.ANP;
+        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
+        if (model.size() < 2) // there is a count added in the construct so there should always be one triple
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
+        final String collectionUri = AnnotationEndpoint.ANC_PREFIX+res;
+        CollectionUtils.toW3CCollection(model, collectionUri, prefer);
+        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionUri, docType));
         return AnnotationEndpoint.setHeaders(builder,
                 AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
                 .build();

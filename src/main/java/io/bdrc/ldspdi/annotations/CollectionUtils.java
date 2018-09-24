@@ -30,6 +30,10 @@ public class CollectionUtils {
     public static final Map<Prefer,String> preferToPagePref = new HashMap<>();
     public static final Map<Character,Prefer> pageUrlCharToPrefer = new HashMap<>();
 
+    // in a minimal representation, the server can choose between links to
+    // IRI or description pages. This option is set here:
+    public static final Prefer PAGES_FOR_MINIMAL = Prefer.DESCRIPTION;
+
     // this artificial integer is used indicate "until the end" of a resource
     // when subsetting collections. It will be a problem if we have texts of more
     // than 2 billion unicode characters.
@@ -86,14 +90,15 @@ public class CollectionUtils {
     public static void toW3CCollection(final Model model, final String fullUri, final Prefer prefer) {
         final Resource main = model.getResource(fullUri);
         model.add(main, RDF.type, AS.OrderedCollection);
-        final Resource firstPage = getPageResource(1, fullUri, prefer);
-        model.add(main, AS.first, firstPage);
-        if (prefer == Prefer.MINIMAL)
+        if (prefer == Prefer.MINIMAL) {
+            final Resource firstPage = getPageResource(1, fullUri, PAGES_FOR_MINIMAL);
+            // total number of items is in the model:
+            final int total = model.getResource(fullUri).getProperty(AS.totalItems).getInt();
+            if (total > 0)
+                model.add(main, AS.first, firstPage);
             return;
+        }
         final Property annInCollection = model.createProperty(BDO, "annInCollection");
-        model.add(firstPage, RDF.type, AS.OrderedCollectionPage);
-        model.add(firstPage, AS.partOf, main);
-        model.add(firstPage, AS.startIndex, model.createTypedLiteral(0, XSDDatatype.XSDinteger));
         int total = 0;
         final Set<Resource> items = new TreeSet<Resource>(new SimpleUriResourceComparator());
         final Selector sel = new SimpleSelector(null, annInCollection, main);
@@ -105,7 +110,14 @@ public class CollectionUtils {
             total += 1;
             it.remove();
         }
-        Resource itemsL = model.createList(items.iterator());
+        if (total < 1) {
+            return;
+        }
+        final Resource firstPage = getPageResource(1, fullUri, prefer);
+        model.add(firstPage, RDF.type, AS.OrderedCollectionPage);
+        model.add(firstPage, AS.partOf, main);
+        model.add(firstPage, AS.startIndex, model.createTypedLiteral(0, XSDDatatype.XSDinteger));
+        final Resource itemsL = model.createList(items.iterator());
         model.add(firstPage, AS.items, itemsL);
         model.add(main, AS.totalItems, model.createTypedLiteral(total, XSDDatatype.XSDinteger));
     }
@@ -138,29 +150,29 @@ public class CollectionUtils {
         return new Integer[] {rangebegin, rangeend};
     }
 
-    public static Model getSubsetGraph(final String prefixedRes, final Prefer prefer, final String fusekiUrl,
-            final String subtypeUrlElt, final String subcoordinates, final String resAlias) throws RestException {
+    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl,
+            final String subtypeUrlElt, final String subcoordinates, final String collectionAlias) throws RestException {
         final SubsetType subType = subsetUrlEltToSubsetType.get(subtypeUrlElt);
         if (subType == null) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
         final Integer[] range;
         try {
             range = getRangeFromUrlElt(subcoordinates);
         } catch (NumberFormatException e) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
-        return getSubsetGraph(prefixedRes, prefer, fusekiUrl, subType, range, resAlias);
+        return getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subType, range, collectionAlias);
     }
 
-    public static Model getSubsetGraph(final String prefixedRes, final Prefer prefer, final String fusekiUrl,
-            final SubsetType subType, final Integer[] range, final String resAlias) throws RestException {
+    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl,
+            final SubsetType subType, final Integer[] range, final String collectionAlias) throws RestException {
         final String queryFileName = AnnotationCollectionEndpoint.preferToQueryFile.get(prefer);
         final LdsQuery qfp = LdsQueryService.get(queryFileName,"library");
         final Map<String,String> args = new HashMap<>();
         args.put("R_SUBMETHOD", subsetToURI.get(subType));
-        args.put("R_RES", prefixedRes);
-        args.put("R_RESALIAS", prefixedRes);
+        args.put("R_RES", prefixedCollectionRes);
+        args.put("R_RESALIAS", collectionAlias);
         args.put("I_SUBRANGEFIRST", range[0].toString());
         args.put("I_SUBRANGELAST", range[1].toString());
         final String query = qfp.getParametizedQuery(args, false);
