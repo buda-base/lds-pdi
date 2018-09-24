@@ -27,7 +27,7 @@
 CONSTRUCT {
     ?R_RESALIAS ?p ?o .
     ?o1 ?p1 ?o2 .
-    ?ann :annInCollection ?R_RES .
+    ?ann :annInCollection ?R_RESALIAS .
 } where {
     {
         ?R_RES ?p ?o .

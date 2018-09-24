@@ -213,15 +213,14 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        final String contentType = mediaType.toString();
         final DocType docType = DocType.ANP;
-        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
-        final String collectionUri = AnnotationEndpoint.ANC_PREFIX+res;
-        CollectionUtils.toW3CCollection(model, collectionUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionUri, docType));
+        final String contentType = mediaType.toString();
+        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
+        CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
+        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAliasUri, docType));
         return AnnotationEndpoint.setHeaders(builder,
                 AnnotationEndpoint.getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType))
                 .build();
