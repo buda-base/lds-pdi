@@ -2,7 +2,7 @@ package io.bdrc.ldspdi.annotations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.ws.rs.GET;
@@ -101,7 +101,7 @@ public class AnnotationEndpoint {
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, docType));
-        return setHeaders(builder, getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
+        return setHeaders(builder, info.getPath(), ext, "Choice", null, contentType, false).build();
     }
 
     @GET
@@ -112,7 +112,7 @@ public class AnnotationEndpoint {
             @Context UriInfo info,
             @Context Request request,
             @Context HttpHeaders headers) throws RestException {
-        log.info("Call to getResourceGraph() with URL: {}", info.getPath());
+        log.info("Call to getResourceGraphSuffix() with URL: {}", info.getPath());
         final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
         if (mediaType == null) {
             return AnnotationEndpoint.mediaTypeChoiceResponse(info);
@@ -128,7 +128,7 @@ public class AnnotationEndpoint {
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, DocType.ANN));
-        return setHeaders(builder, getAnnotationHeaders(info.getPath(), ext, "Choice", null, contentType)).build();
+        return setHeaders(builder, info.getPath(), ext, "Choice", null, contentType, false).build();
     }
 
     static int getJsonLdMode(final MediaType mediaType) {
@@ -142,26 +142,35 @@ public class AnnotationEndpoint {
         final String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
         final ResponseBuilder rb = Response.status(300).entity(html)
                 .header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
-        return setHeaders(rb, getAnnotationHeaders(info.getPath(), null, "List", null, "text/html")).build();
+        return setHeaders(rb, info.getPath(), null, "List", null, "text/html", false).build();
     }
 
     public static Response htmlResponse(final UriInfo info, final String res) throws RestException {
         try {
             ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + res));
-            return setHeaders(builder, getAnnotationHeaders(info.getPath(), null, "Choice", null, null)).build();
+            return setHeaders(builder, info.getPath(), null, "Choice", null, null, false).build();
         } catch (URISyntaxException e) {
             throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
         }
     }
 
-    static HashMap<String, String> getAnnotationHeaders(String url, final String ext, final String tcn,
-            final String profile, final String contentType) {
-        final HashMap<String, MediaType> map = MediaTypeUtils.getExtensionMimeMap();
-        final HashMap<String, String> headers = new HashMap<>();
+    static ResponseBuilder setHeaders(ResponseBuilder builder, String url, final String ext, final String tcn,
+            final String profile, final String contentType, final boolean collection) {
+        final Map<String, MediaType> map = MediaTypeUtils.getExtensionMimeMap();
+        if (collection) {
+            builder.header("Link", "<http://www.w3.org/ns/ldp#BasicContainer>; rel=\"type\"");
+            builder.header("Link", "<http://www.w3.org/TR/annotation-protocol/>; rel=\"http://www.w3.org/ns/ldp#constrainedBy\"");
+        } else {
+            builder.header("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\"");
+            // not mandatory in the spec:
+            builder.header("Link", "<http://www.w3.org/ns/oa#Annotation>; rel=\"type\"");
+        }
+        // TODO: spec mandates the ETag header...
+        builder.header("Allow", "GET, OPTIONS, HEAD");
         if (ext != null) {
             final int dotidx = url.lastIndexOf('.');
             if (dotidx < 0) {
-                headers.put("Content-Location", url + "." + ext);
+                builder.header("Content-Location", url + "." + ext);
             } else {
                 url = url.substring(0, dotidx);
             }
@@ -177,18 +186,11 @@ public class AnnotationEndpoint {
             }
         }
         if (contentType != null)
-            headers.put("Content-Type", contentType);
-        headers.put("Alternates", sb.toString());
+            builder.header("Content-Type", contentType);
+        builder.header("Alternates", sb.toString());
         if (tcn != null)
-            headers.put("TCN", tcn);
-        headers.put("Vary", "Negotiate, Accept");
-        return headers;
-    }
-
-    static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
-        for (String key : headers.keySet()) {
-            builder.header(key, headers.get(key));
-        }
+            builder.header("TCN", tcn);
+        builder.header("Vary", "Negotiate, Accept");
         return builder;
     }
 

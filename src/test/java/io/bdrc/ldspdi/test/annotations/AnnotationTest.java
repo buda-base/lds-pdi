@@ -66,6 +66,7 @@ public class AnnotationTest extends JerseyTest {
                 .header("Accept", JsonLdCTWithAnnoProfile)
                 .get();
         System.out.println(res.readEntity(String.class));
+        System.out.println(res.getHeaders());
         assertTrue(res.getStatus() == 200);
         assertTrue(res.getHeaderString("Content-Type").equals(JsonLdCTWithAnnoProfile));
     }

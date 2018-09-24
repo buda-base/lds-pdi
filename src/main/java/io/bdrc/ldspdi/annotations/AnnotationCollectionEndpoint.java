@@ -91,7 +91,7 @@ public class AnnotationCollectionEndpoint {
             return AnnotationEndpoint.htmlResponse(info, prefixedCollectionRes);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), "Choice");
     }
 
     @GET
@@ -111,7 +111,7 @@ public class AnnotationCollectionEndpoint {
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), null);
     }
 
     @GET
@@ -144,7 +144,7 @@ public class AnnotationCollectionEndpoint {
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), "Choice");
     }
 
     @GET
@@ -168,7 +168,7 @@ public class AnnotationCollectionEndpoint {
         if (mediaType == null)
             return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), null);
     }
 
     @GET
@@ -199,7 +199,7 @@ public class AnnotationCollectionEndpoint {
         }
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath(), "Choice");
     }
 
     @GET
@@ -222,7 +222,7 @@ public class AnnotationCollectionEndpoint {
             return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath(), null);
     }
 
     @GET
@@ -256,7 +256,7 @@ public class AnnotationCollectionEndpoint {
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath(), "Choice");
     }
 
     @GET
@@ -283,20 +283,19 @@ public class AnnotationCollectionEndpoint {
         if (mediaType == null)
             return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath());
+        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath(), null);
     }
 
     private Response getResponse(final Model model, final DocType docType,
             final String collectionAliasUri, final MediaType mediaType, final Prefer prefer,
-            final String path) throws RestException {
+            final String path, final String tcn) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
         final String contentType = mediaType.toString();
         final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAliasUri, docType));
-        return AnnotationEndpoint.setHeaders(builder,
-                AnnotationEndpoint.getAnnotationHeaders(path, ext, "Choice", null, contentType))
+        return AnnotationEndpoint.setHeaders(builder,path, ext, tcn, null, contentType, true)
                 .build();
 
     }

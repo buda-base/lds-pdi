@@ -105,4 +105,15 @@ public class AnnotationCollectionTest extends JerseyTest {
         System.out.println(res.readEntity(String.class));
     }
 
+    @Test
+    public void subCollectionPageSuffix() throws JsonProcessingException, IOException {
+        final Response res = target("/anncollection/ANCVOL1/sub/pages/1-5/pd/1.jsonld")
+                .request()
+                .get();
+        System.out.println(res.getHeaders());
+        System.out.println("result:");
+        System.out.println(res.getStatus());
+        System.out.println(res.readEntity(String.class));
+    }
+
 }
