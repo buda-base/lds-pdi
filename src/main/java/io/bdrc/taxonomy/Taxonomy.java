@@ -2,17 +2,22 @@ package io.bdrc.taxonomy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
@@ -21,17 +26,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.formatters.JSONLDFormatter;
-import io.bdrc.ldspdi.utils.Node;
+import io.bdrc.ldspdi.utils.TaxNode;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class Taxonomy {
-    
-    public static ArrayList<Node<String>> allNodes=new ArrayList<>();
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Node<String> ROOT=new Node("http://purl.bdrc.io/resource/O9TAXTBRC201605");    
+
+    public static Map<String,TaxNode> allNodes = new HashMap<>();
+    public static final String ROOTURI = "http://purl.bdrc.io/resource/O9TAXTBRC201605";
+    public static TaxNode ROOT = new TaxNode(ROOTURI);
     public final static String HASSUBCLASS="http://purl.bdrc.io/ontology/core/taxHasSubClass";
+    public final static Node hasSubClass = ResourceFactory.createProperty(HASSUBCLASS).asNode();
     public final static String COUNT="http://purl.bdrc.io/ontology/tmp/count";
+    public final static Node countNode = ResourceFactory.createProperty(COUNT).asNode();
     public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
     public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
@@ -50,117 +57,120 @@ public class Taxonomy {
     public final static String LANG_SCRIPT="http://purl.bdrc.io/ontology/core/workLangScript";
     public final static String TOPIC="http://purl.bdrc.io/ontology/core/Topic";
     public final static String ROLE="http://purl.bdrc.io/ontology/core/Role";
-    
+
+    public final static ObjectMapper mapper = new ObjectMapper();
+
     static {
-        Triple t=new Triple(NodeFactory.createURI("http://purl.bdrc.io/resource/O9TAXTBRC201605"),NodeFactory.createURI(Taxonomy.HASSUBCLASS),org.apache.jena.graph.Node.ANY);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
         Taxonomy.buildTree(t, Taxonomy.ROOT);
     }
-       
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Node buildTree(Triple t,Node root) {
-        Model mod=TaxModel.getModel();
-        Graph mGraph =mod.getGraph();        
-        ExtendedIterator<Triple> ext=mGraph.find(t); 
-        Triple tp=null;
-        while(ext.hasNext()) {            
-            tp=ext.next();            
-            Node nn=new Node(tp.getObject().getURI());
-            allNodes.add(nn);
+
+    public static TaxNode buildTree(Triple t, TaxNode root) {
+        final Model mod=TaxModel.getModel();
+        final Graph mGraph = mod.getGraph();
+        ExtendedIterator<Triple> ext = mGraph.find(t);
+        while(ext.hasNext()) {
+            final Triple tp = ext.next();
+            final String uri = tp.getObject().getURI();
+            final TaxNode nn = new TaxNode(uri);
+            allNodes.put(uri, nn);
             root.addChild(nn);
-            Triple ttp=new Triple(NodeFactory.createURI(tp.getObject().getURI()),NodeFactory.createURI(HASSUBCLASS),org.apache.jena.graph.Node.ANY);
-            buildTree(ttp,nn);
+            final Triple ttp = new Triple(tp.getObject(), hasSubClass, Node.ANY);
+            buildTree(ttp, nn);
         }
         return root;
     }
-       
-    @SuppressWarnings("unchecked")
+
     public static LinkedList<String> getLeafToRootPath(String leaf) {
-        LinkedList<String> linkedList = new LinkedList<String>();        
-        Node<String> nodeLeaf=Taxonomy.getNode(leaf); 
-        if(nodeLeaf==null) {
+        LinkedList<String> linkedList = new LinkedList<String>();
+        TaxNode node = allNodes.get(leaf);
+        if (node == null) {
             return linkedList;
         }
-        linkedList.addLast(nodeLeaf.getData());
-        while(nodeLeaf!=null) {            
-            linkedList.addLast(nodeLeaf.getParent().getData());
-            nodeLeaf=Taxonomy.getNode(nodeLeaf.getParent().getData());
-        }        
+        linkedList.addLast(node.getUri());
+        while(node!=null) {
+            node = node.getParent();
+            if (node != null)
+                linkedList.addLast(node.getUri());
+        }
         return linkedList;
     }
-        
+
     public static LinkedList<String> getRootToLeafPath(String leaf) {
         LinkedList<String> tmp= getLeafToRootPath(leaf);
         Collections.reverse(tmp);
         return tmp;
     }
-       
-    public static Graph getPartialLDTreeTriples(Node<String> root,HashSet<String> leafTopics,HashMap<String,Integer> topics){
-        Model model=TaxModel.getModel();
-        Graph modGraph=model.getGraph();
-        Model mod=ModelFactory.createDefaultModel();
-        Graph partialTree=mod.getGraph();
-        String previous=ROOT.getData();        
+
+    public static Graph getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, HashMap<String,Integer> topics){
+        Model model = TaxModel.getModel();
+        Graph modGraph = model.getGraph();
+        Model mod = ModelFactory.createDefaultModel();
+        Graph partialTree = mod.getGraph();
+        String previous = ROOTURI;
         for(String uri:leafTopics) {
-            LinkedList<String> ll=getRootToLeafPath(uri);            
-            for(String node:ll) { 
+            LinkedList<String> ll=getRootToLeafPath(uri);
+            for(String node:ll) {
                 Integer count=topics.get(node);
-                if(count==null) {
-                    count=-1;
-                }                
-                if(!node.equals(previous) && !node.equals(ROOT.getData())) {
-                    partialTree.add(new Triple(NodeFactory.createURI(node),
-                            NodeFactory.createURI(COUNT),
-                            NodeFactory.createLiteral(count.toString())));
-                    partialTree.add(new Triple(NodeFactory.createURI(previous),NodeFactory.createURI(HASSUBCLASS),NodeFactory.createURI(node) ));
+                if(count == null) {
+                    count = -1;
                 }
-                ExtendedIterator<Triple> label=modGraph.find(NodeFactory.createURI(node),NodeFactory.createURI(PREFLABEL),org.apache.jena.graph.Node.ANY);
-                
+                if(!node.equals(previous) && !node.equals(ROOTURI)) {
+                    final Literal l = mod.createTypedLiteral(count, XSDDatatype.XSDinteger);
+                    partialTree.add(new Triple(NodeFactory.createURI(node),
+                            countNode,
+                            l.asNode()));
+                    partialTree.add(new Triple(NodeFactory.createURI(previous), hasSubClass, NodeFactory.createURI(node)));
+                }
+                // TODO: the labels should be added in the TaxNodes, this would save time at each query
+                final ExtendedIterator<Triple> label=modGraph.find(NodeFactory.createURI(node),NodeFactory.createURI(PREFLABEL), Node.ANY);
                 while(label.hasNext()){
-                    partialTree.add(label.next());                    
+                    partialTree.add(label.next());
                 }
                 previous=node;
             }
         }
         return partialTree;
     }
-    
-    public static JsonNode buildFacetTree(HashSet<String> tops,HashMap<String,Integer> topics) throws RestException {
+
+    public static JsonNode buildFacetTree(HashSet<String> tops, HashMap<String,Integer> topics) throws RestException {
         JsonNode nn=null;
         if(tops.size()>0) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-                Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops,topics);
-                ByteArrayOutputStream baos=new ByteArrayOutputStream();        
+                Graph g=Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops, topics);
+                ByteArrayOutputStream baos=new ByteArrayOutputStream();
                 JSONLDFormatter.writeModelAsCompact(ModelFactory.createModelForGraph(g),baos);
                 nn=mapper.readTree(baos.toString());
                 baos.close();
             } catch (IOException ex) {
                 throw new RestException(500,new LdsError(LdsError.JSON_ERR).
-                        setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"",ex));              
+                        setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \""+ex.getMessage()+"\"",ex));
             }
         }
         return nn;
     }
-    
+
     public static void processTopicStatement(Statement st,
-                                      HashSet<String> tops,
-                                      HashMap<String,HashSet<String>> Wtopics,
-                                      HashMap<String,HashSet<String>> WorkBranch,
-                                      HashMap<String,Integer> topics) {        
+            HashSet<String> tops,
+            HashMap<String,HashSet<String>> Wtopics,
+            HashMap<String,HashSet<String>> WorkBranch,
+            HashMap<String,Integer> topics) {
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp=Wtopics.get(st.getObject().asNode().getURI());
         if (tmp==null) {
             tmp=new HashSet<>();
         }
-        if(st.getSubject().isURIResource()) {
-            tmp.add(st.getSubject().asNode().getURI());
+        final Resource sub = st.getSubject();
+        final Node obj = st.getObject().asNode();
+        if(sub.isURIResource()) {
+            tmp.add(sub.getURI());
         }
         else {
-            tmp.add(st.getSubject().toString());
+            tmp.add(sub.toString());
         }
-        Wtopics.put(st.getObject().asNode().getURI(), tmp); 
-        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(st.getObject().asNode().getURI());
+        Wtopics.put(obj.getURI(), tmp);
+        LinkedList<String> nodes=Taxonomy.getRootToLeafPath(obj.getURI());
         if(!nodes.isEmpty()) {
             nodes.removeFirst();
             nodes.removeLast();
@@ -170,27 +180,17 @@ public class Taxonomy {
             if (bt==null) {
                 bt=new HashSet<>();
             }
-            if(st.getSubject().isURIResource()) {
-                bt.add(st.getSubject().asNode().getURI());
+
+            if(sub.isURIResource()) {
+                bt.add(sub.getURI());
             }
             else {
-                bt.add(st.getSubject().toString());
+                bt.add(sub.toString());
             }
             WorkBranch.put(s, bt);
             topics.put(s, bt.size());
         }
-        topics.put(st.getObject().asNode().getURI(), Wtopics.get(st.getObject().asNode().getURI()).size());
-    }
-    
-       
-    @SuppressWarnings("rawtypes")
-    public static Node getNode(String str) {
-        for(Node n:allNodes) {            
-            if(n.getData().equals(str)) {
-                return n;
-            }
-        }
-        return null;
+        topics.put(sub.getURI(), Wtopics.get(obj.getURI()).size());
     }
 
 }

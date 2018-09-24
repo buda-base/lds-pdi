@@ -22,6 +22,7 @@ import java.util.HashMap;
  ******************************************************************************/
 
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +32,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 
-
-
-public class BootClass implements javax.servlet.ServletContextListener{
+public class BootClass implements ServletContextListener {
 
     public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
 
@@ -45,7 +44,6 @@ public class BootClass implements javax.servlet.ServletContextListener{
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-
             final String fuseki=arg0.getServletContext().getInitParameter("fuseki");
             final String queryPath=arg0.getServletContext().getInitParameter("queryPath");
             final String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
@@ -56,21 +54,15 @@ public class BootClass implements javax.servlet.ServletContextListener{
             GitService.update(queryPath);
             ServiceConfig.init(params);
             OntData.init();
-            TaxModel.init();
+            TaxModel.fetchModel();
             RdfAuthModel.updateAuthData(fuseki);
             //For applications
             //RdfAuthModel.readAuthModel();
             log.info("BootClass has been properly initialized");
         }
-        catch (IllegalArgumentException e) {
+        catch (IllegalArgumentException | RestException e) {
             log.error("BootClass init error", e);
-            e.printStackTrace();
         }
-        catch (RestException e) {
-            log.error("BootClass init error >> ", e);
-            e.printStackTrace();
-        }
-
     }
 
 }

@@ -51,7 +51,7 @@ public class QueryProcessor {
 
     public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException{
         if(prefixes==null) {
-            prefixes=loadPrefixes();
+            prefixes=getPrefixes();
         }
         int hash=Objects.hashCode(queryName+"::"+URI);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
@@ -70,24 +70,28 @@ public class QueryProcessor {
         return model;
     }
 
-    public static Model getGraph(String query,String fusekiUrl, String prefixes) throws RestException{
-        if(prefixes==null) {
-            prefixes=loadPrefixes();
+    public static Model getGraph(final String query, String fusekiUrl, String prefixes) throws RestException{
+        if (prefixes == null) {
+            prefixes = getPrefixes();
         }
-        if(fusekiUrl == null) {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        int hash=Objects.hashCode(query);
-        Model model=(Model)ResultsCache.getObjectFromCache(hash);
-        if(model==null) {
-            Query q=QueryFactory.create(prefixes+" "+query);
-            QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
+        final int hash = Objects.hashCode(query);
+        Model model = (Model)ResultsCache.getObjectFromCache(hash);
+        if (model == null) {
+            final Query q = QueryFactory.create(prefixes+" "+query);
+            final QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
             model = qe.execConstruct();
             qe.close();
             ResultsCache.addToCache(model, hash);
         }
         return model;
+    }
+
+    public static Model getGraph(final String query) throws RestException{
+        return getGraph(query, null, null);
     }
 
     public static Model getAuthDataGraph(String fusekiUrl) throws RestException{
@@ -191,7 +195,7 @@ public class QueryProcessor {
         }
     }
 
-    private static String loadPrefixes() throws RestException {
+    private static String getPrefixes() throws RestException {
         String pref=Prefixes.getPrefixesString();
         if(pref!=null) {
             return pref;
