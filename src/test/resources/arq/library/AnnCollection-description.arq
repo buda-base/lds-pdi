@@ -43,7 +43,70 @@ CONSTRUCT {
         FILTER(isBlank(?o1))
         ?o1 ?p1 ?o2 .
     } union {
+        FILTER (?R_SUBMETHOD = bdr:SubsettingNone)
         ?ann :annInCollection ?R_RES .
+        ?ann ?annp ?anno .
+        ?ann oa:hasTarget ?ant .
+        ?ant ?antp ?anto .
+        optional {
+            FILTER(isBlank(?anto))
+            ?anto ?antop ?antoo .
+        }
+        optional {
+          ?ann oa:hasBody ?annb .
+          ?annb ?annbp ?annbo .
+          optional {
+            ?annbo a :WorkLocation ;
+            BIND(?annbo as ?annbloc )
+            ?annbloc ?annblocp ?annbloco .
+          }
+          optional {
+            ?annbo a adm:Assertion ;
+            BIND(?annbo as ?annba )
+            ?annba ?annbap ?annbao .
+            optional {
+               ?annba :workLocation ?annbaloc .
+               ?annbaloc ?annbalocp ?annbaloco .
+            }
+          }
+        }
+    } union {
+        FILTER (?R_SUBMETHOD = bdr:SubsettingImageVolume)
+        ?ann :annInCollection ?R_RES .
+        ?ann oa:hasTarget/oa:hasSource/:sourceImageSeq ?imgseq .
+        FILTER (?imgseq <= ?I_SUBRANGELAST && ?imgseq >= ?I_SUBRANGEFIRST)
+        ?ann ?annp ?anno .
+        ?ann oa:hasTarget ?ant .
+        ?ant ?antp ?anto .
+        optional {
+            FILTER(isBlank(?anto))
+            ?anto ?antop ?antoo .
+        }
+        optional {
+          ?ann oa:hasBody ?annb .
+          ?annb ?annbp ?annbo .
+          optional {
+            ?annbo a :WorkLocation ;
+            BIND(?annbo as ?annbloc )
+            ?annbloc ?annblocp ?annbloco .
+          }
+          optional {
+            ?annbo a adm:Assertion ;
+            BIND(?annbo as ?annba )
+            ?annba ?annbap ?annbao .
+            optional {
+               ?annba :workLocation ?annbaloc .
+               ?annbaloc ?annbalocp ?annbaloco .
+            }
+          }
+        }
+    } union {
+        FILTER (?R_SUBMETHOD = bdr:SubsettingChars)
+        ?ann :annInCollection ?R_RES .
+        ?ann oa:hasTarget/oa:hasSource ?source .
+        ?source :sourcecharstart ?start ;
+                :sourcecharend   ?end .
+        FILTER (?start <= ?I_SUBRANGELAST && ?end >= ?I_SUBRANGEFIRST)
         ?ann ?annp ?anno .
         ?ann oa:hasTarget ?ant .
         ?ant ?antp ?anto .
