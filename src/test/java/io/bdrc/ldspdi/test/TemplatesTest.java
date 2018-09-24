@@ -9,8 +9,6 @@ import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.jena.fuseki.embedded.FusekiServer;
@@ -101,10 +99,10 @@ public class TemplatesTest extends JerseyTest{
 
     @Test
     public void wrongTemplateNamePost() throws JsonProcessingException, IOException {
-        MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
-        map.add("L_NAME","dgon gsar");
+        Map<String, String> map = new HashMap<>();
+        map.put("L_NAME","dgon gsar");
         Response res = target("/query/wrongTemplateName").request()
-                .post(Entity.form(map));
+                .post(Entity.json(map));
         String entity=res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node=mapper.readTree(entity);
@@ -115,20 +113,20 @@ public class TemplatesTest extends JerseyTest{
 
     @Test
     public void TemplateGet() throws JsonProcessingException, IOException {
-            Response res = target("/query/missingArg")
-                    .queryParam("L_NAME", "rgyal")
-                    .request()
-                    .get();
-            System.out.println("STATUS >>"+res.getStatus());
-            assertTrue(res.getStatus() == 200);
+        Response res = target("/query/missingArg")
+                .queryParam("L_NAME", "rgyal")
+                .request()
+                .get();
+        System.out.println("STATUS >>"+res.getStatus());
+        assertTrue(res.getStatus() == 200);
     }
 
     @Test
     public void TemplatePost() throws JsonProcessingException, IOException {
-        MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
-        map.add("L_NAME","rgyal");
+        Map<String, String> map = new HashMap<>();
+        map.put("L_NAME","rgyal");
         Response res = target("/query/missingArg").request()
-                .post(Entity.form(map));
+                .post(Entity.json(map));
         assertTrue(res.getStatus() == 200);
     }
 
@@ -162,10 +160,10 @@ public class TemplatesTest extends JerseyTest{
 
     @Test
     public void WrongParamNamePost() throws JsonProcessingException, IOException {
-        MultivaluedMap<String, String> map=new MultivaluedHashMap<>();
-        map.add("WRONG","rgyal");
+        Map<String, String> map = new HashMap<>();
+        map.put("WRONG","rgyal");
         Response res = target("/query/missingArg").request()
-                .post(Entity.form(map));
+                .post(Entity.json(map));
         String entity=res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node=mapper.readTree(entity);

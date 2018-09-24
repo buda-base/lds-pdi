@@ -49,9 +49,9 @@ public class Results {
     public Results(ResultSetWrapper res,HashMap<String,String> hm)
             throws RestException{
         String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
-        if(pageNum!=null) {
+        if (pageNum!=null) {
             this.pageNumber=Integer.parseInt(pageNum);
-        }else {
+        } else {
             this.pageNumber=1;
         }
         pageSize=res.getPageSize();
