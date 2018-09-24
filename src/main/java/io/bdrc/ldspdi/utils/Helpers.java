@@ -30,8 +30,10 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.text.StrSubstitutor;
@@ -40,13 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
-import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 
 public class Helpers {
 
-    public final static Logger log=LoggerFactory.getLogger(Helpers.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
+
+    public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
 
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
@@ -68,38 +71,38 @@ public class Helpers {
         }
     }
 
-	public static String removeAccents(String text) {
-		String f=text;
-		return f == null ? null :
-	        Normalizer.normalize(f, Form.NFD)
-	            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-	}
-
-	public static boolean isTibUni(String s) {
-		return s.matches("[\u0f00-\u0fff]+");
-	}
-
-	public static boolean isWylie(String s) {
-		 Wylie wl = new Wylie(true, false, false, true);
-		 ArrayList<String> warn=new ArrayList<>();
-		 wl.fromWylie(s, warn);
-		 return warn.size()==0;
-	}
-
-	public static String bdrcEncode(String url) {
-		String encoded=url.replace("\"", "%22");
-		encoded=encoded.replace(' ', '+');
-		encoded=encoded.replace("\'", "%27");
-		return encoded;
-	}
-
-	public static boolean isValidURI(String uri) {
-	    String[] schemes = {"http","https"};
-	    UrlValidator urlValidator = new UrlValidator(schemes);
-	    return urlValidator.isValid(uri);
+    public static String removeAccents(String text) {
+        String f=text;
+        return f == null ? null :
+            Normalizer.normalize(f, Form.NFD)
+            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
-	public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
+    public static boolean isTibUni(String s) {
+        return s.matches("[\u0f00-\u0fff]+");
+    }
+
+    public static boolean isWylie(String s) {
+        Wylie wl = new Wylie(true, false, false, true);
+        ArrayList<String> warn=new ArrayList<>();
+        wl.fromWylie(s, warn);
+        return warn.size()==0;
+    }
+
+    public static String bdrcEncode(String url) {
+        String encoded=url.replace("\"", "%22");
+        encoded=encoded.replace(' ', '+');
+        encoded=encoded.replace("\'", "%27");
+        return encoded;
+    }
+
+    public static boolean isValidURI(String uri) {
+        String[] schemes = {"http","https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        return urlValidator.isValid(uri);
+    }
+
+    public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
         HashMap<String,String> copy=new HashMap<>();
         Set<String> set=map.keySet();
         for(String key:set) {
@@ -108,38 +111,40 @@ public class Helpers {
         return copy;
     }
 
-	public static String getMultiChoicesHtml(String path,boolean resource) throws RestException {
-	    InputStream stream = Helpers.class.getClassLoader().getResourceAsStream("multiChoice.tpl");
-	    BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
-	    StringBuffer sb=new StringBuffer();
-	    try {
-    	    String line=buffer.readLine();
-    	    while(line!=null) {
-    	        sb.append(line+System.lineSeparator());
-    	        line=buffer.readLine();
+    public static StringBuffer getTemplateStr(String tlpPath) {
+        final InputStream stream = getResourceOrFile(tlpPath);
+        final BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
+        final StringBuffer sb = new StringBuffer();
+        try {
+            String line=buffer.readLine();
+            while(line != null) {
+                sb.append(line+System.lineSeparator());
+                line = buffer.readLine();
 
-    	    }
-	    } catch (IOException e) {
-	        log.debug("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)");
-	        throw new RestException(500,new LdsError(LdsError.PARSE_ERR).
-	                setContext("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml(String,boolean)",e));
-        }
-	    String rows="";
-	    if(resource) {
-    	    for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
-    	        rows=rows+"<tr><td><a href=\""+path+"."+k+"\">"+path+"."+k+"</a><td>"+
-    	                MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
-    	    }
-	    }else {
-	        for(String k:MediaTypeUtils.getExtensionMimeMap().keySet()) {
-                rows=rows+"<tr><td><a href=\""+path+"&format="+k+"\">"+path+"."+k+"</a><td>"+
-                        MediaTypeUtils.getExtensionMimeMap().get(k)+"</td></tr>"+System.lineSeparator();
             }
-	    }
-	    HashMap<String,String> map=new HashMap<>();
-	    map.put("path", path);
-	    map.put("rows",rows);
-	    StrSubstitutor s=new StrSubstitutor(map);
-	    return s.replace(sb);
-	}
+        } catch (IOException e) {
+            log.error("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml()");
+        }
+        return sb;
+    }
+
+    public static String getMultiChoicesHtml(final String path, final boolean resource) throws RestException {
+        final StringBuilder sb = new StringBuilder();
+        for (final Entry<String,MediaType> e: MediaTypeUtils.getExtensionMimeMap().entrySet()) {
+            final String ext = e.getKey();
+            final String mimeDesc = e.getValue().toString();
+            if(resource) {
+                sb.append("<tr><td><a href=\""+path+"."+ext+"\">"+path+"."+ext+"</a><td>"+
+                        mimeDesc+"</td></tr>\n");
+            } else {
+                sb.append("<tr><td><a href=\""+path+"&format="+ext+"\">"+path+"."+ext+"</a><td>"+
+                        mimeDesc+"</td></tr>\n");
+            }
+        }
+        final HashMap<String,String> map = new HashMap<>();
+        map.put("path", path);
+        map.put("rows", sb.toString());
+        StrSubstitutor s = new StrSubstitutor(map);
+        return s.replace(multiChoiceTpl);
+    }
 }
