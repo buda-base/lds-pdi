@@ -25,7 +25,7 @@ public class QSWriter {
             } else if(node.isLiteral()) {
                 csvrow[varIdx] = node.asLiteral().getValue().toString();
             } else if(node.isAnon()) {
-                csvrow[varIdx] = node.toString();
+                csvrow[varIdx] = "_:"+node.toString();
             }
             varIdx += 1;
         }
@@ -54,7 +54,7 @@ public class QSWriter {
                 final String lang = l.getLanguage();
                 csvrow[3*varIdx+2] = (lang == null) ? "" : lang;
             } else if(node.isAnon()) {
-                csvrow[3*varIdx] = node.toString();
+                csvrow[3*varIdx] = "_:"+node.toString();
                 csvrow[3*varIdx+1] = "@id";
                 csvrow[3*varIdx+2] = "";
             }

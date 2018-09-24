@@ -125,18 +125,21 @@ public class ResultSetWrapper {
     }
 
     public void writeCsvHeaders(boolean simple, CSVWriter w) {
-        String[] headers;
+        final String[] headers;
+        final int factor;
         if (simple) {
             headers = new String[vars.size()];
+            factor = 1;
         } else {
             headers = new String[3*vars.size()];
+            factor = 3;
         }
         int varIdx = 0;
         for (String var : vars) {
-            headers[varIdx] = var;
+            headers[factor*varIdx] = var;
             if (!simple) {
-                headers[varIdx+1] = var+"-type";
-                headers[varIdx+2] = var+"-lang";
+                headers[factor*varIdx+1] = var+"-type";
+                headers[factor*varIdx+2] = var+"-lang";
             }
             varIdx +=1;
         }
@@ -151,12 +154,13 @@ public class ResultSetWrapper {
         if (pageNumber > numberOfPages || pageNumber < 0) {
             return null;
         }
+        final int maxIdx = Math.min(offset+pageSize, numResults);
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException {
                 CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(os));
                 writeCsvHeaders(simple, csvWriter);
-                for (int x=(offset); x<(offset+pageSize);x++) {
+                for (int x=offset; x < maxIdx; x++) {
                     QuerySolution qs = querySolutions.get(x);
                     if (simple)
                         QSWriter.writeCsvSimple(qs, vars, csvWriter);

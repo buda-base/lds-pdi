@@ -1,0 +1,12 @@
+#QueryScope=Work
+#QueryReturnType=Table
+#QueryParams=NONE
+#QueryResults=very basic request returning one row
+#QueryUrl=/simpleRequest
+
+select ?res ?litlang ?litnolang ?bnode where { 
+    bdr:P1AG29 a ?res ;
+    		   skos:prefLabel ?litlang ;
+    		   rdfs:seeAlso ?litnolang ;
+    		   adm:logEntry ?bnode .
+}

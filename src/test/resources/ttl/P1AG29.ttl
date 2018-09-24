@@ -41,16 +41,5 @@ bdr:P1AG29  a           :Person ;
     adm:logEntry        [ adm:logDate         "2015-06-16T18:00:57.789Z"^^xsd:dateTime ;
                           adm:logMessage      "added link to Treasury of Lives"@en ;
                           adm:logWho          bdr:U00002
-                        ] ,
-            [ adm:logDate         "2015-06-16T18:03:24.256Z"^^xsd:dateTime ;
-              adm:logWho          bdr:U00002
-            ] ,
-            [ adm:logDate         "2015-06-17T11:55:05.784Z"^^xsd:dateTime ;
-              adm:logMessage      "added incarnation office R1AG30"@en ;
-              adm:logWho          bdr:U00002
-            ] ,
-            [ adm:logDate         "2015-06-19T11:55:15.76Z"^^xsd:dateTime ;
-              adm:logMessage      "reviewed by ls, cz, cn, kg"@en ;
-              adm:logWho          bdr:U00016
-            ] ;
+                        ] ;
     adm:status          bdr:StatusReleased .
