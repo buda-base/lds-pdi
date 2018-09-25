@@ -295,11 +295,10 @@ public class AnnotationCollectionEndpoint {
             final String path, final String tcn) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
-        final String contentType = mediaType.toString();
-        final String ext = MediaTypeUtils.getExtFormatFromMime(contentType);
+        final String ext = MediaTypeUtils.getExtFromMime(mediaType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAliasUri, docType));
-        return AnnotationEndpoint.setHeaders(builder,path, ext, tcn, null, contentType, true)
+        return AnnotationEndpoint.setHeaders(builder,path, ext, tcn, null, mediaType, true)
                 .build();
 
     }

@@ -56,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.rdf.RdfAuthModel;
-//import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -127,7 +126,7 @@ public class PublicDataResource {
         EntityTag tag=OntData.getEntityTag();
         ResponseBuilder builder = request.evaluatePreconditions(tag);
         if(builder == null){
-            builder = Response.ok(OntData.JSONLD_CONTEXT, "application/ld+json");
+            builder = Response.ok(OntData.JSONLD_CONTEXT, MediaTypeUtils.MT_JSONLD);
             builder.header("Last-Modified", OntData.getLastUpdated()).tag(tag);
         }
         return builder.build();
@@ -174,7 +173,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        final String ext = MediaTypeUtils.getExtFromMime(mediaType);
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX+res, null), mediaType);
         return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice",getEtag(model,res))).build();
     }
@@ -215,7 +214,7 @@ public class PublicDataResource {
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        final String ext = MediaTypeUtils.getExtFromMime(mediaType);
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX+res, null), mediaType);
         return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice",getEtag(model,res))).build();
     }
@@ -256,11 +255,10 @@ public class PublicDataResource {
             @PathParam("path") String path,
             @Context Request request) throws RestException{
         log.info("getCoreOntologyClassView()");
-        String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
-        Date lastUpdate=OntData.getLastUpdated();
-        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+uri).hashCode()));
+        final String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
+        final EntityTag etag=OntData.getEntityTag();
         ResponseBuilder builder = request.evaluatePreconditions(etag);
-        if(OntData.ontMod.getOntResource(uri)==null) {
+        if(OntData.ontMod.getOntResource(uri) == null) {
             throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(uri));
         }
         if(OntData.isClass(uri)) {
@@ -280,34 +278,36 @@ public class PublicDataResource {
 
     @GET
     @Path("/ontology/{ont}.{ext}")
-    public Response getOntology(@DefaultValue("ttl") @PathParam("ext") String ext,@PathParam("ont") String ont, @Context Request request) {
+    public Response getOntology(@PathParam("ext") String ext,
+            @PathParam("ont") String ont,
+            @Context Request request) throws RestException {
         log.info("getOntology()");
-        StreamingOutput stream = new StreamingOutput() {
+        final Model model;
+        if (ont.equals("core")) {
+            model = OntData.ontMod;
+        } else if(ont.equals("auth")) {
+            model = RdfAuthModel.getFullModel();
+        } else {
+            throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(ont));
+        }
+        final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
+        if (JenaLangStr == null) {
+            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(ont));
+        }
+        final StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                Model model=null;
-                if(ont.equals("core")) {
-                    model=OntData.ontMod;
-                }
-                if(ont.equals("auth")) {
-                    model=RdfAuthModel.getFullModel();
-                }
-                if(MediaTypeUtils.getJenaFromExtension(ext)!=null && !ext.equalsIgnoreCase("ttl")){
-                    if(ext.equalsIgnoreCase("jsonld")) {
-                        model.write(os,MediaTypeUtils.getJenaFromExtension("json"));
-                    }else {
-                        model.write(os,MediaTypeUtils.getJenaFromExtension(ext));
-                    }
-                }else{
-                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                if (JenaLangStr == "STTL") {
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                     writer.output(os);
                 }
+                model.write(os, JenaLangStr);
             }
         };
-        EntityTag tag=OntData.getEntityTag();
+        final EntityTag tag = OntData.getEntityTag();
         ResponseBuilder builder = request.evaluatePreconditions(tag);
-        if(builder == null){
-            builder = Response.ok(stream,MediaTypeUtils.getMimeFromExtension(ext));
+        if (builder == null){
+            builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
             builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
         }
         return builder.build();
@@ -339,7 +339,7 @@ public class PublicDataResource {
     }
 
     private static HashMap<String,String> getResourceHeaders(String url,String ext, String tcn, String eTag) {
-        HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
         HashMap<String,String> headers=new HashMap<>();
         if(ext!=null) {
             if(url.indexOf(".")<0) {

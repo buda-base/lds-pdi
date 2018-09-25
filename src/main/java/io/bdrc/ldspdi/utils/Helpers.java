@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
-import io.bdrc.restapi.exceptions.RestException;
 
 
 public class Helpers {
@@ -128,9 +127,9 @@ public class Helpers {
         return sb;
     }
 
-    public static String getMultiChoicesHtml(final String path, final boolean resource) throws RestException {
+    public static String getMultiChoicesHtml(final String path, final boolean resource) {
         final StringBuilder sb = new StringBuilder();
-        for (final Entry<String,MediaType> e: MediaTypeUtils.getExtensionMimeMap().entrySet()) {
+        for (final Entry<String,MediaType> e: MediaTypeUtils.getResExtensionMimeMap().entrySet()) {
             final String ext = e.getKey();
             final String mimeDesc = e.getValue().toString();
             if(resource) {

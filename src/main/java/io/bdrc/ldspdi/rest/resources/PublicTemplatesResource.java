@@ -92,7 +92,7 @@ public class PublicTemplatesResource {
         ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         String fmt=hm.get(QueryConstants.FORMAT);
         if("json".equals(fmt)) {
-            return Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res,hm)), MediaTypeUtils.MT_JSON)
+            return Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res,hm)), MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Disposition", "attachment; filename=\""+file+".json\"")
                     .build();
         }
@@ -197,7 +197,7 @@ public class PublicTemplatesResource {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).
                     setContext(file+ " in getGraphTemplateResults()"));
         }
-        final String ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+        final String ext = MediaTypeUtils.getExtFromMime(mediaType);
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model,ext), mediaType);
         return setHeaders(builder,getGraphResourceHeaders(path,ext,"Choice")).build();
     }
@@ -239,7 +239,7 @@ public class PublicTemplatesResource {
         }
         return Response.ok(ResponseOutputStream.getModelStream(
                 model,
-                MediaTypeUtils.getExtFormatFromMime(mediaType.toString())),
+                MediaTypeUtils.getExtFromMime(mediaType)),
                 mediaType)
                 .build();
     }
@@ -257,7 +257,7 @@ public class PublicTemplatesResource {
     }
 
     private static HashMap<String,String> getGraphResourceHeaders(String url, final String ext, final String tcn) {
-        final HashMap<String,MediaType> map = MediaTypeUtils.getExtensionMimeMap();
+        final HashMap<String,MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
         final HashMap<String,String> headers=new HashMap<>();
 
         if(ext!=null) {

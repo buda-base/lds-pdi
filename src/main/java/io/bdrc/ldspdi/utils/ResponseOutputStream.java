@@ -52,42 +52,41 @@ public class ResponseOutputStream {
         return stream;
     }
 
-    public static StreamingOutput getModelStream(final Model model, String format, final String res, DocType docType) {
-        StreamingOutput stream = new StreamingOutput() {
+    public static StreamingOutput getModelStream(final Model model, final String format, final String res, DocType docType) {
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream os){
-                // might be very inefficient is write is called multiple times (?)
-                if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
-                    if(format.equalsIgnoreCase("jsonld")) {
-                        Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
-                        JSONLDFormatter.jsonObjectToOutputStream(json, os);
-                    } else {
-                        model.write(os,MediaTypeUtils.getJenaFromExtension(format));
-                    }
-                } else {
-                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
-                    writer.output(os);
+                if(format.equals("jsonld")) {
+                    final Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
+                    JSONLDFormatter.jsonObjectToOutputStream(json, os);
+                    return;
                 }
+                final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+                if (JenaFormat == null || JenaFormat.equals("STTL")) {
+                    final RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                    writer.output(os);
+                    return;
+                }
+                model.write(os, JenaFormat);
             }
         };
-        return stream;
     }
 
     public static StreamingOutput getModelStream(Model model, String format) {
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) {
-                if(MediaTypeUtils.getJenaFromExtension(format)!=null && !format.equalsIgnoreCase("ttl")){
-                    if(format.equalsIgnoreCase("jsonld")) {
-                        JSONLDFormatter.writeModelAsCompact(model, os);
-                    }
-                    else {
-                        model.write(os,MediaTypeUtils.getJenaFromExtension(format));
-                    }
-                } else {
+                if(format.equals("jsonld")) {
+                    JSONLDFormatter.writeModelAsCompact(model, os);
+                    return;
+                }
+                String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+                if (JenaFormat == null || JenaFormat.equals("STTL")) {
                     RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
                     writer.output(os);
+                    return;
                 }
+                model.write(os, JenaFormat);
             }
         };
         return stream;

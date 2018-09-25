@@ -68,7 +68,7 @@ public class AnnotationEndpoint {
             @Context Request request,
             @Context HttpHeaders headers) throws RestException {
         log.info("Call to getResourceGraph() with URL: {}, accept: {}", info.getPath(), accept);
-        final MediaType mediaType;
+        MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (accept == null) {
             mediaType = MediaTypeUtils.MT_JSONLD;
@@ -81,27 +81,25 @@ public class AnnotationEndpoint {
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
             return htmlResponse(info, prefixedRes);
         int mode = DEFAULT_ANN_MODE;
-        String contentType = mediaType.toString();
         DocType docType = DocType.ANN;
-        System.out.println(mediaType.getParameters());
         String ext = null;
         if (mediaType.getSubtype().equals("ld+json")) {
             ext = "jsonld";
             mode = getJsonLdMode(mediaType);
             if (mode == OA_ANN_MODE) {
-                contentType = OA_CT;
+                mediaType = MediaTypeUtils.MT_JSONLD_OA;
                 docType = DocType.OA;
             } else {
-                contentType = W3C_CT;
+                mediaType = MediaTypeUtils.MT_JSONLD_WA;
             }
         } else {
-            ext = MediaTypeUtils.getExtFormatFromMime(mediaType.toString());
+            ext = MediaTypeUtils.getExtFromMime(mediaType);
         }
         Model model = QueryProcessor.getSimpleResourceGraph(prefixedRes, "AnnGraph.arq", fusekiUrl, null);
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, docType));
-        return setHeaders(builder, info.getPath(), ext, "Choice", null, contentType, false).build();
+        return setHeaders(builder, info.getPath(), ext, "Choice", null, mediaType, false).build();
     }
 
     @GET
@@ -113,22 +111,19 @@ public class AnnotationEndpoint {
             @Context Request request,
             @Context HttpHeaders headers) throws RestException {
         log.info("Call to getResourceGraphSuffix() with URL: {}", info.getPath());
-        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+        MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
         if (mediaType == null) {
             return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
-        final String contentType;
         if ("jsonld".equals(ext)) {
-            contentType = W3C_CT;
-        } else {
-            contentType = mediaType.toString();
+            mediaType = MediaTypeUtils.MT_JSONLD_WA;
         }
         String prefixedRes = ANN_PREFIX_SHORT+':'+res;
         Model model = QueryProcessor.getSimpleResourceGraph(prefixedRes, "AnnGraph.arq", fusekiUrl, null);
         if (model.size() == 0)
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, ANN_PREFIX+res, DocType.ANN));
-        return setHeaders(builder, info.getPath(), ext, "Choice", null, contentType, false).build();
+        return setHeaders(builder, info.getPath(), ext, "Choice", null, mediaType, false).build();
     }
 
     static int getJsonLdMode(final MediaType mediaType) {
@@ -142,7 +137,7 @@ public class AnnotationEndpoint {
         final String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
         final ResponseBuilder rb = Response.status(300).entity(html)
                 .header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
-        return setHeaders(rb, info.getPath(), null, "List", null, "text/html", false).build();
+        return setHeaders(rb, info.getPath(), null, "List", null, MediaType.TEXT_HTML_TYPE, false).build();
     }
 
     public static Response htmlResponse(final UriInfo info, final String res) throws RestException {
@@ -155,8 +150,8 @@ public class AnnotationEndpoint {
     }
 
     static ResponseBuilder setHeaders(ResponseBuilder builder, String url, final String ext, final String tcn,
-            final String profile, final String contentType, final boolean collection) {
-        final Map<String, MediaType> map = MediaTypeUtils.getExtensionMimeMap();
+            final String profile, final MediaType mediaType, final boolean collection) {
+        final Map<String, MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
         if (collection) {
             builder.header("Link", "<http://www.w3.org/ns/ldp#BasicContainer>; rel=\"type\"");
             builder.header("Link", "<http://www.w3.org/TR/annotation-protocol/>; rel=\"http://www.w3.org/ns/ldp#constrainedBy\"");
@@ -185,8 +180,8 @@ public class AnnotationEndpoint {
                 first = false;
             }
         }
-        if (contentType != null)
-            builder.header("Content-Type", contentType);
+        if (mediaType != null)
+            builder.header("Content-Type", mediaType);
         builder.header("Alternates", sb.toString());
         if (tcn != null)
             builder.header("TCN", tcn);

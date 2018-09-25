@@ -2,19 +2,19 @@ package io.bdrc.formatters;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
@@ -34,8 +34,9 @@ import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
 
 public class TTLRDFWriter {
-    
-    static final Lang sttl = STTLWriter.registerWriter();
+
+    static public final Lang sttl = STTLWriter.registerWriter();
+    static public final String strLangSttl = "STTL";
     static final SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
     static final List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
     static final Context ctx = new Context();
@@ -65,6 +66,6 @@ public class TTLRDFWriter {
 
     public static RDFWriter getSTTLRDFWriter(Model m) {
         return RDFWriter.create().source(m.getGraph()).context(ctx).lang(sttl).build();
-    }    
+    }
 
 }

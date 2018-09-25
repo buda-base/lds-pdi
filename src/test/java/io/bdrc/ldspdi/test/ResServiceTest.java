@@ -38,7 +38,6 @@ import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
-import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class ResServiceTest extends JerseyTest{
@@ -102,6 +101,16 @@ public class ResServiceTest extends JerseyTest{
     }*/
 
     @Test
+    public void AllOk() {
+        Response res = target("/resource/C68.ttl").request()
+                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
+                .get();
+        assertTrue(res.getStatus() == 200);
+        System.out.println(res.readEntity(String.class));
+        //assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
+    }
+
+    @Test
     public void html() {
         for(String method:methods) {
             Response res = target("/resource/P1AG29").request()
@@ -135,7 +144,7 @@ public class ResServiceTest extends JerseyTest{
 
     @Test
     public void GetResourceByExtension() {
-        Set<String> map=MediaTypeUtils.getExtensionMimeMap().keySet();
+        Set<String> map=MediaTypeUtils.getResExtensionMimeMap().keySet();
         for(String ent:map) {
             Response res = target("/resource/P1AG29."+ent).request()
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
@@ -156,7 +165,7 @@ public class ResServiceTest extends JerseyTest{
     }
 
     @Test
-    public void WrongExt() throws RestException {
+    public void WrongExt() {
         Response res = target("/resource/C68.wrong").request()
                 .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                 .get();
@@ -240,7 +249,7 @@ public class ResServiceTest extends JerseyTest{
     }
 
     public boolean checkAlternates(String url,String alternates) {
-        HashMap<String,MediaType> map =MediaTypeUtils.getExtensionMimeMap();
+        HashMap<String,MediaType> map =MediaTypeUtils.getResExtensionMimeMap();
         StringBuilder sb=new StringBuilder("");
         for(Entry<String,MediaType> e :map.entrySet()) {
             sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");
