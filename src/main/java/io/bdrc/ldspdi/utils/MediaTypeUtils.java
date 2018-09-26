@@ -35,6 +35,7 @@ public class MediaTypeUtils {
     public static final MediaType MT_JSONLD_OA = MediaType.valueOf("application/ld+json; profile=\"http://www.w3.org/ns/oa.jsonld\"");
 
     public static final List<Variant> resVariants;
+    public static final List<Variant> resVariantsWithMarc;
     public static final List<Variant> resVariantsNoHtml;
     public static final List<Variant> graphVariants;
     public static final List<Variant> annVariants;
@@ -44,6 +45,11 @@ public class MediaTypeUtils {
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
                 MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
                 MT_TRIX).build();
+
+        resVariantsWithMarc = Variant.mediaTypes(MediaType.TEXT_HTML_TYPE,
+                MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
+                MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
+                MT_TRIX, MT_MRCX, MT_MRCX_CU).build();
 
         resVariantsNoHtml = Variant.mediaTypes(
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,

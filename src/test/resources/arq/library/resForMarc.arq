@@ -1,0 +1,34 @@
+#QueryScope=Work
+#QueryReturnType=Graph
+#QueryResults=A graph for the given work
+#QueryParams=R_RES
+#QueryUrl=/lib/resForMarc?R_RES=bdr:W23819
+
+#param.R_RES.type=resource
+#param.R_RES.subtype=a Resource ID
+#param.R_RES.desc=the unique resource ID of the chosen resource
+
+PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
+
+construct {
+  ?R_RES ?p ?o .
+  ?o ?op ?oo .
+  ?pname ?pnamep ?pnameo .
+  ?pevent ?peventp ?pevento .
+} where {
+  ?R_RES ?p ?o .
+  optional {
+    ?p rdfs:subclassOf* :workCreator .
+    ?o ?op ?oo .
+    ?o bdo:personName ?pname .
+    ?pname ?pnamep ?pnameo .
+    optional {
+      ?o bdo:personEvent ?pevent .
+      ?pevent ?peventp ?pevento .
+    }
+  }
+  optional {
+    FILTER(isBlank(?o))
+    ?o ?op ?oo .
+  }
+}

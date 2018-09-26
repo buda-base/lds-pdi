@@ -1,0 +1,164 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix adr:   <http://purl.bdrc.io/resource-auth/> .
+@prefix as:    <http://www.w3.org/ns/activitystreams#> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix bdac:  <http://purl.bdrc.io/anncollection/> .
+@prefix bdan:  <http://purl.bdrc.io/annotation/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix f:     <java:io.bdrc.ldspdi.sparql.functions.> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix oa:    <http://www.w3.org/ns/oa#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+bdr:W23819  a    bdo:Work ;
+   skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
+   bdo:creatorTerton  bdr:P326 ;
+   bdo:itemBDRCHoldingStatement  "1" ;
+   bdo:note      [ bdo:noteText  "tbrc holds digital scanned images, tiffs and pdf files"@en ] ;
+   bdo:workAuthorshipStatement  "recovered from its place of concealment by gu-ru chos-kyi-dban-phyug"@en ;
+   bdo:workBiblioNote  "reproduced from the rare but incomplet manuscript set of mtshams-brag..."@en ;
+   bdo:workCatalogInfo  "Treasure revelations of the Eight Pronouncements (Kagye). Discovered by Guru Chowang (1212-1270), the reincarnate successor of Nyangrel Nyima Ozer, discoverer of the first major cycle of Eight Pronouncement's treasures, the Kagye Desheg Dupa. Manuscript is incomplete and is from Tsamdrak Monastery in Bhutan. There probably existed a blockprint edition in six volumes for Gaje Monastery, an affiliate of Katok in Kham. A print of this set has not yet been found."@en ;
+   bdo:workCreator  bdr:P326 ;
+   bdo:workEvent  [ a             bdo:PublishedEvent ;
+                    bdo:onYear    1979
+                  ] ;
+   bdo:workExtentStatement  "4 v." ;
+   bdo:workHasItem  bdr:I23819 ;
+   bdo:workHasItemImageAsset  bdr:I23819 ;
+   bdo:workHasPart  bdr:W23819_0001 , bdr:W23819_0017 , bdr:W23819_0056 , bdr:W23819_0074 ;
+   bdo:workHollis  "014259153" ;
+   bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
+   bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
+   bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
+   bdo:workLccn  "79902886" ;
+   bdo:workNumberOfVolumes  4 ;
+   bdo:workPagination  bdr:PaginationAbsolute ;
+   bdo:workPublisherLocation  "paro"@en ;
+   bdo:workPublisherName  "ngodrup and sherab drimay"@en ;
+   bdo:workScanInfo  "scanned at tbrc, 115 5th ave., 7th floor, new york city, ny 10003 by rabten 2003"@en ;
+   bdo:workTitle  [ a             bdo:WorkBibliographicalTitle ;
+                    rdfs:label    "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts
+                  ] ,
+         [ a             bdo:WorkTitlePageTitle ;
+           rdfs:label    "bka' brgyad gsan ba yons rdzogs : a complete cycle of rnin-ma-pa practice focusing upon the ancient eight pronouncements of gu-ru rin-po-che"@en-x-mixed
+         ] ;
+   bdo:workType  bdr:WorkTypePublishedWork ;
+   adm:access    bdr:AccessOpen ;
+   adm:gitRevision  "86d2726b249c9396cb08106bd343c4b84daa1ae7" ;
+   adm:license   bdr:LicensePublicDomain ;
+   adm:logEntry  [ adm:logDate   "2007-04-11T14:01:24.494Z"^^xsd:dateTime ;
+                   adm:logMessage  "edited notations; jann"@en ;
+                   adm:logWho    bdr:U00011
+                 ] ,
+         [ adm:logDate   "2008-01-01T16:02:43.281Z"^^xsd:dateTime ;
+           adm:logMessage  "annotation revised"@en ;
+           adm:logWho    bdr:U00001
+         ] ,
+         [ adm:logDate   "2013-07-25T14:54:14.462Z"^^xsd:dateTime ;
+           adm:logMessage  "added print type"@en ;
+           adm:logWho    bdr:U00013
+         ] ,
+         [ adm:logDate   "2014-04-21T23:05:36.322Z"^^xsd:dateTime ;
+           adm:logMessage  "normalized catalog info"@en ;
+           adm:logWho    bdr:U00012
+         ] ,
+         [ adm:logDate   "2014-04-22T00:30:13.577Z"^^xsd:dateTime ;
+           adm:logMessage  "normalize encoding field for pub info"@en ;
+           adm:logWho    bdr:U00012
+         ] ,
+         [ adm:logDate   "2014-05-17T11:18:37.731Z"^^xsd:dateTime ;
+           adm:logMessage  "normalized catalog info"@en ;
+           adm:logWho    bdr:U00012
+         ] ,
+         [ adm:logDate   "2015-01-05T17:22:13.356Z"^^xsd:dateTime ;
+           adm:logMessage  "added hollis field to pub info"@en ;
+           adm:logWho    bdr:U00006
+         ] ,
+         [ adm:logDate   "2016-01-18T14:17:22.288Z"^^xsd:dateTime ;
+           adm:logWho    bdr:U00021
+         ] ,
+         [ adm:logDate   "2016-12-06T22:56:27.985Z"^^xsd:dateTime ;
+           adm:logWho    bdr:U00021
+         ] ;
+   adm:outline   [ a             adm:Outline ;
+                   adm:legacyImageGroupRID  "O1GS87647" ;
+                   adm:logEntry  [ adm:logDate   "2008-01-01T15:58:56.75Z"^^xsd:dateTime ;
+                                   adm:logMessage  "outline completed"@en ;
+                                   adm:logWho    bdr:U00001
+                                 ] ,
+                         [ adm:logDate   "2012-09-17T15:47:50.719Z"^^xsd:dateTime ;
+                           adm:logMessage  "added T225 (chos spod)"@en ;
+                           adm:logWho    bdr:U00043
+                         ] ;
+                   adm:outlineAuthorStatement  "genesmith; outline prepared with the gracious support of the trace foundation"@en ;
+                   adm:outlineType  bdr:OutlineTypeNoType
+                 ] ;
+   adm:status    bdr:StatusReleased .
+
+bdr:P326  a      bdo:Person ;
+   rdfs:seeAlso  "https://www.treasuryoflives.org/biographies/view/Guru-Chowang/5588"^^xsd:anyURI ;
+   skos:prefLabel  "gu ru chos dbang"@bo-x-ewts ;
+   bdo:note      [ bdo:noteLocationStatement  "p. 2284" ;
+                   bdo:noteText  "1212. gter ston gu ru chos dbang 'khrungs"@en ;
+                   bdo:noteWork  bdr:W26372
+                 ] ,
+         [ bdo:noteLocationStatement  "p. 2286" ;
+           bdo:noteText  "1233. gter ston gu ru chos dbang gis gnam skas brag nas gter bton"@en ;
+           bdo:noteWork  bdr:W26372
+         ] ,
+         [ bdo:noteLocationStatement  "p. 123" ;
+           bdo:noteText  "biodata"@en ;
+           bdo:noteWork  bdr:W19835
+         ] ,
+         [ bdo:noteLocationStatement  "p. 181" ;
+           bdo:noteText  "dates"@en ;
+           bdo:noteWork  bdr:W19804
+         ] ;
+   bdo:personEvent  [ a             bdo:PersonBirth ;
+                      bdo:onYear    1212
+                    ] ,
+         [ a             bdo:PersonDeath ;
+           bdo:onYear    1270
+         ] ,
+         [ a             bdo:PersonOccupiesSeat ;
+           bdo:eventWhere  bdr:G388
+         ] ;
+   bdo:personGender  bdr:GenderMale ;
+   bdo:personName  [ a             bdo:PersonPersonalName ;
+                     rdfs:label    "chos kyi dbang phyug"@bo-x-ewts
+                   ] ,
+         [ a             bdo:PersonPrimaryName ;
+           rdfs:label    "gu ru chos dbang"@bo-x-ewts , "gu ru chos kyi dbang phyug"@bo-x-ewts
+         ] ;
+   bdo:personStudentOf  bdr:P7695 ;
+   bdo:personTeacherOf  bdr:P7173 , bdr:P8510 ;
+   adm:gitRevision  "8f50d23dfe6e8ae6ffaf227dbbef2470cebb2a12" ;
+   adm:logEntry  [ adm:logDate   "2006-12-21T16:07:10.473Z"^^xsd:dateTime ;
+                   adm:logMessage  "added name"@en ;
+                   adm:logWho    bdr:U00002
+                 ] ,
+         [ adm:logDate   "2013-09-09T16:39:34.761Z"^^xsd:dateTime ;
+           adm:logMessage  "added teacher"@en ;
+           adm:logWho    bdr:U00007
+         ] ,
+         [ adm:logDate   "2016-06-29T14:43:59.122Z"^^xsd:dateTime ;
+           adm:logMessage  "treasury link"@en ;
+           adm:logWho    bdr:U00002
+         ] ;
+   adm:status    bdr:StatusReleased .

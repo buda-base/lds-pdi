@@ -50,7 +50,6 @@ import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.GitService;
-import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
@@ -66,18 +65,16 @@ import io.bdrc.restapi.exceptions.RestException;
 @Path("/")
 public class PublicTemplatesResource {
 
-    public final static Logger log=LoggerFactory.getLogger(PublicDataResource.class.getName());
-    public String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class.getName());
 
     @GET
     @Path("/query/{file}")
     @JerseyCacheControl()
     @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, "text/csv"})
     public Response getQueryTemplateResults(@Context UriInfo info,
-            @HeaderParam("fusekiUrl") final String fuseki,
+            @HeaderParam("fusekiUrl") final String fusekiUrl,
             @PathParam("file") String file) throws RestException{
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters());
-        if(fuseki !=null){fusekiUrl=fuseki;}
         //Settings
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
@@ -89,7 +86,7 @@ public class PublicTemplatesResource {
             throw new RestException(500,new LdsError(LdsError.SPARQL_ERR).
                     setContext(" in getQueryTemplateResults() "+query));
         }
-        ResultSetWrapper res = QueryProcessor.getResults(query,fuseki,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
+        ResultSetWrapper res = QueryProcessor.getResults(query,fusekiUrl,hm.get(QueryConstants.RESULT_HASH),hm.get(QueryConstants.PAGE_SIZE));
         String fmt=hm.get(QueryConstants.FORMAT);
         if("json".equals(fmt)) {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res,hm)), MediaType.APPLICATION_JSON_TYPE)
@@ -116,8 +113,6 @@ public class PublicTemplatesResource {
             @PathParam("file") String file) throws RestException{
 
         log.info("Call to testTemplateResults() "+file+ "Params >>"+info.getQueryParameters());
-        if(fuseki !=null){fusekiUrl=fuseki;}
-
         //Settings
         HashMap<String,String> hm=Helpers.convertMulti(info.getQueryParameters());
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
@@ -146,7 +141,6 @@ public class PublicTemplatesResource {
             throw new RestException(500,new LdsError(LdsError.MISSING_PARAM_ERR).
                     setContext("in getQueryTemplateResultsJsonPost() : Map ="+map));
         }
-        if (fuseki !=null) {fusekiUrl=fuseki;}
         final LdsQuery qfp = LdsQueryService.get(file+".arq");
         final String query=qfp.getParametizedQuery(map,true);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
@@ -174,7 +168,6 @@ public class PublicTemplatesResource {
         String path=info.getPath()+info.relativize(info.getRequestUri());
         Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
         log.info("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}", path, format, variant);
-        if(fuseki !=null){fusekiUrl=fuseki;}
         if(format==null && variant == null) {
             final ResponseBuilder rb=Response.status(300).entity(Helpers.getMultiChoicesHtml(path,false))
                     .header("Content-Type", "text/html")
@@ -192,7 +185,7 @@ public class PublicTemplatesResource {
         if(mediaType==null) {
             mediaType=variant.getMediaType();
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
+        Model model=QueryProcessor.getGraph(query,fuseki,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).
                     setContext(file+ " in getGraphTemplateResults()"));
@@ -207,32 +200,26 @@ public class PublicTemplatesResource {
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki,
-            @DefaultValue("jsonld") @HeaderParam("Accept") String format,
+            @DefaultValue("application/ld+json") @HeaderParam("Accept") String accept,
             @PathParam("file") String file,
             @Context UriInfo info,
             @Context Request request,
             HashMap<String,String> map) throws RestException{
-        String path=info.getPath()+info.relativize(info.getRequestUri());
-        Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
-        log.info("Call to getGraphTemplateResultsPost() with URL: {}, accept: {}, variant: {}, map: {}", path, format, variant, map);
-        if(fuseki !=null){fusekiUrl=fuseki;}
-        String params="";
-        for(String key:map.keySet()) {
-            params="&"+key+"="+map.get(key)+"&";
-        }
-        params="?"+params.substring(1,params.length()-1);
-        if(format==null && variant == null) {
-            format="jsonld";
+        final Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
+        log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
+        if (variant == null) {
+            throw new RestException(406, new LdsError(LdsError.NO_ACCEPT_ERR).
+                    setContext(file+ " in getGraphTemplateResultsPost()"));
         }
         //process
         final LdsQuery qfp = LdsQueryService.get(file+".arq");
         final String query = qfp.getParametizedQuery(map,false);
         //format is prevalent
-        MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
+        MediaType mediaType = MediaTypeUtils.getMimeFromExtension(accept);
         if(mediaType==null) {
             mediaType=variant.getMediaType();
         }
-        Model model=QueryProcessor.getGraph(query,fusekiUrl,null);
+        Model model=QueryProcessor.getGraph(query,fuseki,null);
         if(model.size()==0) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).
                     setContext(file+ " in getGraphTemplateResultsPost()"));

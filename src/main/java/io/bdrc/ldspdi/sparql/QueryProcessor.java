@@ -49,9 +49,16 @@ public class QueryProcessor {
         return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
     }
 
-    public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException{
+    public static Model getSimpleResourceGraph(final String URI, final String queryName) throws RestException {
+        return getSimpleResourceGraph(URI, queryName, null, null);
+    }
+
+    public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException {
         if(prefixes==null) {
             prefixes=getPrefixes();
+        }
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         int hash=Objects.hashCode(queryName+"::"+URI);
         Model model=(Model)ResultsCache.getObjectFromCache(hash);
@@ -124,7 +131,7 @@ public class QueryProcessor {
     }*/
 
     public static void updateOntology(Model mod, String fusekiUrl) {
-        if(fusekiUrl == null) {
+        if (fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         log.info("Service fuseki >> "+fusekiUrl);
@@ -145,32 +152,30 @@ public class QueryProcessor {
         access.putModel(ServiceConfig.getProperty("authGraph"), mod);
     }
 
-    public static ResultSetWrapper getResults(String query, String fuseki, String hash, String pageSize) {
-        ResultSetWrapper res;
-
-        if(hash==null) {
-            long start=System.currentTimeMillis();
-            QueryExecution qe=getResultSet(query, fuseki);
-            ResultSet jrs=qe.execSelect();
-            long elapsed=System.currentTimeMillis()-start;
-            int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
-            if(pageSize!=null) {
-                psz=Integer.parseInt(pageSize);
-            }
-            res=new ResultSetWrapper(jrs,elapsed,psz);
-            qe.close();
-            int new_hash=Objects.hashCode(res);
-            res.setHash(new_hash);
-            ResultsCache.addToCache(res, Objects.hashCode(res));
-            return res;
-        }
-        else {
+    public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {
+        if (hash != null) {
             return (ResultSetWrapper)ResultsCache.getObjectFromCache(Integer.parseInt(hash));
         }
+        if(fusekiUrl == null) {
+            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        long start=System.currentTimeMillis();
+        final QueryExecution qe=getResultSet(query, fusekiUrl);
+        final ResultSet jrs=qe.execSelect();
+        long elapsed=System.currentTimeMillis()-start;
+        int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
+        if(pageSize!=null) {
+            psz=Integer.parseInt(pageSize);
+        }
+        final ResultSetWrapper res=new ResultSetWrapper(jrs,elapsed,psz);
+        qe.close();
+        final int new_hash=Objects.hashCode(res);
+        res.setHash(new_hash);
+        ResultsCache.addToCache(res, Objects.hashCode(res));
+        return res;
     }
 
     public static Model getGraphFromModel(String query, Model model) throws RestException {
-
         try {
             QueryExecution qexec = QueryExecutionFactory.create(query, model);
             Model m = qexec.execDescribe() ;
@@ -183,7 +188,6 @@ public class QueryProcessor {
     }
 
     public static ResultSet getResultsFromModel(String query, Model model) throws RestException {
-
         try {
             QueryExecution qexec = QueryExecutionFactory.create(query, model);
             ResultSet res = qexec.execSelect() ;
@@ -196,8 +200,8 @@ public class QueryProcessor {
     }
 
     private static String getPrefixes() throws RestException {
-        String pref=Prefixes.getPrefixesString();
-        if(pref!=null) {
+        String pref = Prefixes.getPrefixesString();
+        if(pref != null) {
             return pref;
         }
         else {

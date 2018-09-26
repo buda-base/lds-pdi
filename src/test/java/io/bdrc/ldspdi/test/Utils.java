@@ -100,6 +100,7 @@ public class Utils {
         res.add("literal3");
         res.add("literal1");
         res.add("layers");
+        res.add("MarcExportTest");
         return res;
     }
 
