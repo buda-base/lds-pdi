@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.marc4j.MarcXmlWriter;
+import org.marc4j.marc.Leader;
 import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
 
@@ -28,6 +29,9 @@ public class MarcExport {
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
     public static final Property partOf = ResourceFactory.createProperty(BDO+"workPartOf");
     public static final Property hasExpression = ResourceFactory.createProperty(BDO+"workHasExpression");
+    // communicated by Columbia, XML leaders don't need addresses
+    public static final String baseLeaderStr = "     nam a22    3ia 4500";
+    static final Leader leader = factory.newLeader(baseLeaderStr);
 
     public static boolean indent = true;
 
@@ -42,7 +46,7 @@ public class MarcExport {
     }
 
     public static Record marcFromModel(final Model m, final Resource main) {
-        Record record = factory.newRecord();
+        final Record record = factory.newRecord(leader);
         return record;
     }
 
