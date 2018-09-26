@@ -50,29 +50,34 @@ public class LdsError {
         return msg;
     }
 
-    public LdsError setContext(String ctx) {
+    public LdsError setMsg(final String msgArg) {
+        msg = msgArg;
+        return this;
+    }
+
+    public LdsError setContext(final String ctx) {
         msg=msg.replace("${ctx}", ctx);
         return this;
     }
 
-    public LdsError setContext(String ctx, Exception ex) {
-        msg=msg.replace("${ctx}", ctx)+System.lineSeparator()+"Exception : "+ex.getMessage();
+    public LdsError setContext(final String ctx, final Exception ex) {
+        msg = msg.replace("${ctx}", ctx)+System.lineSeparator()+"Exception : "+ex.getMessage();
         return this;
     }
 
-    public  static int GENERIC_ERR=5001;
-    public  static int URI_SYNTAX_ERR=5002;
-    public  static int MISSING_PARAM_ERR=5003;
-    public  static int MISSING_RES_ERR=5004;
-    public  static int UNKNOWN_ERR=5005;
-    public  static int ASYNC_ERR=5006;
-    public  static int NO_ACCEPT_ERR=5007;
+    public final static int GENERIC_ERR=5001;
+    public final static int URI_SYNTAX_ERR=5002;
+    public final static int MISSING_PARAM_ERR=5003;
+    public final static int MISSING_RES_ERR=5004;
+    public final static int UNKNOWN_ERR=5005;
+    public final static int ASYNC_ERR=5006;
+    public final static int NO_ACCEPT_ERR=5007;
 
-    public  static int NO_GRAPH_ERR=5010;
-    public  static int PARSE_ERR=5011;
-    public  static int SPARQL_ERR=5012;
+    public final static int NO_GRAPH_ERR=5010;
+    public final static int PARSE_ERR=5011;
+    public final static int SPARQL_ERR=5012;
 
-    public  static int ONT_URI_ERR=5020;
+    public final static int ONT_URI_ERR=5020;
 
-    public  static int JSON_ERR=5030;
+    public final static int JSON_ERR=5030;
 }

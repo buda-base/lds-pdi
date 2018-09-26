@@ -40,7 +40,7 @@ public class ResponseOutputStream {
     public static boolean prettyPrint = false;
 
     public static StreamingOutput getJsonResponseStream(Object toJson) {
-        StreamingOutput stream = new StreamingOutput() {
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 if (prettyPrint)
@@ -49,7 +49,6 @@ public class ResponseOutputStream {
                     om.writeValue(os, toJson);
             }
         };
-        return stream;
     }
 
     public static StreamingOutput getModelStream(final Model model, final String format, final String res, DocType docType) {
@@ -73,7 +72,7 @@ public class ResponseOutputStream {
     }
 
     public static StreamingOutput getModelStream(Model model, String format) {
-        StreamingOutput stream = new StreamingOutput() {
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream os) {
                 if(format.equals("jsonld")) {
@@ -89,17 +88,15 @@ public class ResponseOutputStream {
                 model.write(os, JenaFormat);
             }
         };
-        return stream;
     }
 
     public static StreamingOutput getModelStream(Model model) {
-        StreamingOutput stream = new StreamingOutput() {
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream os){
                 RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                 writer.output(os);
             }
         };
-        return stream;
     }
 }
