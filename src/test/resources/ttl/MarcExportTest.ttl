@@ -26,6 +26,8 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
+bdr:BoTibt :language bdr:LangBo .
+
 bdr:W23819  a    bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
    bdo:creatorTerton  bdr:P326 ;
@@ -44,7 +46,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workHasPart  bdr:W23819_0001 , bdr:W23819_0017 , bdr:W23819_0056 , bdr:W23819_0074 ;
    bdo:workHollis  "014259153" ;
    bdo:workIsbn    "014259153" ;
-   bdo:workIsbn    "1111456291" ;
+   bdo:workIsbn    "1-111456291" ;
    bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
    bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;

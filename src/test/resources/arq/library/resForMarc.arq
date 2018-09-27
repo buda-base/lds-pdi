@@ -13,8 +13,13 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 construct {
   ?R_RES ?p ?o .
   ?o ?op ?oo .
+  ?R_RES tmp:workLanguage ?lang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
+  ?R_RES tmp:publishedYear ?publishedYear .
+  ?R_RES tmp:completedYear ?completedYear .
+  ?o tmp:birthYear ?birthYear .
+  ?o tmp:deathYear ?deathYear .
 } where {
   ?R_RES ?p ?o .
   optional {
@@ -24,9 +29,29 @@ construct {
     ?pname ?pnamep ?pnameo .
     optional {
       ?o bdo:personEvent ?pevent .
-      ?pevent ?peventp ?pevento .
+      ?pevent a :PersonBirth ;
+        :onYear ?birthYear .
+    }
+    optional {
+      ?o bdo:personEvent ?pevent .
+      ?pevent a :PersonDeath ;
+        :onYear ?deathYear .
     }
   }
+  optional {
+    #FILTER(?p = :workLangScript)
+    ?o :language ?lang .
+  }
+  optional {
+    ?R_RES :workEvent ?we .
+    ?we a :PublishedEvent ;
+      :onYear ?publishedYear .
+  }
+#  optional {
+#    ?R_RES :workEvent ?we .
+#    ?we a :CompletedEvent ;
+#      :onYear ?completedYear .
+#  }
   optional {
     FILTER(isBlank(?o))
     ?o ?op ?oo .

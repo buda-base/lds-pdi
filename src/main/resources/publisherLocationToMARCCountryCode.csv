@@ -1,0 +1,840 @@
+"hang khong /",cc
+"hong kong",cc
+"hongkong",cc
+"germany",gw
+"gottingen, germany",gw
+"wiesbaden",gw
+"[shang kang]",cc
+"[xianggang]",cc
+"[zhang kang]",cc
+"shang kang",cc
+"shang kang /",cc
+"xanggang",cc
+"xiang gang",cc
+"Xianggang",cc
+"zhang kang",cc
+"zhang kang /",cc
+"zhang khang",cc
+"wien",au
+"[ bhutan ]",bt
+"[bhutan]",bt
+"[bumthang]",bt
+"[simtokha, thimphu]",bt
+"[them bu/]",bt
+"[thim phu?]",bt
+"[thim phu]",bt
+"[thimphu, bhutan]",bt
+"[thimphu]",bt
+"bhutan",bt
+"bidung, tashigang",bt
+"bkra shis chos rdzong / thim phug",bt
+"bum thang /",bt
+"drugyel jeutsaphu, paro, bhutan",bt
+"drukgyel jeutsaphu, paro, bhutan",bt
+"jakar dzong, bhutan",bt
+"kitchu temple: paro bhutan",bt
+"paro",bt
+"paro kyichu, bhoutan",bt
+"paro, bhutan",bt
+"phun tshogs gling / them phu/",bt
+"pora, bhutan",bt
+"spungs thang /",bt
+"tango, thimphu, bhutan",bt
+"tashigang, bhutan",bt
+"thim phu",bt
+"thim phu/",bt
+"thim phug",bt
+"thim-phu",bt
+"thimbu",bt
+"thimbu, bhutan",bt
+"thimphu",bt
+"thimphu, bhutan",bt
+"thub bstan yang ri sgang",bt
+"[cazadero, ca, usa]",ca
+"prague",xr
+"berkeley, ca",cau
+"cazadero, ca",cau
+"oakland, califfornia, usa",cau
+"[ lha sa]",cc
+"[ pe cing ]",cc
+"[ sde dge]",cc
+"['bar khams, rnga ba khul]",cc
+"['bar khams]",cc
+"['bo ra?]",cc
+"['bras spung]",cc
+"['bras spungs, lha sa]",cc
+"['bras spungs]",cc
+"['bras spungs/]",cc
+"['dzam thang, 'bar khams rdzong]",cc
+"['dzam thang, 'bar thang]",cc
+"['dzam thang, rnga ba rdzong]",cc
+"['dzam thang?]",cc
+"['dzam thang]",cc
+"['gar rtse/]",cc
+"[a mdo ]",cc
+"[a mdo]",cc
+"[a rig chos grwa]",cc
+"[beijing]",cc
+"[bkra shis 'khyil]",cc
+"[bkra shis lhun po?]",cc
+"[bkra shis lhun po]",cc
+"[bkra shis lhun po/]",cc
+"[bla brang /]",cc
+"[bla brang bkra shis 'khyil]",cc
+"[bla brang]",cc
+"[bla rung sgar?.]",cc
+"[bla rung sgar?]",cc
+"[bla rung sgar]",cc
+"[bla rung sgar/]",cc
+"[brag g.yab/]",cc
+"[btsan lha]",cc
+"[cheng du?]",cc
+"[cheng du]",cc
+"[chengdu]",cc
+"[china]",cc
+"[chu dmar leb rdzong]",cc
+"[co ne dgon chen]",cc
+"[co ne rdzong]",cc
+"[co ne]",cc
+"[dar mdo]",cc
+"[dge rgyal]",cc
+"[dkar mdzes bod rigs rang skyong khul, dpal yul rdzong /]",cc
+"[dkar mdzes bod rigs rang skyong khul, dpal yul rdzong, a 'dzom chos sgar]",cc
+"[dkar mdzes bod rigs rang skyong khul, dpal yul rdzong]",cc
+"[dkar mdzes bod rigs rang skyong khul, sde dge rdzong /]",cc
+"[dkar mdzes bod rigs rang skyong khul, sde dge rdzong, rdzong sar khams bye'i slob gling]",cc
+"[dkar mdzes bod rigs rang skyong khul/ sde dge rdzong / rdzong sar khams bye'i slob gling /]",cc
+"[dkar mdzes khul]",cc
+"[dkar mdzes rdzong stong skor sgon/]",cc
+"[dkar mdzes?]",cc
+"[dkar mdzes]",cc
+"[dpa' ris/]",cc
+"[dpal spungs?]",cc
+"[dpal yul rdzong /]",cc
+"[dpal yul rdzong?]",cc
+"[dpal yul rdzong]",cc
+"[dzam thang]",cc
+"[gcig sgril rdzong]",cc
+"[gnyan rong rdzong?]",cc
+"[gser ljongs bla ma rung lnga rig nang bstan slob grwa chen mo]",cc
+"[gser ljongs bla ma rung]",cc
+"[gser rta rdzong /]",cc
+"[gser rta rdzong]",cc
+"[gser rta rdzong}",cc
+"[gser rta]",cc
+"[gser rta/]",cc
+"[gtsang jo mo nang]",cc
+"[gtsang ldan/]",cc
+"[gzhis ka rtse/]",cc
+"[hong yon]",cc
+"[jo mo nang /]",cc
+"[kaH thog]",cc
+"[kan lho]",cc
+"[kan su'u]",cc
+"[khams nang chen]",cc
+"[khreng tu'u?]",cc
+"[khreng tu'u]",cc
+"[khri 'du]",cc
+"[khri'u tu]",cc
+"[khrin tu?]",cc
+"[khrin tu'u?]",cc
+"[khrin tu'u]",cc
+"[khro chu]",cc
+"[kun ming]",cc
+"[lan chou]",cc
+"[lan kru'u]",cc
+"[lan krui'u]",cc
+"[lan zhou]",cc
+"[larungar]",cc
+"[lcags ri thang zhang]",cc
+"[lha sa ]",cc
+"[lha sa?]",cc
+"[lha sa]",cc
+"[lha sa/]",cc
+"[lhasa]",cc
+"[lho kha gong dkar/]",cc
+"[lho lung dkar dgon]",cc
+"[lhun grub steng /]",cc
+"[mao wen]",cc
+"[mdzo dge]",cc
+"[mer chen?]",cc
+"[mgo log?]",cc
+"[mgo log]",cc
+"[mtsho bdun?]",cc
+"[mtsho byang bod rigs rang skyong khul/]",cc
+"[mtsho lho?]",cc
+"[mtsho lho]",cc
+"[mtsho lho/]",cc
+"[mtsho sngon]",cc
+"[mtsho sngon/]",cc
+"[nag chu rdzong]",cc
+"[nan phing]",cc
+"[nang chen rdzong /]",cc
+"[nang chen rdzong]",cc
+"[narthang]",cc
+"[nyag rong]",cc
+"[pe cin]",cc
+"[pe cing /]",cc
+"[rdza chu kha rdzong /]",cc
+"[rdza chu kha?]",cc
+"[rdza stod rdzong]",cc
+"[rdzong gsar/]",cc
+"[rdzong sar dgon?]",cc
+"[reb gong]",cc
+"[reb kong /]",cc
+"[reb kong]",cc
+"[rgyal rong /]",cc
+"[rgyal rong]",cc
+"[rnga ba?]",cc
+"[rnga ba]",cc
+"[rnga ba/]",cc
+"[rnga pa khul/]",cc
+"[rnga yul?]",cc
+"[rong bo]",cc
+"[sde dge par khang chen mo]",cc
+"[sde dge rdzong]",cc
+"[sde dge?]",cc
+"[sde dge]",cc
+"[sde dge/]",cc
+"[ser tha?]",cc
+"[sku 'bum ]",cc
+"[sku 'bum byams pa gling]",cc
+"[sku 'bum]",cc
+"[sku 'bum/]",cc
+"[skye rgu mdo?]",cc
+"[skye rgu mdo]",cc
+"[skye rgu?]",cc
+"[snar thang]",cc
+"[stag rtse rdzong]",cc
+"[tibet?]",cc
+"[wun khron]",cc
+"[zi ling /]",cc
+"[zi ling?]",cc
+"[zi ling]",cc
+"[zi ling/]",cc
+"bar khams",cc
+"bei cing",cc
+"bei jing",cc
+"beijing",cc
+"bkra shis lhun po",cc
+"bkra shis lhun po?",cc
+"bla brang",cc
+"bla brang /",cc
+"bla brang bkra shis 'khyil",cc
+"bla brang/",cc
+"bla rung sgar/",cc
+"brad dkar rta so/",cc
+"brag dkar dgon pa",cc
+"bras spung, lhasa",cc
+"bras spungs lha sa",cc
+"bras spungs, lha sa",cc
+"bras spungs,lhasa",cc
+"ch'eng tu",cc
+"chab mdo",cc
+"chab mdo/",cc
+"cheng du",cc
+"cheng tu'u",cc
+"chengdu",cc
+"dar mdo",cc
+"dar rtse mdo/",cc
+"dar thang dgon",cc
+"dga' ldan /",cc
+"dga' ldan dgon pa/",cc
+"dga' ldan/",cc
+"dkar mdzes khul",cc
+"dkar mdzrs khul",cc
+"dpa' ris rdzong/",cc
+"dpal spungs",cc
+"dzam thang",cc
+"dzam thang /",cc
+"dzam thang dgon",cc
+"gcan tsha rdzong",cc
+"gser ljongs bla ma rung lnga rig nang bstan slob grwa chen mo",cc
+"gser rta",cc
+"gser rta rdzong",cc
+"gtsang jo mo nang /",cc
+"gzhi ka rtse rdzong /",cc
+"gzhi ka rtse/",cc
+"gzhis ka rtse/",cc
+"jo mo nang",cc
+"kaHthog",cc
+"kan kru'u",cc
+"kan lho",cc
+"kang ding",cc
+"khren tu'u",cc
+"khren tu'u/",cc
+"khreng tu",cc
+"khreng tu'u",cc
+"khreng tu'u?",cc
+"khreng tu'u/",cc
+"khrengs tu'u/",cc
+"khri tu/",cc
+"khri'u tu'u",cc
+"khri'u tu'u/",cc
+"khrin tu'u/",cc
+"khring tu'u/",cc
+"khun ming",cc
+"khun ming /",cc
+"kong po",cc
+"kong po/",cc
+"kulhan",cc
+"kun ming",cc
+"kun ming /",cc
+"lan chou",cc
+"lan gru/",cc
+"lan kro'u",cc
+"lan krou'u",cc
+"lan kru'u",cc
+"lan kru'u/",cc
+"lan zhou",cc
+"lanchou",cc
+"lanzhou",cc
+"lanzhou shi",cc
+"lha sa",cc
+"lha sa grong khyer",cc
+"lha sa/",cc
+"lhasa",cc
+"lhun grub steng /",cc
+"lhun grub steng/",cc
+"lhun sgrub steng /",cc
+"lo ro",cc
+"mdo smad snga 'gyur stag lung dgon/",cc
+"mdzod dge rdzong",cc
+"mgo log",cc
+"mtho las dgon rnam rgyal phun tshogs chos rdzong gling",cc
+"mthu ba dgon",cc
+"mtsho lho/",cc
+"mtsho slob shrI dI wa kar wi hA ra",cc
+"mtsho sngon",cc
+"mtsho sngon/",cc
+"nyag a 'dzin rong",cc
+"o rgyan smin grol gling /",cc
+"pad+ma bkod",cc
+"pdal yul rdzong",cc
+"pe cin",cc
+"pe cin ; zi ling",cc
+"pe cin/",cc
+"pe cin/ lon tun/",cc
+"pe cing",cc
+"pe-cin",cc
+"pecin",cc
+"peking",cc
+"peking (པེའི་ཕིང་)",cc
+"qing hai de ling ha shi",cc
+"rdzogs chen dgon/",cc
+"rdzogs chen/",cc
+"reb gong",cc
+"reb gong /",cc
+"reb kong /",cc
+"rgya ye",cc
+"rnga ba",cc
+"rnga ba khul/",cc
+"rnga pa rang skyong khul",cc
+"rong po",cc
+"rtsed thang /",cc
+"sde dge",cc
+"sde dge dgon chen",cc
+"sde dge dgon chen/",cc
+"sde dge lhun grub steng",cc
+"sde dge lhun grub steng /",cc
+"sde dge rdzogs chen/",cc
+"sde dge rdzong /",cc
+"sde dge/",cc
+"shanghai",cc
+"shar rgyal ba dung dkar dgon",cc
+"shrI: siM ha/",cc
+"si khron",cc
+"si khron/",cc
+"sku 'bum",cc
+"sku 'bum byams pa gling",cc
+"sku 'bum byams pa gling /",cc
+"sku 'bum monastery",cc
+"sku 'bum/",cc
+"skye dgu mdo",cc
+"smin grol gling /",cc
+"tibet",cc
+"xi ning",cc
+"xiahe",cc
+"xian",cc
+"xining shi",cc
+"xining, qinghai",cc
+"zha' ho rdzong gi khongs/",cc
+"zhwa lu",cc
+"zi ling",cc
+"zi ling /",cc
+"zi ling?",cc
+"zing chu/",cc
+"zung chu rdzong /",cc
+"པེ་ཅིན། 北京",cc
+"ལྷ་ས།",cc
+"京都",cc
+"京都市",cc
+"兰州市",cc
+"北京",cc
+"四川成都",cc
+"康定",cc
+"拉萨",cc
+"新北市",cc
+"昆明",cc
+"東京",cc
+"济南",cc
+"甘孜",cc
+"西宁",cc
+"washington, d.c.",dcu
+"[ing len/]",enk
+"london",enk
+"st. petersburg",ru
+"paris",fr
+"plouray",fr
+"['bras ljongs/]",ii
+"[bir, h. p.]",ii
+"[bir, h.p.?]",ii
+"[bodhgaya, bihar]",ii
+"[bylakuppe, k.s.]",ii
+"[bylakuppe, karnataka]",ii
+"[bylakuppe]",ii
+"[bylakuppe], karnataka",ii
+"[bylakuppe]. karnataka",ii
+"[bylakuppe}, karnataka",ii
+"[byllakuppe]",ii
+"[d+ha ram sa la?]",ii
+"[darjeeling, w.b.]",ii
+"[darjeeling?]",ii
+"[darjeeling]",ii
+"[dehra dun]",ii
+"[dehradun, u.a.]",ii
+"[dehradun]",ii
+"[delhi?]",ii
+"[delhi]",ii
+"[dga' ldan dgon/]",ii
+"[dga' ldan]",ii
+"[dha ram sa la?]",ii
+"[dha ram sa la]",ii
+"[dharamsala, h.p.?]",ii
+"[dharamsala, h.p.]",ii
+"[dharamsala, india]",ii
+"[dharamsala: h.p., india]",ii
+"[dharamsala?]",ii
+"[dharamsala]",ii
+"[dharamsala}",ii
+"[dharmasala, h.p.]",ii
+"[dharmasala]",ii
+"[distt. kangra, h.p.]",ii
+"[dorjeeling]",ii
+"[gangtok, sikkim?]",ii
+"[gangtok, sikkim]",ii
+"[india]",ii
+"[kalimpong, w.b.?]",ii
+"[kalimpong, w.b.]",ii
+"[kalimpong]",ii
+"[karnataka?]",ii
+"[karnataka]",ii
+"[kinnour, h.p.]",ii
+"[kinnour; h.p.]",ii
+"[kulumanali: himachal pradesh, india]",ii
+"[ladakh, j.k.?]",ii
+"[ldi li]",ii
+"[mandi, h.p.]",ii
+"[mirik?]",ii
+"[mondgod, karwar distt., karnataka]",ii
+"[mundgod, k.s.}",ii
+"[mundgod, karnataka]",ii
+"[mundgod]",ii
+"[new delhi]",ii
+"[qinghai]",ii
+"[rdo rje gdan]",ii
+"[rdor gling]",ii
+"[rdzogs chen dgon]",ii
+"[rum btegs]",ii
+"[rumtek, sikkim]",ii
+"[rumtek]",ii
+"[se ra smad]",ii
+"[sgang tog]",ii
+"[sikkim]",ii
+"[sonada, w.b.]",ii
+"[upper dharamsala, dist. kagngra, h.p.]",ii
+"[varanasi?]",ii
+"ballimaran, delhi",ii
+"bir",ii
+"bir : dzongsar institute",ii
+"bir tibetan society, bir, h.p.",ii
+"bir, dist. kangra",ii
+"bir, dist. kangra, h.p",ii
+"bir, dist. kangra, h.p.",ii
+"bir, dist. kangra, h.p..",ii
+"bir, district kangra, h.p.",ii
+"bir, distt kangra, himachal pradesh",ii
+"bir, distt. kangra",ii
+"bir, distt. kangra,",ii
+"bir, distt. kangra, h.p.",ii
+"bir, distt. kangra, h.p., india",ii
+"bir, h. p.",ii
+"bir, h.p",ii
+"bir, h.p.",ii
+"bir, himachal prades",ii
+"bir. distt. kangra, h.p.",ii
+"bodhagaya",ii
+"bodhgaya, bihar",ii
+"bras ljongs rum bteg",ii
+"buddhist temple, sarnath, varanasi",ii
+"buxar",ii
+"byalkuppe, mysore, k.s.",ii
+"bylakkupe, mysore, india",ii
+"bylakuppa, karnataka",ii
+"bylakuppe",ii
+"bylakuppe, dist. mysore, karnataka",ii
+"bylakuppe, distt. mysore, karnataka",ii
+"bylakuppe, distt. mysore, karnataka state",ii
+"bylakuppe, karnataka",ii
+"bylakuppe, karnataka state",ii
+"bylakuppe, mysore",ii
+"bylakuppe, mysore district, karnataka state, india",ii
+"bylakuppe, mysore distt., karnataka",ii
+"bylakuppe, mysore, india",ii
+"bylakuppe, mysore, k.s.",ii
+"bylakuppe, mysore, karnataka",ii
+"bylakuppe. karnataka state",ii
+"bylakuppy, distt mysore",ii
+"byllakupe, mysore, india",ii
+"byllakuppe",ii
+"byllakuppe, mysore",ii
+"byllakuppe, mysore, india",ii
+"calcutta, bangal",ii
+"chauntra, mandi, h.p.",ii
+"clement town, dehra",ii
+"clement town, dehra dun",ii
+"clement town, dehra dun, u.a.",ii
+"clement town, dehra dun, u.p.",ii
+"clement town, dehradun",ii
+"clement town, dehradun, u.a",ii
+"clement town, dehradun, u.a.",ii
+"clement town, dehradun, uttarakhand",ii
+"d+ha ram sa la",ii
+"d+ha ram sa la/",ii
+"d+hi li",ii
+"dalhouse",ii
+"dalhousie",ii
+"dalhousie, h. p.",ii
+"dalhousie, h.p.",ii
+"darjeeling",ii
+"darjeeling, india",ii
+"darjeeling, w.b.",ii
+"darjeeling, w.b., india",ii
+"darjeeling, w.n.",ii
+"darjeeling, w.n. india",ii
+"darjeeling, west bengal",ii
+"darjeeling, west bengal, india",ii
+"Darjerling",ii
+"dbaramsala",ii
+"deharadun",ii
+"dehra dun",ii
+"dehra dun : u.p.",ii
+"dehra dun, h.p.",ii
+"dehra dun, u. p",ii
+"dehra dun, u.a",ii
+"dehra dun, u.a india",ii
+"dehra dun, u.p.",ii
+"dehra dun, ua, india",ii
+"Dehra Dun, Uttaranchal",ii
+"dehra-dun",ii
+"dehradun",ii
+"dehradun,",ii
+"dehradun, u.a.",ii
+"dehradun, u.o.",ii
+"dehradun, u.p",ii
+"dehradun, u.p.",ii
+"dehradun, uttarakhand",ii
+"dehradun, Uttaranchal",ii
+"dehradun, uttarkhand",ii
+"delhi",ii
+"delhi ; dolanji, h.p.",ii
+"delhi ; gangtok, sikkim",ii
+"delhi, india",ii
+"delhi: majunuka tila",ii
+"deorali, gangtok, sikkim",ii
+"deorali, sikkim",ii
+"dha ram sa la",ii
+"dharamasala",ii
+"dharamasala, h.p.",ii
+"dharamsala",ii
+"dharamsala : h.p.",ii
+"dharamsala h.p. india",ii
+"dharamsala kangra h.p. india",ii
+"dharamsala, h.p., india",ii
+"dharamsala, distt. kangra, h.p",ii
+"dharamsala, distt. kangra, h.p.",ii
+"dharamsala, h. p.",ii
+"dharamsala, h..",ii
+"dharamsala, h.p",ii
+"dharamsala, h.p.",ii
+"dharamsala, h.p., india",ii
+"dharamsala, india",ii
+"dharamsala, kangra distt., h.p., india",ii
+"dharamsala, sarnath",ii
+"dharamshala, distt. kangra, h.p.",ii
+"dharamshala, h.p.",ii
+"dharasala, h.p.",ii
+"dharmasala, h.p.",ii
+"dharmsala, h.p.",ii
+"dharmshala",ii
+"dhi li",ii
+"dhondenling, p.o. tibetan colony, kollegal taluk, karnataka",ii
+"dil+li",ii
+"dist. kangra, himachal pradesh",ii
+"dist. mysore, karnataka state",ii
+"dist. mysore: karnataka state",ii
+"distt. leh, ladakh",ii
+"dlolanji, h.p.",ii
+"dolanji",ii
+"dolanji village, h.p.",ii
+"dolanji, dist. solan",ii
+"dolanji, h.p.",ii
+"dolanji, h.p..",ii
+"dolanji, himachal pradesh",ii
+"dolanji, ochghat, himachal pradesh",ii
+"dolanji, p.o. ochghat",ii
+"dolanji, p.o. ochghat, distt. solan, h.p.",ii
+"dorjeeling",ii
+"drepung loseling photo offset printer",ii
+"drepung losiling, mundgod, n.k.",ii
+"gangtok",ii
+"gangtok, sikkim",ii
+"gangtok, sikkim and dharamsala, h.p.",ii
+"gemur monastery, kawring, h.p.",ii
+"gemur, distt. lahul",ii
+"gemur, h.p.",ii
+"gle/",ii
+"gongtok",ii
+"government of tibet",ii
+"gyudmed tantric college",ii
+"inder puri, new delhi",ii
+"inderpuri, new delhi",ii
+"india",ii
+"jeerango, distt. ganjam",ii
+"jeerango, distt. ganjam, orissa",ii
+"jeerango, dstt. ganjam, orissa",ii
+"jeerango, orissa",ii
+"jingdu",ii
+"ka spug",ii
+"kalimpong",ii
+"kalimpong : g. tharchin",ii
+"kalimpong, w.b.",ii
+"kangara, H.P.",ii
+"kangra, h.p.",ii
+"kawring, gemur, lahul, h.p.",ii
+"kawring, h.p.",ii
+"khajuhee, sarnath",ii
+"khampa industrial society, bir, h.p.",ii
+"khotla-panjola",ii
+"khotla-panjola, h.p.",ii
+"kinnaur, h.p.",ii
+"kolkata",ii
+"kollegal",ii
+"ku lu mi na le",ii
+"la dwags",ii
+"la dwags he mi",ii
+"la dwags/",ii
+"ladakh",ii
+"ladakh, leh",ii
+"lahaul & spiti, h.p.",ii
+"lahul-spiti, h.p.",ii
+"lakshmipur, byllakuppe, distt. mysore, karnataka",ii
+"ldi li",ii
+"ldi li (delhi)",ii
+"ldi li/",ii
+"ldi lli",ii
+"leh",ii
+"leh, ladakh",ii
+"losar, spiti, h.p.",ii
+"ma su ri/",ii
+"majnu-ka-tila, delhi",ii
+"majnu-ka-tilla, delhi",ii
+"manali",ii
+"manali, h.p.",ii
+"manduwala, dehra dun",ii
+"manduwala, dehra dun, u.p.",ii
+"mirik",ii
+"mirik, dist. darjeeling, w.b.",ii
+"mon g+ho Ta/",ii
+"mujnu ka tilla, delhi",ii
+"munali, h.p.",ii
+"mundgod",ii
+"mundgod, distt. north kanara",ii
+"mundgod, distt. north kanara, karnataka",ii
+"mundgod, distt. north kanara, karnataka state, india",ii
+"mundgod, k.s.",ii
+"mundgod, karnataka",ii
+"mundgod, karnataka state",ii
+"mundgod, karnataka state, india",ii
+"mundgod, n. kanara, karnataka",ii
+"mundgod, n.k., karnataka",ii
+"mundgod, north kanara, india",ii
+"mundgod, north karnataka",ii
+"mundgod, u.k., karnataka",ii
+"mussoorie, u.p.",ii
+"mysore",ii
+"mysore, karnataka",ii
+"ne'u ldi li/",ii
+"nemo, ladakh",ii
+"nemo, leh, ladakh",ii
+"new delhi",ii
+"new delhi, india",ii
+"new thobgyal, h.p.",ii
+"new thobgyal, ochghat, h.p.",ii
+"ochghat, distt. solan",ii
+"p. o. upper bhattu via baijnatha, district kangra, himachal pradesh",ii
+"palace monastery, gangtok",ii
+"palampur",ii
+"palampur, dist kangra, h.p.",ii
+"palampur, dist. kangara, h.p.",ii
+"palampur, dist. kangra, h.p.",ii
+"palampur, distt. kangra",ii
+"palampur, h. p.",ii
+"palampur, h.p.",ii
+"q village, kollegal distt, mysore",ii
+"ra-dzaspur",ii
+"rajpur",ii
+"rajpur, dehra dun",ii
+"rajpur, dehra dun, u.p.",ii
+"rajpur, dehradun, u.p.",ii
+"rajpur, u.p.",ii
+"rajpur,dist. dehra dun, u.p.",ii
+"rda ram sa la",ii
+"rda ram sa la/",ii
+"rdo rje gling",ii
+"rdor gling",ii
+"rdor gling rang dbang par khang",ii
+"rdzong sar",ii
+"rdzong sar dgon/",ii
+"rdzong sar khams bye/",ii
+"rewalsar",ii
+"rewalsar, distt. mandi, h.p, india",ii
+"rewalsar, distt. mandi, h.p.",ii
+"rewalsar, distt. mandi, h.p., india",ii
+"rewalsar, h.p.",ii
+"rum btegs",ii
+"rum btegs/",ii
+"rum-teg",ii
+"rumtek",ii
+"rumtek, east sikkim",ii
+"rumtek, sikkim",ii
+"sa kya",ii
+"sa rA/",ii
+"sanjauli, shimla",ii
+"sansal, dist. kangra, h.p.",ii
+"santiniketan, w.b.",ii
+"saranatha, varnasi",ii
+"sarnath",ii
+"sarnath, u.p.",ii
+"sarnath, varanasi",ii
+"sarnath, varanasi, u.p.",ii
+"sarnatha, varanasi",ii
+"se ra",ii
+"sgang tog",ii
+"sgang tog/",ii
+"sikkim",ii
+"simla",ii
+"solan, h.p.",ii
+"sonada",ii
+"sonada, darjeeling",ii
+"sonada, darjeeling,",ii
+"sonada, darjeeling, w.b",ii
+"sonada, darjeeling, w.b.",ii
+"south india?",ii
+"sumra, h.p.",ii
+"tadong, gangtok",ii
+"tadong, gangtok, sikkim",ii
+"tadong, sikkim",ii
+"tashi jong",ii
+"tashi jong, h.p.",ii
+"tashi jong, paprola",ii
+"tashi jons, paprola, dist kangra, h.p.",ii
+"tashi jons, paprola, distt. kangra, h.p.",ii
+"tashijong, palampur, dt. kangra, h.p",ii
+"tashijong, palampur, dt. kangra, h.p.",ii
+"tashijong, palampur, dt. kangra, H.P. :",ii
+"tashijong, palampur, h.p.",ii
+"tashijong, palampur, kangra, h.p.",ii
+"tashijong, taragarh, kangra",ii
+"tenzin gang",ii
+"tezu",ii
+"tezu, arunachal",ii
+"tezu, arunachal pradesh",ii
+"tezu, dist. lohit",ii
+"thabo, h.p.",ii
+"tibetan colony, district n. kanara, karnataka state, india",ii
+"tibetan colony, distt. n. kanara",ii
+"tibetan freedom struggle",ii
+"upper bhattu, dist. kangra, h.p.",ii
+"upper bhattu, distt. kangra, h.p.",ii
+"upper bhattu, h.p.",ii
+"upper dharamsala, distt. kangra, h.p.",ii
+"upper dharamsala, h.p.",ii
+"varanasi",ii
+"varanasi, u.p.",ii
+"wA rA Na sI",ii
+"wA rA Na sI/",ii
+"arcidosso, italy",it
+"roma",it
+"rome",it
+"[kyoto, japan]",ja
+"hamamatsu, japan",ja
+"kyoto",ja
+"osaka",ja
+"sakyo-ku, kyoto",ja
+"tohoku",ja
+"tokyo",ja
+"maryland",mdu
+"[buryatia]",mp
+"[mongolia?]",mp
+"[mongolia]",mp
+"[sog po]",mp
+"[u rge]",mp
+"mongolia",mp
+"sog yul/",mp
+"ulaanbaatar",mp
+"ulaanbaatar, mongolia",mp
+"amsterdam, [amsteldijk 44]",nl
+"questa, new mexico",nmu
+"[ rdza rong phu]",np
+"[ka Tha ma N+Du]",np
+"[kathmandu, nepal]",np
+"[kathmandu?]",np
+"[kathmandu?}",np
+"[kathmandu]",np
+"[pokhara, nepal]",np
+"[solu, nepal]",np
+"[swayambhu, kathmandu]",np
+"bal yul mchod rten, [kathmandu]",np
+"bhairahawa, nepal",np
+"boudha, kathmandu., nepal",np
+"brag dkar rta so/",np
+"glo smon thang",np
+"kaTha man gru",np
+"kathmandu",np
+"kathmandu, nepal",np
+"lumbini",np
+"pharphing, kathmandu, nepal",np
+"pharping, nepal",np
+"rupandehi, nepal",np
+"swayambhu, kathmandu",np
+"swayambhunath",np
+"swayambhunath, kathmandu",np
+"swayambhunath, kathmandu, nepal",np
+"yangleshod",np
+"bodhnath, kathmandu and bodhgaya, bihar",np
+"[new york city]",nyu
+"[new york, ny]",nyu
+"new york",nyu
+"woodstock, ny",nyu
+"[auckland, new zealand]",nz
+"a ri'i phi li Ta phi ya spyan ras gzigs nang pa'i chos tshogs",pau
+"moskva",ru
+"andiast, switzerland",sz
+"taipei",tw
+"taipei, taiwan",tw
+"taiwan",tw
+"[shoreline, wa]",wau
+"seattle",wau
+"shoreline, wa",wau
+"shoreline, wa.",wau
