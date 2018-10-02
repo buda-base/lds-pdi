@@ -344,8 +344,8 @@ public class JSONLDFormatter {
         if (type == null) {
             type  = getDocType(m, mainResourceUri);
             if (type == null) {
-                log.error("not able to determine type of resource "+mainResourceUri);
-                return null;
+                log.info("not able to determine type of resource {} for frame output, outputting compact", mainResourceUri);
+                return modelToJsonObject(m, null, mainResourceUri, RDFFormat.JSONLD_COMPACT_PRETTY, false);
             }
         }
         return modelToJsonObject(m, type, mainResourceUri, RDFFormat.JSONLD_FRAME_PRETTY, false);

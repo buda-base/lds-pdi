@@ -71,17 +71,17 @@ public class ResponseOutputStream {
         };
     }
 
-    public static StreamingOutput getModelStream(Model model, String format) {
+    public static StreamingOutput getModelStream(final Model model, final String format) {
         return new StreamingOutput() {
             @Override
             public void write(OutputStream os) {
-                if(format.equals("jsonld")) {
+                if (format.equals("jsonld")) {
                     JSONLDFormatter.writeModelAsCompact(model, os);
                     return;
                 }
-                String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+                final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
                 if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                    RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                     writer.output(os);
                     return;
                 }
@@ -90,11 +90,11 @@ public class ResponseOutputStream {
         };
     }
 
-    public static StreamingOutput getModelStream(Model model) {
+    public static StreamingOutput getModelStream(final Model model) {
         return new StreamingOutput() {
             @Override
             public void write(OutputStream os){
-                RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
+                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                 writer.output(os);
             }
         };
