@@ -146,6 +146,8 @@ public class ResServiceTest extends JerseyTest{
     public void GetResourceByExtension() {
         Set<String> map=MediaTypeUtils.getResExtensionMimeMap().keySet();
         for(String ent:map) {
+            if (ent.equals("html"))
+                continue;
             Response res = target("/resource/P1AG29."+ent).request()
                     .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
                     .get();

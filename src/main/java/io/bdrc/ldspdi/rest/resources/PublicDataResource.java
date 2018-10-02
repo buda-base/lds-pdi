@@ -216,7 +216,7 @@ public class PublicDataResource {
             @PathParam("res") final String res,
             @PathParam("ext") final String ext,
             @HeaderParam("fusekiUrl") String fusekiUrl,
-            @Context UriInfo info) throws RestException{
+            @Context final UriInfo info) throws RestException{
         log.info("Call to getFormattedResourceGraph()");
         final String prefixedRes = RES_PREFIX_SHORT+':'+res;
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
@@ -226,6 +226,14 @@ public class PublicDataResource {
                     header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
             return rb.build();
         }
+        if (media.equals(MediaType.TEXT_HTML_TYPE)) {
+            try {
+                ResponseBuilder builder=Response.seeOther(new URI(ServiceConfig.getProperty("showUrl")+prefixedRes));
+                return setHeaders(builder,getResourceHeaders(info.getPath(),null,null,null)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500,new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()",e));
+            }
+        }
         if (ext.equals("mrcx")) {
             return MarcExport.getResponse(media, RES_PREFIX+res);
         }
@@ -234,15 +242,41 @@ public class PublicDataResource {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         final ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX+res, null),media);
-        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,"Choice",getEtag(model,res))).build();
+        return setHeaders(builder,getResourceHeaders(info.getPath(),ext,null,getEtag(model,res))).build();
     }
 
     @GET
     @Path("/ontology/{path}/{class}")
     @Produces("text/html")
-    public Response getCoreOntologyClassView(@PathParam("class") String cl,
-            @PathParam("path") String path,
-            @Context Request request) throws RestException{
+    public Response getCoreOntologyClassView(@PathParam("class") final String cl,
+            @PathParam("path") final String path,
+            @Context final Request request) throws RestException{
+        log.info("getCoreOntologyClassView()");
+        final String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
+        final EntityTag etag=OntData.getEntityTag();
+        if(OntData.ontMod.getOntResource(uri) == null) {
+            throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(uri));
+        }
+        ResponseBuilder builder = request.evaluatePreconditions(etag);
+        if(builder == null){
+            if (OntData.isClass(uri)) {
+                builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(uri)));
+            } else {
+                builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri)));
+            }
+        }
+        // there could be more headers here
+        builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
+        return builder.build();
+    }
+
+    @GET
+    @Path("/ontology/{path}/{class}.{ext}")
+    public Response getCoreOntologyClassViewExt(@PathParam("class") final String cl,
+            @PathParam("path") final String path,
+            @PathParam("ext") final String ext,
+            @Context final Request request,
+            @Context final UriInfo info) throws RestException{
         log.info("getCoreOntologyClassView()");
         final String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
         final EntityTag etag=OntData.getEntityTag();
@@ -250,17 +284,28 @@ public class PublicDataResource {
         if(OntData.ontMod.getOntResource(uri) == null) {
             throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(uri));
         }
-        if (OntData.isClass(uri)) {
-            /** class view **/
-            if(builder == null){
+        if (builder != null) {
+            builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
+            return builder.build();
+        }
+        final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
+        if (media == null) {
+            final String html=Helpers.getMultiChoicesHtml("/ontology/"+path+"/"+cl, true);
+            final ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type", "text/html").
+                    header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
+            return rb.build();
+        }
+        if (media.equals(MediaType.TEXT_HTML_TYPE)) {
+            if (OntData.isClass(uri)) {
                 builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(uri)));
-            }
-        } else {
-            /** Properties view **/
-            if (builder == null){
+            } else {
                 builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri)));
             }
+        } else {
+            final Model model = OntData.describeUri(uri);
+            builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, uri, null),media);
         }
+        // there could be more headers here
         builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
         return builder.build();
     }
@@ -342,7 +387,8 @@ public class PublicDataResource {
             sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");
         }
         headers.put("Alternates", sb.toString().substring(0, sb.toString().length()-1));
-        headers.put("TCN", tcn);
+        if (tcn != null)
+            headers.put("TCN", tcn);
         headers.put("Vary", "Negotiate, Accept");
         if(eTag!=null) {
             headers.put("ETag", eTag);

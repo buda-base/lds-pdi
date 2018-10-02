@@ -83,6 +83,7 @@ public class MediaTypeUtils {
         MimeToExt.put(MT_JSONLD_WA,   "jsonld");
         MimeToExt.put(MT_JSONLD_OA,   "jsonld");
         MimeToExt.put(MT_MRCX_CU,     "mrcx");
+        MimeToExt.put(MediaType.TEXT_HTML_TYPE,   "html");
         MimeToExt.put(MT_MRCX,   "mrcx");
         MimeToExt.put(MT_TTL,    "ttl");
         MimeToExt.put(MT_NT,     "nt");
@@ -108,6 +109,7 @@ public class MediaTypeUtils {
         ExtToMime.put("rj",   MediaType.APPLICATION_JSON_TYPE);
         ExtToMime.put("json", MediaType.APPLICATION_JSON_TYPE);
         ExtToMime.put("trix", MT_TRIX);
+        ExtToMime.put("html", MediaType.TEXT_HTML_TYPE);
 
         ResExtToMime = new HashMap<>();
         ResExtToMime.put("ttl",  MT_TTL);
@@ -118,6 +120,7 @@ public class MediaTypeUtils {
         ResExtToMime.put("jsonld", MT_JSONLD);
         ResExtToMime.put("rj",   MediaType.APPLICATION_JSON_TYPE);
         ResExtToMime.put("trix", MT_TRIX);
+        ResExtToMime.put("html", MediaType.TEXT_HTML_TYPE);
     }
 
     public static HashMap<String,MediaType> getResExtensionMimeMap(){

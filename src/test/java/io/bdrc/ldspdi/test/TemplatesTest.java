@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
@@ -65,7 +66,9 @@ public class TemplatesTest extends JerseyTest{
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(PublicTemplatesResource.class).register(RestExceptionMapper.class);
+        return new ResourceConfig(PublicTemplatesResource.class)
+                .register(OntData.class)
+                .register(RestExceptionMapper.class);
     }
 
     @Test

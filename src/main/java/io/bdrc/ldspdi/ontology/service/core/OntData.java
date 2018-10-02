@@ -35,10 +35,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +49,7 @@ import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class OntData implements Runnable{
-
-
+public class OntData implements Runnable {
 
     public static InfModel infMod;
     public static OntModel ontMod;
@@ -59,13 +59,14 @@ public class OntData implements Runnable{
     public static String JSONLD_CONTEXT;
     static EntityTag update;
     static Date lastUpdated;
+    final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
     public static void init() throws RestException {
         try {
             log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
             HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
             InputStream stream=connection.getInputStream();
-            Model m = ModelFactory.createDefaultModel();
+            final Model m = ModelFactory.createDefaultModel();
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
@@ -76,7 +77,7 @@ public class OntData implements Runnable{
             log.info("URL >> "+ServiceConfig.getProperty("owlAuthURL"));
             connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlAuthURL")).openConnection();
             stream=connection.getInputStream();
-            Model auth = ModelFactory.createDefaultModel();
+            final Model auth = ModelFactory.createDefaultModel();
             auth.read(stream, "", "RDF/XML");
             stream.close();
             ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
@@ -86,7 +87,6 @@ public class OntData implements Runnable{
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
-
         URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -112,10 +112,10 @@ public class OntData implements Runnable{
     @Override
     public void run(){
         try {
-            String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
-            InputStream stream=connection.getInputStream();
-            Model m = ModelFactory.createDefaultModel();
+            final String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+            final HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+            final InputStream stream=connection.getInputStream();
+            final Model m = ModelFactory.createDefaultModel();
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
@@ -124,12 +124,10 @@ public class OntData implements Runnable{
             infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
             log.info("updating core ont model() >>");
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
-            OntModel ontAuthModel=OntData.ontAuthMod;
             log.info("updating Auth ont model() >>");
-            QueryProcessor.updateAuthOntology(ontAuthModel, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
+            QueryProcessor.updateAuthOntology(OntData.ontAuthMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
             log.info("Done updating ont models >>");
             readGithubJsonLDContext();
-
         }
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -140,86 +138,97 @@ public class OntData implements Runnable{
         return owlCharacteristics;
     }
 
-    public static ArrayList<OntResource> getDomainUsages(String uri) throws RestException {
-        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
-                "    ?s rdfs:domain <"+uri+"> .    \n" +
+    public static Model describeUri(final String uri) {
+        final String query = "describe  <"+uri+">";
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        return qexec.execDescribe();
+    }
+
+    public static ArrayList<OntResource> getDomainUsages(final String uri) throws RestException {
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                " select distinct ?s where {" +
+                "    ?s rdfs:domain <"+uri+"> ." +
                 "} order by ?p ?s";
-        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
-        ResultSet res = qexec.execSelect() ;
-        ArrayList<OntResource> list=new ArrayList<>();
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        final ResultSet res = qexec.execSelect() ;
+        final ArrayList<OntResource> list=new ArrayList<>();
         while(res.hasNext()) {
-            QuerySolution qs=res.next();
-            RDFNode node=qs.get("?s");
+            final QuerySolution qs=res.next();
+            final RDFNode node=qs.get("?s");
             list.add(ontMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getRangeUsages(String uri) throws RestException {
-        String query=Prefixes.getPrefixesString()+ " select distinct ?s ?p where {\n" +
-                "    ?s rdfs:range <"+uri+"> .    \n" +
+    public static ArrayList<OntResource> getRangeUsages(final String uri) throws RestException {
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                " select distinct ?s ?p where {" +
+                "    ?s rdfs:range <"+uri+"> ." +
                 "} order by ?p ?s";
-        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
-        ResultSet res = qexec.execSelect() ;
-        ArrayList<OntResource> list=new ArrayList<>();
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        final ResultSet res = qexec.execSelect() ;
+        final ArrayList<OntResource> list=new ArrayList<>();
         while(res.hasNext()) {
-            QuerySolution qs=res.next();
-            RDFNode node=qs.get("?s");
+            final QuerySolution qs=res.next();
+            final RDFNode node=qs.get("?s");
             list.add(ontMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getSubProps(String uri) throws RestException {
-        String query=Prefixes.getPrefixesString()+ " select distinct ?s ?p where {\n" +
-                "    ?s rdfs:subPropertyOf <"+uri+"> .    \n" +
+    public static ArrayList<OntResource> getSubProps(final String uri) throws RestException {
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                " select distinct ?s ?p where {" +
+                "    ?s rdfs:subPropertyOf <"+uri+"> ." +
                 "} order by ?p ?s";
-        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
-        ResultSet res = qexec.execSelect() ;
-        ArrayList<OntResource> list=new ArrayList<>();
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        final ResultSet res = qexec.execSelect() ;
+        final ArrayList<OntResource> list=new ArrayList<>();
         while(res.hasNext()) {
-            QuerySolution qs=res.next();
-            RDFNode node=qs.get("?s");
+            final QuerySolution qs=res.next();
+            final RDFNode node=qs.get("?s");
             list.add(ontMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getParentProps(String uri) throws RestException {
-        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
-                "   <"+uri+"> rdfs:subPropertyOf ?s .    \n" +
+    public static ArrayList<OntResource> getParentProps(final String uri) throws RestException {
+        final String query="prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                " select distinct ?s where {" +
+                "   <"+uri+"> rdfs:subPropertyOf ?s ." +
                 "} order by ?s";
-        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
-        ResultSet res = qexec.execSelect() ;
-        ArrayList<OntResource> list=new ArrayList<>();
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        final ResultSet res = qexec.execSelect() ;
+        final ArrayList<OntResource> list=new ArrayList<>();
         while(res.hasNext()) {
-            QuerySolution qs=res.next();
-            RDFNode node=qs.get("?s");
+            final QuerySolution qs=res.next();
+            final RDFNode node=qs.get("?s");
             list.add(ontMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getSubClassesOf(String uri) throws RestException {
-        String query=Prefixes.getPrefixesString()+ " select distinct ?s where {\n" +
-                "   <"+uri+"> rdfs:subClassOf ?s .    \n" +
+    public static ArrayList<OntResource> getSubClassesOf(final String uri) throws RestException {
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                " select distinct ?s where {" +
+                "   <"+uri+"> rdfs:subClassOf ?s ." +
                 "} order by ?s";
-        QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
-        ResultSet res = qexec.execSelect() ;
-        ArrayList<OntResource> list=new ArrayList<>();
+        final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
+        final ResultSet res = qexec.execSelect() ;
+        final ArrayList<OntResource> list=new ArrayList<>();
         while(res.hasNext()) {
-            QuerySolution qs=res.next();
-            RDFNode node=qs.get("?s");
+            final QuerySolution qs=res.next();
+            final RDFNode node=qs.get("?s");
             list.add(ontMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static HashMap<String,ArrayList<OntResource>> getAllSubProps(String uri) throws RestException {
-        ArrayList<OntResource> props=OntData.getDomainUsages(uri);
-        HashMap<String,ArrayList<OntResource>> map=new HashMap<>();
-        for(OntResource rs:props) {
-            ArrayList<OntResource> l=OntData.getSubProps(rs.getURI());
+    public static HashMap<String,ArrayList<OntResource>> getAllSubProps(final String uri) throws RestException {
+        final ArrayList<OntResource> props=OntData.getDomainUsages(uri);
+        final HashMap<String,ArrayList<OntResource>> map=new HashMap<>();
+        for(final OntResource rs:props) {
+            final ArrayList<OntResource> l=OntData.getSubProps(rs.getURI());
             if(l.size()>1) {
                 map.put(rs.getURI(), l);
             }
@@ -227,7 +236,7 @@ public class OntData implements Runnable{
         return map;
     }
 
-    public static boolean isClass(String uri) {
+    public static boolean isClass(final String uri) {
         return ontMod.getOntResource(uri).isClass();
     }
 
@@ -250,9 +259,9 @@ public class OntData implements Runnable{
      * @return list of simple root OntClass(es)
      */
     public static List<OntClass> getSimpleRootClasses() {
-        List<OntClass> classes = ontMod.listHierarchyRootClasses().toList();
-        List<OntClass> rez = new ArrayList<>();
-        for (OntClass oc : classes) {
+        final List<OntClass> classes = ontMod.listHierarchyRootClasses().toList();
+        final List<OntClass> rez = new ArrayList<>();
+        for (final OntClass oc : classes) {
             if (oc.getURI() != null) {
                 rez.add(oc);
             }
@@ -262,10 +271,9 @@ public class OntData implements Runnable{
     }
 
     public static List<OntClassModel> getOntRootClasses() {
-        List<OntClass> roots = getSimpleRootClasses();
-        List<OntClassModel> models = new ArrayList<>();
-
-        for (OntClass root : roots) {
+        final List<OntClass> roots = getSimpleRootClasses();
+        final List<OntClassModel> models = new ArrayList<>();
+        for (final OntClass root : roots) {
             if(!root.isAnon()) {
                 models.add(new OntClassModel(root));
             }
@@ -275,24 +283,23 @@ public class OntData implements Runnable{
     }
 
     public static ArrayList<OntClass> getAllClasses(){
-        ExtendedIterator<OntClass> it=ontMod.listClasses();
-        ArrayList<OntClass> classes=new ArrayList<>();
+        final ExtendedIterator<OntClass> it=ontMod.listClasses();
+        final ArrayList<OntClass> classes=new ArrayList<>();
         while(it.hasNext()) {
-            OntClass ocl=it.next();
+            final OntClass ocl=it.next();
             if(ocl !=null && !ocl.isAnon()) {
                 classes.add(ocl);
             }
-            ocl=null;
         }
         Collections.sort(classes, OntData.ontClassComparator);
         return classes;
     }
 
     public static ArrayList<OntProperty> getAllProps(){
-        ExtendedIterator<OntProperty> it=ontMod.listAllOntProperties();
-        ArrayList<OntProperty> list=new ArrayList<>();
+        final ExtendedIterator<OntProperty> it=ontMod.listAllOntProperties();
+        final ArrayList<OntProperty> list=new ArrayList<>();
         while(it.hasNext()) {
-            OntProperty pr=it.next();
+            final OntProperty pr=it.next();
             if(pr!=null && pr.isProperty()) {
                 list.add(pr);
             }
@@ -302,13 +309,12 @@ public class OntData implements Runnable{
     }
 
     public static List<Individual> getAllIndividuals(){
-        List<Individual> indv =ontMod.listIndividuals().toList();
+        final List<Individual> indv =ontMod.listIndividuals().toList();
         Collections.sort(indv, individualComparator);
         return indv;
     }
 
     public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
-
         @Override
         public int compare(OntClass class1, OntClass class2) {
             if(Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
@@ -320,7 +326,6 @@ public class OntData implements Runnable{
     };
 
     public final static Comparator<OntClassModel> ontClassModelComparator = new Comparator<OntClassModel>() {
-
         @Override
         public int compare(OntClassModel class1, OntClassModel class2) {
             return ontClassComparator.compare(class1.clazz,class2.clazz);
@@ -329,7 +334,6 @@ public class OntData implements Runnable{
     };
 
     public final static Comparator<Individual> individualComparator = new Comparator<Individual>() {
-
         @Override
         public int compare(Individual class1, Individual class2) {
             return class1.getLocalName().compareTo(class2.getLocalName());
@@ -338,10 +342,8 @@ public class OntData implements Runnable{
     };
 
     public final static Comparator<OntProperty> propComparator = new Comparator<OntProperty>() {
-
         @Override
         public int compare(OntProperty prop1, OntProperty prop2) {
-
             if(Prefixes.getPrefix(prop1.getNameSpace()).equals(Prefixes.getPrefix(prop2.getNameSpace()))) {
                 return prop1.getLocalName().compareTo(prop2.getLocalName());
             }
@@ -351,22 +353,20 @@ public class OntData implements Runnable{
     };
 
     public static void rdf10tordf11(OntModel o) {
-        Resource RDFPL = o.getResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-        Resource RDFLS = o.getResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString");
-        ExtendedIterator<DatatypeProperty> it = o.listDatatypeProperties();
+        final ExtendedIterator<DatatypeProperty> it = o.listDatatypeProperties();
         while(it.hasNext()) {
-            DatatypeProperty p = it.next();
+            final DatatypeProperty p = it.next();
             if (p.hasRange(RDFPL)) {
                 p.removeRange(RDFPL);
-                p.addRange(RDFLS);
+                p.addRange(RDF.langString);
             }
         }
-        ExtendedIterator<Restriction> it2 = o.listRestrictions();
+        final ExtendedIterator<Restriction> it2 = o.listRestrictions();
         while(it2.hasNext()) {
-            Restriction r = it2.next();
-            Statement s = r.getProperty(OWL2.onDataRange); // is that code obvious? no
+            final Restriction r = it2.next();
+            final Statement s = r.getProperty(OWL2.onDataRange); // is that code obvious? no
             if (s != null && s.getObject().asResource().equals(RDFPL)) {
-                s.changeObject(RDFLS);
+                s.changeObject(RDF.langString);
 
             }
         }
