@@ -42,6 +42,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workEvent  [ a             bdo:PublishedEvent ;
                     bdo:onYear    1979
                   ] ;
+   bdo:workEditionStatement  "edition statement" ;
    bdo:workExtentStatement  "4 v." ;
    bdo:workHasItem  bdr:I23819 ;
    bdo:workHasItemImageAsset  bdr:I23819 ;

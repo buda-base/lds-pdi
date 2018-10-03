@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.validator.routines.ISBNValidator;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -36,6 +37,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
+import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.LdsError;
@@ -51,14 +53,19 @@ public class MarcExport {
     public static final Property partOf = ResourceFactory.createProperty(BDO+"workPartOf");
     public static final Property hasExpression = ResourceFactory.createProperty(BDO+"workHasExpression");
     public static final Property workEditionStatement = ResourceFactory.createProperty(BDO+"workEditionStatement");
+    public static final Property workExtentStatement = ResourceFactory.createProperty(BDO+"workExtentStatement");
     public static final Property workPublisherName = ResourceFactory.createProperty(BDO+"workPublisherName");
     public static final Property workPublisherLocation = ResourceFactory.createProperty(BDO+"workPublisherLocation");
+    public static final Property workAuthorshipStatement = ResourceFactory.createProperty(BDO+"workAuthorshipStatement");
+    public static final Property workCatalogInfo = ResourceFactory.createProperty(BDO+"workCatalogInfo");
+    public static final Property workBiblioNote = ResourceFactory.createProperty(BDO+"workBiblioNote");
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
     public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
     public static final Property notBefore = ResourceFactory.createProperty(BDO+"notBefore");
     public static final Property notAfter = ResourceFactory.createProperty(BDO+"notAfter");
     public static final Property workIsbn = ResourceFactory.createProperty(BDO+"workIsbn");
     public static final Property workLccn = ResourceFactory.createProperty(BDO+"workLccn");
+    public static final Property workLcCallNumber = ResourceFactory.createProperty(BDO+"workLcCallNumber");
     public static final Property admAccess = ResourceFactory.createProperty(ADM+"access");
     public static final Property admLicense = ResourceFactory.createProperty(ADM+"license");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP+"publishedYear");
@@ -130,6 +137,14 @@ public class MarcExport {
     }
 
     public static final Map<String,String> pubLocToCC = getPubLoctoCC();
+
+    public static String getLangStr(final Literal l) {
+        final String lang = l.getLanguage();
+        if (lang == null || !"bo-x-ewts".equals(lang)) {
+            return l.getString();
+        }
+        return TransConverter.ewtsToAlalc(l.getString(), true);
+    }
 
     public static Map<String,String> getPubLoctoCC() {
         final Map<String,String> res = new HashMap<>();
@@ -218,11 +233,11 @@ public class MarcExport {
         StmtIterator si = main.listProperties(workPublisherLocation);
         boolean hasPubLocation = false;
         while (si.hasNext()) {
-            final String pubLocation = si.next().getLiteral().getString();
-            if (pubLocation.contains("s.")) {
+            final Literal pubLocation = si.next().getLiteral();
+            if (pubLocation.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('a', pubLocation));
+            f264.addSubfield(factory.newSubfield('a', getLangStr(pubLocation)));
             hasPubLocation = true;
         }
         if (!hasPubLocation) {
@@ -231,11 +246,11 @@ public class MarcExport {
         si = main.listProperties(workPublisherName);
         boolean hasPubName = false;
         while (si.hasNext()) {
-            final String pubName = si.next().getLiteral().getString();
-            if (pubName.contains("s.")) {
+            final Literal pubName = si.next().getLiteral();
+            if (pubName.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('b', pubName));
+            f264.addSubfield(factory.newSubfield('b', getLangStr(pubName)));
             hasPubName = true;
         }
         if (!hasPubName) {
@@ -301,6 +316,21 @@ public class MarcExport {
         r.addVariableField(factory.newControlField("008", sb.toString()));
     }
 
+    public static void add300(final Model m, final Resource main, final Record r) {
+        final Statement extentStatementS = main.getProperty(workExtentStatement);
+        if (extentStatementS == null) {
+            return;
+        }
+        String st = extentStatementS.getString();
+        st = st.replace("p.", "pages");
+        // the s in volume(s) is a bit annoying
+        st = st.replace("1 v.", "1 volume");
+        st = st.replaceAll("[^0-9]1 v.", "1 volume");
+        st = st.replaceAll("v.", "volumes");
+        final DataField f300 = factory.newDataField("300", ' ', ' ');
+        r.addVariableField(f300);
+    }
+
     public static Record marcFromModel(final Model m, final Resource main) {
         final Record record = factory.newRecord(leader);
         // these are static and supplied by Columbia
@@ -319,7 +349,7 @@ public class MarcExport {
         // TODO: replace [date]
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource viewed on [date]; title from title page."));
         record.addVariableField(f588);
-        record.addVariableField(factory.newControlField("001", "(BDRC)"+main.getURI()));
+        record.addVariableField(factory.newControlField("001", "(BDRC) "+main.getURI()));
         final DataField f856 = factory.newDataField("856", '4', '0');
         f856.addSubfield(factory.newSubfield('u', main.getURI()));
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
@@ -336,14 +366,54 @@ public class MarcExport {
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
             record.addVariableField(f776_08);
         }
+        si = main.listProperties(workLcCallNumber);
+        while (si.hasNext()) {
+            String lccn = si.next().getLiteral().getString();
+            // see https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
+            lccn = lccn.substring(0,3).toUpperCase()+lccn.substring(3);
+            final int firstSpaceIdx = lccn.indexOf(' ');
+            if (firstSpaceIdx == -1)
+                continue;
+            final String classNumber = lccn.substring(0, firstSpaceIdx);
+            final String cutterNumber = lccn.substring(firstSpaceIdx+1);
+            final DataField f050__4 = factory.newDataField("050", ' ', '4');
+            f050__4.addSubfield(factory.newSubfield('a', classNumber));
+            f050__4.addSubfield(factory.newSubfield('b', cutterNumber));
+            record.addVariableField(f050__4);
+        }
         // edition statment
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
-            final String editionStatement = si.next().getLiteral().getString();
+            final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
-            f250.addSubfield(factory.newSubfield('a', editionStatement));
+            f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)));
             record.addVariableField(f250);
         }
+        // catalog info (summary)
+        si = main.listProperties(workCatalogInfo);
+        while (si.hasNext()) {
+            final Literal catalogInfo = si.next().getLiteral();
+            final DataField f520 = factory.newDataField("520", ' ', ' ');
+            f520.addSubfield(factory.newSubfield('a', getLangStr(catalogInfo)));
+            record.addVariableField(f520);
+        }
+        // biblio note
+        si = main.listProperties(workBiblioNote);
+        while (si.hasNext()) {
+            final Literal biblioNote = si.next().getLiteral();
+            final DataField f500 = factory.newDataField("500", ' ', ' ');
+            f500.addSubfield(factory.newSubfield('a', getLangStr(biblioNote)));
+            record.addVariableField(f500);
+        }
+        // authorship statement
+        //        final DataField f245 = factory.newDataField("250", ' ', ' ');
+        //        si = main.listProperties(workAuthorshipStatement);
+        //        while (si.hasNext()) {
+        //            final String authorshipStatement = si.next().getLiteral().getString();
+        //            f245.addSubfield(factory.newSubfield('a', " / "+authorshipStatement));
+        //            record.addVariableField(f245);
+        //        }
+
         addPubInfo(m, main, record);
         return record;
     }
