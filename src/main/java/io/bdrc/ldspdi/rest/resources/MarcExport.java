@@ -7,7 +7,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
@@ -25,6 +28,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.marc4j.MarcXmlWriter;
 import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
@@ -59,7 +63,23 @@ public class MarcExport {
     public static final Property workAuthorshipStatement = ResourceFactory.createProperty(BDO+"workAuthorshipStatement");
     public static final Property workCatalogInfo = ResourceFactory.createProperty(BDO+"workCatalogInfo");
     public static final Property workBiblioNote = ResourceFactory.createProperty(BDO+"workBiblioNote");
+    public static final Property creatorTerton = ResourceFactory.createProperty(BDO+"creatorTerton");
+    // TODO: update
+    public static final Property creatorMainAuthor = ResourceFactory.createProperty(BDO+"creatorGeneralAuthor");
+    public static final Property creatorTranslator = ResourceFactory.createProperty(BDO+"creatorTranslator");
+    // TODO: update
+    public static final Property creatorIndicScholar = ResourceFactory.createProperty(BDO+"creatorPandita");
+    public static final Property creatorContributingAuthor = ResourceFactory.createProperty(BDO+"creatorContributingAuthor");
+    public static final Property creatorCommentator = ResourceFactory.createProperty(BDO+"creatorCommentator");
+    public static final Property creatorCompiler = ResourceFactory.createProperty(BDO+"creatorEditor");
+    // TODO: update
+    public static final Property creatorReviser = ResourceFactory.createProperty(BDO+"creatorReviserOfTranslation");
+    public static final Property creatorScribe = ResourceFactory.createProperty(BDO+"creatorScribe");
+    public static final Property creatorCalligrapher = ResourceFactory.createProperty(BDO+"creatorCalligrapher");
+    public static final Property creatorArtist = ResourceFactory.createProperty(BDO+"creatorArtist");
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
+    public static final Property personEvent = ResourceFactory.createProperty(BDO+"personEvent");
+    public static final Property personName = ResourceFactory.createProperty(BDO+"personName");
     public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
     public static final Property notBefore = ResourceFactory.createProperty(BDO+"notBefore");
     public static final Property notAfter = ResourceFactory.createProperty(BDO+"notAfter");
@@ -131,10 +151,6 @@ public class MarcExport {
     }
 
     public static boolean indent = true;
-
-    public static String getAuthorStr(final Model m) {
-        return null;
-    }
 
     public static final Map<String,String> pubLocToCC = getPubLoctoCC();
 
@@ -331,6 +347,110 @@ public class MarcExport {
         r.addVariableField(f300);
     }
 
+    public static void addCreatorName(final Model m, final Resource name, final List<String> nameList) {
+        final Literal l = name.getProperty(RDFS.label).getLiteral();
+        final String nameStr = getLangStr(l);
+        nameList.add(nameStr);
+    }
+
+    public static String getCreatorString(final Model m, final Resource creator) {
+        // here we want to keep an order among the various names and titles
+        // otherwise the output could be inconsistent among queries
+        final List<String> names = new ArrayList<>();
+        final List<String> otherNames = new ArrayList<>();
+        final List<String> titles = new ArrayList<>();
+        final List<String> otherTitles = new ArrayList<>();
+        StmtIterator si = creator.listProperties(personName);
+        while (si.hasNext()) {
+            final Resource name = si.next().getResource();
+            final Resource type = name.getPropertyResourceValue(RDF.type);
+            final String typeLocalName = (type == null) ? "" : type.getLocalName();
+            switch(typeLocalName) {
+            case "":
+                addCreatorName(m, name, otherNames);
+                break;
+            case "PersonPrimaryName":
+                addCreatorName(m, name, names);
+                break;
+            case "PersonPrimaryTitle":
+                addCreatorName(m, name, titles);
+                break;
+            case "PersonTitle":
+                addCreatorName(m, name, otherTitles);
+                break;
+            default:
+                continue;
+            }
+        }
+        Integer birthYear = null;
+        Integer deathYear = null;
+        si = creator.listProperties(tmpBirthYear);
+        while (si.hasNext()) {
+            birthYear = si.next().getInt();
+        }
+        si = creator.listProperties(tmpDeathYear);
+        while (si.hasNext()) {
+            deathYear = si.next().getInt();
+        }
+        final StringBuilder sb = new StringBuilder();
+        if (!names.isEmpty()) {
+            Collections.sort(names);
+            sb.append(names.get(0));
+        } else if (!otherNames.isEmpty()) {
+            Collections.sort(otherNames);
+            sb.append(otherNames.get(0));
+        }
+        if (!titles.isEmpty()) {
+            Collections.sort(titles);
+            sb.append(" / ");
+            sb.append(titles.get(0));
+        } else if (!otherTitles.isEmpty()) {
+            Collections.sort(otherTitles);
+            sb.append(" / ");
+            sb.append(otherTitles.get(0));
+        }
+        if (birthYear == null) {
+            if (deathYear != null) {
+                sb.append(", ?-");
+                sb.append(deathYear);
+            }
+        } else {
+            sb.append(", ");
+            sb.append(birthYear);
+            sb.append('-');
+            if (deathYear != null) {
+                sb.append(deathYear);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel) {
+        StmtIterator si = main.listProperties(prop);
+        while (si.hasNext()) {
+            final Resource creator = si.next().getResource();
+            final String creatorStr = getCreatorString(m, creator);
+            final DataField f720_1_ = factory.newDataField("720", '1', ' ');
+            f720_1_.addSubfield(factory.newSubfield('a', creatorStr));
+            f720_1_.addSubfield(factory.newSubfield('e', rel));
+            r.addVariableField(f720_1_);
+        }
+    }
+
+    public static void addAuthors(final Model m, final Resource main, final Record r) {
+        addAuthorRel(m, main, r, creatorTerton, "author.");
+        addAuthorRel(m, main, r, creatorMainAuthor, "author.");
+        addAuthorRel(m, main, r, creatorTranslator, "translator.");
+        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.");
+        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.");
+        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.");
+        addAuthorRel(m, main, r, creatorCompiler, "editor.");
+        addAuthorRel(m, main, r, creatorReviser, "corrector.");
+        addAuthorRel(m, main, r, creatorScribe, "scribe.");
+        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.");
+        addAuthorRel(m, main, r, creatorArtist, "artist.");
+    }
+
     public static Record marcFromModel(final Model m, final Resource main) {
         final Record record = factory.newRecord(leader);
         // these are static and supplied by Columbia
@@ -413,7 +533,7 @@ public class MarcExport {
         //            f245.addSubfield(factory.newSubfield('a', " / "+authorshipStatement));
         //            record.addVariableField(f245);
         //        }
-
+        addAuthors(m, main, record);
         addPubInfo(m, main, record);
         return record;
     }
