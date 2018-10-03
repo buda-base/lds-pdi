@@ -50,6 +50,13 @@ public class MarcExport {
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
     public static final Property partOf = ResourceFactory.createProperty(BDO+"workPartOf");
     public static final Property hasExpression = ResourceFactory.createProperty(BDO+"workHasExpression");
+    public static final Property workEditionStatement = ResourceFactory.createProperty(BDO+"workEditionStatement");
+    public static final Property workPublisherName = ResourceFactory.createProperty(BDO+"workPublisherName");
+    public static final Property workPublisherLocation = ResourceFactory.createProperty(BDO+"workPublisherLocation");
+    public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
+    public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
+    public static final Property notBefore = ResourceFactory.createProperty(BDO+"notBefore");
+    public static final Property notAfter = ResourceFactory.createProperty(BDO+"notAfter");
     public static final Property workIsbn = ResourceFactory.createProperty(BDO+"workIsbn");
     public static final Property workLccn = ResourceFactory.createProperty(BDO+"workLccn");
     public static final Property admAccess = ResourceFactory.createProperty(ADM+"access");
@@ -83,22 +90,10 @@ public class MarcExport {
 
     static final DataField f542_PD = factory.newDataField("542", '1', ' ');
 
-    static final Map<String,String> localNameToMarcLang = new HashMap<>();
-
     static final String defaultCountryCode = "   ";
     static final String defaultLang = "und";
 
     static {
-        localNameToMarcLang.put("LangBo", "tib");
-        localNameToMarcLang.put("LangSa", "san");
-        localNameToMarcLang.put("LangRu", "rus");
-        localNameToMarcLang.put("LangZh", "chi");
-        localNameToMarcLang.put("LangPi", "pli");
-        localNameToMarcLang.put("LangNew", "new");
-        localNameToMarcLang.put("LangHi", "hin");
-        localNameToMarcLang.put("LangMn", "mon");
-        localNameToMarcLang.put("LangEn", "eng");
-        localNameToMarcLang.put("LangDz", "dzo");
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
         f040.addSubfield(factory.newSubfield('e', "rda"));
@@ -218,6 +213,56 @@ public class MarcExport {
 
     }
 
+    public static void addPubInfo(final Model m, final Resource main, final Record r) {
+        final DataField f264 = factory.newDataField("264", ' ', '1');
+        StmtIterator si = main.listProperties(workPublisherLocation);
+        boolean hasPubLocation = false;
+        while (si.hasNext()) {
+            final String pubLocation = si.next().getLiteral().getString();
+            if (pubLocation.contains("s.")) {
+                continue;
+            }
+            f264.addSubfield(factory.newSubfield('a', pubLocation));
+            hasPubLocation = true;
+        }
+        if (!hasPubLocation) {
+            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified]"));
+        }
+        si = main.listProperties(workPublisherName);
+        boolean hasPubName = false;
+        while (si.hasNext()) {
+            final String pubName = si.next().getLiteral().getString();
+            if (pubName.contains("s.")) {
+                continue;
+            }
+            f264.addSubfield(factory.newSubfield('b', pubName));
+            hasPubName = true;
+        }
+        if (!hasPubName) {
+            f264.addSubfield(factory.newSubfield('b', "[publisher not identified]"));
+        }
+        si = main.listProperties(workEvent);
+        boolean hasDate = false;
+        while (si.hasNext()) {
+            final Resource event = si.next().getResource();
+            final Resource eventType = event.getPropertyResourceValue(RDF.type);
+            if (eventType == null || !eventType.getLocalName().equals("PublishedEvent")) {
+                continue;
+            }
+            final Statement onYearS = event.getProperty(onYear);
+            if (onYearS == null) {
+                continue;
+            }
+            int year = onYearS.getInt();
+            f264.addSubfield(factory.newSubfield('c', String.valueOf(year)));
+            hasDate = true;
+        }
+        if (!hasDate) {
+            f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
+        }
+        r.addVariableField(f264);
+    }
+
     public static void add008(final Model m, final Resource main, final Record r) {
         //printModel(m);
         final StringBuilder sb = new StringBuilder();
@@ -280,8 +325,10 @@ public class MarcExport {
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
         record.addVariableField(f856);
         add008(m, main, record);
+        addIsbn(m, main, record);
+        addAccess(m, main, record);
         // lccn
-        final StmtIterator si = main.listProperties(workLccn);
+        StmtIterator si = main.listProperties(workLccn);
         while (si.hasNext()) {
             final String lccn = si.next().getLiteral().getString();
             final DataField f776_08 = factory.newDataField("776", '0', '8');
@@ -289,8 +336,15 @@ public class MarcExport {
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
             record.addVariableField(f776_08);
         }
-        addIsbn(m, main, record);
-        addAccess(m, main, record);
+        // edition statment
+        si = main.listProperties(workEditionStatement);
+        while (si.hasNext()) {
+            final String editionStatement = si.next().getLiteral().getString();
+            final DataField f250 = factory.newDataField("250", ' ', ' ');
+            f250.addSubfield(factory.newSubfield('a', editionStatement));
+            record.addVariableField(f250);
+        }
+        addPubInfo(m, main, record);
         return record;
     }
 
