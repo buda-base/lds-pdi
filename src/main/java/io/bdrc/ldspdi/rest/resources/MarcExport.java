@@ -246,11 +246,11 @@ public class MarcExport {
             sb.append(marcCC);
         }
         sb.append("     o           ");
-        final Resource language = main.getPropertyResourceValue(tmpLang);
-        if (language == null) {
+        final Statement languageS = main.getProperty(tmpLang);
+        if (languageS == null) {
             sb.append(defaultLang);
         } else {
-            sb.append(localNameToMarcLang.getOrDefault(language.getLocalName(), defaultLang));
+            sb.append(languageS.getString());
         }
         sb.append("od");
         r.addVariableField(factory.newControlField("008", sb.toString()));

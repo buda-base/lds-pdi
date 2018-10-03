@@ -39,8 +39,8 @@ construct {
     }
   }
   optional {
-    #FILTER(?p = :workLangScript)
-    ?o :language ?lang .
+    FILTER(?p = :workLangScript)
+    ?o :language/:langMARCCode ?lang .
   }
   optional {
     ?R_RES :workEvent ?we .

@@ -28,6 +28,8 @@
 
 bdr:BoTibt :language bdr:LangBo .
 
+bdr:LangBo :langMARCCode "tib" .
+
 bdr:W23819  a    bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
    bdo:creatorTerton  bdr:P326 ;
