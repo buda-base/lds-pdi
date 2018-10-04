@@ -13,7 +13,7 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 construct {
   ?R_RES ?p ?o .
   ?o ?op ?oo .
-  ?t skos:preflabel ?to .
+  ?t skos:prefLabel ?to .
   ?R_RES tmp:hasRecPart ?part .
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .

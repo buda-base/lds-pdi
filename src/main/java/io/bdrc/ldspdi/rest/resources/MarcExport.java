@@ -34,6 +34,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.SKOS;
 import org.marc4j.MarcXmlWriter;
 import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
@@ -88,6 +89,7 @@ public class MarcExport {
     public static final Property creatorArtist = ResourceFactory.createProperty(BDO+"creatorArtist");
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
     public static final Property workTitle = ResourceFactory.createProperty(BDO+"workTitle");
+    public static final Property workIsAbout = ResourceFactory.createProperty(BDO+"workIsAbout");
     public static final Property personEvent = ResourceFactory.createProperty(BDO+"personEvent");
     public static final Property personName = ResourceFactory.createProperty(BDO+"personName");
     public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
@@ -572,6 +574,44 @@ public class MarcExport {
         }
     }
 
+    private static void addTopics(final Model m, final Resource main, final Record record) {
+        final StmtIterator si = main.listProperties(workIsAbout);
+        final DataField f653 = factory.newDataField("653", ' ', ' ');
+        boolean hasTopic = false;
+        while (si.hasNext()) {
+            // that's a bit cumbersome
+            final Resource topic = si.next().getResource();
+            final StmtIterator topicLabelSi = topic.listProperties(SKOS.prefLabel);
+            final Map<String,List<Literal>> labels = new TreeMap<>();
+            while (topicLabelSi.hasNext()) {
+                final Literal topicLabel = topicLabelSi.next().getLiteral();
+                hasTopic = true;
+                final String lng = topicLabel.getLanguage();
+                final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
+                litList.add(topicLabel);
+            }
+            if (!hasTopic)
+                continue;
+            List<Literal> interestingLiterals = null;
+            if (labels.containsKey("en")) {
+                interestingLiterals = labels.get("en");
+            } else if (labels.containsKey("bo-x-ewts")) {
+                interestingLiterals = labels.get("bo-x-ewts");
+            } else {
+                // other than that we just take the first one
+                for (final List<Literal> l : labels.values()) {
+                    interestingLiterals = l;
+                    break;
+                }
+            }
+            Collections.sort(interestingLiterals, comp);
+            f653.addSubfield(factory.newSubfield('a', getLangStr(interestingLiterals.get(0))));
+        }
+        if (hasTopic) {
+            record.addVariableField(f653);
+        }
+    }
+
     public static void addAuthors(final Model m, final Resource main, final Record r) {
         addAuthorRel(m, main, r, creatorTerton, "author.");
         addAuthorRel(m, main, r, creatorMainAuthor, "author.");
@@ -663,6 +703,7 @@ public class MarcExport {
         addAuthors(m, main, record);
         addPubInfo(m, main, record);
         addTitles(m, main, record);
+        addTopics(m, main, record);
         return record;
     }
 

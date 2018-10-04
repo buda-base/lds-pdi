@@ -30,6 +30,10 @@ bdr:BoTibt :language bdr:LangBo .
 
 bdr:LangBo :langMARCCode "tib" .
 
+bdr:T1082 skos:prefLabel "T1082"@en .
+bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
+bdr:T1193 skos:prefLabel "T1193"@en .
+
 bdr:W23819  a    bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
    bdo:creatorTerton  bdr:P326 ;
