@@ -62,6 +62,18 @@ bdr:W23819  a    bdo:Work ;
    bdo:workTitle  [ a             bdo:WorkBibliographicalTitle ;
                     rdfs:label    "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts
                   ] ,
+                  [ a             bdo:WorkBibliographicalTitle ;
+                    rdfs:label    "second bibliographical title"@en
+                  ] ,
+                  [ a             bdo:WorkColophonTitle ;
+                    rdfs:label    "this is a colophon title"@en
+                  ] ,
+                  [ a             bdo:WorkRunningTitle ;
+                    rdfs:label    "this is a running title"@en
+                  ] ,
+                  [ a             bdo:WorkSubtitle ;
+                    rdfs:label    "subtitle"@bo-x-ewts
+                  ] ,
          [ a             bdo:WorkTitlePageTitle ;
            rdfs:label    "bka' brgyad gsan ba yons rdzogs : a complete cycle of rnin-ma-pa practice focusing upon the ancient eight pronouncements of gu-ru rin-po-che"@en-x-mixed
          ] ;

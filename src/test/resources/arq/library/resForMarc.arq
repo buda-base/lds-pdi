@@ -13,6 +13,10 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 construct {
   ?R_RES ?p ?o .
   ?o ?op ?oo .
+  ?t skos:preflabel ?to .
+  ?R_RES tmp:hasRecPart ?part .
+  ?part skos:prefLabel ?partl .
+  ?part bdo:workPartTreeIndex ?partti .
   ?R_RES tmp:workLanguage ?lang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
@@ -22,6 +26,15 @@ construct {
   ?o tmp:deathYear ?deathYear .
 } where {
   ?R_RES ?p ?o .
+  optional {
+    ?R_RES bdo:workIsAbout ?t .
+    ?t skos:prefLabel ?to .
+  }
+  optional {
+    ?R_RES bdo:workHasPart+ ?part .
+    ?part skos:prefLabel ?partl .
+    ?part bdo:workPartTreeIndex ?partti .
+  }
   optional {
     ?p rdfs:subclassOf* :workCreator .
     ?o ?op ?oo .
