@@ -268,18 +268,6 @@ public class MarcExport {
             }
             // TODO: what about restriction in China?
         }
-        final Resource license = main.getPropertyResourceValue(admLicense);
-        if (license == null) {
-            return; // maybe there should be a f506_unknown?
-        } else {
-            switch (license.getLocalName()) {
-            case "LicensePublicDomain":
-                r.addVariableField(f542_PD);
-                break;
-            default:
-                break;
-            }
-        }
     }
 
     // tmp, for debug
@@ -364,7 +352,7 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("     o           ");
+        sb.append("     o     000 ||");
         final Statement languageS = main.getProperty(tmpLang);
         if (languageS == null) {
             sb.append(defaultLang);
@@ -387,6 +375,7 @@ public class MarcExport {
         st = st.replaceAll("[^0-9]1 v.", "1 volume");
         st = st.replaceAll("v.", "volumes");
         final DataField f300 = factory.newDataField("300", ' ', ' ');
+        f300.addSubfield(factory.newSubfield('a', st));
         r.addVariableField(f300);
     }
 
@@ -668,40 +657,15 @@ public class MarcExport {
 
     public static Record marcFromModel(final Model m, final Resource main) {
         final Record record = factory.newRecord(leader);
-        // these are static and supplied by Columbia
-        record.addVariableField(f006);
-        record.addVariableField(f007);
-        record.addVariableField(f040);
-        record.addVariableField(f336);
-        record.addVariableField(f337);
-        record.addVariableField(f338);
-        record.addVariableField(f533);
-        record.addVariableField(f710_2);
+        record.addVariableField(factory.newControlField("001", "(BDRC) "+main.getURI()));
         // maybe something like that could work?
         //record.addVariableField(factory.newControlField("003", "BDRC"));
-        // these depend on the model
-        final DataField f588 = factory.newDataField("588", ' ', ' ');
-        // TODO: replace [date]
-        f588.addSubfield(factory.newSubfield('a', "Description based on online resource viewed on [date]; title from title page."));
-        record.addVariableField(f588);
-        record.addVariableField(factory.newControlField("001", "(BDRC) "+main.getURI()));
-        final DataField f856 = factory.newDataField("856", '4', '0');
-        f856.addSubfield(factory.newSubfield('u', main.getURI()));
-        f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
-        record.addVariableField(f856);
+        record.addVariableField(f006);
+        record.addVariableField(f007);
         add008(m, main, record);
-        addIsbn(m, main, record);
-        addAccess(m, main, record);
-        // lccn
-        StmtIterator si = main.listProperties(workLccn);
-        while (si.hasNext()) {
-            final String lccn = si.next().getLiteral().getString();
-            final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   [LCCN] "+lccn));
-            f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
-            record.addVariableField(f776_08);
-        }
-        si = main.listProperties(workLcCallNumber);
+        addIsbn(m, main, record); // 020
+        record.addVariableField(f040);
+        StmtIterator si = main.listProperties(workLcCallNumber);
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
             // see https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
@@ -716,6 +680,7 @@ public class MarcExport {
             f050__4.addSubfield(factory.newSubfield('b', cutterNumber));
             record.addVariableField(f050__4);
         }
+        addTitles(m, main, record); // 245
         // edition statment
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
@@ -724,14 +689,11 @@ public class MarcExport {
             f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)));
             record.addVariableField(f250);
         }
-        // catalog info (summary)
-        si = main.listProperties(workCatalogInfo);
-        while (si.hasNext()) {
-            final Literal catalogInfo = si.next().getLiteral();
-            final DataField f520 = factory.newDataField("520", ' ', ' ');
-            f520.addSubfield(factory.newSubfield('a', getLangStr(catalogInfo)));
-            record.addVariableField(f520);
-        }
+        addPubInfo(m, main, record); // 264
+        add300(m, main, record);
+        record.addVariableField(f336);
+        record.addVariableField(f337);
+        record.addVariableField(f338);
         // biblio note
         si = main.listProperties(workBiblioNote);
         while (si.hasNext()) {
@@ -740,11 +702,42 @@ public class MarcExport {
             f500.addSubfield(factory.newSubfield('a', getLangStr(biblioNote)));
             record.addVariableField(f500);
         }
-        addAuthors(m, main, record);
-        addPubInfo(m, main, record);
-        addTitles(m, main, record);
-        addTopics(m, main, record);
-        addOutline(m, main, record);
+        addOutline(m, main, record); // 505
+        addAccess(m, main, record); // 506
+        // catalog info (summary)
+        si = main.listProperties(workCatalogInfo);
+        while (si.hasNext()) {
+            final Literal catalogInfo = si.next().getLiteral();
+            final DataField f520 = factory.newDataField("520", ' ', ' ');
+            f520.addSubfield(factory.newSubfield('a', getLangStr(catalogInfo)));
+            record.addVariableField(f520);
+        }
+        record.addVariableField(f533);
+        final Resource license = main.getPropertyResourceValue(admLicense);
+        if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
+            record.addVariableField(f542_PD);
+        }
+        // TODO: 546
+        final DataField f588 = factory.newDataField("588", ' ', ' ');
+        // TODO: replace [date]
+        f588.addSubfield(factory.newSubfield('a', "Description based on online resource viewed on [date]; title from title page."));
+        record.addVariableField(f588);
+        addTopics(m, main, record); // 653
+        record.addVariableField(f710_2);
+        addAuthors(m, main, record); // 720
+        // lccn
+        si = main.listProperties(workLccn);
+        while (si.hasNext()) {
+            final String lccn = si.next().getLiteral().getString();
+            final DataField f776_08 = factory.newDataField("776", '0', '8');
+            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   [LCCN] "+lccn));
+            f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
+            record.addVariableField(f776_08);
+        }
+        final DataField f856 = factory.newDataField("856", '4', '0');
+        f856.addSubfield(factory.newSubfield('u', main.getURI()));
+        f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
+        record.addVariableField(f856);
         return record;
     }
 
