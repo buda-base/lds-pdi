@@ -50,6 +50,9 @@ bdr:W23819_0056 skos:prefLabel "third part"@en ;
 bdr:W23819_0074 skos:prefLabel "fourth part"@en ;
   bdo:workPartTreeIndex "4" .
 
+bdr:WSeriesParent a bdo:Work ;
+  skos:prefLabel "parent series"@en .
+
 bdr:W23819  a    bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
    bdo:creatorTerton  bdr:P326 ;
@@ -75,6 +78,9 @@ bdr:W23819  a    bdo:Work ;
    bdo:workOtherLangScript  bdr:SaDeva ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
    bdo:workLccn  "79902886" ;
+   bdo:workSeriesName  "series name" ;
+   bdo:workSeriesNumber  "number 4" ;
+   bdo:workNumberOf bdr:WSeriesParent ;
    bdo:workNumberOfVolumes  4 ;
    bdo:workPagination  bdr:PaginationAbsolute ;
    bdo:workPublisherLocation  "paro"@en ;

@@ -92,6 +92,9 @@ public class MarcExport {
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
     public static final Property workTitle = ResourceFactory.createProperty(BDO+"workTitle");
     public static final Property workIsAbout = ResourceFactory.createProperty(BDO+"workIsAbout");
+    public static final Property workNumberOf = ResourceFactory.createProperty(BDO+"workNumberOf");
+    public static final Property workSeriesName = ResourceFactory.createProperty(BDO+"workSeriesName");
+    public static final Property workSeriesNumber = ResourceFactory.createProperty(BDO+"workSeriesNumber");
     public static final Property personEvent = ResourceFactory.createProperty(BDO+"personEvent");
     public static final Property personName = ResourceFactory.createProperty(BDO+"personName");
     public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
@@ -583,6 +586,34 @@ public class MarcExport {
         }
     }
 
+    private static void addSeries(final Model m, final Resource main, final Record record) {
+        StmtIterator si = main.listProperties(workNumberOf);
+        boolean hasSeries = false;
+        final DataField f490 = factory.newDataField("490", ' ', ' ');
+        while (si.hasNext()) {
+            final Resource series = si.next().getResource();
+            final Literal l = getPreferredLit(series);
+            if (l == null)
+                continue;
+            hasSeries = true;
+            f490.addSubfield(factory.newSubfield('a', getLangStr(l)));
+        }
+        si = main.listProperties(workSeriesNumber);
+        while (si.hasNext()) {
+            final Literal series = si.next().getLiteral();
+            hasSeries = true;
+            f490.addSubfield(factory.newSubfield('v', getLangStr(series)));
+        }
+        si = main.listProperties(workSeriesName);
+        while (si.hasNext()) {
+            final Literal series = si.next().getLiteral();
+            hasSeries = true;
+            f490.addSubfield(factory.newSubfield('a', getLangStr(series)));
+        }
+        if (hasSeries)
+            record.addVariableField(f490);
+    }
+
     private static Literal getPreferredLit(Resource r) {
         final StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
         if (!labelSi.hasNext())
@@ -752,6 +783,7 @@ public class MarcExport {
             f500.addSubfield(factory.newSubfield('a', getLangStr(biblioNote)));
             record.addVariableField(f500);
         }
+        addSeries(m, main, record); // 490
         addOutline(m, main, record); // 505
         addAccess(m, main, record); // 506
         // catalog info (summary)
@@ -804,9 +836,10 @@ public class MarcExport {
         if (main.hasProperty(partOf)) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is part of another Work"));
         }
-        if (main.hasProperty(hasExpression)) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is an abstract Work"));
-        }
+        // this should be correct but breaks W2DB4598 because of poorly encoded series data
+        //        if (main.hasProperty(hasExpression)) {
+        //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is an abstract Work"));
+        //        }
         return model;
     }
 
