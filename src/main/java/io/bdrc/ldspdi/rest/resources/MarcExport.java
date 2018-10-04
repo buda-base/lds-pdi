@@ -373,11 +373,12 @@ public class MarcExport {
             return;
         }
         String st = extentStatementS.getString();
-        st = st.replace("p.", "pages");
+        st = st.replace("p\\.", "pages");
+        st = st.replace("ff\\.", "folios");
         // the s in volume(s) is a bit annoying
-        st = st.replace("1 v.", "1 volume");
-        st = st.replaceAll("[^0-9]1 v.", "1 volume");
-        st = st.replaceAll("v.", "volumes");
+        st = st.replaceAll("^1 v\\.", "1 volume");
+        st = st.replaceAll("[^0-9]1 v\\.", "1 volume");
+        st = st.replaceAll("v\\.", "volumes");
         final DataField f300 = factory.newDataField("300", ' ', ' ');
         f300.addSubfield(factory.newSubfield('a', st));
         r.addVariableField(f300);
@@ -539,7 +540,7 @@ public class MarcExport {
         si = main.listProperties(workAuthorshipStatement);
         String authorshipStatement = null;
         while (si.hasNext()) {
-            authorshipStatement = si.next().getLiteral().getString();
+            authorshipStatement = getLangStr(si.next().getLiteral());
         }
         // get title with highest priority:
         Collections.sort(highestPrioList, comp);
