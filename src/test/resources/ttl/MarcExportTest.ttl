@@ -28,7 +28,11 @@
 
 bdr:BoTibt :language bdr:LangBo .
 
+bdr:SaDeva :language bdr:LangSa .
+
 bdr:LangBo :langMARCCode "tib" .
+
+bdr:LangSa :langMARCCode "san" .
 
 bdr:T1082 skos:prefLabel "T1082"@en .
 bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
@@ -68,6 +72,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workIsbn    "1-111456291" ;
    bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
    bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
+   bdo:workOtherLangScript  bdr:SaDeva ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
    bdo:workLccn  "79902886" ;
    bdo:workNumberOfVolumes  4 ;

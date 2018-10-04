@@ -107,6 +107,7 @@ public class MarcExport {
     public static final Property tmpBirthYear = ResourceFactory.createProperty(TMP+"birthYear");
     public static final Property tmpDeathYear = ResourceFactory.createProperty(TMP+"deathYear");
     public static final Property tmpLang = ResourceFactory.createProperty(TMP+"workLanguage");
+    public static final Property tmpOtherLang = ResourceFactory.createProperty(TMP+"workOtherLanguage");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO+"publisherLocation");
 
     public static final class MarcInfo {
@@ -609,6 +610,55 @@ public class MarcExport {
         return interestingLiterals.get(0);
     }
 
+    private static final Map<String,String> marcCodeToLang = new HashMap<>();
+    static {
+        marcCodeToLang.put("tib", "Tibetan");
+        marcCodeToLang.put("dzo", "Dzongkha");
+        marcCodeToLang.put("eng", "English");
+        marcCodeToLang.put("hin", "Hindi");
+        marcCodeToLang.put("mon", "Classical Mongolian");
+        marcCodeToLang.put("new", "Newari");
+        marcCodeToLang.put("pli", "Pali");
+        marcCodeToLang.put("rus", "Russian");
+        marcCodeToLang.put("san", "Sanskrit");
+        marcCodeToLang.put("chi", "Chinese");
+    }
+
+    private static void addLanguages(Model m, Resource main, Record record) {
+        StmtIterator lsi = main.listProperties(tmpLang);
+        final StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        while (lsi.hasNext()) {
+            final String marcLang = lsi.next().getString();
+            final String plainEnglish = marcCodeToLang.get(marcLang);
+            if (first) {
+                sb.append("In ");
+            } else {
+                sb.append(" and ");
+            }
+            sb.append(plainEnglish);
+            first = false;
+        }
+        lsi = main.listProperties(tmpOtherLang);
+        while (lsi.hasNext()) {
+            final String marcLang = lsi.next().getString();
+            final String plainEnglish = marcCodeToLang.get(marcLang);
+            if (first) {
+                sb.append("In ");
+            } else {
+                sb.append(" and ");
+            }
+            sb.append(plainEnglish);
+            first = false;
+        }
+        if (first)
+            return;
+        sb.append('.');
+        final DataField f546 = factory.newDataField("546", ' ', ' ');
+        f546.addSubfield(factory.newSubfield('a', sb.toString()));
+        record.addVariableField(f546);
+    }
+
     private static void addOutline(Model m, Resource main, Record record) {
         final StmtIterator si = main.listProperties(workHasPart);
         final StringBuilder sb = new StringBuilder();
@@ -717,7 +767,7 @@ public class MarcExport {
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
         }
-        // TODO: 546
+        addLanguages(m, main, record); // 546
         final DataField f588 = factory.newDataField("588", ' ', ' ');
         // TODO: replace [date]
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource viewed on [date]; title from title page."));

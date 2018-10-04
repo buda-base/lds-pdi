@@ -17,6 +17,7 @@ construct {
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .
   ?R_RES tmp:workLanguage ?lang .
+  ?R_RES tmp:workOtherLanguage ?olang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
@@ -55,15 +56,14 @@ construct {
     ?o :language/:langMARCCode ?lang .
   }
   optional {
+    FILTER(?p = :workOtherLangScript)
+    ?o :language/:langMARCCode ?olang .
+  }
+  optional {
     ?R_RES :workEvent ?we .
     ?we a :PublishedEvent ;
       :onYear ?publishedYear .
   }
-#  optional {
-#    ?R_RES :workEvent ?we .
-#    ?we a :CompletedEvent ;
-#      :onYear ?completedYear .
-#  }
   optional {
     FILTER(isBlank(?o))
     ?o ?op ?oo .
