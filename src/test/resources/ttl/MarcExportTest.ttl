@@ -34,6 +34,18 @@ bdr:T1082 skos:prefLabel "T1082"@en .
 bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
 bdr:T1193 skos:prefLabel "T1193"@en .
 
+bdr:W23819_0001 skos:prefLabel "first part"@en ;
+  bdo:workPartTreeIndex "1" .
+
+bdr:W23819_0017 skos:prefLabel "second part"@en ;
+  bdo:workPartTreeIndex "2" .
+
+bdr:W23819_0056 skos:prefLabel "third part"@en ;
+  bdo:workPartTreeIndex "3" .
+
+bdr:W23819_0074 skos:prefLabel "fourth part"@en ;
+  bdo:workPartTreeIndex "4" .
+
 bdr:W23819  a    bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
    bdo:creatorTerton  bdr:P326 ;

@@ -14,7 +14,6 @@ construct {
   ?R_RES ?p ?o .
   ?o ?op ?oo .
   ?t skos:prefLabel ?to .
-  ?R_RES tmp:hasRecPart ?part .
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .
   ?R_RES tmp:workLanguage ?lang .
@@ -31,9 +30,9 @@ construct {
     ?t skos:prefLabel ?to .
   }
   optional {
-    ?R_RES bdo:workHasPart+ ?part .
-    ?part skos:prefLabel ?partl .
-    ?part bdo:workPartTreeIndex ?partti .
+    ?R_RES bdo:workHasPart ?part .
+    ?part skos:prefLabel ?partl ;
+          bdo:workPartTreeIndex ?partti .
   }
   optional {
     ?p rdfs:subclassOf* :workCreator .

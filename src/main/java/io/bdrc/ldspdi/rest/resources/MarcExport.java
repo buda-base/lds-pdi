@@ -65,6 +65,8 @@ public class MarcExport {
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
     public static final Property partOf = ResourceFactory.createProperty(BDO+"workPartOf");
+    public static final Property workHasPart = ResourceFactory.createProperty(BDO+"workHasPart");
+    public static final Property workPartTreeIndex = ResourceFactory.createProperty(BDO+"workPartTreeIndex");
     public static final Property hasExpression = ResourceFactory.createProperty(BDO+"workHasExpression");
     public static final Property workEditionStatement = ResourceFactory.createProperty(BDO+"workEditionStatement");
     public static final Property workExtentStatement = ResourceFactory.createProperty(BDO+"workExtentStatement");
@@ -579,37 +581,75 @@ public class MarcExport {
         final DataField f653 = factory.newDataField("653", ' ', ' ');
         boolean hasTopic = false;
         while (si.hasNext()) {
-            // that's a bit cumbersome
             final Resource topic = si.next().getResource();
-            final StmtIterator topicLabelSi = topic.listProperties(SKOS.prefLabel);
-            final Map<String,List<Literal>> labels = new TreeMap<>();
-            while (topicLabelSi.hasNext()) {
-                final Literal topicLabel = topicLabelSi.next().getLiteral();
-                hasTopic = true;
-                final String lng = topicLabel.getLanguage();
-                final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
-                litList.add(topicLabel);
-            }
-            if (!hasTopic)
+            final Literal l = getPreferredLit(topic);
+            if (l == null)
                 continue;
-            List<Literal> interestingLiterals = null;
-            if (labels.containsKey("en")) {
-                interestingLiterals = labels.get("en");
-            } else if (labels.containsKey("bo-x-ewts")) {
-                interestingLiterals = labels.get("bo-x-ewts");
-            } else {
-                // other than that we just take the first one
-                for (final List<Literal> l : labels.values()) {
-                    interestingLiterals = l;
-                    break;
-                }
-            }
-            Collections.sort(interestingLiterals, comp);
-            f653.addSubfield(factory.newSubfield('a', getLangStr(interestingLiterals.get(0))));
+            hasTopic = true;
+            f653.addSubfield(factory.newSubfield('a', getLangStr(l)));
         }
         if (hasTopic) {
             record.addVariableField(f653);
         }
+    }
+
+    private static Literal getPreferredLit(Resource r) {
+        final StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
+        if (!labelSi.hasNext())
+            return null;
+        final Map<String,List<Literal>> labels = new TreeMap<>();
+        while (labelSi.hasNext()) {
+            final Literal topicLabel = labelSi.next().getLiteral();
+            final String lng = topicLabel.getLanguage();
+            final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
+            litList.add(topicLabel);
+        }
+        List<Literal> interestingLiterals = null;
+        if (labels.containsKey("en")) {
+            interestingLiterals = labels.get("en");
+        } else if (labels.containsKey("bo-x-ewts")) {
+            interestingLiterals = labels.get("bo-x-ewts");
+        } else {
+            // other than that we just take the first one
+            for (final List<Literal> l : labels.values()) {
+                interestingLiterals = l;
+                break;
+            }
+        }
+        Collections.sort(interestingLiterals, comp);
+        return interestingLiterals.get(0);
+    }
+
+    private static void addOutline(Model m, Resource main, Record record) {
+        final StmtIterator si = main.listProperties(workHasPart);
+        final StringBuilder sb = new StringBuilder();
+        final Map<String,Literal> parts = new TreeMap<>();
+        boolean hasParts = false;
+        // we keep the parts in order
+        while (si.hasNext()) {
+            final Resource part = si.next().getResource();
+            final Statement indexTreeS = part.getProperty(workPartTreeIndex);
+            if (indexTreeS == null)
+                continue;
+            final Literal l = getPreferredLit(part);
+            if (l == null)
+                continue;
+            final String indexTree = indexTreeS.getString();
+            parts.put(indexTree, l);
+            hasParts = true;
+        }
+        if (!hasParts)
+            return;
+        final DataField f505 = factory.newDataField("505", ' ', ' ');
+        boolean first = true;
+        for (Literal l : parts.values()) {
+            if (!first)
+                sb.append(" -- ");
+            sb.append(getLangStr(l));
+            first = false;
+        }
+        f505.addSubfield(factory.newSubfield('a', sb.toString()));
+        record.addVariableField(f505);
     }
 
     public static void addAuthors(final Model m, final Resource main, final Record r) {
@@ -704,6 +744,7 @@ public class MarcExport {
         addPubInfo(m, main, record);
         addTitles(m, main, record);
         addTopics(m, main, record);
+        addOutline(m, main, record);
         return record;
     }
 
