@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
@@ -108,7 +108,7 @@ public class JsonOutputTest {
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2245)
+                .port(2245)
                 .add("/bdrcrw", srvds)
                 .build() ;
         server.start() ;
@@ -261,14 +261,14 @@ public class JsonOutputTest {
 
     public static ResultSetWrapper getResults(String query, String fuseki) {
         ResultSetWrapper res;
-            long start=System.currentTimeMillis();
-            QueryExecution qe=QueryExecutionFactory.sparqlService(fuseki,QueryFactory.create(query));
-            ResultSet jrs=qe.execSelect();
-            long elapsed=System.currentTimeMillis()-start;
-            int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
-            res=new ResultSetWrapper(jrs,elapsed,psz);
-            qe.close();
-            return res;
+        long start=System.currentTimeMillis();
+        QueryExecution qe=QueryExecutionFactory.sparqlService(fuseki,QueryFactory.create(query));
+        ResultSet jrs=qe.execSelect();
+        long elapsed=System.currentTimeMillis()-start;
+        int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
+        res=new ResultSetWrapper(jrs,elapsed,psz);
+        qe.close();
+        return res;
     }
 
 }

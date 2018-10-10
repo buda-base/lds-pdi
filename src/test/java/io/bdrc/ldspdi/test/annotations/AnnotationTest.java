@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -44,7 +44,7 @@ public class AnnotationTest extends JerseyTest {
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         // Creating a fuseki server
-        server = FusekiServer.create().setPort(2248).add("/bdrcrw", srvds).build();
+        server = FusekiServer.create().port(2248).add("/bdrcrw", srvds).build();
         server.start();
     }
 

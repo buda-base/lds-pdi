@@ -11,7 +11,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -52,7 +52,7 @@ public class TemplatesTest extends JerseyTest{
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2247)
+                .port(2247)
                 .add("/bdrcrw", srvds)
                 .build() ;
         server.start() ;

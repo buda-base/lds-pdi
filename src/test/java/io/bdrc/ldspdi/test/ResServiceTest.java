@@ -16,7 +16,7 @@ import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
-import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Literal;
@@ -57,7 +57,7 @@ public class ResServiceTest extends JerseyTest{
         srvds.setDefaultModel(model);
         //Creating a fuseki server
         server = FusekiServer.create()
-                .setPort(2246)
+                .port(2246)
                 .add("/bdrcrw", srvds)
                 .build() ;
         server.start() ;

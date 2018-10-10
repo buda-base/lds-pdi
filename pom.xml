@@ -10,7 +10,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jersey.version>2.27</jersey.version>
-    <jena.version>3.8.0</jena.version>
+    <jena.version>3.9.0</jena.version>
     <jetty.version>9.4.9.v20180320</jetty.version>
   </properties>
   <repositories>
@@ -99,7 +99,7 @@
     <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
     <dependency>
       <groupId>org.apache.jena</groupId>
-      <artifactId>jena-fuseki-embedded</artifactId>
+      <artifactId>jena-fuseki-main</artifactId>
       <version>${jena.version}</version>
       <scope>test</scope>
     </dependency>
