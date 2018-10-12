@@ -42,6 +42,7 @@ public class Taxonomy {
     public final static Node countNode = ResourceFactory.createProperty(COUNT).asNode();
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
     public final static String TAXONOMY_R="http://purl.bdrc.io/ontology/core/Taxonomy";
+    public final static String ETEXT_R="http://purl.bdrc.io/ontology/core/Etext";
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
     public final static String ETEXT="http://purl.bdrc.io/ontology/core/Etext";
     public final static String ETEXT_CHUNK="http://purl.bdrc.io/ontology/core/EtextChunk";

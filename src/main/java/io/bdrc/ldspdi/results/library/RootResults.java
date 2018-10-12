@@ -7,14 +7,17 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
-import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.Taxonomy;
 
 
 public class RootResults {
+
+    public final static Logger log = LoggerFactory.getLogger(RootResults.class.getName());
 
     public static HashMap<String,Object> getResultsMap(Model mod,int etext_count) throws RestException{
         final HashMap<String,Object> res=new HashMap<>();
@@ -93,17 +96,15 @@ public class RootResults {
                     places.put(st.getSubject().getURI(),pla);
                     break;
                 case Taxonomy.TAXONOMY_R:
-                    // TODO: handle taxonomies
+                case Taxonomy.ETEXT_R:
+                    // TODO: handle taxonomies and etexts
                     break;
                 default:
-                    throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
-                            setContext(" type in RootResults.getResultsMap(Model mod) >> "+type));
-
+                    log.info("unknown type {}, could be harmless", type);
+                    break;
                 }
                 processed.add(st.getSubject().getURI());
             }
-
-
         }
         res.put("metadata",count);
         res.put("works",works);
