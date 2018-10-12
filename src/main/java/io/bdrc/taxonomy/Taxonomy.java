@@ -20,6 +20,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.SKOS;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,9 +40,8 @@ public class Taxonomy {
     public final static Node hasSubClass = ResourceFactory.createProperty(HASSUBCLASS).asNode();
     public final static String COUNT="http://purl.bdrc.io/ontology/tmp/count";
     public final static Node countNode = ResourceFactory.createProperty(COUNT).asNode();
-    public final static String PREFLABEL="http://www.w3.org/2004/02/skos/core#prefLabel";
-    public final static String TYPE="http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     public final static String PERSON="http://purl.bdrc.io/ontology/core/Person";
+    public final static String TAXONOMY_R="http://purl.bdrc.io/ontology/core/Taxonomy";
     public final static String WORK="http://purl.bdrc.io/ontology/core/Work";
     public final static String ETEXT="http://purl.bdrc.io/ontology/core/Etext";
     public final static String ETEXT_CHUNK="http://purl.bdrc.io/ontology/core/EtextChunk";
@@ -124,7 +124,7 @@ public class Taxonomy {
                     partialTree.add(new Triple(NodeFactory.createURI(previous), hasSubClass, NodeFactory.createURI(node)));
                 }
                 // TODO: the labels should be added in the TaxNodes, this would save time at each query
-                final ExtendedIterator<Triple> label=modGraph.find(NodeFactory.createURI(node),NodeFactory.createURI(PREFLABEL), Node.ANY);
+                final ExtendedIterator<Triple> label=modGraph.find(NodeFactory.createURI(node), SKOS.prefLabel.asNode(), Node.ANY);
                 while(label.hasNext()){
                     partialTree.add(label.next());
                 }
