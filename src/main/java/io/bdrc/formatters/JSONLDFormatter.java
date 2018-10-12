@@ -266,7 +266,7 @@ public class JSONLDFormatter {
             return typeToFrameObject.get(type);
         Map<String,Object> jsonObject = new HashMap<>();
         if (needsId) {
-            jsonObject.put("@id", BDR+mainResourceUri);
+            jsonObject.put("@id", mainResourceUri);
         } else {
             jsonObject.put("@type", typeToRootShortUri.get(type));
             typeToFrameObject.put(type, jsonObject);
@@ -361,7 +361,7 @@ public class JSONLDFormatter {
         final JSONLDVariant variant = (RDFFormat.JSONLDVariant) format.getVariant();
         ctx.setJsonLDContext(docTypeToContextObject.get(type));
         ctx.setOptions(jsonLdOptions);
-        DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
+        final DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
         final PrefixMap pm = Prefixes.getPrefixMap();
         Map<String,Object> tm;
         try {
