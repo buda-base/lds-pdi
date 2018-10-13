@@ -87,6 +87,7 @@ public class QueryProcessor {
         final int hash = Objects.hashCode(query);
         Model model = (Model)ResultsCache.getObjectFromCache(hash);
         if (model == null) {
+            log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes+" "+query);
             final QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,q);
             qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
