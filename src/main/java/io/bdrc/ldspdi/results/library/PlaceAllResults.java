@@ -1,10 +1,8 @@
 package io.bdrc.ldspdi.results.library;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -18,13 +16,16 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class PlaceAllResults {
 
-    public final static String[] types= {Taxonomy.ACCESS,Taxonomy.LICENSE,Taxonomy.LANG_SCRIPT,Taxonomy.STATUS};
 
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();
         HashMap<String,ArrayList<Field>> works=new HashMap<>();
         HashMap<String,ArrayList<Field>> people=new HashMap<>();
         HashMap<String,ArrayList<Field>> places=new HashMap<>();
+        HashMap<String,Integer> access=new HashMap<>();
+        HashMap<String,Integer> license=new HashMap<>();
+        HashMap<String,Integer> status=new HashMap<>();
+        HashMap<String,Integer> langScript=new HashMap<>();
         HashMap<String,Integer> total=new HashMap<>();
         HashMap<String,HashMap<String,Integer>> count=new HashMap<>();
         ArrayList<String> processed=new ArrayList<>();
@@ -34,7 +35,6 @@ public class PlaceAllResults {
         HashSet<String> tops=new HashSet<>();
 
         StmtIterator it=mod.listStatements();
-        List<String> all_types=Arrays.asList(types);
         while(it.hasNext()) {
             Statement st=it.next();
             String type=mod.getProperty(st.getSubject(), RDF.type).getObject().asResource().getURI();
@@ -50,27 +50,48 @@ public class PlaceAllResults {
             switch (type) {
             case Taxonomy.WORK:
                 ArrayList<Field> wl=works.get(st.getSubject().getURI());
-                String predicate=st.getPredicate().getURI();
                 if(wl==null) {
                     wl=new ArrayList<Field>();
                 }
                 wl.add(Field.getField(st));
                 works.put(st.getSubject().getURI(),wl);
-                if(st.getObject().isURIResource() && all_types.contains(predicate) ) {
-                    HashMap<String,Integer> map=count.get(predicate);
-                    if(map==null){
-                        map=new HashMap<String,Integer>();
-                    }
-                    Integer ct=map.get(st.getObject().asNode().getURI());
+                if(st.getPredicate().getURI().equals(Taxonomy.ACCESS)) {
+                    Integer ct=access.get(st.getObject().asNode().getURI());
                     if(ct!=null) {
-                        map.put(st.getObject().asNode().getURI(), ct.intValue()+1);
+                        access.put(st.getObject().asNode().getURI(), ct.intValue()+1);
                     }
                     else {
-                        map.put(st.getObject().asNode().getURI(), 1);
+                        access.put(st.getObject().asNode().getURI(), 1);
                     }
-                    count.put(predicate, map);
                 }
-                if(predicate.equals(Taxonomy.WORK_GENRE) || predicate.equals(Taxonomy.WORK_IS_ABOUT)) {
+                if(st.getPredicate().getURI().equals(Taxonomy.LICENSE)) {
+                    Integer ct=license.get(st.getObject().asNode().getURI());
+                    if(ct!=null) {
+                        license.put(st.getObject().asNode().getURI(), ct.intValue()+1);
+                    }
+                    else {
+                        license.put(st.getObject().asNode().getURI(), 1);
+                    }
+                }
+                if(st.getPredicate().getURI().equals(Taxonomy.LANG_SCRIPT)) {
+                    Integer ct=langScript.get(st.getObject().asNode().getURI());
+                    if(ct!=null) {
+                        langScript.put(st.getObject().asNode().getURI(), ct.intValue()+1);
+                    }
+                    else {
+                        langScript.put(st.getObject().asNode().getURI(), 1);
+                    }
+                }
+                if(st.getPredicate().getURI().equals(Taxonomy.STATUS)) {
+                    Integer ct=status.get(st.getObject().asNode().getURI());
+                    if(ct!=null) {
+                        status.put(st.getObject().asNode().getURI(), ct.intValue()+1);
+                    }
+                    else {
+                        status.put(st.getObject().asNode().getURI(), 1);
+                    }
+                }
+                if(st.getPredicate().getURI().equals(Taxonomy.WORK_GENRE) || st.getPredicate().getURI().equals(Taxonomy.WORK_IS_ABOUT)) {
                     Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                 }
                 break;
@@ -98,10 +119,15 @@ public class PlaceAllResults {
             }
             processed.add(st.getSubject().getURI());
         }
+        count.put("total", total);
+        count.put("access", access);
+        count.put("license",license);
+        count.put("status",status);
+        count.put("langScript",langScript);
         res.put("metadata",count);
-        res.put(Taxonomy.WORK,works);
-        res.put(Taxonomy.PERSON,people);
-        res.put(Taxonomy.PLACE,places);
+        res.put("works",works);
+        res.put("persons",people);
+        res.put("places",places);
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }

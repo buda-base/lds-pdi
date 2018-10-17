@@ -41,7 +41,7 @@
     <c:set var="val" value="${k}"/>
     <tr>
 	    <td>${RdfAuthModel.getUser(val).getName()}</td>
-	    <td><a href="/resource-auth/${RdfAuthModel.getUser(val).getUserId().trim()}">${RdfAuthModel.getUser(val).getUserId()}</a></td>	    
+	    <td><a href="/resource-auth/${RdfAuthModel.getUser(val).getId().trim()}">${RdfAuthModel.getUser(val).getId()}</a></td>	    
 	    <td>${RdfAuthModel.getUser(val).getEmail()}</td>
 	    <td>
         <c:if test = "${RdfAuthModel.getUser(val).getGroups()!=null}">
