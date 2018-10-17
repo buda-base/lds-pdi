@@ -70,8 +70,12 @@
 <br>
 </c:otherwise>
 </c:choose>
-<c:if test = "${model.getComment()!=null}">
-<b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
+<!-- COMMENTS -->
+<c:if test = "${model.getComments().size()>0}">
+        <h4>Comments:</h4>
+        <c:forEach items="${model.getCommentsLang()}" var="comm">    
+            <div style="white-space: pre-wrap;">${comm[0]}<span class="lang">${comm[1]}</span></div><hr/>
+        </c:forEach> 
 </c:if>
 <c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics: </b>
