@@ -41,10 +41,8 @@ public class OntPropModel {
     public String rangeUri;
     public ArrayList<String> domain;
     public String domainUri;
-    //public String comment;
     public List<String> comments;
     public List<String[]> commentsLang;
-    public String commentLang;
 
     public OntPropModel(String uri) {
         this.uri=uri;
@@ -72,10 +70,6 @@ public class OntPropModel {
                     this.label=st.getObject().asLiteral().getString();
                     this.labelLang=st.getObject().asLiteral().getLanguage();
                     break;
-                /*case COMMENT:
-                    this.comment=st.getObject().asLiteral().getString()+comment;
-                    this.commentLang=st.getObject().asLiteral().getLanguage();
-                    break;*/
                 case TYPE:
                     this.rdfTypeUri=st.getObject().asNode().getURI();
                     this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
