@@ -1,0 +1,14 @@
+#QueryScope=Works
+#QueryReturnType=Table
+#QueryResults=The volume ID and number associated with a Work, by ascending volume number
+#QueryParams=R_RES
+#QueryUrl=/volumesForWork?R_RES=bdr:W23703
+
+#param.R_RES.type=URI
+#param.R_RES.subtype=bdo:Work
+#param.R_RES.desc=the Work on which info is needed
+
+select ?volnum ?volid where {
+  ?R_RES :workHasItemImageAsset/:itemHasVolume ?volid .
+  ?volid :volumeNumber ?volnum .
+} order by asc(?volnum)

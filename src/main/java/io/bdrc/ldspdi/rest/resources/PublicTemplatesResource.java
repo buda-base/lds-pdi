@@ -49,7 +49,6 @@ import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
-import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
@@ -241,7 +240,6 @@ public class PublicTemplatesResource {
         t.start();
         Prefixes.loadPrefixes();
         LdsQueryService.clearCache();
-        ResultsCache.clearCache();
         return Response.ok().build();
     }
 
