@@ -11,6 +11,7 @@ import java.util.List;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.commons.jcs.JCS;
 import org.apache.commons.jcs.engine.CacheStatus;
 import org.apache.commons.jcs.engine.behavior.ICompositeCacheAttributes;
 import org.apache.commons.jcs.engine.behavior.IElementAttributes;
@@ -29,11 +30,11 @@ public class CacheAccessModel {
      * Cache config
      */
     private ICompositeCacheAttributes getConfig() {
-        return ResultsCache.CACHE.getCacheAttributes();
+        return JCS.getInstance( "default" ).getCacheAttributes();
     }
 
     private IElementAttributes getElementConfig() {
-        return ResultsCache.CACHE.getDefaultElementAttributes();
+        return JCS.getInstance( "default" ).getDefaultElementAttributes();
     }
 
     public String getCacheName() {
@@ -90,11 +91,11 @@ public class CacheAccessModel {
      * Cache stats
      */
     private IElementAttributes getRegionConfig() {
-        return ResultsCache.CACHE.getDefaultElementAttributes();
+        return JCS.getInstance( "default" ).getDefaultElementAttributes();
     }
 
-    private CompositeCache<Integer,Object> getCacheControl() {
-        return ResultsCache.CACHE.getCacheControl();
+    private CompositeCache<Object,Object> getCacheControl() {
+        return JCS.getInstance( "default" ).getCacheControl();
     }
 
     public CacheStatus getStatus() {
