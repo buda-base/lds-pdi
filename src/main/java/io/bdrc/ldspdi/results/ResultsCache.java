@@ -20,18 +20,19 @@ package io.bdrc.ldspdi.results;
  ******************************************************************************/
 
 import org.apache.commons.jcs.JCS;
+import org.apache.commons.jcs.access.CacheAccess;
 import org.apache.commons.jcs.access.exception.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
 
-    //protected static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "default" );
+    protected static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "ldspdi" );
     public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
 
     public static void addToCache(Object res, int hash) {
         try{
-            JCS.getInstance( "default" ).put(Integer.valueOf(hash), res );
+            CACHE.put(Integer.valueOf(hash), res );
             res=null;
         }
         catch (CacheException e ){
@@ -40,10 +41,10 @@ public class ResultsCache {
     }
 
     public static Object getObjectFromCache(int hash) {
-        return JCS.getInstance( "default" ).get( Integer.valueOf(hash));
+        return CACHE.get( Integer.valueOf(hash));
     }
 
     public static void clearCache() {
-        JCS.getInstance( "default" ).clear();
+        CACHE.clear();
     }
 }

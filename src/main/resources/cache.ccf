@@ -1,25 +1,25 @@
 # DEFAULT CACHE REGION
-jcs.default=
-jcs.default.cacheattributes=org.apache.commons.jcs.engine.CompositeCacheAttributes
-jcs.default.cacheattributes.MaxObjects=500
-jcs.default.cacheattributes.UseDisk=false
-jcs.default.cacheattributes.UseRemote=false
-jcs.default.cacheattributes.UseLateral=false
-jcs.default.cacheattributes.MemoryCacheName=org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
-jcs.default.cacheattributes.UseMemoryShrinker=false
-jcs.default.cacheattributes.MaxMemoryIdleTimeSeconds=3600
-jcs.default.cacheattributes.ShrinkerIntervalSeconds=30
-jcs.default.cacheattributes.MaxSpoolPerRun=250
-jcs.default.elementattributes=org.apache.commons.jcs.engine.ElementAttributes
-jcs.default.elementattributes.IsEternal=false
-jcs.default.elementattributes.IsSpool=false
-jcs.default.elementattributes.IsRemote=false
-jcs.default.elementattributes.IsLateral=false
+jcs.ldspdi=
+jcs.ldspdi.cacheattributes=org.apache.commons.jcs.engine.CompositeCacheAttributes
+jcs.ldspdi.cacheattributes.MaxObjects=500
+jcs.ldspdi.cacheattributes.UseDisk=false
+jcs.ldspdi.cacheattributes.UseRemote=false
+jcs.ldspdi.cacheattributes.UseLateral=false
+jcs.ldspdi.cacheattributes.MemoryCacheName=org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
+jcs.ldspdi.cacheattributes.UseMemoryShrinker=false
+jcs.ldspdi.cacheattributes.MaxMemoryIdleTimeSeconds=3600
+jcs.ldspdi.cacheattributes.ShrinkerIntervalSeconds=30
+jcs.ldspdi.cacheattributes.MaxSpoolPerRun=250
+jcs.ldspdi.elementattributes=org.apache.commons.jcs.engine.ElementAttributes
+jcs.ldspdi.elementattributes.IsEternal=false
+jcs.ldspdi.elementattributes.IsSpool=false
+jcs.ldspdi.elementattributes.IsRemote=false
+jcs.ldspdi.elementattributes.IsLateral=false
 #Prod 
-jcs.default.elementattributes.MaxLife=600
+jcs.ldspdi.elementattributes.MaxLife=600
 #Prod 
-jcs.default.elementattributes.IdleTime=300
-#Test jcs.default.elementattributes.MaxLife=180
-#Test jcs.default.elementattributes.IdleTime=120
+jcs.ldspdi.elementattributes.IdleTime=300
+#Test jcs.ldspdi.elementattributes.MaxLife=180
+#Test jcs.ldspdi.elementattributes.IdleTime=120
 
 
