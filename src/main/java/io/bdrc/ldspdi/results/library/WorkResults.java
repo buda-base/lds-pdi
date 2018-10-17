@@ -63,7 +63,6 @@ public class WorkResults {
             if(type.equals(Taxonomy.WORK_GENRE) || type.equals(Taxonomy.WORK_IS_ABOUT)) {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
             }
-
         }
         res.put(Taxonomy.WORK,works);
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
