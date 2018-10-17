@@ -119,9 +119,11 @@ public class Taxonomy {
                 }
                 if(!node.equals(previous) && !node.equals(ROOTURI)) {
                     final Literal l = mod.createTypedLiteral(count, XSDDatatype.XSDinteger);
+                    if(count!=-1) {
                     partialTree.add(new Triple(NodeFactory.createURI(node),
                             countNode,
                             l.asNode()));
+                    }
                     partialTree.add(new Triple(NodeFactory.createURI(previous), hasSubClass, NodeFactory.createURI(node)));
                 }
                 // TODO: the labels should be added in the TaxNodes, this would save time at each query
@@ -174,6 +176,7 @@ public class Taxonomy {
         LinkedList<String> nodes=Taxonomy.getRootToLeafPath(obj.getURI());
         if(!nodes.isEmpty()) {
             nodes.removeFirst();
+            nodes.removeLast();
         }
         for(String s:nodes) {
             HashSet<String> bt=WorkBranch.get(s);
@@ -191,7 +194,6 @@ public class Taxonomy {
             topics.put(s, bt.size());
         }
         topics.put(sub.getURI(), Wtopics.get(obj.getURI()).size());
-
     }
 
 }
