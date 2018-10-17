@@ -155,7 +155,6 @@ public class LibrarySearchResource {
                             setContext("getLibGraphGet()",e));
                 }
             }
-
             res=RootResults.getResultsMap(model,etext_count);
             break;
         case "personFacetGraph":

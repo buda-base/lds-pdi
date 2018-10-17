@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.results.Field;
 import io.bdrc.restapi.exceptions.RestException;
-import io.bdrc.taxonomy.Taxonomy;
 
 
 public class RootResults {
@@ -28,9 +27,6 @@ public class RootResults {
         while(it.hasNext()) {
             final Statement st=it.next();
             final String type=mod.getProperty(st.getSubject(), RDF.type).getObject().asResource().getURI();
-            if(type.equals(Taxonomy.PERSON)) {
-                System.out.println("ST >> "+st);
-            }
             Integer ct=count.get(type);
             if(!processed.contains(st.getSubject().getURI())) {
                 if(ct!=null) {

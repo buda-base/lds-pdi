@@ -119,9 +119,11 @@ public class Taxonomy {
                 }
                 if(!node.equals(previous) && !node.equals(ROOTURI)) {
                     final Literal l = mod.createTypedLiteral(count, XSDDatatype.XSDinteger);
+                    if(count!=-1) {
                     partialTree.add(new Triple(NodeFactory.createURI(node),
                             countNode,
                             l.asNode()));
+                    }
                     partialTree.add(new Triple(NodeFactory.createURI(previous), hasSubClass, NodeFactory.createURI(node)));
                 }
                 // TODO: the labels should be added in the TaxNodes, this would save time at each query
