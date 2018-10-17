@@ -53,8 +53,8 @@ public class ChunksResults {
                         setContext("unknown type in WorkAllResults.getResultsMap(Model mod) >> "+type));
             }
         }
-        res.put("authors",authors);
-        res.put("chunks",chunks);
+        res.put(Taxonomy.WORK_MAIN_AUTHOR,authors);
+        res.put(Taxonomy.ETEXT_CHUNK,chunks);
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
