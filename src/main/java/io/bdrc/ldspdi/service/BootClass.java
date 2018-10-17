@@ -51,7 +51,7 @@ public class BootClass implements ServletContextListener {
             params.put("queryPath",queryPath);
             params.put("fusekiUrl",fuseki);
             params.put("propertyPath",propertyPath);
-            //GitService.update(queryPath);
+            GitService.update(queryPath);
             ServiceConfig.init(params);
             OntData.init();
             TaxModel.fetchModel();
