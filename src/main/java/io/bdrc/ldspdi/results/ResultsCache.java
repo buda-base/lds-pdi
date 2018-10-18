@@ -50,5 +50,6 @@ public class ResultsCache {
 
     public static void clearCache() {
         CACHE.clear();
+        log.info("The ldspdi cache has been cleared");
     }
 }
