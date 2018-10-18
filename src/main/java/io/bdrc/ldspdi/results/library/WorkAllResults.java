@@ -53,8 +53,8 @@ public class WorkAllResults {
                         setContext(" type in WorkAllResults.getResultsMap(Model mod) >> "+type));
             }
         }
-        res.put("associatedWorks",works);
-        res.put("associatedLineages",lineages);
+        res.put(Taxonomy.WORK,works);
+        res.put(Taxonomy.LINEAGE,lineages);
         res.put("tree",Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
