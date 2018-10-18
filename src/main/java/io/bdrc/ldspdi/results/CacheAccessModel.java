@@ -258,7 +258,7 @@ public class CacheAccessModel {
      * Utilities
      */
 
-    private String format(long l) {
+    public String format(long l) {
         return new DecimalFormat("#,###,###").format(l);
     }
 
