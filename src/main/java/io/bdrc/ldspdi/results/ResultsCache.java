@@ -27,8 +27,12 @@ import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
 
-    static CacheAccess<Integer,Object> CACHE = JCS.getInstance( "ldspdi" );
+    public static CacheAccess<Integer,Object> CACHE;
     public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
+
+    public static void init() {
+        CACHE = JCS.getInstance( "ldspdi" );
+    }
 
     public static void addToCache(Object res, int hash) {
         try{

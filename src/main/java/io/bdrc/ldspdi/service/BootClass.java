@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 
@@ -50,6 +51,7 @@ public class BootClass implements ServletContextListener {
             params.put("queryPath",queryPath);
             params.put("fusekiUrl",fuseki);
             params.put("propertyPath",propertyPath);
+            ResultsCache.init();
             //GitService.update(queryPath);
             ServiceConfig.init(params);
             OntData.init();
