@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
 
-    public static CacheAccess<Integer,Object> CACHE;
+    public static CacheAccess<Integer,Object> CACHE ;
     public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
 
     public static void init() {

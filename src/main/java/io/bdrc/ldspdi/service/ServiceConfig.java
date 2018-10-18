@@ -28,6 +28,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.results.ResultsCache;
+
 
 public class ServiceConfig {
 
@@ -68,6 +70,7 @@ public class ServiceConfig {
             prop.load(input);
             prop.setProperty("queryPath", "src/test/resources/arq/");
             input.close();
+            ResultsCache.init();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
