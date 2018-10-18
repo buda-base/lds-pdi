@@ -174,7 +174,7 @@ public class Taxonomy {
         LinkedList<String> nodes=Taxonomy.getRootToLeafPath(obj.getURI());
         if(!nodes.isEmpty()) {
             nodes.removeFirst();
-            nodes.removeLast();
+            //nodes.removeLast();
         }
         for(String s:nodes) {
             HashSet<String> bt=WorkBranch.get(s);
