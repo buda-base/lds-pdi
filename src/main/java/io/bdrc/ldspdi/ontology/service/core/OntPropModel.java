@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.ontology.InverseFunctionalProperty;
+import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.ontology.SymmetricProperty;
 import org.apache.jena.rdf.model.AnonId;
@@ -40,12 +41,19 @@ public class OntPropModel {
     public String rangeUri;
     public ArrayList<String> domain;
     public String domainUri;
-    public String comment;
-    public String commentLang;
+    public List<String> comments;
+    public List<String[]> commentsLang;
 
     public OntPropModel(String uri) {
         this.uri=uri;
         this.name=OntData.ontMod.shortForm(uri);
+        OntProperty prop=OntData.ontMod.getOntProperty(uri);
+        comments = new ArrayList<>();
+        commentsLang = new ArrayList<>();
+        for (RDFNode node : prop.listComments(null).toList()) {
+            comments.add(node.toString());
+            commentsLang.add(new String[]{node.asLiteral().getString(),node.asLiteral().getLanguage()});
+        }
         StmtIterator it=((Model)OntData.ontMod).listStatements(
                 ResourceFactory.createResource(uri),(Property)null,(RDFNode)null);
         while(it.hasNext()) {
@@ -62,10 +70,10 @@ public class OntPropModel {
                     this.label=st.getObject().asLiteral().getString();
                     this.labelLang=st.getObject().asLiteral().getLanguage();
                     break;
-                case COMMENT:
-                    this.comment=st.getObject().asLiteral().getString();
+                /*case COMMENT:
+                    this.comment=st.getObject().asLiteral().getString()+comment;
                     this.commentLang=st.getObject().asLiteral().getLanguage();
-                    break;
+                    break;*/
                 case TYPE:
                     this.rdfTypeUri=st.getObject().asNode().getURI();
                     this.rdfType=OntData.ontMod.shortForm(rdfTypeUri);
@@ -174,16 +182,16 @@ public class OntPropModel {
         return getRange().contains("Inherited");
     }
 
-    public String getComment() {
-        return comment;
+    public List<String> getComments() {
+        return comments;
     }
 
     public String getLabelLang() {
         return labelLang;
     }
 
-    public String getCommentLang() {
-        return commentLang;
+    public List<String[]> getCommentsLang() {
+        return commentsLang;
     }
 
     public String getRdfTypeUri() {

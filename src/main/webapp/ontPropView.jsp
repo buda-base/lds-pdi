@@ -70,8 +70,12 @@
 <br>
 </c:otherwise>
 </c:choose>
-<c:if test = "${model.getComment()!=null}">
-<b>Comment:</b> ${model.getComment()}<span class="lang">${model.getCommentLang()}</span><br>
+<!-- COMMENTS -->
+<c:if test = "${model.getComments().size()>0}">
+        <h4>Comments:</h4>
+        <c:forEach items="${model.getCommentsLang()}" var="comm">    
+            <div style="white-space: pre-wrap;">${comm[0]}<span class="lang">${comm[1]}</span></div><hr/>
+        </c:forEach> 
 </c:if>
 <c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics: </b>
@@ -95,10 +99,10 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfTypeUri()}">${prop.getRdfType()}</a></td></tr>
             <tr><td><b>Label:</b></td><td>${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
-				<c:when test="${prop.isDomainInherited()}">
-				<tr><td><b>Domain:</b></td><td>Inherited</td></tr>
-				</c:when>
-				<c:otherwise>
+                <c:when test="${prop.isDomainInherited()}">
+                <tr><td><b>Domain:</b></td><td>Inherited</td></tr>
+                </c:when>
+                <c:otherwise>
                 <tr><td><b>Domain:</b></td><td>
                 <c:forEach items="${prop.getDomain()}" var="dom">
                     <a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
@@ -107,10 +111,10 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
                 </c:otherwise>
             </c:choose> 
             <c:choose>
-				<c:when test="${prop.isRangeInherited()}">
-				<tr><td><b>Range:</b></td><td>Inherited</td></tr>
-				</c:when>
-				<c:otherwise>           
+                <c:when test="${prop.isRangeInherited()}">
+                <tr><td><b>Range:</b></td><td>Inherited</td></tr>
+                </c:when>
+                <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> 
                 <c:forEach items="${prop.getRange()}" var="range">
                 <a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
