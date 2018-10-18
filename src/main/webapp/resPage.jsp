@@ -118,9 +118,9 @@ input[type=submit]:hover {
 </div>
 </c:if>
 <br>
-<b>Other formats:</b> <a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=json">Json format</a> / 
-<a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=csv">CSV full</a> / 
-<a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=csv&profile=simple">CSV simple</a>
+<b>Other formats:</b> <a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=json">JSON</a> / 
+<a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=csv">CSV</a> / 
+<a href="${requestScope['javax.servlet.forward.request_uri']}?${requestScope['javax.servlet.forward.query_string']}&format=csv&profile=simple">Simple CSV</a>
 <br><br>
 <c:if test="${!model.isFirstPage()}"><a href="${model.getpLinks().getPrevGet()}">Prev</a></c:if>
 <c:if test="${!model.isLastPage()}"><a href="${model.getpLinks().getNextGet()}">Next</a></c:if>
