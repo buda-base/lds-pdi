@@ -37,7 +37,7 @@ import io.bdrc.taxonomy.TaxModel;
 public class BootClass implements ServletContextListener {
 
     public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
-    public final static String AUTH_PROPS_FILE="/etc/buda/ldspdi/ldspdi-auth.properties";
+    public final static String AUTH_PROPS_FILE="/etc/buda/ldspdi/ldspdi.properties";
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
