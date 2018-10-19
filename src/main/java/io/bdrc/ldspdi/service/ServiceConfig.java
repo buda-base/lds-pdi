@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.FileInputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -38,11 +40,17 @@ public class ServiceConfig {
     public final static String FUSEKI_URL="fusekiUrl";
     public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-    public static void init(HashMap<String,String> params) {
+    public static void init(HashMap<String,String> params,String configPath) {
         ServiceConfig.params=params;
 
         try {
-            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+
+            InputStream input=null;
+            if(configPath!=null) {
+                input=new FileInputStream(configPath+"ldspdi.properties");
+            }else {
+                input = ServiceConfig.class.getClassLoader().getResourceAsStream("configtemplate.properties");
+            }
             // load a properties file
             prop.load(input);
             input.close();
@@ -65,7 +73,7 @@ public class ServiceConfig {
 
     public static void initForTests(String fusekiUrl) {
         try {
-            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("configtemplate.properties");
             // load a properties file
             prop.load(input);
             prop.setProperty("queryPath", "src/test/resources/arq/");

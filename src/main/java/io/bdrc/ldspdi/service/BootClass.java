@@ -47,6 +47,7 @@ public class BootClass implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
         try {
+            final String configPath= System.getProperty("ldspdi.configpath");
             final String fuseki=arg0.getServletContext().getInitParameter("fuseki");
             final String queryPath=arg0.getServletContext().getInitParameter("queryPath");
             final String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
@@ -56,7 +57,7 @@ public class BootClass implements ServletContextListener {
             params.put("propertyPath",propertyPath);
             ResultsCache.init();
             GitService.update(queryPath);
-            ServiceConfig.init(params);
+            ServiceConfig.init(params,configPath);
             OntData.init();
             TaxModel.fetchModel();
             AuthProps.init(AUTH_PROPS_FILE);
