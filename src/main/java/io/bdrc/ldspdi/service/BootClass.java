@@ -37,7 +37,6 @@ import io.bdrc.taxonomy.TaxModel;
 public class BootClass implements ServletContextListener {
 
     public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
-    public final static String AUTH_PROPS_FILE="/etc/buda/ldspdi/ldspdi.properties";
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
@@ -60,7 +59,7 @@ public class BootClass implements ServletContextListener {
             ServiceConfig.init(params,configPath);
             OntData.init();
             TaxModel.fetchModel();
-            AuthProps.init(AUTH_PROPS_FILE);
+            AuthProps.init(configPath+"ldspdi.properties");
             RdfAuthModel.updateAuthData(fuseki);
             //For applications
             //RdfAuthModel.readAuthModel();
