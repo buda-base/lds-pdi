@@ -27,6 +27,8 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.AuthProps;
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.restapi.exceptions.RestException;
@@ -35,6 +37,7 @@ import io.bdrc.taxonomy.TaxModel;
 public class BootClass implements ServletContextListener {
 
     public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
+    public final static String AUTH_PROPS_FILE="/etc/buda/ldspdi/ldspdi-auth.properties";
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
@@ -56,7 +59,8 @@ public class BootClass implements ServletContextListener {
             ServiceConfig.init(params);
             OntData.init();
             TaxModel.fetchModel();
-            //RdfAuthModel.updateAuthData(fuseki);
+            AuthProps.init(AUTH_PROPS_FILE);
+            RdfAuthModel.updateAuthData(fuseki);
             //For applications
             //RdfAuthModel.readAuthModel();
             log.info("BootClass has been properly initialized");
