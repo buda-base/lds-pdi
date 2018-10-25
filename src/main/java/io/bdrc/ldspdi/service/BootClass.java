@@ -1,6 +1,10 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Properties;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -59,13 +63,16 @@ public class BootClass implements ServletContextListener {
             ServiceConfig.init(params,configPath);
             OntData.init();
             TaxModel.fetchModel();
-            AuthProps.init(configPath+"ldspdi.properties");
+            InputStream is=new FileInputStream(configPath+"ldspdi.properties");
+            Properties props=new Properties();
+            props.load(is);
+            AuthProps.init(props);
             RdfAuthModel.updateAuthData(fuseki);
             //For applications
             //RdfAuthModel.readAuthModel();
             log.info("BootClass has been properly initialized");
         }
-        catch (IllegalArgumentException | RestException e) {
+        catch (IllegalArgumentException | RestException | IOException e) {
             log.error("BootClass init error", e);
         }
     }
