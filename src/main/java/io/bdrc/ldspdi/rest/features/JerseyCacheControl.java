@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface JerseyCacheControl {
 
-    
+
     /**
      * no-cache cache control.
     */
@@ -20,5 +20,5 @@ public @interface JerseyCacheControl {
      *
     */
     long maxAge() default 172800;
-    
+
 }
