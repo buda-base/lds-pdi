@@ -45,11 +45,10 @@ public class CacheControlFilterFactory implements DynamicFeature {
         public void filter(ContainerRequestContext ctx, ContainerResponseContext responseContext) {
             String appId=AuthProps.getProperty("appId");
             String path=ctx.getUriInfo().getPath();
-            System.out.println("IS Secured ? >> "+RdfAuthModel.isSecuredEndpoint(appId,path));
             if(!RdfAuthModel.isSecuredEndpoint(appId,path)) {
                 responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "public,"+headerValue);
             }else {
-                responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "private");
+                responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "private,"+headerValue);
             }
         }
     }
