@@ -837,6 +837,10 @@ public class MarcExport {
         if (main.hasProperty(partOf)) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is part of another Work"));
         }
+        // should be temporary
+        if (main.getLocalName().startsWith("W1FPL")) {
+            model.add(main, tmpLang, "pli");
+        }
         // this should be correct but breaks W2DB4598 because of poorly encoded series data
         //        if (main.hasProperty(hasExpression)) {
         //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is an abstract Work"));
