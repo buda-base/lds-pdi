@@ -25,6 +25,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -51,6 +52,7 @@ import com.opencsv.CSVReaderBuilder;
 
 import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
@@ -62,6 +64,7 @@ public class MarcExport {
     public final static Logger log = LoggerFactory.getLogger(MarcExport.class.getName());
 
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
+    public static final String BDR = "http://purl.bdrc.io/resource/";
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
     public static final Property partOf = ResourceFactory.createProperty(BDO+"workPartOf");
@@ -97,6 +100,10 @@ public class MarcExport {
     public static final Property workSeriesNumber = ResourceFactory.createProperty(BDO+"workSeriesNumber");
     public static final Property personEvent = ResourceFactory.createProperty(BDO+"personEvent");
     public static final Property personName = ResourceFactory.createProperty(BDO+"personName");
+    public static final Property langScript = ResourceFactory.createProperty(BDO+"langScript");
+    public static final Property otherLangScript = ResourceFactory.createProperty(BDO+"otherLangScript");
+    public static final Property language = ResourceFactory.createProperty(BDO+"language");
+    public static final Property script = ResourceFactory.createProperty(BDO+"script");
     public static final Property onYear = ResourceFactory.createProperty(BDO+"onYear");
     public static final Property notBefore = ResourceFactory.createProperty(BDO+"notBefore");
     public static final Property notAfter = ResourceFactory.createProperty(BDO+"notAfter");
@@ -642,52 +649,68 @@ public class MarcExport {
         return interestingLiterals.get(0);
     }
 
-    private static final Map<String,String> marcCodeToLang = new HashMap<>();
-    static {
-        marcCodeToLang.put("tib", "Tibetan");
-        marcCodeToLang.put("dzo", "Dzongkha");
-        marcCodeToLang.put("eng", "English");
-        marcCodeToLang.put("hin", "Hindi");
-        marcCodeToLang.put("mon", "Classical Mongolian");
-        marcCodeToLang.put("new", "Newari");
-        marcCodeToLang.put("pli", "Pali");
-        marcCodeToLang.put("rus", "Russian");
-        marcCodeToLang.put("san", "Sanskrit");
-        marcCodeToLang.put("chi", "Chinese");
+    private static String getLangLabel(final OntModel m, final String uri) {
+        final Resource main = m.getResource(uri);
+        final Resource lang = main.getPropertyResourceValue(language);
+        return lang.getProperty(RDFS.label).getString();
     }
 
-    private static void addLanguages(Model m, Resource main, Record record) {
-        StmtIterator lsi = main.listProperties(tmpLang);
-        final StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        while (lsi.hasNext()) {
-            final String marcLang = lsi.next().getString();
-            final String plainEnglish = marcCodeToLang.get(marcLang);
-            if (first) {
-                sb.append("In ");
-            } else {
-                sb.append(" and ");
-            }
-            sb.append(plainEnglish);
-            first = false;
+    // returns the script or null if the script is deemed unnecessary
+    private static String getScriptLabel(final OntModel m, final String uri) {
+        Resource main = m.getResource(uri);
+        final Resource lang = main.getPropertyResourceValue(language);
+        final String langLoc = lang.getLocalName();
+        if (langLoc.equals("LangPi") || langLoc.equals("LangSa")) {
+            final Resource scriptR = main.getPropertyResourceValue(script);
+            return scriptR.getProperty(RDFS.label).getString();
         }
-        lsi = main.listProperties(tmpOtherLang);
-        while (lsi.hasNext()) {
-            final String marcLang = lsi.next().getString();
-            final String plainEnglish = marcCodeToLang.get(marcLang);
-            if (first) {
-                sb.append("In ");
-            } else {
-                sb.append(" and ");
-            }
-            sb.append(plainEnglish);
-            first = false;
-        }
-        if (first)
+        return null;
+    }
+
+    private static void addLanguages(final Model m, final Resource main, final Record record) {
+        StmtIterator lsi = main.listProperties(langScript);
+        final OntModel ontMod = OntData.ontMod;
+        if (ontMod == null) { // during tests
             return;
-        sb.append('.');
+        }
+        final StringBuilder sb = new StringBuilder();
+        int nbLangScripts = 0;
+        String firstScriptLabel = null;
+        while (lsi.hasNext()) {
+            final String langScriptUri = lsi.next().getObject().asResource().getURI();
+            final String plainEnglish = getLangLabel(ontMod, langScriptUri);
+            nbLangScripts += 1;
+            if (nbLangScripts == 1) {
+                sb.append("In ");
+                firstScriptLabel = getScriptLabel(ontMod, langScriptUri);
+            } else {
+                sb.append(" and ");
+            }
+            sb.append(plainEnglish);
+        }
+        lsi = main.listProperties(otherLangScript);
+        while (lsi.hasNext()) {
+            final String langScriptUri = lsi.next().getObject().asResource().getURI();
+            final String plainEnglish = getLangLabel(ontMod, langScriptUri);
+            nbLangScripts += 1;
+            if (nbLangScripts == 1) {
+                sb.append("In ");
+                firstScriptLabel = getScriptLabel(ontMod, langScriptUri);
+            } else {
+                sb.append(" and ");
+            }
+            sb.append(plainEnglish);
+        }
+        if (nbLangScripts == 0)
+            return;
         final DataField f546 = factory.newDataField("546", ' ', ' ');
-        f546.addSubfield(factory.newSubfield('a', sb.toString()));
+        if (nbLangScripts == 1 && firstScriptLabel != null) {
+            f546.addSubfield(factory.newSubfield('a', sb.toString()+' '));
+            f546.addSubfield(factory.newSubfield('b', '('+firstScriptLabel+" script)."));
+        } else {
+            sb.append('.');
+            f546.addSubfield(factory.newSubfield('a', sb.toString()));
+        }
         record.addVariableField(f546);
     }
 
@@ -840,6 +863,7 @@ public class MarcExport {
         // should be temporary
         if (main.getLocalName().startsWith("W1FPL")) {
             model.add(main, tmpLang, "pli");
+            model.add(main, langScript, model.createResource(BDR+"PiMymr"));
         }
         // this should be correct but breaks W2DB4598 because of poorly encoded series data
         //        if (main.hasProperty(hasExpression)) {
