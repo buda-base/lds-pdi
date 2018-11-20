@@ -34,6 +34,11 @@ public class MarcExportTest extends JerseyTest {
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
+        //        try {
+        //            OntData.init();
+        //        } catch (RestException e) {
+        //            e.printStackTrace();
+        //        }
         // Creating a fuseki server
         server = FusekiServer.create().port(2251).add("/bdrcrw", srvds).build();
         server.start();
@@ -52,7 +57,7 @@ public class MarcExportTest extends JerseyTest {
 
     @Test
     public void testSimpleRequestSimple() {
-        final Response res = target("/resource/W23819.mrcx")
+        final Response res = target("/resource/W1FPL3356.mrcx")
                 .request()
                 .get();
         System.out.println("result:");
