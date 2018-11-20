@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.Access;
-import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.model.Endpoint;
@@ -29,15 +28,15 @@ public class RdfAuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
+        boolean isSecuredEndpoint=true;
         ctx.setProperty("access", new Access());
         String token=getToken(ctx.getHeaderString("Authorization"));
-        System.out.println("FILTER TOKEN >> "+token);
         TokenValidation validation=null;
-        String appId=AuthProps.getProperty("appId");
         String path=ctx.getUriInfo().getPath();
         Endpoint end=RdfAuthModel.getEndpoint(path);
         UserProfile prof=null;
         if(end==null) {
+            isSecuredEndpoint=false;
             //endpoint is not secured - Using default (empty endpoint)
             //for Access Object
             end=new Endpoint();
@@ -48,22 +47,19 @@ public class RdfAuthFilter implements ContainerRequestFilter {
             validation=new TokenValidation(token);
             prof=validation.getUser();
         }
-        log.info("FILTER IsSecuredEndpoint >> "+path+ " >> "+RdfAuthModel.isSecuredEndpoint(appId,path));
-        if(RdfAuthModel.isSecuredEndpoint(appId,path)) {
+        if(isSecuredEndpoint) {
             //Endpoint is secure
             if(validation==null) {
                 //no token --> access forbidden
                 abort(ctx);
             }else {
                 Access access=new Access(prof,end);
-                System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
+                /*System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
                 System.out.println("FILTER Access matchRole >> "+access.matchRole());
-                System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());
+                System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());*/
                 if(!access.hasEndpointAccess()) {
                     abort(ctx);
                 }
-                System.out.println("FILTER endpoint >> "+end);
-                System.out.println("FILTER user >> "+prof);
                 ctx.setProperty("access", access);
             }
         }
@@ -73,7 +69,6 @@ public class RdfAuthFilter implements ContainerRequestFilter {
                 //token present since validation is not null
                 Access acc=new Access(prof,end);
                 ctx.setProperty("access", acc);
-                System.out.println("FILTER put access >> "+acc);
             }
         }
     }

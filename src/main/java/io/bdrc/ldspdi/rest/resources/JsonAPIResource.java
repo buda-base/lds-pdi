@@ -41,6 +41,7 @@ import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
+import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
@@ -65,6 +66,7 @@ public class JsonAPIResource {
 
     @GET
     @Path("/queries")
+    @JerseyCacheControl()
     public Response queriesListGet() throws RestException{
         log.info("Call to queriesListGet()");
         return Response.ok(
@@ -73,6 +75,7 @@ public class JsonAPIResource {
 
     @POST
     @Path("/queries")
+    @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
     public ArrayList<QueryListItem> queriesListPost() throws RestException{
         log.info("Call to queriesListPost()");
@@ -81,6 +84,7 @@ public class JsonAPIResource {
 
     @GET
     @Path("/queries/{template}")
+    @JerseyCacheControl()
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
         log.info("Call to queryDescGet()");
         final LdsQuery qfp = LdsQueryService.get(name+".arq");
@@ -90,6 +94,7 @@ public class JsonAPIResource {
 
     @POST
     @Path("/queries/{template}")
+    @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
     public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException{
         log.info("Call to queryDescPost()");

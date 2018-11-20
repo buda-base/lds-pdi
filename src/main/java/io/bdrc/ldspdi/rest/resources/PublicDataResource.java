@@ -248,6 +248,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology/{path}/{class}")
     @Produces("text/html")
+    @JerseyCacheControl()
     public Response getCoreOntologyClassView(@PathParam("class") final String cl,
             @PathParam("path") final String path,
             @Context final Request request) throws RestException{
@@ -272,6 +273,7 @@ public class PublicDataResource {
 
     @GET
     @Path("/ontology/{path}/{class}.{ext}")
+    @JerseyCacheControl()
     public Response getCoreOntologyClassViewExt(@PathParam("class") final String cl,
             @PathParam("path") final String path,
             @PathParam("ext") final String ext,
@@ -312,6 +314,7 @@ public class PublicDataResource {
 
     @GET
     @Path("/ontology/{ont}.{ext}")
+    @JerseyCacheControl()
     public Response getOntology(@PathParam("ext") String ext,
             @PathParam("ont") String ont,
             @Context Request request) throws RestException {
@@ -350,6 +353,7 @@ public class PublicDataResource {
     @GET
     @Path("/ontology")
     @Produces("text/html")
+    @JerseyCacheControl()
     public Response getOntologyHomePage(@Context Request request) {
         log.info("Call to getOntologyHomePage()");
         Date lastUpdate=OntData.getLastUpdated();
