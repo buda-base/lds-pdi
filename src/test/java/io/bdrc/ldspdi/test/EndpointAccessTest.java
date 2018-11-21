@@ -49,10 +49,12 @@ public class EndpointAccessTest extends JerseyTest{
         HttpClient client=HttpClientBuilder.create().build();
         HttpPost post=new HttpPost(AuthProps.getProperty("issuer")+"oauth/token");
         HashMap<String,String> json = new HashMap<>();
-        json.put("grant_type","client_credentials");
+        json.put("grant_type","password");
+        json.put("username","admin@bdrc-test.com");
+        json.put("password",AuthProps.getProperty("admin@bdrc-test.com"));
         json.put("client_id",AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret",AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience","https://dev-bdrc.auth0.com/api/v2/");
+        json.put("audience",AuthProps.getProperty("audience"));
         ObjectMapper mapper=new ObjectMapper();
         String post_data=mapper.writer().writeValueAsString(json);
         StringEntity se = new StringEntity(post_data);
