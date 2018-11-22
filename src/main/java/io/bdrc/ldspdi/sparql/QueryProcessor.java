@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -108,7 +109,7 @@ public class QueryProcessor {
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        Model m=access.getModel(ServiceConfig.getProperty("authDataGraph"));
+        Model m=access.getModel(AuthProps.getProperty("authDataGraph"));
         return m;
     }
 
@@ -120,16 +121,6 @@ public class QueryProcessor {
         qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;
     }
-
-    /*public static ResultSet getData(String query,String fusekiUrl){
-
-        if(fusekiUrl == null) {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        }
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query));
-        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-        return qe.execSelect();
-    }*/
 
     public static void updateOntology(Model mod, String fusekiUrl) {
         if (fusekiUrl == null) {
@@ -150,7 +141,7 @@ public class QueryProcessor {
         log.info("AuthGraph >> "+ServiceConfig.getProperty("authGraph"));
         log.info("InfModel Size >> "+mod.size());
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        access.putModel(ServiceConfig.getProperty("authGraph"), mod);
+        access.putModel(AuthProps.getProperty("authGraph"), mod);
     }
 
     public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {

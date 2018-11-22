@@ -31,7 +31,7 @@ import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.rest.features.RdfAuthFilter;
 
-public class EndpointAccessTest extends JerseyTest{
+public class EndpointAccess extends JerseyTest{
 
     static AuthAPI auth;
     static String token;

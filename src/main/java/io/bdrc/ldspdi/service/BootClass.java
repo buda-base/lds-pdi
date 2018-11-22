@@ -63,10 +63,12 @@ public class BootClass implements ServletContextListener {
             ServiceConfig.init(params,configPath);
             OntData.init();
             TaxModel.fetchModel();
-            InputStream is=new FileInputStream(configPath+"ldspdi.properties");
             Properties props=new Properties();
-            props.load(is);
-            AuthProps.init(props);
+            props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
+            InputStream is=new FileInputStream(configPath+"ldspdi-private.properties");
+            Properties private_props=new Properties();
+            private_props.load(is);
+            AuthProps.init(private_props);
             RdfAuthModel.updateAuthData(fuseki);
             //For applications
             //RdfAuthModel.readAuthModel();
