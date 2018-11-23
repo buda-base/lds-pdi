@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.features;
+package io.bdrc.ldspdi.test;
 
 import java.io.IOException;
 
@@ -11,19 +11,19 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import io.bdrc.auth.Access;
-import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.rdf.RdfAuthModel;
 
-//@Provider
-//@PreMatching
+public class RdfAuthTestFilter implements ContainerRequestFilter {
 
-
-public class RdfAuthFilter implements ContainerRequestFilter {
-
-    public final static Logger log=LoggerFactory.getLogger(RdfAuthFilter.class.getName());
+    public final static Logger log=LoggerFactory.getLogger(RdfAuthTestFilter.class.getName());
     @Context private HttpServletRequest httpRequest;
 
     @Override
@@ -31,12 +31,9 @@ public class RdfAuthFilter implements ContainerRequestFilter {
         boolean isSecuredEndpoint=true;
         ctx.setProperty("access", new Access());
         String token=getToken(ctx.getHeaderString("Authorization"));
-        System.out.println("TOKEN Filter >> "+token);
-        TokenValidation validation=null;
         String path=ctx.getUriInfo().getPath();
-        System.out.println("PATH Filter >> "+path);
         Endpoint end=RdfAuthModel.getEndpoint(path);
-        System.out.println("ENDPOINT >> "+end);
+
         UserProfile prof=null;
         if(end==null) {
             isSecuredEndpoint=false;
@@ -47,19 +44,17 @@ public class RdfAuthFilter implements ContainerRequestFilter {
         if(token !=null) {
             //User is logged on
             //Getting his profile
-            validation=new TokenValidation(token);
-            prof=validation.getUser();
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256("secret")).build();
+            DecodedJWT jwt=verifier.verify(token);
+            prof=new UserProfile(jwt);
         }
         if(isSecuredEndpoint) {
             //Endpoint is secure
-            if(validation==null) {
+            if(token==null) {
                 //no token --> access forbidden
                 abort(ctx);
             }else {
                 Access access=new Access(prof,end);
-                /*System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
-                System.out.println("FILTER Access matchRole >> "+access.matchRole());
-                System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());*/
                 if(!access.hasEndpointAccess()) {
                     abort(ctx);
                 }
@@ -68,7 +63,7 @@ public class RdfAuthFilter implements ContainerRequestFilter {
         }
         else {
             //end point not secured
-            if(validation!=null) {
+            if(token!=null) {
                 //token present since validation is not null
                 Access acc=new Access(prof,end);
                 ctx.setProperty("access", acc);

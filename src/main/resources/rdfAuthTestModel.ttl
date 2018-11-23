@@ -1,0 +1,192 @@
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix adr:   <http://purl.bdrc.io/resource-auth/> .
+
+adr:act4  a                aut:ResourceAccess ;
+        aut:forPermission  adr:e6f0abf5-efd6-4c21-a77d-b6e0d857eee5 ;
+        aut:policy         bdr:AccessOpen .
+
+adr:zB6bie5CImrHWnV23AGRDSlnhYOKfqRQ
+        a            aut:Application ;
+        rdfs:label   "Default App" ;
+        aut:appType  "regular_web" ;
+        aut:desc     "" .
+
+adr:5be9920bec312320f56294dc
+        a               aut:User ;
+        aut:authId      "auth0|5be9920bec312320f56294dc" ;
+        aut:connection  "Username-Password-Authentication" ;
+        aut:forGroup    adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:hasRole     adr:1f375b66-31c2-415d-b20d-6904ca9847a7 ;
+        aut:isSocial    "false" ;
+        aut:provider    "auth0" ;
+        foaf:mbox       "admin@bdrc-test.com" ;
+        foaf:name       "admin@bdrc-test.com" .
+
+adr:Edpa3  a          aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "auth/rdf/admin" .
+
+adr:e3803d41-3476-45c8-885b-cbf4cf07eb85
+        a           aut:Permission ;
+        rdfs:label  "RestrictedSealed" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessRestrictedSealed accessType" .
+
+adr:act3  a                aut:ResourceAccess ;
+        aut:forPermission  adr:94aeb9e4-387f-45a7-aa53-f23b72b3581b ;
+        aut:policy         bdr:AccessRestrictedInChina .
+
+adr:114635926879799654981
+        a               aut:User ;
+        aut:authId      "google-oauth2|114635926879799654981" ;
+        aut:connection  "google-oauth2" ;
+        aut:forGroup    adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:hasRole     adr:1f375b66-31c2-415d-b20d-6904ca9847a7 ;
+        aut:isSocial    "true" ;
+        aut:provider    "google-oauth2" ;
+        foaf:mbox       "roux.elie@gmail.com" ;
+        foaf:name       "Élie Roux" .
+
+adr:Edpa2  a          aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "auth/rdf/staff" .
+
+adr:TestEdpa3  a      aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "resource/" , "auth/rdfaccess/admin" .
+
+adr:83b8d0a6-3670-4a17-9d1f-c3ffb3fcbd15
+        a           aut:Permission ;
+        rdfs:label  "RestrictedByQuality" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessRestrictedByQuality accessType" .
+
+adr:G0AjmCKspNngJsTtRnHaAUCD44ZxwoMJ
+        a            aut:Application ;
+        rdfs:label   "auth0-authz" ;
+        aut:appType  "non_interactive" ;
+        aut:desc     "" .
+
+adr:8ecdf2bf-a500-4402-b583-716e98efb74e
+        a           aut:Permission ;
+        rdfs:label  "Mixed" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessMixed accessType" .
+
+adr:act2  a                aut:ResourceAccess ;
+        aut:forPermission  adr:e3803d41-3476-45c8-885b-cbf4cf07eb85 ;
+        aut:policy         bdr:AccessRestrictedSealed .
+
+adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7
+        a              aut:Group ;
+        rdfs:label     "admin" ;
+        aut:desc       "admin BDRC group" ;
+        aut:hasMember  adr:114635926879799654981 , adr:5be9920bec312320f56294dc , adr:103944542200553871933 ;
+        aut:hasRole    adr:1f375b66-31c2-415d-b20d-6904ca9847a7 .
+
+adr:act8  a                aut:ResourceAccess ;
+        aut:forPermission  adr:bd75d2cf-65bd-463f-9f37-6aa13134b722 ;
+        aut:policy         bdr:AccessRestrictedByTbrc .
+
+adr:94aeb9e4-387f-45a7-aa53-f23b72b3581b
+        a           aut:Permission ;
+        rdfs:label  "RestrictedInChina" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessRestrictedInChina accessType" .
+
+adr:Edpa1  a          aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "auth/rdf/private" .
+
+adr:01217e3c-3242-48be-aa37-720a67ea5640
+        a           aut:Permission ;
+        rdfs:label  "RestrictedTemporarily" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessRestrictedTemporarily accessType" .
+
+adr:TestEdpa2  a      aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "auth/rdfaccess/staff" .
+
+adr:act1  a                aut:ResourceAccess ;
+        aut:forPermission  adr:53f83642-a198-4e35-b3a3-cce471bf84ba ;
+        aut:policy         bdr:AccessFairUse .
+
+adr:act7  a                aut:ResourceAccess ;
+        aut:forPermission  adr:8ecdf2bf-a500-4402-b583-716e98efb74e ;
+        aut:policy         bdr:AccessMixed .
+
+adr:TestEdpa1  a      aut:Endpoint ;
+        aut:appId     adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:forGroup  adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:path      "auth/rdfaccess/private" .
+
+adr:1f375b66-31c2-415d-b20d-6904ca9847a7
+        a                  aut:Role ;
+        rdfs:label         "bdrc-iiif-admin" ;
+        aut:appId          adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:appType        "client" ;
+        aut:desc           "Admin role in bdrc-iiif" ;
+        aut:hasPermission  adr:e3803d41-3476-45c8-885b-cbf4cf07eb85 , adr:bd75d2cf-65bd-463f-9f37-6aa13134b722 , adr:94aeb9e4-387f-45a7-aa53-f23b72b3581b , adr:8ecdf2bf-a500-4402-b583-716e98efb74e , adr:83b8d0a6-3670-4a17-9d1f-c3ffb3fcbd15 , adr:53f83642-a198-4e35-b3a3-cce471bf84ba , adr:01217e3c-3242-48be-aa37-720a67ea5640 , adr:e6f0abf5-efd6-4c21-a77d-b6e0d857eee5 .
+
+adr:e6f0abf5-efd6-4c21-a77d-b6e0d857eee5
+        a           aut:Permission ;
+        rdfs:label  "Open" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessOpen accessType" .
+
+adr:53f83642-a198-4e35-b3a3-cce471bf84ba
+        a           aut:Permission ;
+        rdfs:label  "FairUse" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessFairUse accessType" .
+
+adr:act6  a                aut:ResourceAccess ;
+        aut:forPermission  adr:83b8d0a6-3670-4a17-9d1f-c3ffb3fcbd15 ;
+        aut:policy         bdr:AccessRestrictedByQuality .
+
+adr:act5  a                aut:ResourceAccess ;
+        aut:forPermission  adr:01217e3c-3242-48be-aa37-720a67ea5640 ;
+        aut:policy         bdr:AccessRestrictedTemporarily .
+
+adr:bd75d2cf-65bd-463f-9f37-6aa13134b722
+        a           aut:Permission ;
+        rdfs:label  "RestrictedByTbrc" ;
+        aut:appId   adr:hqT7dOM6w7RSxTWpyjk1ymzUfKTAuEg2 ;
+        aut:desc    "allows viewing resources having AccessRestrictedByTbrc accessType" .
+
+adr:103944542200553871933
+        a               aut:User ;
+        aut:authId      "google-oauth2|103944542200553871933" ;
+        aut:connection  "google-oauth2" ;
+        aut:forGroup    adr:957f83d8-7590-4e07-ba0a-5dcd43cddcb7 ;
+        aut:hasRole     adr:1f375b66-31c2-415d-b20d-6904ca9847a7 ;
+        aut:isSocial    "true" ;
+        aut:provider    "google-oauth2" ;
+        foaf:mbox       "christomlinson@tbrc.org" ;
+        foaf:name       "Chris Tomlinson" .
+
+adr:yZbncmir236piYLJJt8q5kD96xeFy2fT
+        a            aut:Application ;
+        rdfs:label   "All Applications" ;
+        aut:appType  "" ;
+        aut:desc     "" .
+
+adr:5be992d9d7ece87f159c8bed
+        a               aut:User ;
+        aut:authId      "auth0|5be992d9d7ece87f159c8bed" ;
+        aut:connection  "Username-Password-Authentication" ;
+        aut:isSocial    "false" ;
+        aut:provider    "auth0" ;
+        foaf:mbox       "public@bdrc-test.com" ;
+        foaf:name       "public@bdrc-test.com" .
+

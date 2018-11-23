@@ -265,7 +265,7 @@
     <dependency>
       <groupId>io.bdrc</groupId>
       <artifactId>bdrc-auth-lib</artifactId>
-      <version>0.8.0</version>
+      <version>0.9.0</version>
     </dependency>
   </dependencies>
   <build>
