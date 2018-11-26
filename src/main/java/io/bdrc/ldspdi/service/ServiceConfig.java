@@ -38,7 +38,7 @@ public class ServiceConfig {
     public final static String FUSEKI_URL="fusekiUrl";
     public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-    public static void init(HashMap<String,String> params,String configPath) {
+    public static void init(HashMap<String,String> params) {
         ServiceConfig.params=params;
 
         try {

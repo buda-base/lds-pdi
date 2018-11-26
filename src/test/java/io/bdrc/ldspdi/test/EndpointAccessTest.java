@@ -27,7 +27,6 @@ public class EndpointAccessTest extends JerseyTest{
 
     @BeforeClass
     public static void init() throws IOException {
-
         RdfAuthModel.initForStaticTests();
     }
 

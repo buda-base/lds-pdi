@@ -50,7 +50,7 @@ public class BootClass implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            final String configPath= System.getProperty("ldspdi.configpath");
+            //final String configPath= System.getProperty("ldspdi.configpath");
             final String fuseki=arg0.getServletContext().getInitParameter("fuseki");
             final String queryPath=arg0.getServletContext().getInitParameter("queryPath");
             final String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
@@ -60,12 +60,12 @@ public class BootClass implements ServletContextListener {
             params.put("propertyPath",propertyPath);
             ResultsCache.init();
             GitService.update(queryPath);
-            ServiceConfig.init(params,configPath);
+            ServiceConfig.init(params);
             OntData.init();
             TaxModel.fetchModel();
             Properties props=new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
-            InputStream is=new FileInputStream(configPath+"ldspdi-private.properties");
+            InputStream is=new FileInputStream("/etc/buda/share/shared-private.properties");
             Properties private_props=new Properties();
             private_props.load(is);
             AuthProps.init(private_props);
