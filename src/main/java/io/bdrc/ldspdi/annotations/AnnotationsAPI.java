@@ -70,6 +70,10 @@ public class AnnotationsAPI {
             if (mediaType == null)
                 return AnnotationEndpoint.mediaTypeChoiceResponse(info);
         }
+       DocType dct=null;
+       if(mediaType.getSubtype().equals("ld+json")) {
+           dct=DocType.ANN;
+       }
        String ext = MediaTypeUtils.getExtFromMime(mediaType);
        MultivaluedMap<String,String> map= info.getQueryParameters();
        String range=map.getFirst("range");
@@ -81,9 +85,8 @@ public class AnnotationsAPI {
        args.put("I_SUBRANGELAST", rg[1].toString());
        final String query = qfp.getParametizedQuery(args, false);
        Model model= QueryProcessor.getGraph(query, ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL), null);
-       ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", DocType.ANN));
+       ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", dct));
        return AnnotationEndpoint.setHeaders(builder, info.getPath(), ext, "Choice", null, mediaType, false).build();
-
     }
 
 }
