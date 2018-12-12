@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -65,13 +66,17 @@ public class BootClass implements ServletContextListener {
             TaxModel.fetchModel();
             Properties props=new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
-            InputStream is=new FileInputStream("/etc/buda/share/shared-private.properties");
+            InputStream is=new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
             Properties private_props=new Properties();
             private_props.load(is);
+            Set<String> set=params.keySet();
+            for(String st:set) {
+                private_props.setProperty(st, params.get(st));
+            }
             AuthProps.init(private_props);
-            RdfAuthModel.updateAuthData(fuseki);
+            //RdfAuthModel.updateAuthData(fuseki);
             //For applications
-            //RdfAuthModel.readAuthModel();
+            RdfAuthModel.readAuthModel();
             log.info("BootClass has been properly initialized");
         }
         catch (IllegalArgumentException | RestException | IOException e) {
