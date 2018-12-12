@@ -70,6 +70,7 @@ public class BootClass implements ServletContextListener {
             InputStream is=new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
             Properties private_props=new Properties();
             private_props.load(is);
+            private_props.putAll(props);
             Set<String> set=params.keySet();
             for(String st:set) {
                 private_props.setProperty(st, params.get(st));
