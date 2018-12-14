@@ -13,6 +13,7 @@ import javax.ws.rs.ext.Provider;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
+import io.bdrc.ldspdi.service.ServiceConfig;
 
 @Provider
 public class CacheControlFilterFactory implements DynamicFeature {
@@ -43,12 +44,14 @@ public class CacheControlFilterFactory implements DynamicFeature {
 
         @Override
         public void filter(ContainerRequestContext ctx, ContainerResponseContext responseContext) {
-            String appId=AuthProps.getProperty("appId");
-            String path=ctx.getUriInfo().getPath();
-            if(!RdfAuthModel.isSecuredEndpoint(appId,path)) {
-                responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "public,"+headerValue);
-            }else {
-                responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "private,"+headerValue);
+            if(ServiceConfig.useAuth()) {
+                String appId=AuthProps.getProperty("appId");
+                String path=ctx.getUriInfo().getPath();
+                if(!RdfAuthModel.isSecuredEndpoint(appId,path)) {
+                    responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "public,"+headerValue);
+                }else {
+                    responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, "private,"+headerValue);
+                }
             }
         }
     }

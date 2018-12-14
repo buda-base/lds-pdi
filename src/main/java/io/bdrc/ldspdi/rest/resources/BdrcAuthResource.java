@@ -58,7 +58,7 @@ public class BdrcAuthResource {
     public Response getAuthResource(@PathParam("res") final String res) throws RestException {
         log.info("Call getAuthResource()");
         String query="describe <http://purl.bdrc.io/resource-auth/"+res+">";
-        Model m=QueryProcessor.getGraphFromModel(query, RdfAuthModel.getFullModel());
+        Model m=QueryProcessor.getGraphFromModel(query, QueryProcessor.getAuthGraph(null, "authDataGraph"));
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(m, "ttl"), MediaTypeUtils.getMimeFromExtension("ttl"));
         builder=setLastModified(builder);
         return builder.build();
@@ -69,7 +69,7 @@ public class BdrcAuthResource {
     public Response getAuthModel(@Context Request request) throws RestException {
         log.info("Call to getAuthModel()");
         ResponseBuilder builder=Response.ok(ResponseOutputStream.getModelStream(
-                QueryProcessor.getAuthDataGraph(fusekiUrl)),MediaTypeUtils.getMimeFromExtension("ttl"));
+                QueryProcessor.getAuthGraph(fusekiUrl,"authDataGraph")),MediaTypeUtils.getMimeFromExtension("ttl"));
         builder=setLastModified(builder);
         return builder.build();
     }
@@ -78,26 +78,34 @@ public class BdrcAuthResource {
     @Path("/authmodel/updated")
     public long getAuthModelUpdated(@Context Request request) {
         //log.info("Call to getAuthModelUpdated()");
-        return RdfAuthModel.getUpdated();
+        if(ServiceConfig.useAuth()) {
+            return RdfAuthModel.getUpdated();
+        }else {
+            return 999999999;
+        }
     }
 
     @POST
     @Path("/callbacks/github/bdrc-auth")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAuthModel() throws RestException{
-        log.info("updating Auth data model() >>");
-        Thread t=new Thread(new RdfAuthModel());
-        t.start();
-        return Response.ok("Auth Model was updated").build();
+        if(ServiceConfig.useAuth()) {
+            log.info("updating Auth data model() >>");
+            Thread t=new Thread(new RdfAuthModel());
+            t.start();
+            return Response.ok("Auth Model was updated").build();
+        }
+        return Response.ok("Auth usage is disabled").build();
     }
 
     private ResponseBuilder setLastModified(ResponseBuilder builder) {
         Calendar cal=Calendar.getInstance();
-        cal.setTimeInMillis(RdfAuthModel.getUpdated());
+        if(ServiceConfig.useAuth()) {
+            cal.setTimeInMillis(RdfAuthModel.getUpdated());
+        }
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         builder.header("Last-Modified", formatter.format(cal.getTime()));
         return builder;
     }
-
 }

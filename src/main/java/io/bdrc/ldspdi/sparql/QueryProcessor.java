@@ -103,13 +103,14 @@ public class QueryProcessor {
         return getGraph(query, null, null);
     }
 
-    public static Model getAuthDataGraph(String fusekiUrl) throws RestException{
+    public static Model getAuthGraph(String fusekiUrl,String graph) throws RestException{
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        Model m=access.getModel(AuthProps.getProperty("authDataGraph"));
+        //Model m=access.getModel(AuthProps.getProperty("authDataGraph"));
+        Model m=access.getModel(ServiceConfig.getProperty(graph));
         return m;
     }
 
@@ -191,7 +192,7 @@ public class QueryProcessor {
         }
     }
 
-    private static String getPrefixes() throws RestException {
+    public static String getPrefixes() throws RestException {
         String pref = Prefixes.getPrefixesString();
         if(pref != null) {
             return pref;

@@ -76,9 +76,11 @@ public class BootClass implements ServletContextListener {
                 private_props.setProperty(st, params.get(st));
             }
             AuthProps.init(private_props);
-            RdfAuthModel.updateAuthData(fuseki);
-            //For applications
-            //RdfAuthModel.readAuthModel();
+            if(ServiceConfig.useAuth()) {
+                RdfAuthModel.updateAuthData(fuseki);
+                //For applications
+                //RdfAuthModel.readAuthModel();
+            }
             log.info("BootClass has been properly initialized");
         }
         catch (IllegalArgumentException | RestException | IOException e) {

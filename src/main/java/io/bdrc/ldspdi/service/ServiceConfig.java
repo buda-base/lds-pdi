@@ -74,6 +74,10 @@ public class ServiceConfig {
         prop.setProperty(FUSEKI_URL, fusekiUrl);
     }
 
+    public static boolean useAuth() {
+        return Boolean.parseBoolean(prop.getProperty("useAuth"));
+    }
+
     public static String getProperty(String key){
         return prop.getProperty(key);
     }

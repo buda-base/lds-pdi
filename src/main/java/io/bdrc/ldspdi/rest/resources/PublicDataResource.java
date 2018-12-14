@@ -54,7 +54,6 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -323,7 +322,12 @@ public class PublicDataResource {
         if (ont.equals("core")) {
             model = OntData.ontMod;
         } else if(ont.equals("auth")) {
-            model = RdfAuthModel.getFullModel();
+            String query="construct {?s ?p ?o}\n" +
+                    "where {\n" +
+                    "graph <http://purl.bdrc.io/ontology/ext/authSchema>\n" +
+                    "  {?s ?p ?o}\n" +
+                    "}";
+            model = QueryProcessor.getGraph(query, null, QueryProcessor.getPrefixes());
         } else {
             throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(ont));
         }
