@@ -74,6 +74,7 @@ public class DocFileModel {
                         files.add(tmp.substring(tmp.lastIndexOf("/")+1));
                     }
                 }
+                stream.close();
             } catch (IOException e) {
                 log.error("Error while getting query templates", e);
                 e.printStackTrace();
