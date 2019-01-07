@@ -121,7 +121,7 @@ public class ResServiceTest extends JerseyTest{
             assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
             assertTrue(res.getHeaderString("TCN").equals("Choice"));
             assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
-            assertTrue(res.getHeaderString("Location").equals("http://library.bdrc.io/show/bdr:P1AG29"));
+            assertTrue(res.getHeaderString("Location").endsWith("show/bdr:P1AG29"));
         }
     }
 
