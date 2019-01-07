@@ -38,6 +38,9 @@ public class QueryMvcSolutionItem {
                         }else if(Uri.startsWith("http://purl.bdrc.io/ontology/core/")){
                             tmp="<a href=\""+Uri+"\"> "+res.getLocalName()+"</a>";
                         }
+                        else {
+                            tmp="<a href=\""+Uri+"\"> "+Uri+"</a>";
+                        }
                     }
                     dataRow.put(key, tmp);
                 }
