@@ -27,3 +27,5 @@ prefix oa:    <http://www.w3.org/ns/oa#>
 prefix as:    <http://www.w3.org/ns/activitystreams#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 prefix schema: <http://schema.org/>
+prefix sh: <http://www.w3.org/ns/shacl#>
+prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>

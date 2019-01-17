@@ -217,6 +217,7 @@ public class QueryProcessor {
                     " PREFIX dcterms: <http://purl.org/dc/terms/>\n" +
                     " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>"+
                     " PREFIX aut:   <http://purl.bdrc.io/ontology/ext/auth/>"+
+                    " PREFIX sh: <http://www.w3.org/ns/shacl#> ."+
                     " PREFIX adr:   <http://purl.bdrc.io/resource-auth/>";
         }
     }

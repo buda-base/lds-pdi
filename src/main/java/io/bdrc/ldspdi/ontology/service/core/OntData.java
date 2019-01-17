@@ -51,6 +51,9 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class OntData implements Runnable {
 
+    public static String ONT_CORE_URI="http://purl.bdrc.io/ontology/core/";
+    public static String ONT_ADMIN_URI="http://purl.bdrc.io/ontology/admin/";
+
     public static InfModel infMod;
     public static OntModel ontMod;
     public static OntModel ontAuthMod;
@@ -70,6 +73,13 @@ public class OntData implements Runnable {
             m.read(stream, "", "RDF/XML");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+            /******RDFS model*********/
+            InputStream st=OntData.class.getClassLoader().getResourceAsStream("rdfs.ttl");
+            final Model m1 = ModelFactory.createDefaultModel();
+            m1.read(st, "", "TURTLE");
+            st.close();
+            ontMod.add(m1);
+            /***************/
             //owlCharacteristics=new OWLPropsCharacteristics(ontMod);
             rdf10tordf11(ontMod);
             readGithubJsonLDContext();
@@ -144,6 +154,52 @@ public class OntData implements Runnable {
         return qexec.execDescribe();
     }
 
+    public static ArrayList<OntProperty> getAllClassProps(String iri){
+        OntClassModel clModel=new OntClassModel(iri);
+        final ArrayList<OntProperty> list=new ArrayList<>();
+        if(clModel.clazz!=null) {
+            String qy="";
+            try {
+                qy=Prefixes.getPrefixesString() +" select distinct  ?clazz ?p\n" +
+                        "where {\n" +
+                        "bind (<"+iri+"> as ?base)\n" +
+                        "graph :ontologySchema {\n" +
+                        "?base rdfs:subClassOf+ ?clazz .\n" +
+                        "{ ?p rdfs:domain/(owl:unionOf/rdf:rest*/rdf:first)* ?clazz . }\n" +
+                        "}\n" +
+                        "}";
+            } catch (RestException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            /*final String query = "prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "select distinct ?p where {\n" +
+                    "  ?s a <"+iri + "> ."+
+                    "  ?s ?p ?o;\n" +
+                    "  Filter(?p != rdf:type)\n" +
+                    "}";
+            final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);*/
+            //final QueryExecution qexec = QueryExecutionFactory.create(qy, ontMod);
+            final QueryExecution qexec=QueryProcessor.getResultSet(qy,null);
+            final ResultSet res = qexec.execSelect() ;
+            while(res.hasNext()) {
+                final QuerySolution qs=res.next();
+                final RDFNode node=qs.get("?p");
+                OntResource rsc=ontMod.getOntResource(node.asResource().getURI());
+                //System.out.println("NODE >> "+node.asResource()+ " OntProp >>"+ontMod.getOntResource(node.asResource().getURI()).isProperty());
+                if(rsc.isProperty()) {
+                    list.add(rsc.asProperty());
+                }
+                else {
+                    System.out.println("Skipped "+node.asResource().getURI()+" property in getAllClassProps("+iri+")");
+                }
+                //list.add(ontMod.getOntResource(node.asResource().getURI()).asProperty());
+                //list.add(node.asResource().getURI());
+            }
+        }
+        return list;
+    }
+
     public static ArrayList<OntResource> getDomainUsages(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 " select distinct ?s where {" +
@@ -211,7 +267,7 @@ public class OntData implements Runnable {
     public static ArrayList<OntResource> getSubClassesOf(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 " select distinct ?s where {" +
-                "   <"+uri+"> rdfs:subClassOf ?s ." +
+                "   ?s rdfs:subClassOf <"+uri+"> ." +
                 "} order by ?s";
         final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);
         final ResultSet res = qexec.execSelect() ;

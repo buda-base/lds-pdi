@@ -32,6 +32,7 @@ public class OWLPropsCharacteristics {
     public static final String OWL_ASYMMETRIC="http://www.w3.org/2002/07/owl#AsymmetricProperty";
     public static final String OWL_REFLEXIVE="http://www.w3.org/2002/07/owl#ReflexiveProperty";
     public static final String OWL_INVERSEOF="http://www.w3.org/2002/07/owl#inverseOf";
+    public static final String OWL_ANNOTATION_PROP="http://www.w3.org/2002/07/owl#AnnotationProperty";
 
     ArrayList<String> functionalProps;
     ArrayList<String> symmetricProps;
