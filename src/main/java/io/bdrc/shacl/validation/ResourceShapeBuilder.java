@@ -18,7 +18,6 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.ontology.service.core.OWLPropsCharacteristics;
-import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -27,14 +26,12 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class ResourceShapeBuilder {
 
-    OntClassModel clModel;
     String uri;
     Model shapeModel;
 
     public ResourceShapeBuilder(String iri) throws RestException {
         shapeModel=ModelFactory.createDefaultModel();
         shapeModel.setNsPrefixes(Prefixes.getPrefixMapping());
-        clModel=new OntClassModel(iri);
         this.uri=SHACL.BDRC_SHAPE+"/"+iri.substring(iri.lastIndexOf('/')+1)+"Shape";
         Statement res = ResourceFactory.createStatement(ResourceFactory.createResource(uri),
                 RDF.type, ResourceFactory.createResource(SHACL.URL_ROOT+SHACL.NODE_SHAPE));

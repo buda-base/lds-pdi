@@ -20,6 +20,7 @@ package io.bdrc.ldspdi.rest.resources;
  ******************************************************************************/
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,6 +47,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -94,6 +96,20 @@ public class PublicDataResource {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 os.write(ServiceConfig.getRobots().getBytes());
+            }
+        };
+        return Response.ok(stream,MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    @GET
+    @Path("/shacl/{file}")
+    public Response getShaclFile(@Context UriInfo info, @PathParam("file") final String file) {
+        log.info("Call getRobots()");
+        StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                InputStream str=PublicDataResource.class.getClassLoader().getResourceAsStream(file+".ttl");
+                os.write(IOUtils.toByteArray(str));
             }
         };
         return Response.ok(stream,MediaType.TEXT_PLAIN_TYPE).build();
