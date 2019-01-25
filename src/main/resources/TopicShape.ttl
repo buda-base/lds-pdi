@@ -29,52 +29,13 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
-rsh:hasIncarnation  a  sh:PropertyGroup .
+<http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso>
+        a       sh:PropertyGroup .
 
 rsh:TopicShape  a       sh:NodeShape ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationYangtse
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsrKTs
-                        ] ;
-        sh:property     [ sh:class  adm:AccessType ;
-                          sh:path   adm:access
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsVIAF
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationGeneral
-                        ] ;
-        sh:property     [ sh:class  bdo:Note ;
-                          sh:path   bdo:note
-                        ] ;
+        sh:closed       true ;
         sh:property     [ sh:datatype  xsd:anyURI ;
                           sh:path      adm:attributionURL
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationSpeech
-                        ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      adm:attributionName
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationMind
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic ;
-                          sh:path   bdo:seeAlso
-                        ] ;
-        sh:property     [ sh:class  bdo:StatusType ;
-                          sh:path   adm:status
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationBody
                         ] ;
         sh:property     [ sh:datatype  owl:AnnotationProperty ;
                           sh:path      bdo:sameAsWorldCat
@@ -82,29 +43,39 @@ rsh:TopicShape  a       sh:NodeShape ;
         sh:property     [ sh:class  adm:License ;
                           sh:path   adm:license
                         ] ;
-        sh:property     [ sh:class  rdfs:Resource ;
-                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path   rdfs:isDefinedBy
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationQualities
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsToL
+        sh:property     [ sh:class  adm:AccessType ;
+                          sh:path   adm:access
                         ] ;
         sh:property     [ sh:datatype  xsd:anyURI ;
                           sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
                           sh:path      bdo:originalRecord
                         ] ;
+        sh:property     [ sh:class  bdo:StatusType ;
+                          sh:path   adm:status
+                        ] ;
+        sh:property     [ sh:class  bdo:Note ;
+                          sh:path   bdo:note
+                        ] ;
         sh:property     [ sh:class  adm:LogEntry ;
                           sh:path   adm:logEntry
                         ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationActivities
+        sh:property     [ sh:class  bdo:Topic ;
+                          sh:path   bdo:seeAlso
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsToL
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      adm:attributionName
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsVIAF
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsrKTs
+                        ] ;
+        sh:property     [ sh:class  rdfs:Resource ;
+                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path   rdfs:isDefinedBy
                         ] ;
         sh:targetClass  bdo:Topic .
-
-<http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso>
-        a       sh:PropertyGroup .

@@ -34,8 +34,29 @@
 
 rsh:OrganizationShape
         a               sh:NodeShape ;
-        sh:property     [ sh:class  bdo:Note ;
-                          sh:path   bdo:note
+        sh:closed       true ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsWorldCat
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      adm:attributionName
+                        ] ;
+        sh:property     [ sh:class  bdo:StatusType ;
+                          sh:path   adm:status
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsToL
+                        ] ;
+        sh:property     [ sh:class  adm:License ;
+                          sh:path   adm:license
+                        ] ;
+        sh:property     [ sh:class  rdfs:Resource ;
+                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path   rdfs:isDefinedBy
+                        ] ;
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path      bdo:originalRecord
                         ] ;
         sh:property     [ sh:datatype  xsd:anyURI ;
                           sh:path      adm:attributionURL
@@ -43,36 +64,16 @@ rsh:OrganizationShape
         sh:property     [ sh:datatype  owl:AnnotationProperty ;
                           sh:path      bdo:sameAsVIAF
                         ] ;
+        sh:property     [ sh:class  bdo:Note ;
+                          sh:path   bdo:note
+                        ] ;
         sh:property     [ sh:class  adm:LogEntry ;
                           sh:path   adm:logEntry
                         ] ;
         sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsWorldCat
-                        ] ;
-        sh:property     [ sh:class  bdo:StatusType ;
-                          sh:path   adm:status
+                          sh:path      bdo:sameAsrKTs
                         ] ;
         sh:property     [ sh:class  adm:AccessType ;
                           sh:path   adm:access
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsrKTs
-                        ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path      bdo:originalRecord
-                        ] ;
-        sh:property     [ sh:class  adm:License ;
-                          sh:path   adm:license
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsToL
-                        ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      adm:attributionName
-                        ] ;
-        sh:property     [ sh:class  rdfs:Resource ;
-                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path   rdfs:isDefinedBy
                         ] ;
         sh:targetClass  bdo:Organization .

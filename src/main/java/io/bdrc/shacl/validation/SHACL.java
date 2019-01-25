@@ -14,5 +14,6 @@ public class SHACL {
     public static String PATH="path";
     public static String PROPERTY="property";
     public static String DATATYPE="datatype";
+    public static String CLOSED="closed";
 
 }

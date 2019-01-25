@@ -33,75 +33,76 @@
         a       sh:PropertyGroup .
 
 rsh:VolumeShape  a      sh:NodeShape ;
-        sh:property     [ sh:class  rdfs:Resource ;
-                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path   rdfs:isDefinedBy
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsrKTs
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:volumeQcPerson
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string , xsd:integer ;
-                          sh:path      bdo:volumeNumber
-                        ] ;
-        sh:property     [ sh:class  adm:LogEntry ;
-                          sh:path   adm:logEntry
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsVIAF
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:volumePagesIntro
+        sh:closed       true ;
+        sh:property     [ sh:class  adm:AccessType ;
+                          sh:path   adm:access
                         ] ;
         sh:property     [ sh:class  bdo:StatusType ;
                           sh:path   adm:status
                         ] ;
-        sh:property     [ sh:class  adm:License ;
-                          sh:path   adm:license
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:volumePagesTotal
-                        ] ;
-        sh:property     [ sh:datatype  rdf:langString ;
-                          sh:path      bdo:volumeName
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:volumePagesTbrcIntro
-                        ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:path      adm:attributionURL
+        sh:property     [ sh:class  bdo:IntegerOrString ;
+                          sh:path   bdo:volumeNumber
                         ] ;
         sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsToL
-                        ] ;
-        sh:property     [ sh:class  bdo:Note ;
-                          sh:path   bdo:note
-                        ] ;
-        sh:property     [ sh:class  bdo:Item ;
-                          sh:path   bdo:volumeOf
+                          sh:path      bdo:sameAsVIAF
                         ] ;
         sh:property     [ sh:datatype  owl:AnnotationProperty ;
                           sh:path      bdo:sameAsWorldCat
                         ] ;
         sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path      bdo:originalRecord
+                          sh:path      adm:attributionURL
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
                           sh:path      adm:volumeQcNote
                         ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsrKTs
+                        ] ;
+        sh:property     [ sh:class  rdfs:Resource ;
+                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path   rdfs:isDefinedBy
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsToL
+                        ] ;
         sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:volumePagesText
+                          sh:path      bdo:volumePagesTotal
+                        ] ;
+        sh:property     [ sh:datatype  xsd:integer ;
+                          sh:path      bdo:volumePagesIntro
+                        ] ;
+        sh:property     [ sh:datatype  xsd:integer ;
+                          sh:path      bdo:volumePagesTbrcIntro
+                        ] ;
+        sh:property     [ sh:class  bdo:Item ;
+                          sh:path   bdo:volumeOf
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
                           sh:path      adm:volumeQcDate
                         ] ;
-        sh:property     [ sh:class  adm:AccessType ;
-                          sh:path   adm:access
-                        ] ;
         sh:property     [ sh:datatype  rdf:PlainLiteral ;
                           sh:path      adm:attributionName
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      adm:volumeQcPerson
+                        ] ;
+        sh:property     [ sh:datatype  xsd:integer ;
+                          sh:path      bdo:volumePagesText
+                        ] ;
+        sh:property     [ sh:class  bdo:Note ;
+                          sh:path   bdo:note
+                        ] ;
+        sh:property     [ sh:class  adm:License ;
+                          sh:path   adm:license
+                        ] ;
+        sh:property     [ sh:datatype  rdf:langString ;
+                          sh:path      bdo:volumeName
+                        ] ;
+        sh:property     [ sh:class  adm:LogEntry ;
+                          sh:path   adm:logEntry
+                        ] ;
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path      bdo:originalRecord
                         ] ;
         sh:targetClass  bdo:Volume .

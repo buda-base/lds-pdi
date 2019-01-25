@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
@@ -39,6 +40,9 @@ public class ResourceShapeBuilder {
         shapeModel.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri),
                 ResourceFactory.createProperty(SHACL.URL_ROOT+SHACL.TARGET_CLASS),
                 ResourceFactory.createResource(iri)));
+        shapeModel.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri),
+                ResourceFactory.createProperty(SHACL.URL_ROOT+SHACL.CLOSED),
+                ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean)));
         List<OntProperty> props=OntData.getAllClassProps(iri);
         for(OntProperty pr:props) {
             Resource rss=null;

@@ -29,179 +29,223 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
-rsh:hasIncarnation  a  sh:PropertyGroup .
-
 rsh:PersonShape  a      sh:NodeShape ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsrKTs
-                        ] ;
-        sh:property     [ sh:class  bdo:PersonName ;
-                          sh:path   bdo:personName
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasNibling
-                        ] ;
-        sh:property     [ sh:class  adm:AccessType ;
-                          sh:path   adm:access
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationActivities
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic ;
-                          sh:path   bdo:personOfSect
-                        ] ;
-        sh:property     [ sh:class  bdo:PersonEvent ;
-                          sh:path   bdo:personEvent
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasCousin
-                        ] ;
-        sh:property     [ sh:class  bdo:Note ;
-                          sh:path   bdo:note
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasSibling
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:path   bdo:personHasConsort
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationYangtse
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
+        sh:closed       true ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
                           sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationYangtse
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationQualities
-                        ] ;
-        sh:property     [ sh:class  bdo:Gender ;
-                          sh:path   bdo:personGender
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
-                          sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationQualities
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationSpeech
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsVIAF
+                          sh:path   bdo:incarnationActivities
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
                           sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasUnknownKinship
+                          sh:path   bdo:hasSpouse
                         ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path      bdo:originalRecord
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personArtistOf
                         ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
                           sh:group  rsh:isIncarnation ;
                           sh:path   bdo:incarnationSpeech
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
                           sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasGrandParent
+                          sh:path   bdo:hasUnknownKinship
                         ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationBody
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personTertonOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personRecipientOfResponseToQueryOf
+                        ] ;
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path      bdo:originalRecord
+                        ] ;
+        sh:property     [ sh:class  bdo:StatusType ;
+                          sh:path   adm:status
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      adm:attributionName
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personCommentatorOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personCalligrapherOf
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
                           sh:group  rsh:kinWith ;
                           sh:path   bdo:hasParentSibling
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
-                          sh:path   bdo:personConsortOf
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:path   bdo:personStudentOf
-                        ] ;
-        sh:property     [ sh:class  bdo:StatusType ;
-                          sh:path   adm:status
-                        ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:path      adm:attributionURL
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationGeneral
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
                           sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasChild
+                          sh:path   bdo:hasSibling
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personAmanuensisOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Gender ;
+                          sh:path   bdo:personGender
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personReciterOf
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasParent
+                          sh:path   bdo:personTeacherOf
                         ] ;
-        sh:property     [ sh:datatype  xsd:boolean ;
-                          sh:path      bdo:personIsNonActor
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personContributingAuthorOf
                         ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasGrandChild
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsToL
-                        ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:kinWith ;
-                          sh:path   bdo:hasSpouse
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
-                          sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationActivities
-                        ] ;
-        sh:property     [ sh:class  adm:License ;
-                          sh:path   adm:license
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personMainAuthorOf
                         ] ;
         sh:property     [ sh:class  rdfs:Resource ;
                           sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
                           sh:path   rdfs:isDefinedBy
                         ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:path      bdo:DDBCAId
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsWorldCat
                         ] ;
-        sh:property     [ sh:class  bdo:Person ;
-                          sh:group  rsh:hasIncarnation ;
-                          sh:path   bdo:hasIncarnationMind
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:path      adm:attributionURL
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personForgerOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personScribeOf
+                        ] ;
+        sh:property     [ sh:datatype  xsd:boolean ;
+                          sh:path      bdo:personIsNonActor
+                        ] ;
+        sh:property     [ sh:class  bdo:Note ;
+                          sh:path   bdo:note
+                        ] ;
+        sh:property     [ sh:class  bdo:Topic ;
+                          sh:path   bdo:personOfSect
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsVIAF
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personCompilerOf
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
+                          sh:group  rsh:isIncarnation ;
+                          sh:path   bdo:incarnationGeneral
                         ] ;
         sh:property     [ sh:class  adm:LogEntry ;
                           sh:path   adm:logEntry
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsrKTs
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsToL
+                        ] ;
+        sh:property     [ sh:class  adm:License ;
+                          sh:path   adm:license
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personAttributedAuthorOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasParent
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasChild
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
+                          sh:group  rsh:isIncarnation ;
+                          sh:path   bdo:incarnationQualities
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasGrandParent
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasNibling
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
+                          sh:group  rsh:isIncarnation ;
+                          sh:path   bdo:incarnationYangtse
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personHeadTranslatorOf
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonName ;
+                          sh:path   bdo:personName
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
+                          sh:group  rsh:isIncarnation ;
+                          sh:path   bdo:incarnationMind
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonOrTopic ;
+                          sh:group  rsh:isIncarnation ;
+                          sh:path   bdo:incarnationBody
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:path   bdo:personHasConsort
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:path   bdo:personConsortOf
+                        ] ;
+        sh:property     [ sh:class  adm:AccessType ;
+                          sh:path   adm:access
+                        ] ;
+        sh:property     [ sh:class  bdo:PersonEvent ;
+                          sh:path   bdo:personEvent
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personTranslatorOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personOralTranslatorOf
+                        ] ;
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasGrandChild
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
                           sh:group  rsh:kinWith ;
                           sh:path   bdo:hasInLaw
                         ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
-                          sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationGeneral
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personIndicScholarOf
                         ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsWorldCat
-                        ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      adm:attributionName
-                        ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
-                          sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationBody
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personReviserOf
                         ] ;
         sh:property     [ sh:class  bdo:Person ;
-                          sh:path   bdo:personTeacherOf
+                          sh:path   bdo:personStudentOf
                         ] ;
-        sh:property     [ sh:class  bdo:Topic , bdo:Person ;
-                          sh:group  rsh:isIncarnation ;
-                          sh:path   bdo:incarnationMind
+        sh:property     [ sh:class  bdo:Person ;
+                          sh:group  rsh:kinWith ;
+                          sh:path   bdo:hasCousin
+                        ] ;
+        sh:property     [ sh:class  bdo:Work ;
+                          sh:group  rsh:personCreatorOf ;
+                          sh:path   bdo:personBardOf
                         ] ;
         sh:targetClass  bdo:Person .
 
@@ -211,3 +255,5 @@ rsh:isIncarnation  a  sh:PropertyGroup .
 
 <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso>
         a       sh:PropertyGroup .
+
+rsh:personCreatorOf  a  sh:PropertyGroup .

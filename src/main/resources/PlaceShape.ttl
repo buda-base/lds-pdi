@@ -30,118 +30,113 @@
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
 rsh:PlaceShape  a       sh:NodeShape ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      tbr:place_prov_py
-                        ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:path      bdo:DDBCAId
-                        ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:path      adm:attributionURL
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:placeWBArea
-                        ] ;
-        sh:property     [ sh:class  adm:License ;
-                          sh:path   adm:license
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsVIAF
-                        ] ;
+        sh:closed       true ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_accession
+                          sh:path      adm:place_TLM_adminEmail
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      tbr:place_town_ch
+                        ] ;
+        sh:property     [ sh:class  bdo:Note ;
+                          sh:path   bdo:note
                         ] ;
         sh:property     [ sh:class  bdo:Taxonomy ;
                           sh:path   adm:place_TLM_taxonomy
                         ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeGonpaPerEcumen
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsToL
                         ] ;
-        sh:property     [ sh:datatype  xsd:anyURI ;
-                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path      bdo:originalRecord
-                        ] ;
-        sh:property     [ sh:class  bdo:Place ;
-                          sh:path   bdo:placeIsNear
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeGB2260-2013
+        sh:property     [ sh:datatype  xsd:integer ;
+                          sh:path      bdo:placeWB2010
                         ] ;
         sh:property     [ sh:class  bdo:Place ;
-                          sh:path   bdo:placeLocatedIn
-                        ] ;
-        sh:property     [ sh:class  bdo:PlaceType ;
-                          sh:path   bdo:placeType
+                          sh:path   bdo:placeContains
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      tbr:place_name_kr
+                          sh:path      tbr:place_name_lex
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_num
-                        ] ;
-        sh:property     [ sh:class  rdfs:Resource ;
-                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
-                          sh:path   rdfs:isDefinedBy
-                        ] ;
-        sh:property     [ sh:class  bdo:StatusType ;
-                          sh:path   adm:status
+                          sh:path      bdo:placeAccuracy
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeLong
+                          sh:path      adm:place_TLM_accession
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
                           sh:path      tbr:place_id_TBRC
                         ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_adminEmail
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      tbr:place_prov_py
                         ] ;
-        sh:property     [ sh:class  adm:AccessType ;
-                          sh:path   adm:access
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      bdo:placeGB2260-2013
                         ] ;
         sh:property     [ sh:class  bdo:PlaceEvent ;
                           sh:path   bdo:placeEvent
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      bdo:placeLat
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      tbr:place_town_py
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      bdo:placeMARCCountryCode
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      bdo:placeLong
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
                           sh:path      tbr:place_gonpa_per1000
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeRegionPoly
+                          sh:path      tbr:place_town_syl
                         ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      bdo:placeWB2010
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeChgisId
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_librarian
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      tbr:place_name_lex
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsWorldCat
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsrKTs
-                        ] ;
-        sh:property     [ sh:class  adm:LogEntry ;
-                          sh:path   adm:logEntry
-                        ] ;
-        sh:property     [ sh:datatype  owl:AnnotationProperty ;
-                          sh:path      bdo:sameAsToL
+        sh:property     [ sh:class  vcard:Address ;
+                          sh:path   bdo:placeAddress
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
                           sh:path      tbr:place_gb_dist
                         ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsVIAF
+                        ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeAccuracy
+                          sh:path      bdo:placeRegionPoly
                         ] ;
         sh:property     [ sh:class  bdo:Place ;
-                          sh:path   bdo:placeContains
+                          sh:path   bdo:placeIsNear
                         ] ;
-        sh:property     [ sh:class  vcard:Address ;
-                          sh:path   bdo:placeAddress
+        sh:property     [ sh:class  bdo:StatusType ;
+                          sh:path   adm:status
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      bdo:placeGonpaPerEcumen
+                        ] ;
+        sh:property     [ sh:datatype  xsd:integer ;
+                          sh:path      bdo:placeWBArea
+                        ] ;
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:group     <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path      bdo:originalRecord
+                        ] ;
+        sh:property     [ sh:class  bdo:PlaceType ;
+                          sh:path   bdo:placeType
+                        ] ;
+        sh:property     [ sh:class  rdfs:Resource ;
+                          sh:group  <http://purl.bdrc.io/shacl/core/shape/rdf-schema#seeAlso> ;
+                          sh:path   rdfs:isDefinedBy
+                        ] ;
+        sh:property     [ sh:class  adm:LogEntry ;
+                          sh:path   adm:logEntry
+                        ] ;
+        sh:property     [ sh:class  adm:AccessType ;
+                          sh:path   adm:access
+                        ] ;
+        sh:property     [ sh:datatype  rdf:PlainLiteral ;
+                          sh:path      adm:attributionName
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      adm:place_TLM_code
                         ] ;
         sh:property     [ sh:datatype  xsd:integer ;
                           sh:path      bdo:placeWB2000
@@ -149,38 +144,41 @@ rsh:PlaceShape  a       sh:NodeShape ;
         sh:property     [ sh:datatype  xsd:string ;
                           sh:path      adm:place_TLM_admin
                         ] ;
-        sh:property     [ sh:class  bdo:Note ;
-                          sh:path   bdo:note
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      adm:place_TLM_num
+                        ] ;
+        sh:property     [ sh:datatype  xsd:anyURI ;
+                          sh:path      adm:attributionURL
+                        ] ;
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsWorldCat
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      tbr:place_id_Lex
-                        ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      tbr:place_town_ch
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_code
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      adm:place_TLM_librarianEmail
+                          sh:path      adm:place_TLM_librarian
                         ] ;
         sh:property     [ sh:datatype  rdf:PlainLiteral ;
                           sh:path      tbr:place_dist_py
                         ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeMARCCountryCode
-                        ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      tbr:place_town_py
+        sh:property     [ sh:datatype  owl:AnnotationProperty ;
+                          sh:path      bdo:sameAsrKTs
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      tbr:place_town_syl
+                          sh:path      bdo:placeChgisId
+                        ] ;
+        sh:property     [ sh:class  adm:License ;
+                          sh:path   adm:license
                         ] ;
         sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      bdo:placeLat
+                          sh:path      adm:place_TLM_librarianEmail
                         ] ;
-        sh:property     [ sh:datatype  rdf:PlainLiteral ;
-                          sh:path      adm:attributionName
+        sh:property     [ sh:class  bdo:Place ;
+                          sh:path   bdo:placeLocatedIn
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      tbr:place_name_kr
+                        ] ;
+        sh:property     [ sh:datatype  xsd:string ;
+                          sh:path      tbr:place_id_Lex
                         ] ;
         sh:targetClass  bdo:Place .
 
