@@ -50,7 +50,7 @@ public class ResourceShapeBuilder {
             if(it.hasNext()) {
                 String prUri=pr.getURI();
                 OntPropModel prMod=new OntPropModel(prUri);
-                System.out.println("!!!!!!!!!!! >> "+pr+ " PR >>> "+prMod.getRange()+" <<isObject >>"+pr.isObjectProperty()+" <<isDataType >>"+pr.isDatatypeProperty());
+                //System.out.println("!!!!!!!!!!! >> "+pr+ " PR >>> "+prMod.getRange()+" <<isObject >>"+pr.isObjectProperty()+" <<isDataType >>"+pr.isDatatypeProperty());
                 rss= ResourceFactory.createResource(SHACL.BDRC_SHAPE+"/"+prUri.substring(prUri.lastIndexOf('/')+1));
                 Statement stmp = ResourceFactory.createStatement(rss,
                         RDF.type,
