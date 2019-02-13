@@ -18,7 +18,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.annotations.AnnotationCollectionEndpoint;
 import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
@@ -36,7 +38,7 @@ public class AnnotationCollectionTest extends JerseyTest {
     public final static Logger log = LoggerFactory.getLogger(AnnotationCollectionTest.class.getName());
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
         fusekiUrl = "http://localhost:2249/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);

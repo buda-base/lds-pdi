@@ -1,5 +1,7 @@
 package io.bdrc.shacl.validation;
 
+import java.io.IOException;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -8,6 +10,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.vocabulary.SH;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -43,9 +48,9 @@ public class ShapeBuilder {
         return uri;
     }
 
-    public static void main(String[] args) throws RestException {
+    public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
         ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
-        OntData.init();
+        OntData.init(null);
         String iri="http://purl.bdrc.io/ontology/core/Topic";
         ShapeBuilder builder=new ShapeBuilder(iri);
         builder.getNodeShape().getModel().write(System.out,"TURTLE");

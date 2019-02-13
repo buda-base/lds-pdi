@@ -400,6 +400,22 @@ public class PublicDataResource {
             builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
         }
         return builder.build();
+    }   
+    
+    @GET
+    @Path("/{extOnt}")
+    @Produces("text/html")
+    @JerseyCacheControl()
+    public Response getExtOntologyHomePage(@Context Request request,@PathParam("extOnt") String ont) throws RestException {
+    	Date lastUpdate=OntData.getLastUpdated();
+    	OntData.init(ont);
+        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+"/ontologyHome.jsp").hashCode()));
+        ResponseBuilder builder = request.evaluatePreconditions(etag);
+        if(builder == null){
+            builder = Response.ok(new Viewable("/ontologyHome.jsp",OntData.ontMod));
+            builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
+        }
+        return builder.build();
     }
 
     @POST

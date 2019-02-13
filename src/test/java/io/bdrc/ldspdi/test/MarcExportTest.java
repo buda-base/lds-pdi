@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.test;
 
+import java.io.IOException;
+
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
@@ -16,6 +18,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
@@ -29,7 +34,7 @@ public class MarcExportTest extends JerseyTest {
     public final static Logger log = LoggerFactory.getLogger(CsvTest.class.getName());
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
         fusekiUrl = "http://localhost:2251/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);

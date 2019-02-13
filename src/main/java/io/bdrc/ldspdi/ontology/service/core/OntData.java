@@ -64,10 +64,13 @@ public class OntData implements Runnable {
     static Date lastUpdated;
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
-    public static void init() throws RestException {
+    public static void init(String ont) throws RestException {
         try {
+        	if(ont==null) {
+        		ont="defaultOwlURL";
+        	}
             log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
-            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty(ont)).openConnection();
             InputStream stream=connection.getInputStream();
             final Model m = ModelFactory.createDefaultModel();
             m.read(stream, "", "RDF/XML");

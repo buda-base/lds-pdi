@@ -1,0 +1,25 @@
+ontologies:
+   - name : default
+     baseuri : 'http://purl.bdrc.io/ontology/core/'
+     fileurl: 'https://github.com/buda-base/owl-schema/raw/master/bdo.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/core'
+     graph: 'http://purl.bdrc.io/ontology/core/ontologySchema'
+   - name : core-rdfs
+     baseuri : 'http://purl.bdrc.io/ontology/core/'
+     fileurl: 'https://github.com/buda-base/owl-schema/raw/master/bdo.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/core'
+     graph: 'http://purl.bdrc.io/ontology/core/ontologySchema'   
+   - name : core-owl
+     baseuri : 'http://purl.bdrc.io/ontology/core/owl/'
+     fileurl: 'https://github.com/buda-base/owl-schema/raw/master/bdo.owl.ttl'
+     type: 'owl'
+     endpoint: '/ontology/core.owl'
+     graph: 'http://purl.bdrc.io/ontology/core/ontologySchema'
+   - name : core-shapes
+     baseuri: 'http://purl.bdrc.io/ontology/core/shapes/'
+     fileurl: 'https://github.com/buda-base/owl-schema/raw/master/bdo.shacl.ttl'
+     type: 'shacl'
+     endpoint: '/ontology/core.shapes'
+     graph: 'http://purl.bdrc.io/ontology/core/shapesSchema'

@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -101,7 +103,7 @@ public class JsonOutputTest {
 
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
         fusekiUrl="http://localhost:2245/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);

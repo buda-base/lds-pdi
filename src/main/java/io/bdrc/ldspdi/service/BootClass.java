@@ -63,7 +63,7 @@ public class BootClass implements ServletContextListener {
             ResultsCache.init();
             GitService.update(queryPath);
             ServiceConfig.init(params);
-            OntData.init();
+            OntData.init(null);
             TaxModel.fetchModel();
             Properties props=new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
@@ -80,6 +80,7 @@ public class BootClass implements ServletContextListener {
                 RdfAuthModel.updateAuthData(fuseki);
                 //For applications
                 //RdfAuthModel.readAuthModel();
+                System.out.println("USERS >>"+RdfAuthModel.getUsers());
             }
             log.info("BootClass has been properly initialized");
         }

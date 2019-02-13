@@ -1,11 +1,5 @@
 package io.bdrc.ldspdi.utils;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -26,6 +20,13 @@ import java.io.InputStreamReader;
  * limitations under the License.
  ******************************************************************************/
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.commons.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class Helpers {
         Set<String> set=map.keySet();
         for(String key:set) {
             copy.put(key, map.getFirst(key));
-        }
+        }        
         return copy;
     }
 
@@ -143,7 +144,7 @@ public class Helpers {
         final HashMap<String,String> map = new HashMap<>();
         map.put("path", path);
         map.put("rows", sb.toString());
-        StrSubstitutor s = new StrSubstitutor(map);
+        StringSubstitutor s = new StringSubstitutor(map);
         return s.replace(multiChoiceTpl);
     }
 }

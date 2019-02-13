@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -50,7 +54,7 @@ public class ResServiceTest extends JerseyTest{
     public final static String[] methods= {"GET", "POST"};
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
         fusekiUrl="http://localhost:2246/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);

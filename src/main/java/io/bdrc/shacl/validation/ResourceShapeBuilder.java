@@ -147,7 +147,7 @@ public class ResourceShapeBuilder {
 
     public static void main(String[] args) throws RestException, IOException {
         ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
-        OntData.init();
+        OntData.init(null);
         List<OntResource> classes=OntData.getSubClassesOf("http://purl.bdrc.io/ontology/core/Entity");
         for(OntResource om:classes) {
             System.out.println("ROOT >>"+om.getURI());
