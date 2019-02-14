@@ -1,8 +1,10 @@
 package io.bdrc.ldspdi.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.bdrc.ldspdi.ontology.service.core.OntParams;
 
@@ -58,4 +60,20 @@ public class Config {
 		}	
 		return mapByBase.keySet().contains(uri);
 	}
+	
+	public ArrayList<String> getValidBaseUri(){
+		if(mapByBase.isEmpty()) {			
+			mapByBase=getOntologiesMapByBase();
+		}
+		ArrayList<String> valid=new ArrayList<>();
+		Set<String> bases=mapByBase.keySet();
+		for(String s:bases) {
+			OntParams p=getOntologyByBase(s);
+			if(!p.getName().endsWith("test")) {
+				valid.add(s.substring(0, s.length()-1));
+			}
+		}
+		return valid;
+	}
+	
 }

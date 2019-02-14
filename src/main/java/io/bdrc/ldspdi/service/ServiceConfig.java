@@ -103,16 +103,8 @@ public class ServiceConfig {
         return prop.getProperty(key);
     }
     
-    public static OntParams getOntology(String key){
-        return config.getOntology(key);
-    }
-    
-    public static boolean isBaseUri(String key){
-        return config.isBaseUri(key);
-    }
-    
-    public static OntParams getOntologyByBase(String key){
-        return config.getOntologyByBase(key);
+    public static Config getConfig() {
+    	return config;
     }
 
     public static String getRobots() {

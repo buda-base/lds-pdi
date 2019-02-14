@@ -25,6 +25,7 @@ public class DocFileModel {
     ArrayList<String> files;
     public final static Logger log=LoggerFactory.getLogger(DocFileModel.class.getName());
     public Set<String> keys;
+    public ArrayList<String> ontos;
     HashMap<String,ArrayList<QueryTemplate>> templ;
 
     public DocFileModel() throws RestException{
@@ -49,6 +50,7 @@ public class DocFileModel {
                 templ.put(queryScope,qtlist);
             }
         }
+        this.ontos=ServiceConfig.getConfig().getValidBaseUri();
         this.keys=templ.keySet();
     }
 
@@ -60,7 +62,11 @@ public class DocFileModel {
         return keys;
     }
 
-    public static ArrayList<String> getQueryTemplates() throws RestException {
+    public ArrayList<String> getOntos() {
+		return ontos;
+	}
+
+	public static ArrayList<String> getQueryTemplates() throws RestException {
         ArrayList<String> files=new ArrayList<>();
         Path dpath = Paths.get(ServiceConfig.getProperty("queryPath")+"public");
         if (Files.isDirectory(dpath)) {

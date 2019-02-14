@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -319,61 +318,6 @@ public class PublicDataResource {
         return builder.build();
     }*/
 
-    @GET
-    @Path("/ontology/{ont}.{ext}")
-    @JerseyCacheControl()
-    public Response getOntology(@PathParam("ext") String ext,
-            @PathParam("ont") String ont,
-            @Context Request request) throws RestException {
-        log.info("getOntology()");
-        final Model model;
-        if (ont.equals("core")) {
-            model = OntData.ontMod;
-        } else if(ont.equals("auth")) {
-            String query="construct {?s ?p ?o}\n" +
-                    "where {\n" +
-                    "graph <http://purl.bdrc.io/ontology/ext/authSchema>\n" +
-                    "  {?s ?p ?o}\n" +
-                    "}";
-            model = QueryProcessor.getGraph(query, null, QueryProcessor.getPrefixes());
-        } else {
-            throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(ont));
-        }
-        final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
-        if (JenaLangStr == null) {
-            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(ont));
-        }
-        final StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if (JenaLangStr == "STTL") {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
-                    writer.output(os);
-                }
-                model.write(os, JenaLangStr);
-            }
-        };
-        final EntityTag tag = OntData.getEntityTag();
-        ResponseBuilder builder = request.evaluatePreconditions(tag);
-        if (builder == null){
-            builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
-            builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
-        }
-        return builder.build();
-    }
-
-    //displays the home page of the default ontology (as specified in ontologies.yml)
-    @GET
-    @Path("/ontology")
-    @Produces("text/html")
-    @JerseyCacheControl()
-    public Response getOntologyHomePage(@Context Request request) throws RestException {
-    	System.out.println("Call to getOntologyHomePage()");
-        OntModel mod=OntData.setOntModel("default");        
-        ResponseBuilder builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
-        return builder.build();
-    }   
-    
     @GET    
     @Path("/{base : .*}/{other}")
     @Produces("text/html")
@@ -384,12 +328,12 @@ public class PublicDataResource {
     		@PathParam("base") String base, 
     		@PathParam("other") String other) throws RestException {
     	System.out.println("Call to getExtOntologyHomePage()");    	   	
-    	System.out.println("PATH >>"+info.getAbsolutePath()+ " baseUri ? >>"+ServiceConfig.isBaseUri(info.getAbsolutePath().toString()));
+    	System.out.println("PATH >>"+info.getAbsolutePath()+ " baseUri ? >>"+ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString()));
     	System.out.println("BASE >>"+base+ " and id >>"+other);    	    	
     	System.out.println("BASE URI >>"+info.getBaseUri());
     	ResponseBuilder builder = null;
     	//Is the fuul request uri a baseuri? If so, setting up current ont and serving its the home page
-    	if(ServiceConfig.isBaseUri(info.getAbsolutePath().toString())) {
+    	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
     		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
             if(builder == null){
                 builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
@@ -398,7 +342,7 @@ public class PublicDataResource {
     		{
     		//if not, checking if a valid ontology matches the baseUri part of the request
         	//if so : serving properties or class pages
-	    	OntParams ont=ServiceConfig.getOntologyByBase(info.getBaseUri()+base+"/");
+	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");
 	    	if(ont !=null) {
 	    		OntData.init(ont.getName());	    		
 	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
@@ -416,6 +360,52 @@ public class PublicDataResource {
 	    	}else {
 	    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
 	    	}
+    	}
+    	return builder.build();
+    }
+    
+    @GET    
+    @Path("/{base : .*}/{other}.{ext}")
+    @Produces("text/html")
+    @JerseyCacheControl()
+    public Response getOntologyResourceAsFile(
+    		@Context final UriInfo info, 
+    		@Context Request request,
+    		@PathParam("base") String base, 
+    		@PathParam("other") String other,
+    		@PathParam("ext") String ext) throws RestException {
+    	String res=info.getAbsolutePath().toString();
+    	res=res.substring(0, res.lastIndexOf('.'))+"/";
+    	System.out.println("Call to getOntologyResourceAsFile()");    	   	
+    	System.out.println("PATH ext>>"+res+ " baseUri ? >>"+ServiceConfig.getConfig().isBaseUri(res));
+    	System.out.println("BASE >>"+base+ " and id >>"+other);    	    	
+    	System.out.println("BASE URI >>"+info.getBaseUri());
+    	ResponseBuilder builder = null;
+    	final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
+        if (JenaLangStr == null) {
+            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(res));
+        }    	
+    	if(ServiceConfig.getConfig().isBaseUri(res)) {
+    		OntParams params=ServiceConfig.getConfig().getOntologyByBase(res);
+    		String query="construct {?s ?p ?o}\n" +
+                    "where {\n" +
+                    "graph <"+params.getGraph()+">\n" +
+                    "  {?s ?p ?o}\n" +
+                    "}";
+            Model model = QueryProcessor.getGraph(query, null, QueryProcessor.getPrefixes());            
+            final StreamingOutput stream = new StreamingOutput() {
+                @Override
+                public void write(OutputStream os) throws IOException, WebApplicationException {
+                    if (JenaLangStr == "STTL") {
+                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
+                        writer.output(os);
+                    }
+                    model.write(os, JenaLangStr);
+                }
+            };
+            builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
+    	}else {   	
+    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(res));	    	
     	}
     	return builder.build();
     }

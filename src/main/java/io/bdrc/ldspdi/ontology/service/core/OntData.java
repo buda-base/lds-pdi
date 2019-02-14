@@ -70,8 +70,8 @@ public class OntData implements Runnable {
         	if(ont==null) {
         		ont="default";
         	}
-        	String url=ServiceConfig.getOntology(ont).fileurl;
-            log.info("URL >> "+ServiceConfig.getOntology(ont).fileurl);
+        	String url=ServiceConfig.getConfig().getOntology(ont).fileurl;
+            log.info("URL >> "+ServiceConfig.getConfig().getOntology(ont).fileurl);
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             InputStream stream=connection.getInputStream();
             final Model m = ModelFactory.createDefaultModel();
@@ -92,7 +92,7 @@ public class OntData implements Runnable {
             rdf10tordf11(ontMod);
             readGithubJsonLDContext();
             models.put(ont, ontMod);
-            modelsBase.put(ServiceConfig.getOntology(ont).getBaseuri(), ontMod);
+            modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(), ontMod);
             log.info("URL >> "+ServiceConfig.getProperty("owlAuthURL"));
             connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlAuthURL")).openConnection();
             stream=connection.getInputStream();
@@ -108,12 +108,12 @@ public class OntData implements Runnable {
     }
     
     public static OntModel getOntModelByBase(String baseUri) throws RestException {    	
-    	if(modelsBase.get(baseUri)==null && ServiceConfig.getOntologyByBase(baseUri)!=null) {
-    		OntData.init(ServiceConfig.getOntologyByBase(baseUri).getName());
+    	if(modelsBase.get(baseUri)==null && ServiceConfig.getConfig().getOntologyByBase(baseUri)!=null) {
+    		OntData.init(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
     	}
-    	if(ServiceConfig.getOntologyByBase(baseUri)!=null) {
-    		ontMod=models.get(ServiceConfig.getOntologyByBase(baseUri).getName());
-    		return modelsBase.get(ServiceConfig.getOntologyByBase(baseUri).getName());
+    	if(ServiceConfig.getConfig().getOntologyByBase(baseUri)!=null) {
+    		ontMod=models.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
+    		return modelsBase.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
     	}else {
     		return null;
     	}
@@ -121,10 +121,10 @@ public class OntData implements Runnable {
     }
     
     public static OntModel setOntModel(String name) throws RestException {    	
-    	if(models.get(name)==null && ServiceConfig.getOntology(name)!=null) {
+    	if(models.get(name)==null && ServiceConfig.getConfig().getOntology(name)!=null) {
     		OntData.init(name);
     	}
-    	if(ServiceConfig.getOntology(name)!=null) {
+    	if(ServiceConfig.getConfig().getOntology(name)!=null) {
     		ontMod=models.get(name);
     		return models.get(name);
     	}else {
@@ -200,7 +200,7 @@ public class OntData implements Runnable {
                 qy=Prefixes.getPrefixesString() +" select distinct  ?clazz ?p\n" +
                         "where {\n" +
                         "bind (<"+iri+"> as ?base)\n" +
-                        "graph <"+ServiceConfig.getOntology(ont).getGraph() +">{\n" +
+                        "graph <"+ServiceConfig.getConfig().getOntology(ont).getGraph() +">{\n" +
                         "?base rdfs:subClassOf+ ?clazz .\n" +
                         "{ ?p rdfs:domain/(owl:unionOf/rdf:rest*/rdf:first)* ?clazz . }\n" +
                         "}\n" +

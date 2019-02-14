@@ -32,8 +32,12 @@
 }
 </style>
 <script type="text/javascript">
-function onto(val){
-    var x = "ontology/"+val+"."+document.getElementById("format").value;
+function onto(){
+    var x = document.getElementById("uri1").value+"."+document.getElementById("format").value;
+    window.location.assign(x);
+}
+function browse(){
+    var x = document.getElementById("uri").value+"/";
     window.location.assign(x);
 }
 </script>
@@ -45,15 +49,32 @@ function onto(val){
     
 <h2>Navigate through BDRC Ontology</h2>
 <p>You can use this service to access the current BDRC ontology and discover the data model:</p>
-<p><a href="/ontology">Ontology service</a></p>
-<div> View/download the ontology file: <select id="format">
+<p>ONTOLOGY SERVICE</p>
+<div> Browse an ontology : 
+<select id="uri">
+<c:forEach items="${model.ontos}" var="k">
+  <option value="${k}">${k}</option>  
+</c:forEach>
+</select>
+<button onclick="javascript:browse();" type="button"> Browse </button>
+</div> 
+</br>
+<div> View/download the ontology file: 
+<select id="uri1">
+<c:forEach items="${model.ontos}" var="k">
+  <option value="${k}">${k}</option>  
+</c:forEach>
+</select> 
+Format:
+<select id="format">
   <option value="ttl">text/turtle=ttl</option>
   <option value="rdf">application/rdf+xml=rdf</option>
   <option value="owl">application/owl+xml=owl</option>
   <option value="json">application/json=json</option>
   <option value="nt">application/n-triples=nt</option>
   <option value="trix">application/trix+xml=trix</option>
-</select> <button onclick="javascript:onto('core');" type="button"> View </button>
+</select> 
+<button onclick="javascript:onto();" type="button"> View </button>
 </div>
 
 <h2>Instructions</h2>
