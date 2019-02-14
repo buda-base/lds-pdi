@@ -279,31 +279,6 @@ public class PublicDataResource {
     }
 
     /*@GET
-    @Path("/ontology/{path}/{class}")
-    @Produces("text/html")
-    @JerseyCacheControl()
-    public Response getCoreOntologyClassView(@PathParam("class") final String cl,
-            @PathParam("path") final String path,
-            @Context final Request request) throws RestException{
-        log.info("getCoreOntologyClassView()");
-        final String uri="http://purl.bdrc.io/ontology/"+path+"/"+cl;
-        final EntityTag etag=OntData.getEntityTag();
-        if(OntData.ontMod.getOntResource(uri) == null) {
-            throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(uri));
-        }
-        ResponseBuilder builder = request.evaluatePreconditions(etag);
-        if(builder == null){
-            if (OntData.isClass(uri)) {
-                builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(uri)));
-            } else {
-                builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri)));
-            }
-        }
-        // there could be more headers here
-        builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
-        return builder.build();
-    }*/
-    /*@GET
     @Path("/ontology/{path}/{class}.{ext}")
     @JerseyCacheControl()
     public Response getCoreOntologyClassViewExt(@PathParam("class") final String cl,
@@ -342,7 +317,7 @@ public class PublicDataResource {
         // there could be more headers here
         builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
         return builder.build();
-    }
+    }*/
 
     @GET
     @Path("/ontology/{ont}.{ext}")
@@ -385,7 +360,7 @@ public class PublicDataResource {
             builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
         }
         return builder.build();
-    }*/
+    }
 
     //displays the home page of the default ontology (as specified in ontologies.yml)
     @GET
