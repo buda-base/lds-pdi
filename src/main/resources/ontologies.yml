@@ -37,3 +37,10 @@ ontologies:
      type: 'rdfs'
      endpoint: '/ontology/ext/auth'
      graph: 'http://purl.bdrc.io/ontology/ext/authSchema'
+#admin ontology (still included into bdo, will be separated later)
+   - name : 'admin'
+     baseuri : 'http://purl.bdrc.io/ontology/admin/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/bdo.owl'
+     type: 'rdfs'
+     endpoint: '/ontology/core'
+     graph: 'http://purl.bdrc.io/ontology/core/ontologySchema'
