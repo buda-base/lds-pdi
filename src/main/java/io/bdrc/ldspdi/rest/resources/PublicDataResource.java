@@ -425,7 +425,7 @@ public class PublicDataResource {
         	//if so : serving properties or class pages
 	    	OntParams ont=ServiceConfig.getOntologyByBase(info.getBaseUri()+base+"/");
 	    	if(ont !=null) {
-	    		OntModel model=OntData.setOntModel(ont.getName());	    		
+	    		OntData.init(ont.getName());	    		
 	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
 	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
 	    	    }
