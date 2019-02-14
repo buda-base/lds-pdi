@@ -67,7 +67,8 @@ public class MediaTypeUtils {
                 MT_TRIX).build();
 
         ExtToJena = new HashMap<>();
-        ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);
+        //ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);
+        ExtToJena.put("ttl",  RDFLanguages.strLangTurtle);
         ExtToJena.put("nt",   RDFLanguages.strLangNTriples);
         ExtToJena.put("nq",   RDFLanguages.strLangNQuads);
         ExtToJena.put("trig", RDFLanguages.strLangTriG);

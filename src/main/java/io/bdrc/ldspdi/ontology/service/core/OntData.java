@@ -47,12 +47,10 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.RestException;
 
-public class OntData implements Runnable {
-
-    public static String ONT_CORE_URI="http://purl.bdrc.io/ontology/core/";
-    public static String ONT_ADMIN_URI="http://purl.bdrc.io/ontology/admin/";
+public class OntData implements Runnable {    
 
     public static InfModel infMod;
     public static OntModel ontMod;
@@ -62,18 +60,25 @@ public class OntData implements Runnable {
     public static String JSONLD_CONTEXT;
     static EntityTag update;
     static Date lastUpdated;
+    static String ont;
+    public static HashMap<String,OntModel> models=new HashMap<>();
+    public static HashMap<String,OntModel> modelsBase=new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
     public static void init(String ont) throws RestException {
         try {
         	if(ont==null) {
-        		ont="defaultOwlURL";
+        		ont="default";
         	}
-            log.info("URL >> "+ServiceConfig.getProperty("owlURL"));
-            HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty(ont)).openConnection();
+        	String url=ServiceConfig.getOntology(ont).fileurl;
+            log.info("URL >> "+ServiceConfig.getOntology(ont).fileurl);
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             InputStream stream=connection.getInputStream();
             final Model m = ModelFactory.createDefaultModel();
-            m.read(stream, "", "RDF/XML");
+            System.out.println("Ext="+MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.')+1)));
+            m.read(stream, "", MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.')+1)));
+            
+            //m.read(stream, "", "TURTLE");
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             /******RDFS model*********/
@@ -81,12 +86,13 @@ public class OntData implements Runnable {
             final Model m1 = ModelFactory.createDefaultModel();
             m1.read(st, "", "TURTLE");
             st.close();
-            ontMod.add(m1);
+            ontMod.add(m1);            
             /***************/
             //owlCharacteristics=new OWLPropsCharacteristics(ontMod);
             rdf10tordf11(ontMod);
             readGithubJsonLDContext();
-            log.info("updating core ont model() >>");
+            models.put(ont, ontMod);
+            modelsBase.put(ServiceConfig.getOntology(ont).getBaseuri(), ontMod);
             log.info("URL >> "+ServiceConfig.getProperty("owlAuthURL"));
             connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlAuthURL")).openConnection();
             stream=connection.getInputStream();
@@ -94,9 +100,37 @@ public class OntData implements Runnable {
             auth.read(stream, "", "RDF/XML");
             stream.close();
             ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
+            //System.out.println("MODELS after Init>>"+models.keySet());
+            //System.out.println("MODELS Base after Init>>"+modelsBase.keySet());
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);
         }
+    }
+    
+    public static OntModel getOntModelByBase(String baseUri) throws RestException {    	
+    	if(modelsBase.get(baseUri)==null && ServiceConfig.getOntologyByBase(baseUri)!=null) {
+    		OntData.init(ServiceConfig.getOntologyByBase(baseUri).getName());
+    	}
+    	if(ServiceConfig.getOntologyByBase(baseUri)!=null) {
+    		ontMod=models.get(ServiceConfig.getOntologyByBase(baseUri).getName());
+    		return modelsBase.get(ServiceConfig.getOntologyByBase(baseUri).getName());
+    	}else {
+    		return null;
+    	}
+    	
+    }
+    
+    public static OntModel setOntModel(String name) throws RestException {    	
+    	if(models.get(name)==null && ServiceConfig.getOntology(name)!=null) {
+    		OntData.init(name);
+    	}
+    	if(ServiceConfig.getOntology(name)!=null) {
+    		ontMod=models.get(name);
+    		return models.get(name);
+    	}else {
+    		return null;
+    	}
+    	
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
@@ -166,7 +200,7 @@ public class OntData implements Runnable {
                 qy=Prefixes.getPrefixesString() +" select distinct  ?clazz ?p\n" +
                         "where {\n" +
                         "bind (<"+iri+"> as ?base)\n" +
-                        "graph :ontologySchema {\n" +
+                        "graph <"+ServiceConfig.getOntology(ont).getGraph() +">{\n" +
                         "?base rdfs:subClassOf+ ?clazz .\n" +
                         "{ ?p rdfs:domain/(owl:unionOf/rdf:rest*/rdf:first)* ?clazz . }\n" +
                         "}\n" +
@@ -175,14 +209,6 @@ public class OntData implements Runnable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            /*final String query = "prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    "select distinct ?p where {\n" +
-                    "  ?s a <"+iri + "> ."+
-                    "  ?s ?p ?o;\n" +
-                    "  Filter(?p != rdf:type)\n" +
-                    "}";
-            final QueryExecution qexec = QueryExecutionFactory.create(query, ontMod);*/
-            //final QueryExecution qexec = QueryExecutionFactory.create(qy, ontMod);
             final QueryExecution qexec=QueryProcessor.getResultSet(qy,null);
             final ResultSet res = qexec.execSelect() ;
             while(res.hasNext()) {
@@ -196,8 +222,6 @@ public class OntData implements Runnable {
                 else {
                     System.out.println("Skipped "+node.asResource().getURI()+" property in getAllClassProps("+iri+")");
                 }
-                //list.add(ontMod.getOntResource(node.asResource().getURI()).asProperty());
-                //list.add(node.asResource().getURI());
             }
         }
         return list;

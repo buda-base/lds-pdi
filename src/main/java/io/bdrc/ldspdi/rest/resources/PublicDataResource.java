@@ -48,6 +48,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.ontology.service.core.OntParams;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
@@ -276,7 +278,7 @@ public class PublicDataResource {
         return setHeaders(builder,getResourceHeaders(info.getPath(),ext,null,getEtag(model,res))).build();
     }
 
-    @GET
+    /*@GET
     @Path("/ontology/{path}/{class}")
     @Produces("text/html")
     @JerseyCacheControl()
@@ -300,9 +302,8 @@ public class PublicDataResource {
         // there could be more headers here
         builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
         return builder.build();
-    }
-
-    @GET
+    }*/
+    /*@GET
     @Path("/ontology/{path}/{class}.{ext}")
     @JerseyCacheControl()
     public Response getCoreOntologyClassViewExt(@PathParam("class") final String cl,
@@ -384,44 +385,71 @@ public class PublicDataResource {
             builder.header("Last-Modified", OntData.getLastUpdated()).header("Vary", "Accept").tag(tag);
         }
         return builder.build();
-    }
+    }*/
 
+    //displays the home page of the default ontology (as specified in ontologies.yml)
     @GET
     @Path("/ontology")
     @Produces("text/html")
     @JerseyCacheControl()
-    public Response getOntologyHomePage(@Context Request request) {
-        log.info("Call to getOntologyHomePage()");
-        Date lastUpdate=OntData.getLastUpdated();
-        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+"/ontologyHome.jsp").hashCode()));
-        ResponseBuilder builder = request.evaluatePreconditions(etag);
-        if(builder == null){
-            builder = Response.ok(new Viewable("/ontologyHome.jsp",OntData.ontMod));
-            builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
-        }
+    public Response getOntologyHomePage(@Context Request request) throws RestException {
+    	System.out.println("Call to getOntologyHomePage()");
+        OntModel mod=OntData.setOntModel("default");        
+        ResponseBuilder builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
         return builder.build();
     }   
     
-    @GET
-    @Path("/{extOnt}")
+    @GET    
+    @Path("/{base : .*}/{other}")
     @Produces("text/html")
     @JerseyCacheControl()
-    public Response getExtOntologyHomePage(@Context Request request,@PathParam("extOnt") String ont) throws RestException {
-    	Date lastUpdate=OntData.getLastUpdated();
-    	OntData.init(ont);
-        EntityTag etag=new EntityTag(Integer.toString((lastUpdate.toString()+"/ontologyHome.jsp").hashCode()));
-        ResponseBuilder builder = request.evaluatePreconditions(etag);
-        if(builder == null){
-            builder = Response.ok(new Viewable("/ontologyHome.jsp",OntData.ontMod));
-            builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag);
-        }
-        return builder.build();
+    public Response getExtOntologyHomePage(
+    		@Context final UriInfo info, 
+    		@Context Request request,
+    		@PathParam("base") String base, 
+    		@PathParam("other") String other) throws RestException {
+    	System.out.println("Call to getExtOntologyHomePage()");    	   	
+    	System.out.println("PATH >>"+info.getAbsolutePath()+ " baseUri ? >>"+ServiceConfig.isBaseUri(info.getAbsolutePath().toString()));
+    	System.out.println("BASE >>"+base+ " and id >>"+other);    	    	
+    	System.out.println("BASE URI >>"+info.getBaseUri());
+    	ResponseBuilder builder = null;
+    	//Is the fuul request uri a baseuri? If so, setting up current ont and serving its the home page
+    	if(ServiceConfig.isBaseUri(info.getAbsolutePath().toString())) {
+    		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
+            if(builder == null){
+                builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
+            }            
+    	}else     	
+    		{
+    		//if not, checking if a valid ontology matches the baseUri part of the request
+        	//if so : serving properties or class pages
+	    	OntParams ont=ServiceConfig.getOntologyByBase(info.getBaseUri()+base+"/");
+	    	if(ont !=null) {
+	    		OntModel model=OntData.setOntModel(ont.getName());	    		
+	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
+	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+	    	    }
+	            if(builder == null){
+	                if (OntData.isClass(info.getAbsolutePath().toString())) {
+	                	System.out.println("CLASS>>"+info.getAbsolutePath().toString());
+	                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
+	                } else {
+	                	System.out.println("PROP>>"+info.getAbsolutePath().toString());
+	                    builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(info.getAbsolutePath().toString())));
+	                }
+	            }		
+	    	}else {
+	    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+	    	}
+    	}
+    	return builder.build();
     }
 
     @POST
     @Path("/callbacks/github/owl-schema")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException{
+    	//To be reworked to include all declared ontologies
         log.info("updating Ontology models() >>");
         Thread t=new Thread(new OntData());
         t.start();

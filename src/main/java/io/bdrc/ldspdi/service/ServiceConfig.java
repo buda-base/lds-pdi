@@ -106,6 +106,14 @@ public class ServiceConfig {
     public static OntParams getOntology(String key){
         return config.getOntology(key);
     }
+    
+    public static boolean isBaseUri(String key){
+        return config.isBaseUri(key);
+    }
+    
+    public static OntParams getOntologyByBase(String key){
+        return config.getOntologyByBase(key);
+    }
 
     public static String getRobots() {
         return "User-agent: *"+System.lineSeparator()+"Disallow: /";
