@@ -59,7 +59,7 @@ function browse(){
 <button onclick="javascript:browse();" type="button"> Browse </button>
 </div> 
 </br>
-<div> View/download an ontology file: 
+<div> View/download ontology files: 
 <select id="uri1">
 <c:forEach items="${model.ontos}" var="k">
   <option value="${k}">${k}</option>  
