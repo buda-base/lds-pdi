@@ -386,8 +386,9 @@ public class PublicDataResource {
                     if (JenaLangStr == "STTL") {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                         writer.output(os);
+                    }else {
+                    	model.write(os, JenaLangStr);
                     }
-                    model.write(os, JenaLangStr);
                 }
             };
             builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
