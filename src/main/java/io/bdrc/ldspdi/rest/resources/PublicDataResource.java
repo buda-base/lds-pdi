@@ -326,11 +326,7 @@ public class PublicDataResource {
     		@Context final UriInfo info, 
     		@Context Request request,
     		@PathParam("base") String base, 
-    		@PathParam("other") String other) throws RestException {
-    	System.out.println("Call to getExtOntologyHomePage()");    	   	
-    	System.out.println("PATH >>"+info.getAbsolutePath()+ " baseUri ? >>"+ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString()));
-    	System.out.println("BASE >>"+base+ " and id >>"+other);    	    	
-    	System.out.println("BASE URI >>"+info.getBaseUri());
+    		@PathParam("other") String other) throws RestException {    	
     	ResponseBuilder builder = null;
     	//Is the fuul request uri a baseuri? If so, setting up current ont and serving its the home page
     	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
@@ -342,22 +338,16 @@ public class PublicDataResource {
     		{
     		//if not, checking if a valid ontology matches the baseUri part of the request
         	//if so : serving properties or class pages
-	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");
-	    	//OntParams ont=ServiceConfig.getConfig().getOntologyByBase("http://purl.bdrc.io/"+base+"/");
+	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");	    	
 	    	if(ont !=null) {
-	    		OntData.setOntModel(ont.getName());	
-	    		//if(OntData.ontMod.getOntResource("http://purl.bdrc.io/ontology/core/AgentAsCreator") == null) {
+	    		OntData.setOntModel(ont.getName());		    		
 	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
 	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for"+ info.getAbsolutePath().toString()));
 	    	    }
 	            if(builder == null){
-	            	if (OntData.isClass("http://purl.bdrc.io/ontology/core/AgentAsCreator")) {
-	                //if (OntData.isClass(info.getAbsolutePath().toString())) {
-	                	//System.out.println("CLASS>>"+info.getAbsolutePath().toString());
+	            	if (OntData.isClass("http://purl.bdrc.io/ontology/core/AgentAsCreator")) {	                
 	                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
-	                	//builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel("http://purl.bdrc.io/ontology/core/AgentAsCreator")));
-	                    //System.out.println("OntClassModel >>"+new OntClassModel("http://purl.bdrc.io/ontology/core/AgentAsCreator").getParent());
-	                } else {
+	                	} else {
 	                	System.out.println("PROP>>"+info.getAbsolutePath().toString());
 	                    builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(info.getAbsolutePath().toString())));
 	                    System.out.println("OntPropModel >>"+new OntPropModel(info.getAbsolutePath().toString()));
@@ -381,11 +371,7 @@ public class PublicDataResource {
     		@PathParam("other") String other,
     		@PathParam("ext") String ext) throws RestException {
     	String res=info.getAbsolutePath().toString();
-    	res=res.substring(0, res.lastIndexOf('.'))+"/";
-    	System.out.println("Call to getOntologyResourceAsFile()");    	   	
-    	System.out.println("PATH ext>>"+res+ " baseUri ? >>"+ServiceConfig.getConfig().isBaseUri(res));
-    	System.out.println("BASE >>"+base+ " and id >>"+other);    	    	
-    	System.out.println("BASE URI >>"+info.getBaseUri());
+    	res=res.substring(0, res.lastIndexOf('.'))+"/";    	
     	ResponseBuilder builder = null;
     	final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
@@ -405,7 +391,8 @@ public class PublicDataResource {
                 }
             };
             builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
-    	}else {   	
+    	}else {
+    		//to implement here : serving serialized single class or props
     		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));	    	
     	}
     	return builder.build();
