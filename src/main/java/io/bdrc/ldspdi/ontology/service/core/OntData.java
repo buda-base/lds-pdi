@@ -160,21 +160,17 @@ public class OntData implements Runnable {
     @Override
     public void run(){
         try {
-            final String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-            final HttpURLConnection connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlURL")).openConnection();
-            final InputStream stream=connection.getInputStream();
-            final Model m = ModelFactory.createDefaultModel();
-            m.read(stream, "", "RDF/XML");
-            stream.close();
-            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
-            log.info("OntModel Size >> "+ontMod.size());
-            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
-            log.info("updating core ont model() >>");
-            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
-            log.info("updating Auth ont model() >>");
-            QueryProcessor.updateAuthOntology(OntData.ontAuthMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data");
-            log.info("Done updating ont models >>");
+        	ArrayList<String> names=ServiceConfig.getConfig().getValidNames();
+        	for(String name:names) {         		
+	            final String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);	           
+	            ontMod = OntData.setOntModel(name);
+	            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
+	            log.info("OntModel Size >> "+ontMod.size());
+	            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontMod.getBaseModel());
+	            log.info("updating core ont model() >> "+ name);
+	            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data", ServiceConfig.getConfig().getOntology(name).getGraph());
+	            log.info("updated >>"+ServiceConfig.getConfig().getOntology(name).getGraph()); 
+        	}
             readGithubJsonLDContext();
         }
         catch(Exception ex) {

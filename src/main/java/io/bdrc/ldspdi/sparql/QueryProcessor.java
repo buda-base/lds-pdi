@@ -123,26 +123,15 @@ public class QueryProcessor {
         return qe;
     }
 
-    public static void updateOntology(Model mod, String fusekiUrl) {
-        if (fusekiUrl == null) {
-            fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-        }
-        log.info("Service fuseki >> "+fusekiUrl);
-        log.info("OntologyGraph >> "+ServiceConfig.getProperty("ontGraph"));
-        log.info("InfModel Size >> "+mod.size());
-        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        access.putModel(ServiceConfig.getProperty("ontGraph"), mod);
-    }
-
-    public static void updateAuthOntology(Model mod, String fusekiUrl) {
+    public static void updateOntology(Model mod, String fusekiUrl, String graph) {
         if(fusekiUrl == null) {
             fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         log.info("Service fuseki >> "+fusekiUrl);
-        log.info("AuthGraph >> "+ServiceConfig.getProperty("authGraph"));
+        log.info("Graph >> "+graph);
         log.info("InfModel Size >> "+mod.size());
         DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
-        access.putModel(AuthProps.getProperty("authGraph"), mod);
+        access.putModel(graph, mod);
     }
 
     public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {
@@ -198,27 +187,35 @@ public class QueryProcessor {
             return pref;
         }
         else {
-            return "PREFIX : <http://purl.bdrc.io/ontology/core/>\n" +
-                    " PREFIX bdo: <http://purl.bdrc.io/ontology/core/>\n" +
-                    " PREFIX adm: <http://purl.bdrc.io/ontology/admin/>\n" +
-                    " PREFIX bdr: <http://purl.bdrc.io/resource/>\n" +
-                    " PREFIX bdan: <http://purl.bdrc.io/annotation/>\n" +
-                    " PREFIX bdac: <http://purl.bdrc.io/anncollection/>\n" +
-                    " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                    " PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
-                    " PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-                    " PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>\n" +
-                    " PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>\n" +
-                    " PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\n" +
-                    " PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-                    " PREFIX text: <http://jena.apache.org/text#>\n" +
-                    " PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
-                    " PREFIX dcterms: <http://purl.org/dc/terms/>\n" +
-                    " PREFIX f: <java:io.bdrc.ldspdi.sparql.functions.>"+
-                    " PREFIX aut:   <http://purl.bdrc.io/ontology/ext/auth/>"+
-                    " PREFIX sh: <http://www.w3.org/ns/shacl#> ."+
-                    " PREFIX adr:   <http://purl.bdrc.io/resource-auth/>";
+            return "prefix :      <http://purl.bdrc.io/ontology/core/>\n" + 
+            		"prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n" + 
+            		"prefix bdd:   <http://purl.bdrc.io/data/>\n" + 
+            		"prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n" + 
+            		"prefix bdr:   <http://purl.bdrc.io/resource/>\n" + 
+            		"prefix bdan:  <http://purl.bdrc.io/annotation/>\n" + 
+            		"prefix bdac:  <http://purl.bdrc.io/anncollection/>\n" + 
+            		"prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/>\n" + 
+            		"prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n" + 
+            		"prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/>\n" + 
+            		"prefix adr:   <http://purl.bdrc.io/resource-auth/>\n" + 
+            		"prefix bf:    <http://id.loc.gov/ontologies/bibframe/>\n" + 
+            		"prefix dcterms: <http://purl.org/dc/terms/>\n" + 
+            		"prefix f:     <java:io.bdrc.ldspdi.sparql.functions.>\n" + 
+            		"prefix foaf:  <http://xmlns.com/foaf/0.1/>\n" + 
+            		"prefix iiif2: <http://iiif.io/api/presentation/2#>\n" + 
+            		"prefix iiif3: <http://iiif.io/api/presentation/3#>\n" + 
+            		"prefix owl:   <http://www.w3.org/2002/07/owl#>\n" + 
+            		"prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
+            		"prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + 
+            		"prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n" + 
+            		"prefix vcard: <http://www.w3.org/2006/vcard/ns#>\n" + 
+            		"prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + 
+            		"prefix text:  <http://jena.apache.org/text#>\n" + 
+            		"prefix oa:    <http://www.w3.org/ns/oa#>\n" + 
+            		"prefix as:    <http://www.w3.org/ns/activitystreams#>\n" + 
+            		"prefix ldp:   <http://www.w3.org/ns/ldp#>\n" + 
+            		"prefix sh: <http://www.w3.org/ns/shacl#>\n" + 
+            		"prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>";
         }
     }
 }

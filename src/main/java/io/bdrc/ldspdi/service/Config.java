@@ -76,4 +76,18 @@ public class Config {
 		return valid;
 	}
 	
+	public ArrayList<String> getValidNames(){
+		if(map.isEmpty()) {			
+			map=getOntologiesMap();
+		}
+		ArrayList<String> valid=new ArrayList<>();
+		Set<String> names=map.keySet();
+		for(String s:names) {			
+			if(!s.endsWith("test")) {
+				valid.add(s);
+			}
+		}
+		return valid;
+	}
+	
 }
