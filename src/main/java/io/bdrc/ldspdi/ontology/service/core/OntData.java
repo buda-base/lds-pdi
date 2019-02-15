@@ -71,6 +71,7 @@ public class OntData implements Runnable {
         		ont="default";
         	}
         	String url=ServiceConfig.getConfig().getOntology(ont).fileurl;
+        	System.out.println("Url="+url);
             log.info("URL >> "+ServiceConfig.getConfig().getOntology(ont).fileurl);
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             InputStream stream=connection.getInputStream();
@@ -82,14 +83,14 @@ public class OntData implements Runnable {
             stream.close();
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
             /******RDFS model*********/
-            InputStream st=OntData.class.getClassLoader().getResourceAsStream("rdfs.ttl");
+            /*InputStream st=OntData.class.getClassLoader().getResourceAsStream("rdfs.ttl");
             final Model m1 = ModelFactory.createDefaultModel();
             m1.read(st, "", "TURTLE");
             st.close();
-            ontMod.add(m1);            
+            ontMod.add(m1);*/            
             /***************/
             //owlCharacteristics=new OWLPropsCharacteristics(ontMod);
-            rdf10tordf11(ontMod);
+            //rdf10tordf11(ontMod);
             readGithubJsonLDContext();
             models.put(ont, ontMod);
             modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(), ontMod);
@@ -320,7 +321,11 @@ public class OntData implements Runnable {
     }
 
     public static boolean isClass(final String uri) {
-        return ontMod.getOntResource(uri).isClass();
+    	if(ontMod.getOntResource(uri) !=null) {
+    		return ontMod.getOntResource(uri).isClass();
+    	}else {
+    		return false;
+    	}
     }
 
     public static int getNumPrefixes() {

@@ -343,22 +343,28 @@ public class PublicDataResource {
     		//if not, checking if a valid ontology matches the baseUri part of the request
         	//if so : serving properties or class pages
 	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");
+	    	//OntParams ont=ServiceConfig.getConfig().getOntologyByBase("http://purl.bdrc.io/"+base+"/");
 	    	if(ont !=null) {
-	    		OntData.init(ont.getName());	    		
+	    		OntData.setOntModel(ont.getName());	
+	    		//if(OntData.ontMod.getOntResource("http://purl.bdrc.io/ontology/core/AgentAsCreator") == null) {
 	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
-	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for"+ info.getAbsolutePath().toString()));
 	    	    }
 	            if(builder == null){
-	                if (OntData.isClass(info.getAbsolutePath().toString())) {
-	                	System.out.println("CLASS>>"+info.getAbsolutePath().toString());
+	            	if (OntData.isClass("http://purl.bdrc.io/ontology/core/AgentAsCreator")) {
+	                //if (OntData.isClass(info.getAbsolutePath().toString())) {
+	                	//System.out.println("CLASS>>"+info.getAbsolutePath().toString());
 	                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
+	                	//builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel("http://purl.bdrc.io/ontology/core/AgentAsCreator")));
+	                    //System.out.println("OntClassModel >>"+new OntClassModel("http://purl.bdrc.io/ontology/core/AgentAsCreator").getParent());
 	                } else {
 	                	System.out.println("PROP>>"+info.getAbsolutePath().toString());
 	                    builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(info.getAbsolutePath().toString())));
+	                    System.out.println("OntPropModel >>"+new OntPropModel(info.getAbsolutePath().toString()));
 	                }
 	            }		
 	    	}else {
-	    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+	    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext("Ontparams is null for "+info.getBaseUri()+base+"/"));
 	    	}
     	}
     	return builder.build();
@@ -383,16 +389,11 @@ public class PublicDataResource {
     	ResponseBuilder builder = null;
     	final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
-            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(res));
+            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
         }    	
     	if(ServiceConfig.getConfig().isBaseUri(res)) {
     		OntParams params=ServiceConfig.getConfig().getOntologyByBase(res);
-    		String query="construct {?s ?p ?o}\n" +
-                    "where {\n" +
-                    "graph <"+params.getGraph()+">\n" +
-                    "  {?s ?p ?o}\n" +
-                    "}";
-            Model model = QueryProcessor.getGraph(query, null, QueryProcessor.getPrefixes());            
+    		Model model=OntData.setOntModel(params.getName());    		   
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
                 public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -405,7 +406,7 @@ public class PublicDataResource {
             };
             builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
     	}else {   	
-    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(res));	    	
+    		throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));	    	
     	}
     	return builder.build();
     }
