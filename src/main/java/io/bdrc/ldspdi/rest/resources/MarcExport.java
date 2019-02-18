@@ -183,7 +183,7 @@ public class MarcExport {
         f337.addSubfield(factory.newSubfield('b', "c"));
         f337.addSubfield(factory.newSubfield('2', "rdamedia"));
         f338.addSubfield(factory.newSubfield('a', "online resource"));
-        f338.addSubfield(factory.newSubfield('b', "er"));
+        f338.addSubfield(factory.newSubfield('b', "cr"));
         f338.addSubfield(factory.newSubfield('2', "rdacarrier"));
         f533.addSubfield(factory.newSubfield('a', "Electronic reproduction"));
         f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. :"));
@@ -200,7 +200,7 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
-        f542_PD.addSubfield(factory.newSubfield('u', "http://creativecommons.org/licenses/publicdomain"));
+        f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
         f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
     }
 
@@ -597,7 +597,7 @@ public class MarcExport {
     private static void addSeries(final Model m, final Resource main, final Record record) {
         StmtIterator si = main.listProperties(workNumberOf);
         boolean hasSeries = false;
-        final DataField f490 = factory.newDataField("490", ' ', ' ');
+        final DataField f490 = factory.newDataField("490", '0', ' ');
         while (si.hasNext()) {
             final Resource series = si.next().getResource();
             final Literal l = getPreferredLit(series);
@@ -734,7 +734,7 @@ public class MarcExport {
         }
         if (!hasParts)
             return;
-        final DataField f505 = factory.newDataField("505", ' ', ' ');
+        final DataField f505 = factory.newDataField("505", '0', ' ');
         boolean first = true;
         for (Literal l : parts.values()) {
             if (!first)
@@ -774,7 +774,7 @@ public class MarcExport {
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
             // see https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
-            lccn = lccn.substring(0,3).toUpperCase()+lccn.substring(3);
+            lccn = lccn.toUpperCase();
             final int firstSpaceIdx = lccn.indexOf(' ');
             if (firstSpaceIdx == -1)
                 continue;
