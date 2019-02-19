@@ -341,14 +341,15 @@ public class PublicDataResource {
 	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");	    	
 	    	if(ont !=null) {
 	    		OntData.setOntModel(ont.getName());		    		
-	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
+	    		if(OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {	    			
 	    			throw new RestException(404,new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for"+ info.getAbsolutePath().toString()));
 	    	    }
 	            if(builder == null){
-	            	if (OntData.isClass("http://purl.bdrc.io/ontology/core/AgentAsCreator")) {	                
+	            	if (OntData.isClass(info.getAbsolutePath().toString())) {	
+	            		log.info("CLASS>>"+info.getAbsolutePath().toString());
 	                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
 	                	} else {
-	                	System.out.println("PROP>>"+info.getAbsolutePath().toString());
+	                	log.info("PROP>>"+info.getAbsolutePath().toString());
 	                    builder = Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(info.getAbsolutePath().toString())));
 	                    System.out.println("OntPropModel >>"+new OntPropModel(info.getAbsolutePath().toString()));
 	                }
