@@ -170,8 +170,12 @@ public class OntData implements Runnable {
 	            log.info("updating core ont model() >> "+ name);
 	            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,fusekiUrl.lastIndexOf('/'))+"/data", ServiceConfig.getConfig().getOntology(name).getGraph());
 	            log.info("updated >>"+ServiceConfig.getConfig().getOntology(name).getGraph()); 
+	            System.out.println("updated >>"+ServiceConfig.getConfig().getOntology(name).getGraph()); 
         	}
             readGithubJsonLDContext();
+            //purge models map to force reloading of updated models
+            models=new HashMap<>();
+            modelsBase=new HashMap<>();
         }
         catch(Exception ex) {
             log.error("Error updating OntModel", ex);
