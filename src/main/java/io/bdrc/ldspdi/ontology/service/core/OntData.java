@@ -94,15 +94,18 @@ public class OntData implements Runnable {
             readGithubJsonLDContext();
             models.put(ont, ontMod);
             modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(), ontMod);
-            log.info("URL >> "+ServiceConfig.getProperty("owlAuthURL"));
-            connection = (HttpURLConnection) new URL(ServiceConfig.getProperty("owlAuthURL")).openConnection();
+            String authUrl=ServiceConfig.getConfig().getOntology("auth").fileurl;
+            log.info("URL >> "+authUrl);
+            connection = (HttpURLConnection) new URL(authUrl).openConnection();
             stream=connection.getInputStream();
-            final Model auth = ModelFactory.createDefaultModel();
-            auth.read(stream, "", "RDF/XML");
+            final Model auth = ModelFactory.createDefaultModel();            
+            auth.read(stream, "", MediaTypeUtils.getJenaFromExtension(authUrl.substring(authUrl.lastIndexOf('.')+1)));
             stream.close();
             ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
-            //System.out.println("MODELS after Init>>"+models.keySet());
-            //System.out.println("MODELS Base after Init>>"+modelsBase.keySet());
+            models.put("auth", ontAuthMod);
+            modelsBase.put(ServiceConfig.getConfig().getOntology("auth").getBaseuri(), ontAuthMod);
+            log.info("MODELS after Init>>"+models.keySet());
+            log.info("MODELS Base after Init>>"+modelsBase.keySet());
         } catch (IOException io) {
             log.error("Error initializing OntModel", io);
         }
