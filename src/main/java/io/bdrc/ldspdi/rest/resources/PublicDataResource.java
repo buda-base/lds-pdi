@@ -319,21 +319,42 @@ public class PublicDataResource {
     }*/
 
     @GET    
-    @Path("/{base : .*}/{other}")
-    @Produces("text/html")
+    @Path("/{base : .*}/{other}")    
     @JerseyCacheControl()
     public Response getExtOntologyHomePage(
     		@Context final UriInfo info, 
     		@Context Request request,
+    		@HeaderParam("Accept") String format,
     		@PathParam("base") String base, 
     		@PathParam("other") String other) throws RestException {    	
     	ResponseBuilder builder = null;
-    	//Is the fuul request uri a baseuri? If so, setting up current ont and serving its the home page
+    	//Is the full request uri a baseuri? If so, setting up current ont and serving its the home page
     	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
     		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
-            if(builder == null){
-                builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
-            }            
+    		if(format !=null) {
+    			Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+    			if (variant == null) {
+    	            return Response.status(406).build();
+    	        }
+    	        MediaType mediaType = variant.getMediaType();
+    	        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
+    	        	builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
+    	        }else {
+    	        	final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType));
+    	        	final StreamingOutput stream = new StreamingOutput() {
+    	                @Override
+    	                public void write(OutputStream os) throws IOException, WebApplicationException {
+    	                    if (JenaLangStr == "STTL") {
+    	                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod);
+    	                        writer.output(os);
+    	                    }else {
+    	                    	mod.write(os, JenaLangStr);
+    	                    }
+    	                }
+    	            };
+    	            builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(MediaTypeUtils.getExtFromMime(mediaType)));    	        	
+    	        }
+    		}          
     	}else     	
     		{
     		//if not, checking if a valid ontology matches the baseUri part of the request
