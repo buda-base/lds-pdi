@@ -111,13 +111,15 @@ public class OntData implements Runnable {
         }
     }
     
-    public static OntModel getOntModelByBase(String baseUri) throws RestException {    	
+    public static OntModel getOntModelByBase(String baseUri) throws RestException {
     	if(modelsBase.get(baseUri)==null && ServiceConfig.getConfig().getOntologyByBase(baseUri)!=null) {
     		OntData.init(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
+    		return OntData.ontMod;
     	}
     	if(ServiceConfig.getConfig().getOntologyByBase(baseUri)!=null) {
     		ontMod=models.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
-    		return modelsBase.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
+    		//return modelsBase.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
+    		return ontMod;
     	}else {
     		return null;
     	}
@@ -127,9 +129,9 @@ public class OntData implements Runnable {
     public static OntModel setOntModel(String name) throws RestException {    	
     	if(models.get(name)==null && ServiceConfig.getConfig().getOntology(name)!=null) {
     		OntData.init(name);
+    		return OntData.ontMod;
     	}
     	if(ServiceConfig.getConfig().getOntology(name)!=null) {
-    		ontMod=models.get(name);
     		return models.get(name);
     	}else {
     		return null;
