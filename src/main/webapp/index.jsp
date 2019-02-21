@@ -71,7 +71,7 @@ Format:
   <option value="rdf">application/rdf+xml=rdf</option>
   <option value="owl">application/owl+xml=owl</option>
   <option value="json">application/json=json</option>
-  <option value="jsonld">application/json=ld+json</option>
+  <option value="jsonld">application/ld+json=jsonld</option>
   <option value="nt">application/n-triples=nt</option>
   <option value="trix">application/trix+xml=trix</option>
 </select> 
