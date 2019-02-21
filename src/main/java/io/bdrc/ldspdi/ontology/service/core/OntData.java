@@ -88,9 +88,6 @@ public class OntData implements Runnable {
             m1.read(st, "", "TURTLE");
             st.close();
             ontMod.add(m1);           
-            /***************/
-            //owlCharacteristics=new OWLPropsCharacteristics(ontMod);
-            //rdf10tordf11(ontMod);
             readGithubJsonLDContext();
             models.put(ont, ontMod);
             modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(), ontMod);
@@ -117,8 +114,7 @@ public class OntData implements Runnable {
     		return OntData.ontMod;
     	}
     	if(ServiceConfig.getConfig().getOntologyByBase(baseUri)!=null) {
-    		ontMod=models.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
-    		//return modelsBase.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
+    		ontMod=models.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());    		
     		return ontMod;
     	}else {
     		return null;
@@ -168,8 +164,7 @@ public class OntData implements Runnable {
         	ArrayList<String> names=ServiceConfig.getConfig().getValidNames();
         	for(String name:names) {         		
 	            final String fusekiUrl=ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);	           
-	            ontMod = OntData.setOntModel(name);
-	            owlCharacteristics=new OWLPropsCharacteristics(ontMod);
+	            ontMod = OntData.setOntModel(name);	            
 	            log.info("OntModel Size >> "+ontMod.size());
 	            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontMod.getBaseModel());
 	            log.info("updating core ont model() >> "+ name);
@@ -187,7 +182,10 @@ public class OntData implements Runnable {
         }
     }
 
-    public static OWLPropsCharacteristics getOwlCharacteristics() {
+    public static OWLPropsCharacteristics getOwlCharacteristics() throws IOException, RestException {
+    	if(owlCharacteristics==null) {
+    		owlCharacteristics=new OWLPropsCharacteristics(ontMod);
+    	}
         return owlCharacteristics;
     }
 
