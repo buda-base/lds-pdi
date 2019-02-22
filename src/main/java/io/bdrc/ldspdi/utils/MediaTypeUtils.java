@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Variant;
 
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 
 import io.bdrc.formatters.TTLRDFWriter;
@@ -15,6 +16,7 @@ public class MediaTypeUtils {
 
     public static final HashMap<String,String> ExtToJena;
     public static final HashMap<String,String> ExtToJenaRead;
+    public static final HashMap<String,Lang> ExtToJenaLang;
     public static final HashMap<MediaType,String> MimeToExt;
     public static final HashMap<String,MediaType> ExtToMime;
     // these are the extensions advertised in the http headers
@@ -80,6 +82,19 @@ public class MediaTypeUtils {
         ExtToJena.put("json", RDFLanguages.strLangRDFJSON);
         ExtToJena.put("trix", RDFLanguages.strLangTriX);
         
+        ExtToJenaLang = new HashMap<>();
+        ExtToJenaLang.put("ttl",  Lang.TURTLE);        
+        ExtToJenaLang.put("nt",   Lang.NT);
+        ExtToJenaLang.put("nq",   Lang.NQ);
+        ExtToJenaLang.put("trig", Lang.TRIG);
+        ExtToJenaLang.put("rdf",  Lang.RDFXML);
+        ExtToJenaLang.put("owl",  Lang.RDFXML);
+        ExtToJenaLang.put("jsonld", Lang.JSONLD);
+        ExtToJenaLang.put("rt",   Lang.RDFTHRIFT);
+        ExtToJenaLang.put("rj",   Lang.RDFJSON);
+        ExtToJenaLang.put("json", Lang.RDFJSON);
+        ExtToJenaLang.put("trix", Lang.TRIX);
+        
         ExtToJenaRead = new HashMap<>(ExtToJena);
         ExtToJenaRead.put("ttl",  RDFLanguages.strLangTurtle);
         
@@ -142,6 +157,10 @@ public class MediaTypeUtils {
 
     public static String getJenaFromExtension(String ext) {
         return ExtToJena.get(ext);
+    }
+    
+    public static Lang getJenaLangFromExtension(String ext) {
+        return ExtToJenaLang.get(ext);
     }
     
     public static String getJenaReadFromExtension(String ext) {

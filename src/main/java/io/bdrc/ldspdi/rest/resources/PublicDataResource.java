@@ -350,8 +350,14 @@ public class PublicDataResource {
     	                        writer.output(os);
     	                    }else {
     	                    	//here using the absolute path as baseUri since it has been recognized 
-    	                    	//as the base uri of a declared ontology (in ontologies.yml file)    	                    	
-    	                    	mod.write(os, JenaLangStr, pr.getBaseuri());
+    	                    	//as the base uri of a declared ontology (in ontologies.yml file)
+    	                    	System.out.println("USING RDFWRITER RIOT");
+    	                    	RDFWriter.create()
+    	                    	.source(mod.getGraph())
+    	                    	.base(pr.getBaseuri())
+    	                    	.lang(MediaTypeUtils.getJenaLangFromExtension(MediaTypeUtils.getExtFromMime(mediaType)))
+    	                    	.build().output(os);
+    	                    	//mod.write(os, JenaLangStr, pr.getBaseuri());
     	                    }
     	                }
     	            };
@@ -413,6 +419,7 @@ public class PublicDataResource {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,baseUri);
                         writer.output(os);
                     }else {
+                    	
                     	model.write(os, JenaLangStr,baseUri);
                     }
                 }
