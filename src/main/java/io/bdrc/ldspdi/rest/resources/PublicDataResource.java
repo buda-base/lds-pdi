@@ -330,7 +330,7 @@ public class PublicDataResource {
     	ResponseBuilder builder = null;
     	//Is the full request uri a baseuri? If so, setting up current ont and serving its the home page
     	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {    		
-    		
+    		OntParams pr=ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString());
     		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
     		if(format !=null) {
     			Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -346,12 +346,12 @@ public class PublicDataResource {
     	                @Override
     	                public void write(OutputStream os) throws IOException, WebApplicationException {
     	                    if (JenaLangStr == "STTL") {
-    	                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod);
+    	                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod,pr.getBaseuri());
     	                        writer.output(os);
     	                    }else {
     	                    	//here using the absolute path as baseUri since it has been recognized 
-    	                    	//as the base uri of a declared ontology (in ontologies.yml file)
-    	                    	mod.write(os, JenaLangStr, info.getAbsolutePath().toString());
+    	                    	//as the base uri of a declared ontology (in ontologies.yml file)    	                    	
+    	                    	mod.write(os, JenaLangStr, pr.getBaseuri());
     	                    }
     	                }
     	            };
@@ -410,7 +410,7 @@ public class PublicDataResource {
                 @Override
                 public void write(OutputStream os) throws IOException, WebApplicationException {
                     if (JenaLangStr == "STTL") {
-                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
+                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,baseUri);
                         writer.output(os);
                     }else {
                     	model.write(os, JenaLangStr,baseUri);

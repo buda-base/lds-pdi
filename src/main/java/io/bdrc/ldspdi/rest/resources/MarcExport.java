@@ -283,7 +283,7 @@ public class MarcExport {
 
     // tmp, for debug
     public static void printModel(final Model m) {
-        TTLRDFWriter.getSTTLRDFWriter(m).output(System.out);
+        TTLRDFWriter.getSTTLRDFWriter(m,"").output(System.out);
     }
 
     public static void addPubInfo(final Model m, final Resource main, final Record r) {
