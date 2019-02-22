@@ -27,7 +27,7 @@ public class ModelWriteTest {
 		m.write(System.out,"TURTLE","http://purl.bdrc.io/ontology/ext/auth/");
 		System.out.println("---------------------------------------------------------------------------------------");
 		System.out.println("xml:base is lacking when");
-		System.out.println("WRITING MODEL m.write(System.out,\"TURTLE\",\"http://purl.bdrc.io/ontology/ext/auth/\")");
+		System.out.println("WRITING MODEL m.write(System.out,\"RDF/XML\",\"http://purl.bdrc.io/ontology/ext/auth/\")");
 		m.write(System.out,"RDF/XML","http://purl.bdrc.io/ontology/ext/auth/");
 		
 		System.out.println("---------------------------------------------------------------------------------------");
