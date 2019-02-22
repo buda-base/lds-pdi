@@ -62,7 +62,7 @@ public class ResponseOutputStream {
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
                 if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                    final RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model);
+                    final RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model,"");
                     writer.output(os);
                     return;
                 }
@@ -81,7 +81,7 @@ public class ResponseOutputStream {
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
                 if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,"");
                     writer.output(os);
                     return;
                 }
@@ -94,7 +94,7 @@ public class ResponseOutputStream {
         return new StreamingOutput() {
             @Override
             public void write(OutputStream os){
-                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
+                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,"");
                 writer.output(os);
             }
         };
