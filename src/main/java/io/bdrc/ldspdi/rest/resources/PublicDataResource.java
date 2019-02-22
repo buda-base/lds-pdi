@@ -329,7 +329,8 @@ public class PublicDataResource {
     		@PathParam("other") String other) throws RestException {    	
     	ResponseBuilder builder = null;
     	//Is the full request uri a baseuri? If so, setting up current ont and serving its the home page
-    	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
+    	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {    		
+    		
     		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
     		if(format !=null) {
     			Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -348,7 +349,9 @@ public class PublicDataResource {
     	                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod);
     	                        writer.output(os);
     	                    }else {
-    	                    	mod.write(os, JenaLangStr);
+    	                    	//here using the absolute path as baseUri since it has been recognized 
+    	                    	//as the base uri of a declared ontology (in ontologies.yml file)
+    	                    	mod.write(os, JenaLangStr, info.getAbsolutePath().toString());
     	                    }
     	                }
     	            };
@@ -401,6 +404,7 @@ public class PublicDataResource {
         }    	
     	if(ServiceConfig.getConfig().isBaseUri(res)) {
     		OntParams params=ServiceConfig.getConfig().getOntologyByBase(res);
+    		final String baseUri=res;
     		Model model=OntData.setOntModel(params.getName());    		   
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
@@ -409,7 +413,7 @@ public class PublicDataResource {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model);
                         writer.output(os);
                     }else {
-                    	model.write(os, JenaLangStr);
+                    	model.write(os, JenaLangStr,baseUri);
                     }
                 }
             };

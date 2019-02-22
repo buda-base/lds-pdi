@@ -77,7 +77,7 @@ public class OntData implements Runnable {
             InputStream stream=connection.getInputStream();
             final Model m = ModelFactory.createDefaultModel();
             System.out.println("Ext="+MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.')+1)));
-            m.read(stream, "", MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.')+1)));
+            m.read(stream, "", MediaTypeUtils.getJenaReadFromExtension(url.substring(url.lastIndexOf('.')+1)));
             
             //m.read(stream, "", "TURTLE");
             stream.close();
@@ -96,7 +96,7 @@ public class OntData implements Runnable {
             connection = (HttpURLConnection) new URL(authUrl).openConnection();
             stream=connection.getInputStream();
             final Model auth = ModelFactory.createDefaultModel();            
-            auth.read(stream, "", MediaTypeUtils.getJenaFromExtension(authUrl.substring(authUrl.lastIndexOf('.')+1)));
+            auth.read(stream, "", MediaTypeUtils.getJenaReadFromExtension(authUrl.substring(authUrl.lastIndexOf('.')+1)));
             stream.close();
             ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
             models.put("auth", ontAuthMod);

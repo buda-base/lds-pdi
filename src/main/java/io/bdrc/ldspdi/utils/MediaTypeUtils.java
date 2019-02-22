@@ -14,6 +14,7 @@ import io.bdrc.formatters.TTLRDFWriter;
 public class MediaTypeUtils {
 
     public static final HashMap<String,String> ExtToJena;
+    public static final HashMap<String,String> ExtToJenaRead;
     public static final HashMap<MediaType,String> MimeToExt;
     public static final HashMap<String,MediaType> ExtToMime;
     // these are the extensions advertised in the http headers
@@ -67,8 +68,7 @@ public class MediaTypeUtils {
                 MT_TRIX).build();
 
         ExtToJena = new HashMap<>();
-        //ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);
-        ExtToJena.put("ttl",  RDFLanguages.strLangTurtle);
+        ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);        
         ExtToJena.put("nt",   RDFLanguages.strLangNTriples);
         ExtToJena.put("nq",   RDFLanguages.strLangNQuads);
         ExtToJena.put("trig", RDFLanguages.strLangTriG);
@@ -79,6 +79,10 @@ public class MediaTypeUtils {
         ExtToJena.put("rj",   RDFLanguages.strLangRDFJSON);
         ExtToJena.put("json", RDFLanguages.strLangRDFJSON);
         ExtToJena.put("trix", RDFLanguages.strLangTriX);
+        
+        ExtToJenaRead = new HashMap<>(ExtToJena);
+        ExtToJenaRead.put("ttl",  RDFLanguages.strLangTurtle);
+        
 
         MimeToExt = new HashMap<>();
         MimeToExt.put(MT_JSONLD_WA,   "jsonld");
@@ -138,6 +142,10 @@ public class MediaTypeUtils {
 
     public static String getJenaFromExtension(String ext) {
         return ExtToJena.get(ext);
+    }
+    
+    public static String getJenaReadFromExtension(String ext) {
+        return ExtToJenaRead.get(ext);
     }
 
     public static MediaType getMediaType(final Request request, final String format, final List<Variant> variants) {
