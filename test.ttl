@@ -31,7 +31,7 @@ It is important to notice that roles are used for application level access contr
   rdfs:label "role"@en ;
   rdfs:subClassOf :Entity ;
 .
-aut:appId
+:appId
   a owl:ObjectProperty ;
   rdfs:comment "This property links permissions, roles and endpoints to their associated application resources."@en ;
   rdfs:domain :Role ;
