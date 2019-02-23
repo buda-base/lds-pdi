@@ -22,3 +22,4 @@ aut:Application
   rdfs:comment "represent a application that provides a set of web services or exposes endpoints. For instance, bdrc  Linked Data server is one app and bdrc IIIF Image server is another one."@en ;
   rdfs:label "application"@en ;
   rdfs:subClassOf aut:Entity ;
+.
