@@ -51,6 +51,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
@@ -351,9 +352,13 @@ public class PublicDataResource {
     	                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod,pr.getBaseuri());
     	                        writer.output(os);
     	                    }else {
+    	                    	org.apache.jena.rdf.model.RDFWriter wr=mod.getWriter(JenaLangStr);
+    	                    	if(JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+    	                    		wr.setProperty("xmlbase", pr.getBaseuri());
+    	                    	}
     	                    	//here using the absolute path as baseUri since it has been recognized 
-    	                    	//as the base uri of a declared ontology (in ontologies.yml file)    	                    	
-    	                    	mod.write(os, JenaLangStr, pr.getBaseuri());
+    	                    	//as the base uri of a declared ontology (in ontologies.yml file)  
+    	                    	wr.write(mod, os, pr.getBaseuri());    	                    	
     	                    }
     	                }
     	            };
@@ -415,8 +420,11 @@ public class PublicDataResource {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,baseUri);
                         writer.output(os);
                     }else {
-                    	
-                    	model.write(os, JenaLangStr,baseUri);
+                    	org.apache.jena.rdf.model.RDFWriter wr=model.getWriter(JenaLangStr);
+                    	if(JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                    		wr.setProperty("xmlbase", params.getBaseuri());
+                    	}
+                    	wr.write(model, os, params.getBaseuri());                    	
                     }
                 }
             };
