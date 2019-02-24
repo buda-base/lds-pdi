@@ -328,16 +328,18 @@ public class PublicDataResource {
     		@PathParam("base") String base, 
     		@PathParam("other") String other) throws RestException {    	
     	ResponseBuilder builder = null;
-    	//Is the full request uri a baseuri? If so, setting up current ont and serving its the home page
+    	//Is the full request uri a baseuri? 
     	if(ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {    		
     		OntParams pr=ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString());
     		OntModel mod=OntData.getOntModelByBase(info.getAbsolutePath().toString()); 
+    		//if accept header is present
     		if(format !=null) {
     			Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
     			if (variant == null) {
     	            return Response.status(406).build();
     	        }
     	        MediaType mediaType = variant.getMediaType();
+    	        //browser request : serving html page
     	        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
     	        	builder = Response.ok(new Viewable("/ontologyHome.jsp",mod));
     	        }else {
@@ -350,14 +352,8 @@ public class PublicDataResource {
     	                        writer.output(os);
     	                    }else {
     	                    	//here using the absolute path as baseUri since it has been recognized 
-    	                    	//as the base uri of a declared ontology (in ontologies.yml file)
-    	                    	System.out.println("USING RDFWRITER RIOT");
-    	                    	RDFWriter.create()
-    	                    	.source(mod.getGraph())
-    	                    	.base(pr.getBaseuri())
-    	                    	.lang(MediaTypeUtils.getJenaLangFromExtension(MediaTypeUtils.getExtFromMime(mediaType)))
-    	                    	.build().output(os);
-    	                    	//mod.write(os, JenaLangStr, pr.getBaseuri());
+    	                    	//as the base uri of a declared ontology (in ontologies.yml file)    	                    	
+    	                    	mod.write(os, JenaLangStr, pr.getBaseuri());
     	                    }
     	                }
     	            };
@@ -366,8 +362,8 @@ public class PublicDataResource {
     		}          
     	}else     	
     		{
-    		//if not, checking if a valid ontology matches the baseUri part of the request
-        	//if so : serving properties or class pages
+    		//if not a base uri, checking if a valid ontology matches the baseUri part of the request
+        	//if so : serving properties or class html pages
 	    	OntParams ont=ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri()+base+"/");	    	
 	    	if(ont !=null) {
 	    		OntData.setOntModel(ont.getName());		    		
