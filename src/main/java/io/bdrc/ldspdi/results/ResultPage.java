@@ -36,66 +36,65 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPage {
 
-    public final static Logger log=LoggerFactory.getLogger(ResultPage.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(ResultPage.class.getName());
 
-    public int pageNumber,numberOfPages,pageSize,numResults, hash;
+    public int pageNumber, numberOfPages, pageSize, numResults, hash;
     public long execTime;
-    public String id,query;
-    public boolean isLastPage,isFirstPage,isUrlQuery=false;
+    public String id, query;
+    public boolean isLastPage, isFirstPage, isUrlQuery = false;
     public ResultPageLinks pLinks;
-    public HashMap<String,List<String>> head;
+    public HashMap<String, List<String>> head;
     public List<String> headrows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
-    HashMap<String,String> hm;
+    HashMap<String, String> hm;
     private QueryTemplate temp;
 
-    public ResultPage(ResultSetWrapper res,String pageNum,HashMap<String,String> hm,QueryTemplate temp)
-            throws RestException{
-        if(pageNum!=null) {
-            this.pageNumber=Integer.parseInt(pageNum);
-        }else {
-            this.pageNumber=1;
+    public ResultPage(ResultSetWrapper res, String pageNum, HashMap<String, String> hm, QueryTemplate temp) throws RestException {
+        if (pageNum != null) {
+            this.pageNumber = Integer.parseInt(pageNum);
+        } else {
+            this.pageNumber = 1;
         }
-        this.hm=hm;
-        pageSize=res.getPageSize();
-        numResults=res.getNumResults();
-        execTime=res.getExecTime();
-        hash=res.getHash();
-        head=res.getHead();
-        headrows=head.get("vars");
-        numberOfPages=res.getNumberOfPages();
-        id=temp.getId();
-        query=hm.get("query");
-        String tmp=hm.get(QueryConstants.QUERY_TYPE);
-        if(tmp!=null) {isUrlQuery=tmp.equals(QueryConstants.URL_QUERY);}
-        int offset=(pageNumber-1)*pageSize;
-        this.temp=temp;
-        mvc_rows=new ArrayList<>();
-        ArrayList<QueryMvcSolutionItem> allRows=res.getMvc_rows();
-        if(pageNumber<=numberOfPages) {
-            for (int x=(offset); x<(offset+pageSize);x++) {
+        this.hm = hm;
+        pageSize = res.getPageSize();
+        numResults = res.getNumResults();
+        execTime = res.getExecTime();
+        hash = res.getHash();
+        head = res.getHead();
+        headrows = head.get("vars");
+        numberOfPages = res.getNumberOfPages();
+        id = temp.getId();
+        query = hm.get("query");
+        String tmp = hm.get(QueryConstants.QUERY_TYPE);
+        if (tmp != null) {
+            isUrlQuery = tmp.equals(QueryConstants.URL_QUERY);
+        }
+        int offset = (pageNumber - 1) * pageSize;
+        this.temp = temp;
+        mvc_rows = new ArrayList<>();
+        ArrayList<QueryMvcSolutionItem> allRows = res.getMvc_rows();
+        if (pageNumber <= numberOfPages) {
+            for (int x = (offset); x < (offset + pageSize); x++) {
                 try {
                     mvc_rows.add(allRows.get(x));
-                }
-                catch(Exception ex) {
-                    //For building the last page
+                } catch (Exception ex) {
+                    // For building the last page
                     break;
                 }
             }
         }
-        if(pageNumber==1) {
-            isFirstPage=true;
+        if (pageNumber == 1) {
+            isFirstPage = true;
+        } else {
+            isFirstPage = false;
         }
-        else {
-            isFirstPage=false;
+        if (pageNumber == res.numberOfPages) {
+            isLastPage = true;
+        } else {
+            isLastPage = false;
         }
-        if(pageNumber==res.numberOfPages) {
-            isLastPage=true;
-        }else {
-            isLastPage=false;
-        }
-        pLinks=new ResultPageLinks(this,hm);
-        res=null;
+        pLinks = new ResultPageLinks(this, hm);
+        res = null;
     }
 
     public ArrayList<QueryMvcSolutionItem> getMvc_rows() {
@@ -134,7 +133,7 @@ public class ResultPage {
         return isFirstPage;
     }
 
-    public HashMap<String,List<String>> getHead() {
+    public HashMap<String, List<String>> getHead() {
         return head;
     }
 
@@ -149,6 +148,7 @@ public class ResultPage {
     public String getId() {
         return id;
     }
+
     public String getQuery() {
         return query;
     }
@@ -169,14 +169,17 @@ public class ResultPage {
         this.query = query;
     }
 
-    public List<String> getParamList(){
-        List<String> list=Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
+    public List<String> getParamList() {
+        if (temp.getQueryParams() == null) {
+            return new ArrayList<String>();
+        }
+        List<String> list = Arrays.asList(temp.getQueryParams().split(Pattern.compile(",").toString()));
         return list;
     }
 
     public String getParamValue(String param) {
-        String val=hm.get(param);
-        if(val!=null) {
+        String val = hm.get(param);
+        if (val != null) {
             return val;
         }
         return "";
@@ -192,11 +195,8 @@ public class ResultPage {
 
     @Override
     public String toString() {
-        return "ResultPage [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize
-                + ", numResults=" + numResults + ", hash=" + hash + ", execTime=" + execTime + ", id=" + id + ", query="
-                + query + ", isLastPage=" + isLastPage + ", isFirstPage=" + isFirstPage + ", isUrlQuery=" + isUrlQuery
-                + ", pLinks=" + pLinks + ", head=" + head + ", hm=" + hm + ", temp=" + temp
-                + "]";
+        return "ResultPage [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize + ", numResults=" + numResults + ", hash=" + hash + ", execTime=" + execTime + ", id=" + id + ", query=" + query + ", isLastPage="
+                + isLastPage + ", isFirstPage=" + isFirstPage + ", isUrlQuery=" + isUrlQuery + ", pLinks=" + pLinks + ", head=" + head + ", hm=" + hm + ", temp=" + temp + "]";
     }
 
 }

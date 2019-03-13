@@ -84,7 +84,6 @@ public class PublicTemplatesResource {
 			throw new RestException(500,
 					new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
 		}
-		System.out.println("QUERY >> " + query);
 		ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH),
 				hm.get(QueryConstants.PAGE_SIZE));
 		String fmt = hm.get(QueryConstants.FORMAT);

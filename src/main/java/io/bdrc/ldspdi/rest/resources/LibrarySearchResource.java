@@ -128,6 +128,7 @@ public class LibrarySearchResource {
 		}
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
 		final String query = qfp.getParametizedQuery(map, false);
+		log.info("Call to getLibGraphGet() with query >> " + query);
 		final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
 		HashMap<String, Object> res = null;
 		switch (file) {
