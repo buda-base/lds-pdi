@@ -148,6 +148,10 @@ public class LdsQuery {
         }
     }
 
+    public String getPrefixedQuery() {
+        return prefixedQuery;
+    }
+
     private void checkReturnType() throws RestException {
         if (!QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed :" + metaInf.get(QueryConstants.QUERY_RETURN_TYPE) + " is not a valid query return type"));
