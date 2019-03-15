@@ -17,7 +17,8 @@ construct {
   ?series skos:prefLabel ?seriesl .
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .
-  ?R_RES tmp:workLanguage ?lang .
+  ?R_RES tmp:workMarcLanguage ?mlang .
+  ?R_RES tmp:workBCPLanguage ?bcplang .
   ?R_RES tmp:workOtherLanguage ?olang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
@@ -58,7 +59,8 @@ construct {
   }
   optional {
     FILTER(?p = :workLangScript)
-    ?o :language/:langMARCCode ?lang .
+    ?o :language/:langMARCCode ?mlang .
+    ?o :language/:langBCP47Lang ?bcplang .
   }
   optional {
     FILTER(?p = :workOtherLangScript)

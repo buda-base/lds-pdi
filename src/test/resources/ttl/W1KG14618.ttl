@@ -1,0 +1,91 @@
+@base          <file:///> .
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix adr:   <http://purl.bdrc.io/resource-auth/> .
+@prefix as:    <http://www.w3.org/ns/activitystreams#> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix bdac:  <http://purl.bdrc.io/anncollection/> .
+@prefix bdan:  <http://purl.bdrc.io/annotation/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dila:  <http://authority.dila.edu.tw/person/?fromInner=> .
+@prefix f:     <java:io.bdrc.ldspdi.sparql.functions.> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix oa:    <http://www.w3.org/ns/oa#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rsh:   <http://purl.bdrc.io/shacl/core/shape/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+bdr:W1KG14618  a  bdo:Work ;
+   skos:prefLabel  "mthong ba dga' byed/ byung ru'i 'phreng ba/"@bo-x-ewts , "藏中医术精选"@zh-hans ;
+   bdo:creatorMainAuthor  bdr:P1KG16273 , bdr:P1KG16274 ;
+   bdo:itemBDRCHoldingStatement  "tbrc holds digitally scanned images, tiffs and pdf files; scanned for preservation purposes only; not for distribution" ;
+   bdo:note      [ bdo:noteText  "in tibetan"@en ] ;
+   bdo:workCreator  bdr:P1KG16273 , bdr:P1KG16274 ;
+   bdo:workEditionStatement  "par gzhi dang po/"@bo-x-ewts ;
+   bdo:workEvent  [ a             bdo:PublishedEvent ;
+                    bdo:onYear    2008
+                  ] ;
+   bdo:workExtentStatement  "2, 3, 4, 2, 205 p." ;
+   bdo:workHasItem  bdr:I1KG14618 ;
+   bdo:workHasItemImageAsset  bdr:I1KG14618 ;
+   bdo:workHollis  "014256179" ;
+   bdo:workIsAbout  bdr:T2MS13793 ;
+   bdo:workIsbn  "9787105097241" ;
+   bdo:workLangScript  bdr:Bo , bdr:BoTibt , bdr:LanguageTaxonomy ;
+   bdo:workNumberOfVolumes  1 ;
+   bdo:workObjectType  bdr:ObjectTypeComputerInput ;
+   bdo:workPublisherLocation  "pe cin/"@bo-x-ewts ;
+   bdo:workPublisherName  "mi rigs dpe skrun khang /"@bo-x-ewts ;
+   bdo:workScanInfo  "Scanned at M/S Satluj Infotech Images, E-45, Sector 27 Noida, District Gautam Buddha Nagar, U.P. 201301 via New Delhi, IN for the Tibetan Buddhist Resource Center, 150 17th st., New York, NY 10011, U.S.A 2006. Comments: 10/2013"@en ;
+   bdo:workSeriesName  "bod kyi gso ba rig pa'i gna' dpe phyogs bsgrigs dpe tshogs/"@bo-x-ewts ;
+   bdo:workSeriesNumber  "86" ;
+   bdo:workTitle  [ a             bdo:WorkBibliographicalTitle ;
+                    rdfs:label    "mthong ba dga' byed/ byung ru'i 'phreng ba/"@bo-x-ewts , "zang zhong yi jing xuan/"@bo-x-ewts , "藏中医术精选"@zh-hans
+                  ] ;
+   adm:access    bdr:AccessOpen ;
+   adm:gitRevision  "2d58f8275303110e5f9e7b9ce71cc7b1c9e5445b" ;
+   adm:license   bdr:LicensePublicDomain ;
+   adm:logEntry  [ adm:logDate   "2013-10-24T13:47:56.576Z"^^xsd:dateTime ;
+                   adm:logMessage  "released for scan request to india"@en ;
+                   adm:logWho    bdr:U00016
+                 ] ,
+         [ adm:logDate   "2013-10-24T13:47:56.931Z"^^xsd:dateTime ;
+           adm:logMessage  "released for scan request to india"@en ;
+           adm:logWho    bdr:U00016
+         ] ,
+         [ adm:logDate   "2013-10-24T13:48:23.215Z"^^xsd:dateTime ;
+           adm:logMessage  "added volumeMap for scan request"@en ;
+           adm:logWho    bdr:U00016
+         ] ,
+         [ adm:logDate   "2014-01-08T15:27:13.591Z"^^xsd:dateTime ;
+           adm:logMessage  "added copyright titles"@en ;
+           adm:logWho    bdr:U00016
+         ] ,
+         [ adm:logDate   "2014-01-08T15:27:20.379Z"^^xsd:dateTime ;
+           adm:logMessage  "added copyright titles"@en ;
+           adm:logWho    bdr:U00016
+         ] ,
+         [ adm:logDate   "2014-04-22T00:30:13.577Z"^^xsd:dateTime ;
+           adm:logMessage  "normalize encoding field for pub info"@en ;
+           adm:logWho    bdr:U00012
+         ] ,
+         [ adm:logDate   "2015-01-05T17:22:13.356Z"^^xsd:dateTime ;
+           adm:logMessage  "added hollis field to pub info"@en ;
+           adm:logWho    bdr:U00006
+         ] ;
+   adm:status    bdr:StatusReleased .

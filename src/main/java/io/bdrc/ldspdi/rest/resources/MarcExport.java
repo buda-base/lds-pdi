@@ -6,13 +6,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.Collator;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -116,7 +119,8 @@ public class MarcExport {
     //public static final Property tmpCompletedYear = ResourceFactory.createProperty(TMP+"completedYear");
     public static final Property tmpBirthYear = ResourceFactory.createProperty(TMP+"birthYear");
     public static final Property tmpDeathYear = ResourceFactory.createProperty(TMP+"deathYear");
-    public static final Property tmpLang = ResourceFactory.createProperty(TMP+"workLanguage");
+    public static final Property tmpMarcLang = ResourceFactory.createProperty(TMP+"workMarcLanguage");
+    public static final Property tmpBcpLang = ResourceFactory.createProperty(TMP+"workBCPLanguage");
     public static final Property tmpOtherLang = ResourceFactory.createProperty(TMP+"workOtherLanguage");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO+"publisherLocation");
 
@@ -153,25 +157,29 @@ public class MarcExport {
     static final DataField f506_restricted = factory.newDataField("506", '1', ' ');
     static final DataField f506_open = factory.newDataField("506", '0', ' ');
     static final DataField f506_fairUse = factory.newDataField("506", '1', ' ');
+    static final DataField f506_restrictedInChina = factory.newDataField("506", '1', ' ');
 
     static final DataField f542_PD = factory.newDataField("542", '1', ' ');
 
     static final String defaultCountryCode = "   ";
     static final String defaultLang = "und";
 
+    // for 588 field
+    static final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+
     static {
         titleLocalNameToMarcInfo.put("WorkTitlePageTitle", new MarcInfo(0, '5', null));
-        titleLocalNameToMarcInfo.put("WorkBibliographicalTitle", new MarcInfo(1, '3', "BDRC Bibliographical Title:"));
+        titleLocalNameToMarcInfo.put("WorkBibliographicalTitle", new MarcInfo(1, '3', "BDRC Bibliographical title:"));
         titleLocalNameToMarcInfo.put("WorkCoverTitle", new MarcInfo(2, '4', null));
         titleLocalNameToMarcInfo.put("WorkFullTitle", new MarcInfo(3, '3', null));
-        titleLocalNameToMarcInfo.put("WorkHalfTitle", new MarcInfo(99, '0', null)); // or 3?
-        titleLocalNameToMarcInfo.put("WorkColophonTitle", new MarcInfo(99, '3', "Colophon Title:"));
-        titleLocalNameToMarcInfo.put("WorkCopyrightPageTitle", new MarcInfo(99, '3', null));
-        titleLocalNameToMarcInfo.put("WorkDkarChagTitle", new MarcInfo(99, '3', "Table of contents Title:"));
-        titleLocalNameToMarcInfo.put("WorkOtherTitle", new MarcInfo(99, '3', null));
-        titleLocalNameToMarcInfo.put("WorkRunningTitle", new MarcInfo(99, '7', null));
-        titleLocalNameToMarcInfo.put("WorkSpineTitle", new MarcInfo(99, '8', null));
-        titleLocalNameToMarcInfo.put("WorkTitlePortion", new MarcInfo(99, '0', null));
+        titleLocalNameToMarcInfo.put("WorkHalfTitle", new MarcInfo(4, '3', null)); // or 3?
+        titleLocalNameToMarcInfo.put("WorkColophonTitle", new MarcInfo(5, '3', "Colophon title:"));
+        titleLocalNameToMarcInfo.put("WorkCopyrightPageTitle", new MarcInfo(6, '3', null));
+        titleLocalNameToMarcInfo.put("WorkDkarChagTitle", new MarcInfo(7, '3', "Table of contents title:"));
+        titleLocalNameToMarcInfo.put("WorkOtherTitle", new MarcInfo(8, '3', null));
+        titleLocalNameToMarcInfo.put("WorkRunningTitle", new MarcInfo(9, '7', null));
+        titleLocalNameToMarcInfo.put("WorkSpineTitle", new MarcInfo(10, '8', null));
+        titleLocalNameToMarcInfo.put("WorkTitlePortion", new MarcInfo(11, '0', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
         f040.addSubfield(factory.newSubfield('e', "rda"));
@@ -193,13 +201,13 @@ public class MarcExport {
         f506_restricted.addSubfield(factory.newSubfield('a', "Access restricted."));
         f506_restricted.addSubfield(factory.newSubfield('f', "No online access"));
         f506_restricted.addSubfield(factory.newSubfield('2', "star"));
-        //f506_open.addSubfield(factory.newSubfield('u', "http://creativecommons.org/licenses/publicdomain"));
         f506_open.addSubfield(factory.newSubfield('2', "star"));
         f506_open.addSubfield(factory.newSubfield('a', "Open Access."));
         f506_open.addSubfield(factory.newSubfield('f', "Unrestricted online access"));
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
+        f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Open to readers with IP addresses outside China."));
         f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
         f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
     }
@@ -213,8 +221,8 @@ public class MarcExport {
         if (lang == null || !"bo-x-ewts".equals(lang)) {
             return StringUtils.capitalize(l.getString());
         }
-        String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
-        return StringUtils.capitalize(alalc);
+        final String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
+        return StringUtils.capitalize(alalc.replace('-', ' '));
     }
 
     public static Map<String,String> getPubLoctoCC() {
@@ -273,11 +281,13 @@ public class MarcExport {
             case "AccessFairUse":
                 r.addVariableField(f506_fairUse);
                 break;
+            case "AccessRestrictedInChina":
+                r.addVariableField(f506_restrictedInChina);
+                break;
             default:
                 r.addVariableField(f506_restricted);
                 break;
             }
-            // TODO: what about restriction in China?
         }
     }
 
@@ -364,7 +374,7 @@ public class MarcExport {
             sb.append(marcCC);
         }
         sb.append("     o     000 ||");
-        final Statement languageS = main.getProperty(tmpLang);
+        final Statement languageS = main.getProperty(tmpMarcLang);
         if (languageS == null) {
             sb.append(defaultLang);
         } else {
@@ -483,7 +493,13 @@ public class MarcExport {
 
     public final static class CompareStringLiterals implements Comparator<Literal> {
 
-        private static Collator collator = Collator.getInstance(); // root locale
+        private static final Collator collator = Collator.getInstance(); // root locale
+
+        private String bcpTag = null;
+
+        public CompareStringLiterals(final String bcpTag) {
+            this.bcpTag = bcpTag;
+        }
 
         @Override
         public int compare(Literal l1, Literal l2) {
@@ -492,6 +508,17 @@ public class MarcExport {
             int res;
             if (!lang1.isEmpty()) {
                 if (!lang2.isEmpty()) {
+                    // we want those with a corresponding bcpTag at the beginning of the list
+                    if (this.bcpTag != null) {
+                        final boolean lang1ok = lang1.equals(this.bcpTag) || lang1.startsWith(this.bcpTag+'-');
+                        final boolean lang2ok = lang2.equals(this.bcpTag) || lang2.startsWith(this.bcpTag+'-');
+                        if (lang1ok && !lang2ok) {
+                            return -1;
+                        }
+                        if (!lang1ok && lang2ok) {
+                            return 1;
+                        }
+                    }
                     res = lang1.compareTo(lang2);
                     if (res != 0) return res;
                     return collator.compare(l1.getString(), l2.getString());
@@ -505,7 +532,15 @@ public class MarcExport {
         }
     }
 
-    private final static CompareStringLiterals comp = new CompareStringLiterals();
+    private final static CompareStringLiterals comp = new CompareStringLiterals(null);
+
+    private static String getbcp47lang(final Resource main) {
+        final Statement languageS = main.getProperty(tmpBcpLang);
+        if (languageS != null) {
+            return languageS.getString();
+        }
+        return null;
+    }
 
     private static void addTitles(final Model m, final Resource main, final Record record) {
         // again, we keep titles in order for consistency among marc queries
@@ -518,30 +553,42 @@ public class MarcExport {
             final Resource title = si.next().getResource();
             final Resource type = title.getPropertyResourceValue(RDF.type);
             final String typeLocalName = type.getLocalName();
-            final Literal titleLit = title.getProperty(RDFS.label).getLiteral();
-            if (typeLocalName.equals("WorkSubtitle")) {
-                subtitleStr = getLangStr(titleLit);
-                continue;
-            }
-            final MarcInfo mi = titleLocalNameToMarcInfo.get(typeLocalName);
-            if (mi == null) {
-                log.error("missing MarcInfo for title type {}", typeLocalName);
-                continue;
-            }
-            if (!titles.containsKey(typeLocalName)) {
-                titles.put(typeLocalName, new ArrayList<>());
-            }
-            final List<Literal> titleList = titles.get(typeLocalName);
-            titleList.add(titleLit);
-            final Integer prio = mi.prio;
-            if (prio < highestPrio) {
-                highestPrio = prio;
-                highestPrioList = titleList;
+            StmtIterator labelSi = title.listProperties(RDFS.label);
+            while (labelSi.hasNext()) {
+                final Literal titleLit = labelSi.next().getLiteral();
+                if (typeLocalName.equals("WorkSubtitle")) {
+                    subtitleStr = getLangStr(titleLit);
+                    continue;
+                }
+                final MarcInfo mi = titleLocalNameToMarcInfo.get(typeLocalName);
+                if (mi == null) {
+                    log.error("missing MarcInfo for title type {}", typeLocalName);
+                    continue;
+                }
+                if (!titles.containsKey(typeLocalName)) {
+                    titles.put(typeLocalName, new ArrayList<>());
+                }
+                final List<Literal> titleList = titles.get(typeLocalName);
+                titleList.add(titleLit);
+                final Integer prio = mi.prio;
+                if (prio < highestPrio) {
+                    highestPrio = prio;
+                    highestPrioList = titleList;
+                }
             }
         }
         if (highestPrioList == null) {
             // no title...
             return;
+        }
+        if (highestPrioList.size() > 1) {
+            // sorting highestPrioList by language
+            final String bcp47lang = getbcp47lang(main);
+            if (bcp47lang == null) {
+                log.error("no bcp47 lang tag returned for "+main.getLocalName());
+            }
+            System.out.println(bcp47lang);
+            Collections.sort(highestPrioList, new CompareStringLiterals(bcp47lang)); // works for null
         }
         // authorship statement
         si = main.listProperties(workAuthorshipStatement);
@@ -549,8 +596,6 @@ public class MarcExport {
         while (si.hasNext()) {
             authorshipStatement = getLangStr(si.next().getLiteral());
         }
-        // get title with highest priority:
-        Collections.sort(highestPrioList, comp);
         final Literal mainTitleL = highestPrioList.get(0);
         highestPrioList.remove(0);
         final DataField f245 = factory.newDataField("245", '0', '0');
@@ -562,6 +607,7 @@ public class MarcExport {
             f245.addSubfield(factory.newSubfield('c', " / "+authorshipStatement));
         }
         record.addVariableField(f245);
+        // TODO: consume the rest of highestPrioList
         for (Entry<String,List<Literal>> e : titles.entrySet()) {
             final MarcInfo mi = titleLocalNameToMarcInfo.get(e.getKey());
             final List<Literal> list = e.getValue();
@@ -705,8 +751,8 @@ public class MarcExport {
             return;
         final DataField f546 = factory.newDataField("546", ' ', ' ');
         if (nbLangScripts == 1 && firstScriptLabel != null) {
-            f546.addSubfield(factory.newSubfield('a', sb.toString()+' '));
-            f546.addSubfield(factory.newSubfield('b', '('+firstScriptLabel+" script)."));
+            f546.addSubfield(factory.newSubfield('a', sb.toString()+';'));
+            f546.addSubfield(factory.newSubfield('b', firstScriptLabel+" script."));
         } else {
             sb.append('.');
             f546.addSubfield(factory.newSubfield('a', sb.toString()));
@@ -786,7 +832,7 @@ public class MarcExport {
             record.addVariableField(f050__4);
         }
         addTitles(m, main, record); // 245
-        // edition statment
+        // edition statement
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
@@ -825,8 +871,9 @@ public class MarcExport {
         }
         addLanguages(m, main, record); // 546
         final DataField f588 = factory.newDataField("588", ' ', ' ');
-        // TODO: replace [date]
-        f588.addSubfield(factory.newSubfield('a', "Description based on online resource viewed on [date]; title from title page."));
+        final Date curDate = new Date();
+        String dateStr = dateFormat.format(curDate);
+        f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")"));
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
         record.addVariableField(f710_2);
@@ -862,13 +909,14 @@ public class MarcExport {
         }
         // should be temporary
         if (main.getLocalName().startsWith("W1FPL")) {
-            model.add(main, tmpLang, "pli");
+            model.add(main, tmpMarcLang, "pli");
+            model.add(main, tmpBcpLang, "pi");
             model.add(main, langScript, model.createResource(BDR+"PiMymr"));
         }
         // this should be correct but breaks W2DB4598 because of poorly encoded series data
         //        if (main.hasProperty(hasExpression)) {
         //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is an abstract Work"));
-        //        }
+        //        }st
         return model;
     }
 

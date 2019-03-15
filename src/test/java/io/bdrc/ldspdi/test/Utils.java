@@ -95,6 +95,7 @@ public class Utils {
         res.add("P1AG29");
         res.add("G1KR1355");
         res.add("W1FPL3356");
+        res.add("W1KG14618");
         res.add("AN123");
         res.add("W_Chos_Yin");
         res.add("literal3");
