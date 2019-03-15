@@ -891,7 +891,7 @@ public class MarcExport {
         final DataField f588 = factory.newDataField("588", ' ', ' ');
         final Date curDate = new Date();
         String dateStr = dateFormat.format(curDate);
-        f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")"));
+        f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")."));
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
         record.addVariableField(f710_2);

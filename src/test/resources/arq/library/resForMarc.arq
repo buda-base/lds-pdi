@@ -43,6 +43,7 @@ construct {
   }
   optional {
     ?p rdfs:subclassOf* :workCreator .
+    ?R_RES ?p ?o .
     ?o ?op ?oo .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
@@ -58,12 +59,12 @@ construct {
     }
   }
   optional {
-    FILTER(?p = :workLangScript)
+    ?R_RES :workLangScript ?o .
     ?o :language/:langMARCCode ?mlang .
     ?o :language/:langBCP47Lang ?bcplang .
   }
   optional {
-    FILTER(?p = :workOtherLangScript)
+    ?R_RES :workOtherLangScript ?o .
     ?o :language/:langMARCCode ?olang .
   }
   optional {
@@ -72,7 +73,10 @@ construct {
       :onYear ?publishedYear .
   }
   optional {
-    FILTER(isBlank(?o))
+    {
+      ?R_RES ?p ?o .
+      FILTER(isBlank(?o))
+    }
     ?o ?op ?oo .
   }
 }
