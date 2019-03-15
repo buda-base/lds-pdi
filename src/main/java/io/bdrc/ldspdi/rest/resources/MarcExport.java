@@ -195,21 +195,21 @@ public class MarcExport {
         f338.addSubfield(factory.newSubfield('2', "rdacarrier"));
         f533.addSubfield(factory.newSubfield('a', "Electronic reproduction"));
         f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. :"));
-        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center"));
-        f710_2.addSubfield(factory.newSubfield('a', "Buddhist Digital Resource Center"));
+        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center."));
+        f710_2.addSubfield(factory.newSubfield('a', "Buddhist Digital Resource Center."));
         // see https://www.oclc.org/content/dam/oclc/digitalregistry/506F_vocabulary.pdf
         f506_restricted.addSubfield(factory.newSubfield('a', "Access restricted."));
         f506_restricted.addSubfield(factory.newSubfield('f', "No online access"));
-        f506_restricted.addSubfield(factory.newSubfield('2', "star"));
-        f506_open.addSubfield(factory.newSubfield('2', "star"));
+        f506_restricted.addSubfield(factory.newSubfield('2', "star."));
         f506_open.addSubfield(factory.newSubfield('a', "Open Access."));
         f506_open.addSubfield(factory.newSubfield('f', "Unrestricted online access"));
+        f506_open.addSubfield(factory.newSubfield('2', "star."));
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
-        f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
+        f506_fairUse.addSubfield(factory.newSubfield('2', "star."));
         f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Open to readers with IP addresses outside China."));
-        f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
         f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
+        f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
     }
 
     public static boolean indent = true;
@@ -337,7 +337,7 @@ public class MarcExport {
                 continue;
             }
             int year = onYearS.getInt();
-            f264.addSubfield(factory.newSubfield('c', String.valueOf(year)));
+            f264.addSubfield(factory.newSubfield('c', String.valueOf(year)+"."));
             hasDate = true;
         }
         if (!hasDate) {
@@ -390,8 +390,11 @@ public class MarcExport {
             return;
         }
         String st = extentStatementS.getString();
-        st = st.replace("p\\.", "pages");
-        st = st.replace("ff\\.", "folios");
+        System.out.println(st);
+        st = st.replace("pp.", "pages");
+        st = st.replace("p.", "pages");
+        System.out.println(st);
+        st = st.replace("ff.", "folios");
         // the s in volume(s) is a bit annoying
         st = st.replaceAll("^1 v\\.", "1 volume");
         st = st.replaceAll("[^0-9]1 v\\.", "1 volume");
@@ -542,7 +545,7 @@ public class MarcExport {
         return null;
     }
 
-    private static void addTitles(final Model m, final Resource main, final Record record) {
+    private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang) {
         // again, we keep titles in order for consistency among marc queries
         final Map<String,List<Literal>> titles = new TreeMap<>();
         StmtIterator si = main.listProperties(workTitle);
@@ -581,14 +584,10 @@ public class MarcExport {
             // no title...
             return;
         }
+        final CompareStringLiterals compbcp = new CompareStringLiterals(bcp47lang);
         if (highestPrioList.size() > 1) {
             // sorting highestPrioList by language
-            final String bcp47lang = getbcp47lang(main);
-            if (bcp47lang == null) {
-                log.error("no bcp47 lang tag returned for "+main.getLocalName());
-            }
-            System.out.println(bcp47lang);
-            Collections.sort(highestPrioList, new CompareStringLiterals(bcp47lang)); // works for null
+            Collections.sort(highestPrioList, compbcp); // works for null
         }
         // authorship statement
         si = main.listProperties(workAuthorshipStatement);
@@ -599,19 +598,28 @@ public class MarcExport {
         final Literal mainTitleL = highestPrioList.get(0);
         highestPrioList.remove(0);
         final DataField f245 = factory.newDataField("245", '0', '0');
-        f245.addSubfield(factory.newSubfield('a', getLangStr(mainTitleL)));
+        String mainTitleS;
+        if (subtitleStr != null || authorshipStatement != null) {
+            mainTitleS = getLangStr(mainTitleL) + " / ";
+        } else {
+            mainTitleS = getLangStr(mainTitleL) + ".";
+        }
+        f245.addSubfield(factory.newSubfield('a', mainTitleS));
         if (subtitleStr != null) {
-            f245.addSubfield(factory.newSubfield('b', " / "+subtitleStr));
+            if (authorshipStatement != null) {
+                f245.addSubfield(factory.newSubfield('b', subtitleStr+" / "));
+            } else {
+                f245.addSubfield(factory.newSubfield('b', subtitleStr+"."));
+            }
         }
         if (authorshipStatement != null) {
-            f245.addSubfield(factory.newSubfield('c', " / "+authorshipStatement));
+            f245.addSubfield(factory.newSubfield('c', authorshipStatement+"."));
         }
         record.addVariableField(f245);
-        // TODO: consume the rest of highestPrioList
         for (Entry<String,List<Literal>> e : titles.entrySet()) {
             final MarcInfo mi = titleLocalNameToMarcInfo.get(e.getKey());
             final List<Literal> list = e.getValue();
-            Collections.sort(list, comp);
+            Collections.sort(list, compbcp);
             for (Literal l : list) {
                 final DataField f246 = factory.newDataField("246", '1', mi.subindex2);
                 if (mi.subfieldi != null) {
@@ -629,7 +637,7 @@ public class MarcExport {
         boolean hasTopic = false;
         while (si.hasNext()) {
             final Resource topic = si.next().getResource();
-            final Literal l = getPreferredLit(topic);
+            final Literal l = getPreferredLit(topic, null);
             if (l == null)
                 continue;
             hasTopic = true;
@@ -640,13 +648,13 @@ public class MarcExport {
         }
     }
 
-    private static void addSeries(final Model m, final Resource main, final Record record) {
+    private static void addSeries(final Model m, final Resource main, final Record record, final String bcp47lang) {
         StmtIterator si = main.listProperties(workNumberOf);
         boolean hasSeries = false;
         final DataField f490 = factory.newDataField("490", '0', ' ');
         while (si.hasNext()) {
             final Resource series = si.next().getResource();
-            final Literal l = getPreferredLit(series);
+            final Literal l = getPreferredLit(series, bcp47lang);
             if (l == null)
                 continue;
             hasSeries = true;
@@ -668,7 +676,7 @@ public class MarcExport {
             record.addVariableField(f490);
     }
 
-    private static Literal getPreferredLit(Resource r) {
+    private static Literal getPreferredLit(Resource r, final String bcp47lang) {
         final StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
         if (!labelSi.hasNext())
             return null;
@@ -691,7 +699,7 @@ public class MarcExport {
                 break;
             }
         }
-        Collections.sort(interestingLiterals, comp);
+        Collections.sort(interestingLiterals, new CompareStringLiterals(bcp47lang));
         return interestingLiterals.get(0);
     }
 
@@ -760,7 +768,7 @@ public class MarcExport {
         record.addVariableField(f546);
     }
 
-    private static void addOutline(Model m, Resource main, Record record) {
+    private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang) {
         final StmtIterator si = main.listProperties(workHasPart);
         final StringBuilder sb = new StringBuilder();
         final Map<String,Literal> parts = new TreeMap<>();
@@ -771,7 +779,7 @@ public class MarcExport {
             final Statement indexTreeS = part.getProperty(workPartTreeIndex);
             if (indexTreeS == null)
                 continue;
-            final Literal l = getPreferredLit(part);
+            final Literal l = getPreferredLit(part, bcp47lang);
             if (l == null)
                 continue;
             final String indexTree = indexTreeS.getString();
@@ -788,6 +796,7 @@ public class MarcExport {
             sb.append(getLangStr(l));
             first = false;
         }
+        sb.append('.');
         f505.addSubfield(factory.newSubfield('a', sb.toString()));
         record.addVariableField(f505);
     }
@@ -831,13 +840,17 @@ public class MarcExport {
             f050__4.addSubfield(factory.newSubfield('b', cutterNumber));
             record.addVariableField(f050__4);
         }
-        addTitles(m, main, record); // 245
+        final String bcp47lang = getbcp47lang(main);
+        if (bcp47lang == null) {
+            log.error("no bcp47 lang tag returned for "+main.getLocalName());
+        }
+        addTitles(m, main, record, bcp47lang); // 245
         // edition statement
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
-            f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)));
+            f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)+"."));
             record.addVariableField(f250);
         }
         addPubInfo(m, main, record); // 264
@@ -845,16 +858,22 @@ public class MarcExport {
         record.addVariableField(f336);
         record.addVariableField(f337);
         record.addVariableField(f338);
+        addSeries(m, main, record, bcp47lang); // 490
+        // Columbia requested that 546 be the first 5xx field
+        addLanguages(m, main, record); // 546
         // biblio note
         si = main.listProperties(workBiblioNote);
         while (si.hasNext()) {
             final Literal biblioNote = si.next().getLiteral();
             final DataField f500 = factory.newDataField("500", ' ', ' ');
-            f500.addSubfield(factory.newSubfield('a', getLangStr(biblioNote)));
+            String biblioNoteS = getLangStr(biblioNote);
+            if (!biblioNoteS.endsWith(".")) {
+                biblioNoteS += ".";
+            }
+            f500.addSubfield(factory.newSubfield('a', biblioNoteS));
             record.addVariableField(f500);
         }
-        addSeries(m, main, record); // 490
-        addOutline(m, main, record); // 505
+        addOutline(m, main, record, bcp47lang); // 505
         addAccess(m, main, record); // 506
         // catalog info (summary)
         si = main.listProperties(workCatalogInfo);
@@ -869,7 +888,6 @@ public class MarcExport {
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
         }
-        addLanguages(m, main, record); // 546
         final DataField f588 = factory.newDataField("588", ' ', ' ');
         final Date curDate = new Date();
         String dateStr = dateFormat.format(curDate);
