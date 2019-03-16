@@ -723,6 +723,9 @@ public class MarcExport {
     private static String getScriptLabel(final OntModel m, final String uri) {
         Resource main = m.getResource(uri);
         final Resource lang = main.getPropertyResourceValue(language);
+        if (lang == null) {
+            log.error("cannot find language for {}", uri);
+        }
         final String langLoc = lang.getLocalName();
         if (langLoc.equals("LangPi") || langLoc.equals("LangSa")) {
             final Resource scriptR = main.getPropertyResourceValue(script);
