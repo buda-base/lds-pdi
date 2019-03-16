@@ -26,11 +26,32 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-bdr:BoTibt :language bdr:LangBo .
+bdr:BoTibt
+  a owl:Class ;
+  bdo:language bdr:LangBo ;
+  bdo:script bdr:ScriptTibt ;
+  rdfs:subClassOf bdr:Bo ;
+  skos:prefLabel "Tibetan"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts ;
+.
+
+bdr:ScriptTibt
+  a bdo:Script ;
+  skos:prefLabel "Tibetan Script"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts ;
+  rdfs:seeAlso <http://lexvo.org/id/script/Tibt> .
 
 bdr:SaDeva :language bdr:LangSa .
 
-bdr:LangBo :langMARCCode "tib" .
+bdr:LangBo
+  a bdo:Language ;
+  a owl:Class ;
+  bdo:langBCP47Lang "bo" ;
+  bdo:langMARCCode "tib" ;
+  rdfs:seeAlso <http://lexvo.org/id/iso639-3/bod> ;
+  rdfs:subClassOf bdo:Language ;
+  skos:prefLabel "Tibetan"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts .
 
 bdr:LangSa :langMARCCode "san" .
 

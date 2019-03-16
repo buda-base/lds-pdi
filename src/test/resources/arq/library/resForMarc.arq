@@ -23,60 +23,55 @@ construct {
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
-  ?R_RES tmp:completedYear ?completedYear .
-  ?o tmp:birthYear ?birthYear .
-  ?o tmp:deathYear ?deathYear .
+  ?o bdo:personEvent ?pevent .
+  ?pevent ?peventp ?pevento .
 } where {
-  ?R_RES ?p ?o .
-  optional {
+  {
+    ?R_RES ?p ?o .
+  }
+  union {
     ?R_RES bdo:workIsAbout ?t .
     ?t skos:prefLabel ?to .
   }
-  optional {
+  union {
     ?R_RES bdo:workHasPart ?part .
     ?part skos:prefLabel ?partl ;
           bdo:workPartTreeIndex ?partti .
   }
-  optional {
+  union {
     ?R_RES bdo:workNumberOf ?series .
     ?series skos:prefLabel ?seriesl .
   }
-  optional {
+  union {
     ?p rdfs:subclassOf* :workCreator .
     ?R_RES ?p ?o .
     ?o ?op ?oo .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
-    optional {
-      ?o bdo:personEvent ?pevent .
-      ?pevent a :PersonBirth ;
-        :onYear ?birthYear .
-    }
-    optional {
-      ?o bdo:personEvent ?pevent2 .
-      ?pevent2 a :PersonDeath ;
-        :onYear ?deathYear .
-    }
   }
-  optional {
+  union {
+    ?p rdfs:subclassOf* :workCreator .
+    ?R_RES ?p ?o .
+    ?o bdo:personEvent ?pevent .
+    ?pevent ?peventp ?pevento .
+  }
+  union {
     ?R_RES :workLangScript ?o .
     ?o :language/:langMARCCode ?mlang .
     ?o :language/:langBCP47Lang ?bcplang .
   }
-  optional {
+  union {
     ?R_RES :workOtherLangScript ?o .
     ?o :language/:langMARCCode ?olang .
   }
-  optional {
+  union {
     ?R_RES :workEvent ?we .
     ?we a :PublishedEvent ;
       :onYear ?publishedYear .
   }
-  optional {
-    {
-      ?R_RES ?p ?o .
-      FILTER(isBlank(?o))
-    }
-    ?o ?op ?oo .
+  union {
+      ?R_RES :workTitle ?o .
+      ?o ?op ?oo .
   }
 }
+

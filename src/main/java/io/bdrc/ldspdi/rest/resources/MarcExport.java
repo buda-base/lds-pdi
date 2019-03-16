@@ -117,8 +117,6 @@ public class MarcExport {
     public static final Property admLicense = ResourceFactory.createProperty(ADM+"license");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP+"publishedYear");
     //public static final Property tmpCompletedYear = ResourceFactory.createProperty(TMP+"completedYear");
-    public static final Property tmpBirthYear = ResourceFactory.createProperty(TMP+"birthYear");
-    public static final Property tmpDeathYear = ResourceFactory.createProperty(TMP+"deathYear");
     public static final Property tmpMarcLang = ResourceFactory.createProperty(TMP+"workMarcLanguage");
     public static final Property tmpBcpLang = ResourceFactory.createProperty(TMP+"workBCPLanguage");
     public static final Property tmpOtherLang = ResourceFactory.createProperty(TMP+"workOtherLanguage");
@@ -441,13 +439,20 @@ public class MarcExport {
         }
         Integer birthYear = null;
         Integer deathYear = null;
-        si = creator.listProperties(tmpBirthYear);
+        si = creator.listProperties(personEvent);
         while (si.hasNext()) {
-            birthYear = si.next().getInt();
-        }
-        si = creator.listProperties(tmpDeathYear);
-        while (si.hasNext()) {
-            deathYear = si.next().getInt();
+            final Resource event = si.next().getResource();
+            final Resource eventType = event.getPropertyResourceValue(RDF.type);
+            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
+                if (event.hasProperty(onYear)) {
+                    birthYear = event.getProperty(onYear).getInt();
+                }
+            }
+            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
+                if (event.hasProperty(onYear)) {
+                    deathYear = event.getProperty(onYear).getInt();
+                }
+            }
         }
         final StringBuilder sb = new StringBuilder();
         if (!names.isEmpty()) {
@@ -677,7 +682,10 @@ public class MarcExport {
     }
 
     private static Literal getPreferredLit(Resource r, final String bcp47lang) {
-        final StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
+        StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
+        if (!labelSi.hasNext())
+            return null;
+        labelSi = r.listProperties(RDFS.label);
         if (!labelSi.hasNext())
             return null;
         final Map<String,List<Literal>> labels = new TreeMap<>();
@@ -705,8 +713,10 @@ public class MarcExport {
 
     private static String getLangLabel(final OntModel m, final String uri) {
         final Resource main = m.getResource(uri);
-        final Resource lang = main.getPropertyResourceValue(language);
-        return lang.getProperty(RDFS.label).getString();
+        final Literal langL = getPreferredLit(main, null);
+        if (langL == null)
+            return null;
+        return langL.getString();
     }
 
     // returns the script or null if the script is deemed unnecessary
@@ -716,7 +726,10 @@ public class MarcExport {
         final String langLoc = lang.getLocalName();
         if (langLoc.equals("LangPi") || langLoc.equals("LangSa")) {
             final Resource scriptR = main.getPropertyResourceValue(script);
-            return scriptR.getProperty(RDFS.label).getString();
+            final Literal scriptL = getPreferredLit(scriptR, null);
+            if (scriptL == null)
+                return null;
+            return scriptL.getString();
         }
         return null;
     }
