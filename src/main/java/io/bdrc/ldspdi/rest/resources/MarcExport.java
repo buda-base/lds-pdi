@@ -407,98 +407,145 @@ public class MarcExport {
         r.addVariableField(f300);
     }
 
-    public static void addCreatorName(final Model m, final Resource name, final List<String> nameList) {
+    public static void addCreatorName(final Model m, final Resource name, final List<Literal> nameList) {
         final Literal l = name.getProperty(RDFS.label).getLiteral();
-        final String nameStr = getLangStr(l);
-        nameList.add(nameStr);
+        nameList.add(l);
     }
 
-    public static String getCreatorString(final Model m, final Resource creator) {
-        // here we want to keep an order among the various names and titles
-        // otherwise the output could be inconsistent among queries
-        final List<String> names = new ArrayList<>();
-        final List<String> otherNames = new ArrayList<>();
-        final List<String> titles = new ArrayList<>();
-        final List<String> otherTitles = new ArrayList<>();
-        StmtIterator si = creator.listProperties(personName);
-        while (si.hasNext()) {
-            final Resource name = si.next().getResource();
-            final Resource type = name.getPropertyResourceValue(RDF.type);
-            final String typeLocalName = (type == null) ? "" : type.getLocalName();
-            switch(typeLocalName) {
-            case "":
-                addCreatorName(m, name, otherNames);
-                break;
-            case "PersonPrimaryName":
-                addCreatorName(m, name, names);
-                break;
-            case "PersonPrimaryTitle":
-                addCreatorName(m, name, titles);
-                break;
-            case "PersonTitle":
-                addCreatorName(m, name, otherTitles);
-                break;
-            default:
-                continue;
-            }
-        }
-        Integer birthYear = null;
-        Integer deathYear = null;
-        si = creator.listProperties(personEvent);
-        while (si.hasNext()) {
-            final Resource event = si.next().getResource();
-            final Resource eventType = event.getPropertyResourceValue(RDF.type);
-            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
-                if (event.hasProperty(onYear)) {
-                    birthYear = event.getProperty(onYear).getInt();
-                }
-            }
-            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
-                if (event.hasProperty(onYear)) {
-                    deathYear = event.getProperty(onYear).getInt();
-                }
-            }
-        }
-        final StringBuilder sb = new StringBuilder();
-        if (!names.isEmpty()) {
-            Collections.sort(names);
-            sb.append(names.get(0));
-        } else if (!otherNames.isEmpty()) {
-            Collections.sort(otherNames);
-            sb.append(otherNames.get(0));
-        }
-        if (!titles.isEmpty()) {
-            Collections.sort(titles);
-            sb.append(" / ");
-            sb.append(titles.get(0));
-        } else if (!otherTitles.isEmpty()) {
-            Collections.sort(otherTitles);
-            sb.append(" / ");
-            sb.append(otherTitles.get(0));
-        }
-        if (birthYear == null) {
-            if (deathYear != null) {
-                sb.append(", ?-");
-                sb.append(deathYear);
-            }
-        } else {
-            sb.append(", ");
-            sb.append(birthYear);
-            sb.append('-');
-            if (deathYear != null) {
-                sb.append(deathYear);
-            }
-        }
-        return sb.toString();
-    }
-
-    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel) {
+    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel, final Index880 i880, final List<DataField> list880) {
         StmtIterator si = main.listProperties(prop);
         while (si.hasNext()) {
             final Resource creator = si.next().getResource();
-            final String creatorStr = getCreatorString(m, creator);
+            // here we want to keep an order among the various names and titles
+            // otherwise the output could be inconsistent among queries
+            final List<Literal> names = new ArrayList<>();
+            final List<Literal> otherNames = new ArrayList<>();
+            final List<Literal> titles = new ArrayList<>();
+            final List<Literal> otherTitles = new ArrayList<>();
+            StmtIterator nsi = creator.listProperties(personName);
+            while (nsi.hasNext()) {
+                final Resource name = nsi.next().getResource();
+                final Resource type = name.getPropertyResourceValue(RDF.type);
+                final String typeLocalName = (type == null) ? "" : type.getLocalName();
+                switch(typeLocalName) {
+                case "":
+                    addCreatorName(m, name, otherNames);
+                    break;
+                case "PersonPrimaryName":
+                    addCreatorName(m, name, names);
+                    break;
+                case "PersonPrimaryTitle":
+                    addCreatorName(m, name, titles);
+                    break;
+                case "PersonTitle":
+                    addCreatorName(m, name, otherTitles);
+                    break;
+                default:
+                    continue;
+                }
+            }
+            Integer birthYear = null;
+            Integer deathYear = null;
+            si = creator.listProperties(personEvent);
+            while (si.hasNext()) {
+                final Resource event = si.next().getResource();
+                final Resource eventType = event.getPropertyResourceValue(RDF.type);
+                if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
+                    if (event.hasProperty(onYear)) {
+                        birthYear = event.getProperty(onYear).getInt();
+                    }
+                }
+                if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
+                    if (event.hasProperty(onYear)) {
+                        deathYear = event.getProperty(onYear).getInt();
+                    }
+                }
+            }
+            final StringBuilder sb = new StringBuilder();
+            final StringBuilder sb880 = new StringBuilder();
+            boolean has880 = false;
+            if (!names.isEmpty()) {
+                Collections.sort(names, baseComp);
+                sb.append(getLangStr(names.get(0)));
+                final String name880 = get880String(names.get(0));
+                if (name880 != null) {
+                    sb880.append(name880);
+                    has880 = true;
+                }
+            } else if (!otherNames.isEmpty()) {
+                Collections.sort(otherNames, baseComp);
+                sb.append(getLangStr(otherNames.get(0)));
+                final String name880 = get880String(otherNames.get(0));
+                if (name880 != null) {
+                    sb880.append(name880);
+                    has880 = true;
+                }
+            }
+            if (!titles.isEmpty()) {
+                Collections.sort(titles, baseComp);
+                sb.append(" / ");
+                final String title = getLangStr(titles.get(0));
+                sb.append(title);
+                if (has880) {
+                    final String title880 = get880String(titles.get(0));
+                    if (title880 != null) {
+                        sb880.append(" / ");
+                        sb880.append(title880);
+                    } else {
+                        sb880.append(title);
+                    }
+                }
+            } else if (!otherTitles.isEmpty()) {
+                Collections.sort(otherTitles, baseComp);
+                sb.append(" / ");
+                final String title = getLangStr(otherTitles.get(0));
+                sb.append(title);
+                if (has880) {
+                    final String title880 = get880String(otherTitles.get(0));
+                    if (title880 != null) {
+                        sb880.append(" / ");
+                        sb880.append(title880);
+                    } else {
+                        sb880.append(title);
+                    }
+                }
+            }
+            if (birthYear == null) {
+                if (deathYear != null) {
+                    sb.append(", ?-");
+                    sb.append(deathYear);
+                    if (has880) {
+                        sb880.append(", ?-");
+                        sb880.append(deathYear);
+                    }
+                }
+            } else {
+                sb.append(", ");
+                sb.append(birthYear);
+                sb.append('-');
+                if (has880) {
+                    sb880.append(", ");
+                    sb880.append(birthYear);
+                    sb880.append('-');
+                }
+                if (deathYear != null) {
+                    sb.append(deathYear);
+                    if (has880) {
+                        sb880.append(deathYear);
+                    }
+                }
+            }
             final DataField f720_1_ = factory.newDataField("720", '1', ' ');
-            f720_1_.addSubfield(factory.newSubfield('a', creatorStr));
+            if (has880) {
+                String curi880 = i880.getNext();
+                final DataField f880 = factory.newDataField("880", '1', ' ');
+                list880.add(f880);
+                f720_1_.addSubfield(factory.newSubfield('6', "880-"+curi880));
+                f880.addSubfield(factory.newSubfield('6', "720-"+curi880));
+                f880.addSubfield(factory.newSubfield('a', sb880.toString()));
+                f880.addSubfield(factory.newSubfield('e', rel));
+            }
+            f720_1_.addSubfield(factory.newSubfield('a', sb.toString()));
             f720_1_.addSubfield(factory.newSubfield('e', rel));
             r.addVariableField(f720_1_);
         }
@@ -567,10 +614,9 @@ public class MarcExport {
         return null;
     }
 
-    private static List<DataField> addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880) {
+    private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880, final List<DataField> list880) {
         // again, we keep titles in order for consistency among marc queries
         final Map<String,List<Literal>> titles = new TreeMap<>();
-        final List<DataField> list880 = new ArrayList<>();
         StmtIterator si = main.listProperties(workTitle);
         String subtitleStr = null;
         String subtitleStr880 = null;
@@ -607,7 +653,7 @@ public class MarcExport {
         }
         if (highestPrioList == null) {
             // no title...
-            return list880;
+            return;
         }
         final CompareStringLiterals compbcp = new CompareStringLiterals(bcp47lang);
         if (highestPrioList.size() > 1) {
@@ -627,7 +673,6 @@ public class MarcExport {
         String curi880;
         final DataField f880_main = factory.newDataField("880", '0', '0');
         if (mainTitleS880 != null) {
-            System.out.println(mainTitleS880);
             curi880 = i880.getNext();
             list880.add(f880_main);
             f245.addSubfield(factory.newSubfield('6', "880-"+curi880));
@@ -675,8 +720,20 @@ public class MarcExport {
             final MarcInfo mi = titleLocalNameToMarcInfo.get(e.getKey());
             final List<Literal> list = e.getValue();
             Collections.sort(list, compbcp);
-            for (Literal l : list) {
+            for (final Literal l : list) {
                 final DataField f246 = factory.newDataField("246", '1', mi.subindex2);
+                String titleS880 = get880String(l);
+                if (titleS880 != null) {
+                    curi880 = i880.getNext();
+                    final DataField f880 = factory.newDataField("880", '1', mi.subindex2);
+                    f246.addSubfield(factory.newSubfield('6', "880-"+curi880));
+                    f880.addSubfield(factory.newSubfield('6', "246-"+curi880));
+                    if (mi.subfieldi != null) {
+                        f880.addSubfield(factory.newSubfield('i', mi.subfieldi));
+                    }
+                    f880.addSubfield(factory.newSubfield('a', titleS880));
+                    list880.add(f880);
+                }
                 if (mi.subfieldi != null) {
                     f246.addSubfield(factory.newSubfield('i', mi.subfieldi));
                 }
@@ -684,7 +741,6 @@ public class MarcExport {
                 record.addVariableField(f246);
             }
         }
-        return list880;
     }
 
     private static void addTopics(final Model m, final Resource main, final Record record) {
@@ -761,6 +817,8 @@ public class MarcExport {
         Collections.sort(interestingLiterals, new CompareStringLiterals(bcp47lang));
         return interestingLiterals.get(0);
     }
+
+    private static CompareStringLiterals baseComp =  new CompareStringLiterals(null);
 
     private static String getLangLabel(final OntModel m, final String uri) {
         final Resource main = m.getResource(uri);
@@ -869,22 +927,23 @@ public class MarcExport {
         record.addVariableField(f505);
     }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880) {
-        addAuthorRel(m, main, r, creatorTerton, "author.");
-        addAuthorRel(m, main, r, creatorMainAuthor, "author.");
-        addAuthorRel(m, main, r, creatorTranslator, "translator.");
-        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.");
-        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.");
-        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.");
-        addAuthorRel(m, main, r, creatorCompiler, "editor.");
-        addAuthorRel(m, main, r, creatorReviser, "corrector.");
-        addAuthorRel(m, main, r, creatorScribe, "scribe.");
-        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.");
-        addAuthorRel(m, main, r, creatorArtist, "artist.");
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880) {
+        addAuthorRel(m, main, r, creatorTerton, "author.", i880, list880);
+        addAuthorRel(m, main, r, creatorMainAuthor, "author.", i880, list880);
+        addAuthorRel(m, main, r, creatorTranslator, "translator.", i880, list880);
+        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.", i880, list880);
+        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.", i880, list880);
+        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.", i880, list880);
+        addAuthorRel(m, main, r, creatorCompiler, "editor.", i880, list880);
+        addAuthorRel(m, main, r, creatorReviser, "corrector.", i880, list880);
+        addAuthorRel(m, main, r, creatorScribe, "scribe.", i880, list880);
+        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.", i880, list880);
+        addAuthorRel(m, main, r, creatorArtist, "artist.", i880, list880);
     }
 
     public static final class Index880 {
-        private int nextIndex = 0;
+        // https://www.oclc.org/bibformats/en/controlsubfields.html#subfield6
+        private int nextIndex = 1;
 
         public Index880() {}
 
@@ -927,7 +986,8 @@ public class MarcExport {
         if (bcp47lang == null) {
             log.error("no bcp47 lang tag returned for "+main.getLocalName());
         }
-        addTitles(m, main, record, bcp47lang, i880); // 245
+        final List<DataField> list880 = new ArrayList<>();
+        addTitles(m, main, record, bcp47lang, i880, list880); // 245
         // edition statement
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
@@ -978,7 +1038,7 @@ public class MarcExport {
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
         record.addVariableField(f710_2);
-        addAuthors(m, main, record, i880); // 720
+        addAuthors(m, main, record, i880, list880); // 720
         // lccn
         si = main.listProperties(workLccn);
         while (si.hasNext()) {
@@ -992,6 +1052,9 @@ public class MarcExport {
         f856.addSubfield(factory.newSubfield('u', main.getURI()));
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
         record.addVariableField(f856);
+        for (DataField df880 : list880) {
+            record.addVariableField(df880);
+        }
         return record;
     }
 
@@ -1017,7 +1080,7 @@ public class MarcExport {
         // this should be correct but breaks W2DB4598 because of poorly encoded series data
         //        if (main.hasProperty(hasExpression)) {
         //            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is an abstract Work"));
-        //        }st
+        //        }
         return model;
     }
 
