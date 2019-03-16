@@ -725,6 +725,7 @@ public class MarcExport {
         final Resource lang = main.getPropertyResourceValue(language);
         if (lang == null) {
             log.error("cannot find language for {}", uri);
+            return null;
         }
         final String langLoc = lang.getLocalName();
         if (langLoc.equals("LangPi") || langLoc.equals("LangSa")) {
