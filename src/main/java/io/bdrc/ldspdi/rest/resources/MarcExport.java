@@ -53,6 +53,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
+import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -136,6 +137,8 @@ public class MarcExport {
 
     public static final Map<String,MarcInfo> titleLocalNameToMarcInfo = new HashMap<>();
 
+    public static final EwtsConverter ewtsConverter = new EwtsConverter();
+
     // communicated by Columbia, XML leaders don't need addresses
     public static final String baseLeaderStr = "     nam a22    3ia 4500";
     static final Leader leader = factory.newLeader(baseLeaderStr);
@@ -161,6 +164,8 @@ public class MarcExport {
 
     static final String defaultCountryCode = "   ";
     static final String defaultLang = "und";
+
+
 
     // for 588 field
     static final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
@@ -540,8 +545,6 @@ public class MarcExport {
         }
     }
 
-    private final static CompareStringLiterals comp = new CompareStringLiterals(null);
-
     private static String getbcp47lang(final Resource main) {
         final Statement languageS = main.getProperty(tmpBcpLang);
         if (languageS != null) {
@@ -550,11 +553,27 @@ public class MarcExport {
         return null;
     }
 
-    private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang) {
+    private static String get880String(final Literal l) {
+        final String lang = l.getLanguage();
+        if ("bo-x-ewts".equals(lang)) {
+            final String orig = l.getString();
+            final List<String> warns = new ArrayList<>();
+            final String u = ewtsConverter.toUnicode(orig, warns, true);
+            if (warns.isEmpty()) {
+                // only convert literals with no errors in the ewts
+                return u;
+            }
+        }
+        return null;
+    }
+
+    private static List<DataField> addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880) {
         // again, we keep titles in order for consistency among marc queries
         final Map<String,List<Literal>> titles = new TreeMap<>();
+        final List<DataField> list880 = new ArrayList<>();
         StmtIterator si = main.listProperties(workTitle);
         String subtitleStr = null;
+        String subtitleStr880 = null;
         Integer highestPrio = 999;
         List<Literal> highestPrioList = null;
         while (si.hasNext()) {
@@ -566,6 +585,7 @@ public class MarcExport {
                 final Literal titleLit = labelSi.next().getLiteral();
                 if (typeLocalName.equals("WorkSubtitle")) {
                     subtitleStr = getLangStr(titleLit);
+                    subtitleStr880 = get880String(titleLit);
                     continue;
                 }
                 final MarcInfo mi = titleLocalNameToMarcInfo.get(typeLocalName);
@@ -587,7 +607,7 @@ public class MarcExport {
         }
         if (highestPrioList == null) {
             // no title...
-            return;
+            return list880;
         }
         final CompareStringLiterals compbcp = new CompareStringLiterals(bcp47lang);
         if (highestPrioList.size() > 1) {
@@ -603,13 +623,33 @@ public class MarcExport {
         final Literal mainTitleL = highestPrioList.get(0);
         highestPrioList.remove(0);
         final DataField f245 = factory.newDataField("245", '0', '0');
+        String mainTitleS880 = get880String(mainTitleL);
+        String curi880;
+        final DataField f880_main = factory.newDataField("880", '0', '0');
+        if (mainTitleS880 != null) {
+            System.out.println(mainTitleS880);
+            curi880 = i880.getNext();
+            list880.add(f880_main);
+            f245.addSubfield(factory.newSubfield('6', "880-"+curi880));
+            f880_main.addSubfield(factory.newSubfield('6', "245-"+curi880));
+        }
         String mainTitleS;
+        // ma che buoni questi spaghetti!
         if (subtitleStr != null || authorshipStatement != null) {
             mainTitleS = getLangStr(mainTitleL) + " / ";
+            if (mainTitleS880 != null) {
+                mainTitleS880 += " / ";
+            }
         } else {
             mainTitleS = getLangStr(mainTitleL) + ".";
+            if (mainTitleS880 != null) {
+                mainTitleS880 += ".";
+            }
         }
         f245.addSubfield(factory.newSubfield('a', mainTitleS));
+        if (mainTitleS880 != null) {
+            f880_main.addSubfield(factory.newSubfield('a', mainTitleS880));
+        }
         if (subtitleStr != null) {
             if (authorshipStatement != null) {
                 f245.addSubfield(factory.newSubfield('b', subtitleStr+" / "));
@@ -617,8 +657,18 @@ public class MarcExport {
                 f245.addSubfield(factory.newSubfield('b', subtitleStr+"."));
             }
         }
+        if (mainTitleS880 != null && subtitleStr880 != null) {
+            if (authorshipStatement != null) {
+                f880_main.addSubfield(factory.newSubfield('b', subtitleStr880+" / "));
+            } else {
+                f880_main.addSubfield(factory.newSubfield('b', subtitleStr880+"."));
+            }
+        }
         if (authorshipStatement != null) {
             f245.addSubfield(factory.newSubfield('c', authorshipStatement+"."));
+            if (mainTitleS880 != null) {
+                f880_main.addSubfield(factory.newSubfield('b', authorshipStatement+"."));
+            }
         }
         record.addVariableField(f245);
         for (Entry<String,List<Literal>> e : titles.entrySet()) {
@@ -634,6 +684,7 @@ public class MarcExport {
                 record.addVariableField(f246);
             }
         }
+        return list880;
     }
 
     private static void addTopics(final Model m, final Resource main, final Record record) {
@@ -818,7 +869,7 @@ public class MarcExport {
         record.addVariableField(f505);
     }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r) {
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880) {
         addAuthorRel(m, main, r, creatorTerton, "author.");
         addAuthorRel(m, main, r, creatorMainAuthor, "author.");
         addAuthorRel(m, main, r, creatorTranslator, "translator.");
@@ -832,7 +883,19 @@ public class MarcExport {
         addAuthorRel(m, main, r, creatorArtist, "artist.");
     }
 
+    public static final class Index880 {
+        private int nextIndex = 0;
+
+        public Index880() {}
+
+        public String getNext() {
+            nextIndex += 1;
+            return String.format("%02d", nextIndex-1);
+        }
+    }
+
     public static Record marcFromModel(final Model m, final Resource main) {
+        final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         record.addVariableField(factory.newControlField("001", "(BDRC) "+main.getURI()));
         // maybe something like that could work?
@@ -864,7 +927,7 @@ public class MarcExport {
         if (bcp47lang == null) {
             log.error("no bcp47 lang tag returned for "+main.getLocalName());
         }
-        addTitles(m, main, record, bcp47lang); // 245
+        addTitles(m, main, record, bcp47lang, i880); // 245
         // edition statement
         si = main.listProperties(workEditionStatement);
         while (si.hasNext()) {
@@ -915,7 +978,7 @@ public class MarcExport {
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
         record.addVariableField(f710_2);
-        addAuthors(m, main, record); // 720
+        addAuthors(m, main, record, i880); // 720
         // lccn
         si = main.listProperties(workLccn);
         while (si.hasNext()) {

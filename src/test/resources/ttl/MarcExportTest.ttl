@@ -120,10 +120,10 @@ bdr:W23819  a    bdo:Work ;
                     rdfs:label    "this is a running title"@en
                   ] ,
                   [ a             bdo:WorkSubtitle ;
-                    rdfs:label    "subtitle"@bo-x-ewts
+                    rdfs:label    "sub ti tel"@bo-x-ewts
                   ] ,
          [ a             bdo:WorkTitlePageTitle ;
-           rdfs:label    "bka' brgyad gsan ba yons rdzogs : a complete cycle of rnin-ma-pa practice focusing upon the ancient eight pronouncements of gu-ru rin-po-che"@en-x-mixed
+           rdfs:label    "bka' brgyad gsan ba yon rdzogs"@bo-x-ewts
          ] ;
    bdo:workType  bdr:WorkTypePublishedWork ;
    adm:access    bdr:AccessOpen ;
