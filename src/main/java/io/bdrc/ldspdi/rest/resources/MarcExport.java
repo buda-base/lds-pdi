@@ -841,6 +841,9 @@ public class MarcExport {
         record.addVariableField(f007);
         add008(m, main, record);
         addIsbn(m, main, record); // 020
+        final DataField f035 = factory.newDataField("035", ' ', ' ');
+        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+main.getLocalName()));
+        record.addVariableField(f035);
         record.addVariableField(f040);
         StmtIterator si = main.listProperties(workLcCallNumber);
         while (si.hasNext()) {
