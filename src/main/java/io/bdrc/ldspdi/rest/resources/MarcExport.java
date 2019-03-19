@@ -210,7 +210,7 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star."));
-        f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Open to readers with IP addresses outside China."));
+        f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
         f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
         f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
     }
@@ -256,14 +256,14 @@ public class MarcExport {
         return res;
     }
 
-    public static void addIsbn(final Model m, final Resource main, final Record r) {
+    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean itemMode) {
         final StmtIterator si = main.listProperties(workIsbn);
         while (si.hasNext()) {
             final Statement s = si.next();
             final String isbn = s.getLiteral().getString();
             final String validIsbn = isbnvalidator.validate(isbn);
             final DataField df = factory.newDataField("020", ' ', ' ');
-            if (validIsbn != null) {
+            if (!itemMode && validIsbn != null) {
                 df.addSubfield(factory.newSubfield('a', validIsbn));
             } else {
                 df.addSubfield(factory.newSubfield('z', isbn));
@@ -393,15 +393,13 @@ public class MarcExport {
             return;
         }
         String st = extentStatementS.getString();
-        System.out.println(st);
         st = st.replace("pp.", "pages");
         st = st.replace("p.", "pages");
-        System.out.println(st);
         st = st.replace("ff.", "folios");
         // the s in volume(s) is a bit annoying
-        st = st.replaceAll("^1 v\\.", "1 volume");
-        st = st.replaceAll("[^0-9]1 v\\.", "1 volume");
-        st = st.replaceAll("v\\.", "volumes");
+        st = st.replaceAll("^1 ?v\\.", "1 volume");
+        st = st.replaceAll("[^0-9]1 ?v\\.", "1 volume");
+        st = st.replaceAll(" ?v\\.", " volumes");
         final DataField f300 = factory.newDataField("300", ' ', ' ');
         f300.addSubfield(factory.newSubfield('a', st));
         r.addVariableField(f300);
@@ -790,17 +788,17 @@ public class MarcExport {
 
     private static Literal getPreferredLit(Resource r, final String bcp47lang) {
         StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
-        if (!labelSi.hasNext())
-            return null;
-        labelSi = r.listProperties(RDFS.label);
-        if (!labelSi.hasNext())
-            return null;
+        if (!labelSi.hasNext()) {
+            labelSi = r.listProperties(RDFS.label);
+            if (!labelSi.hasNext())
+                return null;
+        }
         final Map<String,List<Literal>> labels = new TreeMap<>();
         while (labelSi.hasNext()) {
-            final Literal topicLabel = labelSi.next().getLiteral();
-            final String lng = topicLabel.getLanguage();
+            final Literal label = labelSi.next().getLiteral();
+            final String lng = label.getLanguage();
             final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
-            litList.add(topicLabel);
+            litList.add(label);
         }
         List<Literal> interestingLiterals = null;
         if (labels.containsKey("en")) {
@@ -953,21 +951,21 @@ public class MarcExport {
         }
     }
 
-    public static Record marcFromModel(final Model m, final Resource main) {
+    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
-        record.addVariableField(factory.newControlField("001", "(BDRC) "+main.getURI()));
+        record.addVariableField(factory.newControlField("001", "(BDRC) "+originalR.getURI()));
         // maybe something like that could work?
         //record.addVariableField(factory.newControlField("003", "BDRC"));
         record.addVariableField(f006);
         record.addVariableField(f007);
-        add008(m, main, record);
-        addIsbn(m, main, record); // 020
+        add008(m, workR, record);
+        addIsbn(m, workR, record, itemMode); // 020
         final DataField f035 = factory.newDataField("035", ' ', ' ');
-        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+main.getLocalName()));
+        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+originalR.getLocalName()));
         record.addVariableField(f035);
         record.addVariableField(f040);
-        StmtIterator si = main.listProperties(workLcCallNumber);
+        StmtIterator si = workR.listProperties(workLcCallNumber);
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
             // see https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
@@ -982,30 +980,30 @@ public class MarcExport {
             f050__4.addSubfield(factory.newSubfield('b', cutterNumber));
             record.addVariableField(f050__4);
         }
-        final String bcp47lang = getbcp47lang(main);
+        final String bcp47lang = getbcp47lang(workR);
         if (bcp47lang == null) {
-            log.error("no bcp47 lang tag returned for "+main.getLocalName());
+            log.error("no bcp47 lang tag returned for "+workR.getLocalName());
         }
         final List<DataField> list880 = new ArrayList<>();
-        addTitles(m, main, record, bcp47lang, i880, list880); // 245
+        addTitles(m, workR, record, bcp47lang, i880, list880); // 245
         // edition statement
-        si = main.listProperties(workEditionStatement);
+        si = workR.listProperties(workEditionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
             f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)+"."));
             record.addVariableField(f250);
         }
-        addPubInfo(m, main, record); // 264
-        add300(m, main, record);
+        addPubInfo(m, workR, record); // 264
+        add300(m, workR, record);
         record.addVariableField(f336);
         record.addVariableField(f337);
         record.addVariableField(f338);
-        addSeries(m, main, record, bcp47lang); // 490
+        addSeries(m, workR, record, bcp47lang); // 490
         // Columbia requested that 546 be the first 5xx field
-        addLanguages(m, main, record); // 546
+        addLanguages(m, workR, record); // 546
         // biblio note
-        si = main.listProperties(workBiblioNote);
+        si = workR.listProperties(workBiblioNote);
         while (si.hasNext()) {
             final Literal biblioNote = si.next().getLiteral();
             final DataField f500 = factory.newDataField("500", ' ', ' ');
@@ -1016,10 +1014,10 @@ public class MarcExport {
             f500.addSubfield(factory.newSubfield('a', biblioNoteS));
             record.addVariableField(f500);
         }
-        addOutline(m, main, record, bcp47lang); // 505
-        addAccess(m, main, record); // 506
+        addOutline(m, workR, record, bcp47lang); // 505
+        addAccess(m, workR, record); // 506
         // catalog info (summary)
-        si = main.listProperties(workCatalogInfo);
+        si = workR.listProperties(workCatalogInfo);
         while (si.hasNext()) {
             final Literal catalogInfo = si.next().getLiteral();
             final DataField f520 = factory.newDataField("520", ' ', ' ');
@@ -1027,7 +1025,7 @@ public class MarcExport {
             record.addVariableField(f520);
         }
         record.addVariableField(f533);
-        final Resource license = main.getPropertyResourceValue(admLicense);
+        final Resource license = workR.getPropertyResourceValue(admLicense);
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
         }
@@ -1036,11 +1034,11 @@ public class MarcExport {
         String dateStr = dateFormat.format(curDate);
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")."));
         record.addVariableField(f588);
-        addTopics(m, main, record); // 653
+        addTopics(m, workR, record); // 653
         record.addVariableField(f710_2);
-        addAuthors(m, main, record, i880, list880); // 720
+        addAuthors(m, workR, record, i880, list880); // 720
         // lccn
-        si = main.listProperties(workLccn);
+        si = workR.listProperties(workLccn);
         while (si.hasNext()) {
             final String lccn = si.next().getLiteral().getString();
             final DataField f776_08 = factory.newDataField("776", '0', '8');
@@ -1049,7 +1047,7 @@ public class MarcExport {
             record.addVariableField(f776_08);
         }
         final DataField f856 = factory.newDataField("856", '4', '0');
-        f856.addSubfield(factory.newSubfield('u', main.getURI()));
+        f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
         record.addVariableField(f856);
         for (DataField df880 : list880) {
@@ -1058,7 +1056,7 @@ public class MarcExport {
         return record;
     }
 
-    public static Model getMarcModel(final String resUri) throws RestException {
+    public static Model getModelForMarc(final String resUri) throws RestException {
         Model model = QueryProcessor.getSimpleResourceGraph(resUri, "resForMarc.arq");
         if (model.size() < 1) {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(resUri));
@@ -1084,10 +1082,31 @@ public class MarcExport {
         return model;
     }
 
+    public static final String ItemUriPrefix = BDR+"I";
+    public static final String WorkUriPrefix = BDR+"W";
+    public static final int ItemUriPrefixLen = ItemUriPrefix.length();
+
     public static Response getResponse(final MediaType mt, final String resUri) throws RestException {
-        final Model m = getMarcModel(resUri);
-        final Resource main = m.getResource(resUri);
-        final Record r = marcFromModel(m, main);
+        // I really don't like that but making that better would mean either:
+        //   - a very weird and probably slower SPARQL query
+        //   - two queries
+        // The idea is that we're sending MARC records for items to Columbia,
+        // as they only want "electronic resources" records, and electronic
+        // resources are items in our system, not works.
+        boolean itemMode = false;
+        final Model m;
+        final Resource main;
+        if (resUri.startsWith(ItemUriPrefix)) {
+            itemMode = true;
+            final String workUri = WorkUriPrefix+resUri.substring(ItemUriPrefixLen);
+            m = getModelForMarc(workUri);
+            main = m.getResource(workUri);
+        } else {
+            m = getModelForMarc(resUri);
+            main = m.getResource(resUri);
+        }
+        final Resource origMain = m.getResource(resUri);
+        final Record r = marcFromModel(m, main, origMain, itemMode);
         final StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(final OutputStream os) throws IOException, WebApplicationException {
