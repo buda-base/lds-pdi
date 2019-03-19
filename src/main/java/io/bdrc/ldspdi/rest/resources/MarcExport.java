@@ -342,7 +342,6 @@ public class MarcExport {
     }
 
     public static void add008(final Model m, final Resource main, final Record r, final String marcLang) {
-        //printModel(m);
         final StringBuilder sb = new StringBuilder();
         final LocalDate localDate = LocalDate.now();
         sb.append(localDate.format(yymmdd));
@@ -869,7 +868,6 @@ public class MarcExport {
             if (nbLangScripts == 1) {
                 sb.append("In ");
                 firstScriptLabel = getScriptLabel(m, ls);
-                System.out.println(firstScriptLabel);
             } else {
                 sb.append(" and ");
             }
@@ -903,7 +901,7 @@ public class MarcExport {
         final StmtIterator si = main.listProperties(workHasPart);
         final StringBuilder sb = new StringBuilder();
         final Map<String,Literal> parts = new TreeMap<>();
-        boolean hasParts = false;
+        int nbParts = 0;
         // we keep the parts in order
         while (si.hasNext()) {
             final Resource part = si.next().getResource();
@@ -915,9 +913,10 @@ public class MarcExport {
                 continue;
             final String indexTree = indexTreeS.getString();
             parts.put(indexTree, l);
-            hasParts = true;
+            nbParts += 1;
         }
-        if (!hasParts)
+        // some works have just one first level (this is kind of weird), eg W1GS61415
+        if (nbParts < 2)
             return;
         final DataField f505 = factory.newDataField("505", '0', ' ');
         boolean first = true;
