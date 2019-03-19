@@ -17,14 +17,16 @@ construct {
   ?series skos:prefLabel ?seriesl .
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .
-  ?R_RES tmp:workMarcLanguage ?mlang .
-  ?R_RES tmp:workBCPLanguage ?bcplang .
-  ?R_RES tmp:workOtherLanguage ?olang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
   ?o bdo:personEvent ?pevent .
   ?pevent ?peventp ?pevento .
+  ?ols ?olsp ?olso .
+  ?lango ?langop ?langoo .
+  ?scripto ?scriptop ?scriptoo .
+  ?ools ?oolsp ?oolso .
+  ?olango ?olangop ?olangoo .
 } where {
   {
     ?R_RES ?p ?o .
@@ -56,13 +58,21 @@ construct {
     ?pevent ?peventp ?pevento .
   }
   union {
-    ?R_RES :workLangScript ?o .
-    ?o :language/:langMARCCode ?mlang .
-    ?o :language/:langBCP47Lang ?bcplang .
+    ?R_RES :workLangScript ?ols .
+    ?ols ?olsp ?olso .
+    ?ols :language ?lango .
+    ?lango ?langop ?langoo .
   }
   union {
-    ?R_RES :workOtherLangScript ?o .
-    ?o :language/:langMARCCode ?olang .
+    ?R_RES :workLangScript ?ols .
+    ?ols :script ?scripto .
+    ?scripto ?scriptop ?scriptoo .
+  }
+  union {
+    ?R_RES :workOtherLangScript ?ools .
+    ?ools ?oolsp ?oolso .
+    ?ools :language ?olango .
+    ?olango ?olangop ?olangoo .
   }
   union {
     ?R_RES :workEvent ?we .
@@ -74,4 +84,3 @@ construct {
       ?o ?op ?oo .
   }
 }
-

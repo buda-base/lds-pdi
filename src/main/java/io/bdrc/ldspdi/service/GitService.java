@@ -38,7 +38,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 public class GitService implements Runnable{
 
     private static String GIT_LOCAL_PATH;
-    private static String GIT_REMOTE_URL="https://github.com/BuddhistDigitalResourceCenter/lds-queries.git";
+    private static String GIT_REMOTE_URL="https://github.com/buda-base/lds-queries.git";
     private static Repository localRepo;
 
 
