@@ -219,9 +219,10 @@ public class MarcExport {
     public static String getLangStr(final Literal l) {
         final String lang = l.getLanguage();
         if (lang == null || !"bo-x-ewts".equals(lang)) {
-            return StringUtils.capitalize(l.getString());
+            return StringUtils.capitalize(l.getString().replaceAll("[/|;]", ""));
         }
-        final String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
+        String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
+        alalc = alalc.replace("u0fbe", "x");
         return StringUtils.capitalize(alalc.replace('-', ' '));
     }
 

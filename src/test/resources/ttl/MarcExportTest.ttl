@@ -122,13 +122,13 @@ bdr:W23819  a    bdo:Work ;
                     rdfs:label    "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts
                   ] ,
                   [ a             bdo:WorkBibliographicalTitle ;
-                    rdfs:label    "second bibliographical title"@en
+                    rdfs:label    "second bibliographical | ; / title"@en
                   ] ,
                   [ a             bdo:WorkColophonTitle ;
                     rdfs:label    "this is a colophon title"@en
                   ] ,
                   [ a             bdo:WorkRunningTitle ;
-                    rdfs:label    "this is a running title"@en
+                    rdfs:label    "si khron bod rig pa'i zhib 'jug; si chuan zang xue/"@bo-x-ewts
                   ] ,
                   [ a             bdo:WorkSubtitle ;
                     rdfs:label    "sub ti tel"@bo-x-ewts
