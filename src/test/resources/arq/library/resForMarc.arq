@@ -17,60 +17,70 @@ construct {
   ?series skos:prefLabel ?seriesl .
   ?part skos:prefLabel ?partl .
   ?part bdo:workPartTreeIndex ?partti .
-  ?R_RES tmp:workLanguage ?lang .
-  ?R_RES tmp:workOtherLanguage ?olang .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
-  ?R_RES tmp:completedYear ?completedYear .
-  ?o tmp:birthYear ?birthYear .
-  ?o tmp:deathYear ?deathYear .
+  ?o bdo:personEvent ?pevent .
+  ?pevent ?peventp ?pevento .
+  ?ols ?olsp ?olso .
+  ?lango ?langop ?langoo .
+  ?scripto ?scriptop ?scriptoo .
+  ?ools ?oolsp ?oolso .
+  ?olango ?olangop ?olangoo .
 } where {
-  ?R_RES ?p ?o .
-  optional {
+  {
+    ?R_RES ?p ?o .
+  }
+  union {
     ?R_RES bdo:workIsAbout ?t .
     ?t skos:prefLabel ?to .
   }
-  optional {
+  union {
     ?R_RES bdo:workHasPart ?part .
     ?part skos:prefLabel ?partl ;
           bdo:workPartTreeIndex ?partti .
   }
-  optional {
+  union {
     ?R_RES bdo:workNumberOf ?series .
     ?series skos:prefLabel ?seriesl .
   }
-  optional {
+  union {
     ?p rdfs:subclassOf* :workCreator .
+    ?R_RES ?p ?o .
     ?o ?op ?oo .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
-    optional {
-      ?o bdo:personEvent ?pevent .
-      ?pevent a :PersonBirth ;
-        :onYear ?birthYear .
-    }
-    optional {
-      ?o bdo:personEvent ?pevent2 .
-      ?pevent2 a :PersonDeath ;
-        :onYear ?deathYear .
-    }
   }
-  optional {
-    FILTER(?p = :workLangScript)
-    ?o :language/:langMARCCode ?lang .
+  union {
+    ?p rdfs:subclassOf* :workCreator .
+    ?R_RES ?p ?o .
+    ?o bdo:personEvent ?pevent .
+    ?pevent ?peventp ?pevento .
   }
-  optional {
-    FILTER(?p = :workOtherLangScript)
-    ?o :language/:langMARCCode ?olang .
+  union {
+    ?R_RES :workLangScript ?ols .
+    ?ols ?olsp ?olso .
+    ?ols :language ?lango .
+    ?lango ?langop ?langoo .
   }
-  optional {
+  union {
+    ?R_RES :workLangScript ?ols .
+    ?ols :script ?scripto .
+    ?scripto ?scriptop ?scriptoo .
+  }
+  union {
+    ?R_RES :workOtherLangScript ?ools .
+    ?ools ?oolsp ?oolso .
+    ?ools :language ?olango .
+    ?olango ?olangop ?olangoo .
+  }
+  union {
     ?R_RES :workEvent ?we .
     ?we a :PublishedEvent ;
       :onYear ?publishedYear .
   }
-  optional {
-    FILTER(isBlank(?o))
-    ?o ?op ?oo .
+  union {
+      ?R_RES :workTitle ?o .
+      ?o ?op ?oo .
   }
 }

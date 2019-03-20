@@ -26,13 +26,45 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-bdr:BoTibt :language bdr:LangBo .
+bdr:BoTibt
+  a owl:Class ;
+  bdo:language bdr:LangBo ;
+  bdo:script bdr:ScriptTibt ;
+  rdfs:subClassOf bdr:Bo ;
+  skos:prefLabel "Tibetan"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts ;
+.
 
-bdr:SaDeva :language bdr:LangSa .
+bdr:BoDbuCan  a  bdo:LangScript ;
+   rdfs:label    "dbu can"@bo-x-ewts , "Uchen script"@en ;
+   bdo:language  bdr:LangBo ;
+   bdo:script    bdr:ScriptDbuCan ;
+   bdo:taxSubClassOf  bdr:BoTibt .
 
-bdr:LangBo :langMARCCode "tib" .
+bdr:ScriptTibt
+  a bdo:Script ;
+  skos:prefLabel "Tibetan Script"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts ;
+  rdfs:seeAlso <http://lexvo.org/id/script/Tibt> .
 
-bdr:LangSa :langMARCCode "san" .
+bdr:SaDeva  a    bdo:LangScript ;
+   rdfs:label    "Sanskrit in Devanagari"@en ;
+   bdo:language  bdr:LangSa ;
+   bdo:script    bdr:ScriptDeva ;
+   bdo:taxSubClassOf  bdr:Sa .
+
+bdr:LangBo
+  a bdo:Language ;
+  a owl:Class ;
+  bdo:langBCP47Lang "bo" ;
+  bdo:langMARCCode "tib" ;
+  rdfs:seeAlso <http://lexvo.org/id/iso639-3/bod> ;
+  rdfs:subClassOf bdo:Language ;
+  skos:prefLabel "Tibetan"@en ;
+  skos:prefLabel "bod yig"@bo-x-ewts .
+
+bdr:LangSa :langMARCCode "san" ;
+  skos:prefLabel "Sanskrit"@en .
 
 bdr:T1082 skos:prefLabel "T1082"@en .
 bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
@@ -75,7 +107,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workIsbn    "1-111456291" ;
    bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
    bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
-   bdo:workOtherLangScript  bdr:SaDeva ;
+   #bdo:workOtherLangScript  bdr:SaDeva ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
    bdo:workLccn  "79902886" ;
    bdo:workSeriesName  "series name" ;
@@ -90,19 +122,19 @@ bdr:W23819  a    bdo:Work ;
                     rdfs:label    "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts
                   ] ,
                   [ a             bdo:WorkBibliographicalTitle ;
-                    rdfs:label    "second bibliographical title"@en
+                    rdfs:label    "second bibliographical | ; / title"@en
                   ] ,
                   [ a             bdo:WorkColophonTitle ;
                     rdfs:label    "this is a colophon title"@en
                   ] ,
                   [ a             bdo:WorkRunningTitle ;
-                    rdfs:label    "this is a running title"@en
+                    rdfs:label    "si khron bod rig pa'i zhib 'jug; si chuan zang xue/"@bo-x-ewts
                   ] ,
                   [ a             bdo:WorkSubtitle ;
-                    rdfs:label    "subtitle"@bo-x-ewts
+                    rdfs:label    "sub ti tel"@bo-x-ewts
                   ] ,
          [ a             bdo:WorkTitlePageTitle ;
-           rdfs:label    "bka' brgyad gsan ba yons rdzogs : a complete cycle of rnin-ma-pa practice focusing upon the ancient eight pronouncements of gu-ru rin-po-che"@en-x-mixed
+           rdfs:label    "bka' brgyad gsan ba yon rdzogs"@bo-x-ewts
          ] ;
    bdo:workType  bdr:WorkTypePublishedWork ;
    adm:access    bdr:AccessOpen ;
@@ -112,33 +144,6 @@ bdr:W23819  a    bdo:Work ;
                    adm:logMessage  "edited notations; jann"@en ;
                    adm:logWho    bdr:U00011
                  ] ,
-         [ adm:logDate   "2008-01-01T16:02:43.281Z"^^xsd:dateTime ;
-           adm:logMessage  "annotation revised"@en ;
-           adm:logWho    bdr:U00001
-         ] ,
-         [ adm:logDate   "2013-07-25T14:54:14.462Z"^^xsd:dateTime ;
-           adm:logMessage  "added print type"@en ;
-           adm:logWho    bdr:U00013
-         ] ,
-         [ adm:logDate   "2014-04-21T23:05:36.322Z"^^xsd:dateTime ;
-           adm:logMessage  "normalized catalog info"@en ;
-           adm:logWho    bdr:U00012
-         ] ,
-         [ adm:logDate   "2014-04-22T00:30:13.577Z"^^xsd:dateTime ;
-           adm:logMessage  "normalize encoding field for pub info"@en ;
-           adm:logWho    bdr:U00012
-         ] ,
-         [ adm:logDate   "2014-05-17T11:18:37.731Z"^^xsd:dateTime ;
-           adm:logMessage  "normalized catalog info"@en ;
-           adm:logWho    bdr:U00012
-         ] ,
-         [ adm:logDate   "2015-01-05T17:22:13.356Z"^^xsd:dateTime ;
-           adm:logMessage  "added hollis field to pub info"@en ;
-           adm:logWho    bdr:U00006
-         ] ,
-         [ adm:logDate   "2016-01-18T14:17:22.288Z"^^xsd:dateTime ;
-           adm:logWho    bdr:U00021
-         ] ,
          [ adm:logDate   "2016-12-06T22:56:27.985Z"^^xsd:dateTime ;
            adm:logWho    bdr:U00021
          ] ;

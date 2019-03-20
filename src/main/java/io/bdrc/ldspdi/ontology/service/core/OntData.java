@@ -136,7 +136,7 @@ public class OntData implements Runnable {
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
-        URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
+        URL url = new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder st = new StringBuilder();
