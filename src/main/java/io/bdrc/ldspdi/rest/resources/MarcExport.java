@@ -82,7 +82,7 @@ public class MarcExport {
     public static final Property workBiblioNote = ResourceFactory.createProperty(BDO+"workBiblioNote");
     public static final Property creatorTerton = ResourceFactory.createProperty(BDO+"creatorTerton");
     // TODO: update
-    public static final Property creatorMainAuthor = ResourceFactory.createProperty(BDO+"creatorGeneralAuthor");
+    public static final Property creatorMainAuthor = ResourceFactory.createProperty(BDO+"creatorMainAuthor");
     public static final Property creatorTranslator = ResourceFactory.createProperty(BDO+"creatorTranslator");
     // TODO: update
     public static final Property creatorIndicScholar = ResourceFactory.createProperty(BDO+"creatorPandita");
@@ -1069,7 +1069,7 @@ public class MarcExport {
         final DataField f588 = factory.newDataField("588", ' ', ' ');
         final Date curDate = new Date();
         String dateStr = dateFormat.format(curDate);
-        f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")."));
+        f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed "+dateStr+")"));
         record.addVariableField(f588);
         addTopics(m, workR, record); // 653
         record.addVariableField(f710_2);
