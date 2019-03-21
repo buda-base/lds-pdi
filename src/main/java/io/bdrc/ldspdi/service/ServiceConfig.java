@@ -21,11 +21,7 @@ package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -36,32 +32,30 @@ import org.yaml.snakeyaml.Yaml;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import io.bdrc.ldspdi.ontology.service.core.OntParams;
 import io.bdrc.ldspdi.results.ResultsCache;
-
 
 public class ServiceConfig {
 
     static Properties prop = new Properties();
-    public static HashMap<String,String> params;
+    public static HashMap<String, String> params;
     public static Config config;
-    public final static String FUSEKI_URL="fusekiUrl";
-    public final static Logger log=LoggerFactory.getLogger(ServiceConfig.class.getName());
+    public final static String FUSEKI_URL = "fusekiUrl";
+    public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-    public static void init(HashMap<String,String> params) throws JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.params=params;
+    public static void init(HashMap<String, String> params) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.params = params;
 
         try {
-            InputStream input=ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             // load a properties file
             prop.load(input);
             input.close();
             /**
-             * sets the PROD values of fuseki and queryPath properties
-             * Overrides test queryPath value            *
-            **/
-            Set<String> set=params.keySet();
-            for(String st:set) {
+             * sets the PROD values of fuseki and queryPath properties Overrides test
+             * queryPath value *
+             **/
+            Set<String> set = params.keySet();
+            for (String st : set) {
                 prop.setProperty(st, params.get(st));
             }
 
@@ -71,14 +65,16 @@ public class ServiceConfig {
         }
         loadOntologies();
     }
-    
+
     @SuppressWarnings("unchecked")
-	public static Config loadOntologies() throws JsonParseException, JsonMappingException, IOException{
-    	InputStream input=ServiceConfig.class.getClassLoader().getResourceAsStream("ontologies.yml");
-    	Yaml yaml = new Yaml();
-    	config = yaml.loadAs(input, Config.class);
-    	input.close();
-    	return config;
+    public static Config loadOntologies() throws JsonParseException, JsonMappingException, IOException {
+        InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ontologies.yml");
+        // InputStream input =
+        // ServiceConfig.class.getClassLoader().getResourceAsStream("ontologiesLocal.yml");
+        Yaml yaml = new Yaml();
+        config = yaml.loadAs(input, Config.class);
+        input.close();
+        return config;
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
@@ -99,21 +95,20 @@ public class ServiceConfig {
         return Boolean.parseBoolean(prop.getProperty("useAuth"));
     }
 
-    public static String getProperty(String key){
+    public static String getProperty(String key) {
         return prop.getProperty(key);
     }
-    
+
     public static Config getConfig() {
-    	return config;
+        return config;
     }
 
     public static String getRobots() {
-        return "User-agent: *"+System.lineSeparator()+"Disallow: /";
-    }
-    
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
-    	System.out.println(ServiceConfig.loadOntologies().getOntology("core-shapes"));    	
+        return "User-agent: *" + System.lineSeparator() + "Disallow: /";
     }
 
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+        System.out.println(ServiceConfig.loadOntologies().getOntology("core-shapes"));
+    }
 
 }
