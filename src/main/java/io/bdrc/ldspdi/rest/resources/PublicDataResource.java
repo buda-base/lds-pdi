@@ -265,18 +265,26 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException {
         ResponseBuilder builder = null;
+        System.out.println(ServiceConfig.getConfig().getOntologies());
         System.out.println("ONT PARAMS with base>> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString()) + " base >>" + info.getAbsolutePath().toString());
         System.out.println("ONT PARAMS full path >> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString() + other) + " base >>" + info.getAbsolutePath().toString() + other);
         boolean isBase = false;
         String baseUri = "";
-        if (ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
-            baseUri = info.getAbsolutePath().toString();
+        String tmp = info.getAbsolutePath().toString();
+        System.out.println("TMP BaseUri path >> " + tmp);
+        if (!tmp.endsWith("/")) {
+            tmp = tmp + "/";
+        }
+        if (ServiceConfig.getConfig().isBaseUri(tmp)) {
+            System.out.println("TMP BaseUri has path !!!!!!!!!!!!>> ");
+            baseUri = tmp;
             isBase = true;
         }
         if (ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString() + other)) {
             baseUri = info.getAbsolutePath().toString() + other;
             isBase = true;
         }
+        System.out.println("BaseUri >> " + baseUri + " is Base>>" + isBase);
         // Is the full request uri a baseuri?
         if (isBase) {
             OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
