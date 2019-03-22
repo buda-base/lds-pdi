@@ -272,7 +272,8 @@ public class PublicDataResource {
         // Is the full request uri a baseuri?
         if (isBase) {
             OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
-            OntModel mod = OntData.getOntModelByBase(baseUri);
+            OntData.setOntModelWithBase(baseUri);
+            OntModel mod = OntData.ontMod;
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -311,7 +312,7 @@ public class PublicDataResource {
             // if so : serving properties or class html pages
             OntParams ont = ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri() + base + "/");
             if (ont != null) {
-                OntData.setOntModel(ont.getName());
+                OntData.getOntModelByName(ont.getName());
                 if (OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
                     throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for" + info.getAbsolutePath().toString()));
                 }
@@ -339,6 +340,7 @@ public class PublicDataResource {
     public Response getOntologyResourceAsFile(@Context final UriInfo info, @Context Request request, @PathParam("base") String base, @PathParam("other") String other, @PathParam("ext") String ext) throws RestException {
         String res = info.getAbsolutePath().toString();
         res = res.substring(0, res.lastIndexOf('.')) + "/";
+        System.out.println("RES >>>>> " + res);
         ResponseBuilder builder = null;
         final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
@@ -347,7 +349,7 @@ public class PublicDataResource {
         if (ServiceConfig.getConfig().isBaseUri(res)) {
             OntParams params = ServiceConfig.getConfig().getOntologyByBase(res);
             final String baseUri = res;
-            Model model = OntData.setOntModel(params.getName());
+            Model model = OntData.getOntModelByName(params.getName());
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
                 public void write(OutputStream os) throws IOException, WebApplicationException {

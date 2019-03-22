@@ -194,3 +194,25 @@ ontologies:
      type: 'rdfs'
      endpoint: '/ontology/adm/types/TermsOfUse'
      graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
+#Unkown ontology
+   - name : 'unknown'
+     baseuri: 'http://purl.bdrc.io/ontology/adm/unknown/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/adm/unknown-entities.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/adm/types/unknown'
+     graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
+# ROLES ontologies
+#Creators ontology
+   - name : 'creator'
+     baseuri: 'http://purl.bdrc.io/ontology/roles/creator/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/roles/creators.ttl'
+     type: 'rdfs'
+     endpoint: 'ontology/roles/creator'
+     graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
+#Chinese monastic ontology
+   - name : 'ChineseMonastic'
+     baseuri: 'http://purl.bdrc.io/ontology/roles/ChineseMonastic/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/roles/chinese_monastic.ttl'
+     type: 'rdfs'
+     endpoint: 'ontology/roles/ChineseMonastic'
+     graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'

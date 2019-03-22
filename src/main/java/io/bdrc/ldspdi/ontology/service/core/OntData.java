@@ -79,7 +79,7 @@ public class OntData implements Runnable {
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
                 m.add(tmp);
-                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tmp);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
@@ -137,11 +137,19 @@ public class OntData implements Runnable {
         modelsBase.put(baseUri, om);
     }
 
+    public static void setOntModelWithName(String name) throws RestException {
+        ontMod = getOntModelByName(name);
+    }
+
+    public static void setOntModelWithBase(String baseUri) throws RestException {
+        ontMod = getOntModelByBase(baseUri);
+    }
+
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
         return modelsBase.get(baseUri);
     }
 
-    public static OntModel setOntModel(String name) throws RestException {
+    public static OntModel getOntModelByName(String name) throws RestException {
         return models.get(name);
     }
 
@@ -184,7 +192,7 @@ public class OntData implements Runnable {
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
                 m.add(tmp);
-                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tmp);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }

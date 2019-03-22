@@ -63,9 +63,7 @@ public class BootClass implements ServletContextListener {
             ResultsCache.init();
             GitService.update(queryPath);
             ServiceConfig.init(params);
-            // OntData.init(null);
-            Thread t = new Thread(new OntData());
-            t.start();
+            OntData.init();
             TaxModel.fetchModel();
             Properties props = new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
