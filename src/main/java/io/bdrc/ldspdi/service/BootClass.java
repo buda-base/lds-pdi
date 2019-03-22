@@ -41,49 +41,50 @@ import io.bdrc.taxonomy.TaxModel;
 
 public class BootClass implements ServletContextListener {
 
-    public final static Logger log=LoggerFactory.getLogger(BootClass.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(BootClass.class.getName());
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
-        //Do nothing;
+        // Do nothing;
     }
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            //final String configPath= System.getProperty("ldspdi.configpath");
-            final String fuseki=arg0.getServletContext().getInitParameter("fuseki");
-            final String queryPath=arg0.getServletContext().getInitParameter("queryPath");
-            final String propertyPath=arg0.getServletContext().getInitParameter("propertyPath");
-            HashMap<String,String> params=new HashMap<>();
-            params.put("queryPath",queryPath);
-            params.put("fusekiUrl",fuseki);
-            System.out.println("FUSEKI URL >>"+fuseki);
-            params.put("propertyPath",propertyPath);
+            // final String configPath= System.getProperty("ldspdi.configpath");
+            final String fuseki = arg0.getServletContext().getInitParameter("fuseki");
+            final String queryPath = arg0.getServletContext().getInitParameter("queryPath");
+            final String propertyPath = arg0.getServletContext().getInitParameter("propertyPath");
+            HashMap<String, String> params = new HashMap<>();
+            params.put("queryPath", queryPath);
+            params.put("fusekiUrl", fuseki);
+            System.out.println("FUSEKI URL >>" + fuseki);
+            params.put("propertyPath", propertyPath);
             ResultsCache.init();
             GitService.update(queryPath);
             ServiceConfig.init(params);
-            OntData.init(null);
+            // OntData.init(null);
+            Thread t = new Thread(new OntData());
+            t.start();
             TaxModel.fetchModel();
-            Properties props=new Properties();
+            Properties props = new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
-            InputStream is=new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
-            Properties private_props=new Properties();
+            InputStream is = new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
+            Properties private_props = new Properties();
             private_props.load(is);
             private_props.putAll(props);
-            Set<String> set=params.keySet();
-            for(String st:set) {
+            Set<String> set = params.keySet();
+            for (String st : set) {
                 private_props.setProperty(st, params.get(st));
             }
             AuthProps.init(private_props);
-            if(ServiceConfig.useAuth()) {
-                //RdfAuthModel.updateAuthData(fuseki);
-                //For applications
-                RdfAuthModel.readAuthModel();                
+            if (ServiceConfig.useAuth()) {
+                // RdfAuthModel.updateAuthData(fuseki);
+                // For applications
+                RdfAuthModel.readAuthModel();
             }
             log.info("BootClass has been properly initialized");
-        }
-        catch (IllegalArgumentException | RestException | IOException e) {
+        } catch (IllegalArgumentException | RestException | IOException e) {
             log.error("BootClass init error", e);
         }
     }

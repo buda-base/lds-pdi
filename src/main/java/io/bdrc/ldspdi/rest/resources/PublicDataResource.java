@@ -72,7 +72,6 @@ import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
-import io.bdrc.shacl.validation.ResourceShapeBuilder;
 
 @Path("/")
 public class PublicDataResource {
@@ -112,21 +111,6 @@ public class PublicDataResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 InputStream str = PublicDataResource.class.getClassLoader().getResourceAsStream(file + ".ttl");
                 os.write(IOUtils.toByteArray(str));
-            }
-        };
-        return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    @GET
-    @Path("/shape/{clazz}")
-    public Response getShapeFile(@Context UriInfo info, @PathParam("clazz") final String clazz) throws RestException {
-        log.info("Call getRobots()");
-        ResourceShapeBuilder builder = new ResourceShapeBuilder("http://purl.bdrc.io/ontology/core/" + clazz);
-        Model m = builder.getShapeModel();
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                m.write(os, "TURTLE");
             }
         };
         return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).build();

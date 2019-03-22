@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class OntData implements Runnable {
@@ -65,73 +64,85 @@ public class OntData implements Runnable {
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
-    public static void init(String ont) throws RestException {
+    public static void init() {
         try {
-            if (ont == null) {
-                ont = "default";
+            models = new HashMap<>();
+            modelsBase = new HashMap<>();
+            final String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+            ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
+            Model m = ModelFactory.createDefaultModel();
+            for (String name : names) {
+                String url = ServiceConfig.getConfig().getOntology(name).fileurl;
+                System.out.println("Url=" + url);
+                log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                InputStream stream = connection.getInputStream();
+                Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
+                m.add(tmp);
+                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+                OntData.addOntModelByName(name, om);
+                OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
-            String url = ServiceConfig.getConfig().getOntology(ont).fileurl;
-            System.out.println("Url=" + url);
-            log.info("URL >> " + ServiceConfig.getConfig().getOntology(ont).fileurl);
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            InputStream stream = connection.getInputStream();
-            final Model m = ModelFactory.createDefaultModel();
-            System.out.println("Ext=" + MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.') + 1)));
-            m.read(stream, ServiceConfig.getConfig().getOntology(ont).baseuri, MediaTypeUtils.getJenaReadFromExtension(url.substring(url.lastIndexOf('.') + 1)));
-            m.write(System.out, "TURTLE");
-            stream.close();
-            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-            /****** RDFS model *********/
-            InputStream st = OntData.class.getClassLoader().getResourceAsStream("rdfs.ttl");
-            final Model m1 = ModelFactory.createDefaultModel();
-            m1.read(st, "", "TURTLE");
-            st.close();
-            ontMod.add(m1);
+            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
+            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("default").getGraph());
             readGithubJsonLDContext();
-            models.put(ont, ontMod);
-            modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(), ontMod);
-            String authUrl = ServiceConfig.getConfig().getOntology("auth").fileurl;
-            log.info("URL >> " + authUrl);
-            connection = (HttpURLConnection) new URL(authUrl).openConnection();
-            stream = connection.getInputStream();
-            final Model auth = ModelFactory.createDefaultModel();
-            auth.read(stream, "", MediaTypeUtils.getJenaReadFromExtension(authUrl.substring(authUrl.lastIndexOf('.') + 1)));
-            stream.close();
-            ontAuthMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
-            models.put("auth", ontAuthMod);
-            modelsBase.put(ServiceConfig.getConfig().getOntology("auth").getBaseuri(), ontAuthMod);
-            log.info("MODELS after Init>>" + models.keySet());
-            log.info("MODELS Base after Init>>" + modelsBase.keySet());
-        } catch (IOException io) {
-            log.error("Error initializing OntModel", io);
+            // purge models map to force reloading of updated models
+            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+
+        } catch (Exception ex) {
+            log.error("Error updating OntModel", ex);
         }
+    }
+    /*
+     * public static void init(String ont) throws RestException { try { if (ont ==
+     * null) { ont = "default"; } String url =
+     * ServiceConfig.getConfig().getOntology(ont).fileurl; System.out.println("Url="
+     * + url); log.info("URL >> " +
+     * ServiceConfig.getConfig().getOntology(ont).fileurl); HttpURLConnection
+     * connection = (HttpURLConnection) new URL(url).openConnection(); InputStream
+     * stream = connection.getInputStream(); final Model m =
+     * ModelFactory.createDefaultModel(); System.out.println("Ext=" +
+     * MediaTypeUtils.getJenaFromExtension(url.substring(url.lastIndexOf('.') +
+     * 1))); m.read(stream, ServiceConfig.getConfig().getOntology(ont).baseuri,
+     * MediaTypeUtils.getJenaReadFromExtension(url.substring(url.lastIndexOf('.') +
+     * 1))); m.write(System.out, "TURTLE"); stream.close(); ontMod =
+     * ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+     * 
+     * InputStream st =
+     * OntData.class.getClassLoader().getResourceAsStream("rdfs.ttl"); final Model
+     * m1 = ModelFactory.createDefaultModel(); m1.read(st, "", "TURTLE");
+     * st.close(); ontMod.add(m1); readGithubJsonLDContext(); models.put(ont,
+     * ontMod);
+     * modelsBase.put(ServiceConfig.getConfig().getOntology(ont).getBaseuri(),
+     * ontMod); String authUrl =
+     * ServiceConfig.getConfig().getOntology("auth").fileurl; log.info("URL >> " +
+     * authUrl); connection = (HttpURLConnection) new URL(authUrl).openConnection();
+     * stream = connection.getInputStream(); final Model auth =
+     * ModelFactory.createDefaultModel(); auth.read(stream, "",
+     * MediaTypeUtils.getJenaReadFromExtension(authUrl.substring(authUrl.lastIndexOf
+     * ('.') + 1))); stream.close(); ontAuthMod =
+     * ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, auth);
+     * models.put("auth", ontAuthMod);
+     * modelsBase.put(ServiceConfig.getConfig().getOntology("auth").getBaseuri(),
+     * ontAuthMod); log.info("MODELS after Init>>" + models.keySet());
+     * log.info("MODELS Base after Init>>" + modelsBase.keySet()); } catch
+     * (IOException io) { log.error("Error initializing OntModel", io); } }
+     */
+
+    public static void addOntModelByName(String name, OntModel om) {
+        models.put(name, om);
+    }
+
+    public static void addOntModelByBase(String baseUri, OntModel om) {
+        modelsBase.put(baseUri, om);
     }
 
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
-        if (modelsBase.get(baseUri) == null && ServiceConfig.getConfig().getOntologyByBase(baseUri) != null) {
-            OntData.init(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
-            return OntData.ontMod;
-        }
-        if (ServiceConfig.getConfig().getOntologyByBase(baseUri) != null) {
-            ontMod = models.get(ServiceConfig.getConfig().getOntologyByBase(baseUri).getName());
-            return ontMod;
-        } else {
-            return null;
-        }
-
+        return modelsBase.get(baseUri);
     }
 
     public static OntModel setOntModel(String name) throws RestException {
-        if (models.get(name) == null && ServiceConfig.getConfig().getOntology(name) != null) {
-            OntData.init(name);
-            return OntData.ontMod;
-        }
-        if (ServiceConfig.getConfig().getOntology(name) != null) {
-            return models.get(name);
-        } else {
-            return null;
-        }
-
+        return models.get(name);
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
@@ -160,6 +171,8 @@ public class OntData implements Runnable {
     @Override
     public void run() {
         try {
+            models = new HashMap<>();
+            modelsBase = new HashMap<>();
             final String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
             ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
             Model m = ModelFactory.createDefaultModel();
@@ -171,14 +184,16 @@ public class OntData implements Runnable {
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
                 m.add(tmp);
+                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+                OntData.addOntModelByName(name, om);
+                OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
             infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("default").getGraph());
             readGithubJsonLDContext();
             // purge models map to force reloading of updated models
             ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-            models = new HashMap<>();
-            modelsBase = new HashMap<>();
+
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
         }
