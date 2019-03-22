@@ -260,56 +260,27 @@ public class PublicDataResource {
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
     }
 
-    /*
-     * @GET
-     * 
-     * @Path("/ontology/{path}/{class}.{ext}")
-     * 
-     * @JerseyCacheControl() public Response
-     * getCoreOntologyClassViewExt(@PathParam("class") final String cl,
-     * 
-     * @PathParam("path") final String path,
-     * 
-     * @PathParam("ext") final String ext,
-     * 
-     * @Context final Request request,
-     * 
-     * @Context final UriInfo info) throws RestException{
-     * log.info("getCoreOntologyClassView()"); final String
-     * uri="http://purl.bdrc.io/ontology/"+path+"/"+cl; final EntityTag
-     * etag=OntData.getEntityTag(); ResponseBuilder builder =
-     * request.evaluatePreconditions(etag); if(OntData.ontMod.getOntResource(uri) ==
-     * null) { throw new RestException(404,new
-     * LdsError(LdsError.ONT_URI_ERR).setContext(uri)); } if (builder != null) {
-     * builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag); return
-     * builder.build(); } final MediaType media =
-     * MediaTypeUtils.getMimeFromExtension(ext); if (media == null) { final String
-     * html=Helpers.getMultiChoicesHtml("/ontology/"+path+"/"+cl, true); final
-     * ResponseBuilder rb=Response.status(300).entity(html).header("Content-Type",
-     * "text/html").
-     * header("Content-Location",info.getBaseUri()+"choice?path="+info.getPath());
-     * return rb.build(); } if (media.equals(MediaType.TEXT_HTML_TYPE)) { if
-     * (OntData.isClass(uri)) { builder = Response.ok(new
-     * Viewable("/ontClassView.jsp", new OntClassModel(uri))); } else { builder =
-     * Response.ok(new Viewable("/ontPropView.jsp",new OntPropModel(uri))); } } else
-     * { final Model model = OntData.describeUri(uri); builder =
-     * Response.ok(ResponseOutputStream.getModelStream(model, ext, uri,
-     * null),media); } // there could be more headers here
-     * builder.header("Last-Modified", OntData.getLastUpdated()).tag(etag); return
-     * builder.build(); }
-     */
-
     @GET
     @Path("/{base : .*}/{other}")
     @JerseyCacheControl()
     public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException {
         ResponseBuilder builder = null;
-        System.out.println("ONT PARAMS >> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString()) + " base >>" + info.getAbsolutePath().toString());
-        // Is the full request uri a baseuri?
+        System.out.println("ONT PARAMS with base>> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString()) + " base >>" + info.getAbsolutePath().toString());
+        System.out.println("ONT PARAMS full path >> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString() + other) + " base >>" + info.getAbsolutePath().toString() + other);
+        boolean isBase = false;
+        String baseUri = "";
         if (ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString())) {
-            OntParams pr = ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString());
-
-            OntModel mod = OntData.getOntModelByBase(info.getAbsolutePath().toString());
+            baseUri = info.getAbsolutePath().toString();
+            isBase = true;
+        }
+        if (ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString() + other)) {
+            baseUri = info.getAbsolutePath().toString() + other;
+            isBase = true;
+        }
+        // Is the full request uri a baseuri?
+        if (isBase) {
+            OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
+            OntModel mod = OntData.getOntModelByBase(baseUri);
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
