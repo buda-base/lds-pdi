@@ -2,16 +2,9 @@ package io.bdrc.ldspdi.test;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
@@ -36,32 +29,28 @@ public class OntServiceTest extends JerseyTest {
         // target("onto/admin").request().accept("application/rdf+xml").get();
         System.out.println("TARGET >>" + target("ontology/admin").request() + " Status=" + res.getStatus());
         assertTrue(res.getStatus() == 200);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>" + res.readEntity(String.class));
+        // System.out.println(">>>>>>>>>>>>>>>>>>>>>" + res.readEntity(String.class));
         // assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
     }
 
-    @Test
-    public void loadAdminTTL() throws ClientProtocolException, IOException {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet(this.getBaseUri() + "ontology/admin");
-        // get.addHeader("Accept", "text/turtle");
-        get.addHeader("Accept", "application/rdf+xml");
-        System.out.println("URL >>> " + this.getBaseUri() + "ontology/admin");
-        HttpResponse resp = client.execute(get);
-        System.out.println("STATUS >>> " + resp.getStatusLine());
-        assert (resp.getStatusLine().getStatusCode() == 200);
-    }
-
-    @Test
-    public void loadAccessTTL() throws ClientProtocolException, IOException {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet(this.getBaseUri() + "ontology/Access");
-        // get.addHeader("Accept", "text/turtle");
-        get.addHeader("Accept", "application/rdf+xml");
-        System.out.println("URL >>> " + this.getBaseUri() + "ontology/Access");
-        HttpResponse resp = client.execute(get);
-        System.out.println("STATUS >>> " + resp.getStatusLine());
-        assert (resp.getStatusLine().getStatusCode() == 200);
-    }
+    /*
+     * @Test public void loadAdminTTL() throws ClientProtocolException, IOException
+     * { HttpClient client = HttpClientBuilder.create().build(); HttpGet get = new
+     * HttpGet(this.getBaseUri() + "ontology/admin"); // get.addHeader("Accept",
+     * "text/turtle"); get.addHeader("Accept", "application/rdf+xml");
+     * System.out.println("URL >>> " + this.getBaseUri() + "ontology/admin");
+     * HttpResponse resp = client.execute(get); System.out.println("STATUS >>> " +
+     * resp.getStatusLine()); assert (resp.getStatusLine().getStatusCode() == 200);
+     * }
+     * 
+     * @Test public void loadAccessTTL() throws ClientProtocolException, IOException
+     * { HttpClient client = HttpClientBuilder.create().build(); HttpGet get = new
+     * HttpGet(this.getBaseUri() + "ontology/Access"); // get.addHeader("Accept",
+     * "text/turtle"); get.addHeader("Accept", "application/rdf+xml");
+     * System.out.println("URL >>> " + this.getBaseUri() + "ontology/Access");
+     * HttpResponse resp = client.execute(get); System.out.println("STATUS >>> " +
+     * resp.getStatusLine()); assert (resp.getStatusLine().getStatusCode() == 200);
+     * }
+     */
 
 }
