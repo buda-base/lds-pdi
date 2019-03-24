@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
-import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
@@ -63,7 +62,7 @@ public class BootClass implements ServletContextListener {
             ResultsCache.init();
             GitService.update(queryPath);
             ServiceConfig.init(params);
-            OntData.init();
+            // OntData.init();
             TaxModel.fetchModel();
             Properties props = new Properties();
             props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));

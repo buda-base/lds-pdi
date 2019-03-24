@@ -64,7 +64,7 @@ public class OntData implements Runnable {
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
-    public static void init() {
+    static {
         try {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
