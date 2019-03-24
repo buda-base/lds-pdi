@@ -32,7 +32,7 @@ public class EndpointAccessTest extends JerseyTest{
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(AuthTestResource.class)
+        return new ResourceConfig(TestResource.class)
                 .register(RdfAuthTestFilter.class);
 
     }

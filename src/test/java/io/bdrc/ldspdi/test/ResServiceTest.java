@@ -44,27 +44,24 @@ import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
-public class ResServiceTest extends JerseyTest{
+public class ResServiceTest extends JerseyTest {
 
-    private static FusekiServer server ;
+    private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
-    public final static Logger log=LoggerFactory.getLogger(ResServiceTest.class.getName());
-    public final static String[] methods= {"GET", "POST"};
+    public final static Logger log = LoggerFactory.getLogger(ResServiceTest.class.getName());
+    public final static String[] methods = { "GET", "POST" };
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl="http://localhost:2246/bdrcrw";
+        fusekiUrl = "http://localhost:2246/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
-        //Creating a fuseki server
-        server = FusekiServer.create()
-                .port(2246)
-                .add("/bdrcrw", srvds)
-                .build() ;
-        server.start() ;
+        // Creating a fuseki server
+        server = FusekiServer.create().port(2246).add("/bdrcrw", srvds).build();
+        server.start();
     }
 
     @AfterClass
@@ -78,69 +75,35 @@ public class ResServiceTest extends JerseyTest{
         return new ResourceConfig(PublicDataResource.class).register(RestExceptionMapper.class);
     }
 
-    /*@Test
-    public void normalResource() throws IOException {
-
-        Set<Entry<String,String>> fmt=MediaTypeUtils.JENAFORMAT.entrySet();
-        for(String method:methods) {
-            for(Entry<String,String> ent:fmt) {
-                String mime=MediaTypeUtils.getMimeFromExtension(ent.getKey());
-                Response res = target("/resource/P1AG29").request()
-                        .accept(mime)
-                        .header("fusekiUrl", fusekiUrl)
-                        .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                        .method(method);
-                assertTrue(res.getStatus() == 200);
-                assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
-                assertTrue(res.getHeaderString("TCN").equals("Choice"));
-                assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
-                assertTrue(res.getHeaderString("Content-Type").equals(mime));
-                assertTrue(res.getHeaderString("Content-Location").equals("resource/P1AG29."+MediaTypeUtils.getExtFormatFromMime(mime)));
-                Model dist = getModelFromFileName(TestUtils.TESTDIR+"P1AG29.ttl",Lang.TURTLE);
-                Model returned=ModelFactory.createDefaultModel();
-                returned.read(res.readEntity(InputStream.class),"",ent.getValue());
-                assertTrue(dist.isIsomorphicWith(returned));
-            }
-        }
-    }*/
-
     @Test
     public void AllOk() {
-        Response res = target("/resource/C68.ttl").request()
-                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                .get();
+        Response res = target("/resource/C68.ttl").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
         assertTrue(res.getStatus() == 200);
         System.out.println(res.readEntity(String.class));
-        //assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
+        // assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
     }
 
     @Test
     public void html() {
-        for(String method:methods) {
-            Response res = target("/resource/P1AG29").request()
-                    .accept("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                    .method(method);
+        for (String method : methods) {
+            Response res = target("/resource/P1AG29").request().accept("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
             assertTrue(res.getStatus() == 303);
             assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
             assertTrue(res.getHeaderString("TCN").equals("Choice"));
-            assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
+            assertTrue(checkAlternates("resource/P1AG29", res.getHeaderString("Alternates")));
             assertTrue(res.getHeaderString("Location").endsWith("show/bdr:P1AG29"));
         }
     }
 
     @Test
     public void wrongAccept() {
-        for(String method:methods) {
-            Response res = target("/resource/test").request()
-                    .accept("application/xhtml+xml")
-                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                    .method(method);
-            if(method.equals("GET")) {
+        for (String method : methods) {
+            Response res = target("/resource/test").request().accept("application/xhtml+xml").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
+            if (method.equals("GET")) {
                 assertTrue(res.getStatus() == 406);
                 assertTrue(res.getHeaderString("TCN").equals("List"));
             }
-            if(method.equals("POST")) {
+            if (method.equals("POST")) {
                 assertTrue(res.getStatus() == 406);
             }
         }
@@ -148,50 +111,41 @@ public class ResServiceTest extends JerseyTest{
 
     @Test
     public void GetResourceByExtension() {
-        Set<String> map=MediaTypeUtils.getResExtensionMimeMap().keySet();
-        for(String ent:map) {
+        Set<String> map = MediaTypeUtils.getResExtensionMimeMap().keySet();
+        for (String ent : map) {
             if (ent.equals("html"))
                 continue;
-            Response res = target("/resource/P1AG29."+ent).request()
-                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                    .get();
+            Response res = target("/resource/P1AG29." + ent).request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
             assertTrue(res.getStatus() == 200);
             assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
             assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
-            assertTrue(checkAlternates("resource/P1AG29",res.getHeaderString("Alternates")));
+            assertTrue(checkAlternates("resource/P1AG29", res.getHeaderString("Alternates")));
         }
     }
 
     @Test
     public void WrongResource() {
-        Response res = target("/resource/wrong.ttl").request()
-                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                .get();
+        Response res = target("/resource/wrong.ttl").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
         assertTrue(res.getStatus() == 404);
     }
 
     @Test
     public void WrongExt() {
-        Response res = target("/resource/C68.wrong").request()
-                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                .get();
+        Response res = target("/resource/C68.wrong").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
         assertTrue(res.getStatus() == 300);
-        assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
+        assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68", true)));
     }
 
     @Test
     public void nores() {
-        for(String method:methods) {
-            Response res = target("/resource/nonexistant").request()
-                    .accept("text/turtle")
-                    .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE)
-                    .method(method);
+        for (String method : methods) {
+            Response res = target("/resource/nonexistant").request().accept("text/turtle").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
             assertTrue(res.getStatus() == 404);
         }
     }
 
     @Test
-    public void testHtmlLitFormatter(){
+    public void testHtmlLitFormatter() {
         PrefixMap pm = PrefixMapFactory.create();
         pm.add("xsd", "http://www.w3.org/2001/XMLSchema#");
         pm.add("owl", "http://www.w3.org/2002/07/owl#");
@@ -200,12 +154,12 @@ public class ResServiceTest extends JerseyTest{
         NodeFormatterTTL nfttl = new NodeFormatterTTL(null, pm, null);
         Model m = ModelFactory.createDefaultModel();
         Literal l = m.createTypedLiteral("2009-10-22T18:31:49.12Z", XSDDatatype.XSDdateTime);
-        Literal l1=m.createTypedLiteral(3.141592, new BaseDatatype("http://www.w3.org/2002/07/owl#real"));
-        Literal l2=m.createTypedLiteral("Dharma is beautiful", XMLLiteralType.theXMLLiteralType);
-        Literal l3=m.createTypedLiteral("true", XSDDatatype.XSDboolean);
-        Literal l4=m.createLiteral("rgyud bla ma", "bo-x-ewts");
-        Literal l5=m.createTypedLiteral("buddha is goodness", XSDDatatype.XSDstring);
-        Literal l6=m.createTypedLiteral(-5, XSDDatatype.XSDinteger);
+        Literal l1 = m.createTypedLiteral(3.141592, new BaseDatatype("http://www.w3.org/2002/07/owl#real"));
+        Literal l2 = m.createTypedLiteral("Dharma is beautiful", XMLLiteralType.theXMLLiteralType);
+        Literal l3 = m.createTypedLiteral("true", XSDDatatype.XSDboolean);
+        Literal l4 = m.createLiteral("rgyud bla ma", "bo-x-ewts");
+        Literal l5 = m.createTypedLiteral("buddha is goodness", XSDDatatype.XSDstring);
+        Literal l6 = m.createTypedLiteral(-5, XSDDatatype.XSDinteger);
 
         StringWriterI sw = new StringWriterI();
         nfttl.formatLiteral(sw, l.asNode());
@@ -245,31 +199,30 @@ public class ResServiceTest extends JerseyTest{
     }
 
     static void logResponse(Response res) {
-        log.info(" Status >> "+res.getStatus());
-        log.info(" Vary >> "+res.getHeaderString("Vary"));
-        log.info(" TCN >> "+res.getHeaderString("TCN"));
-        log.info(" Alternates >> "+res.getHeaderString("Alternates"));
-        log.info(" Content-Type >> "+res.getHeaderString("Content-type"));
-        log.info(" Content-Location >> "+res.getHeaderString("Content-Location"));
-        log.info(" Entity >> "+res.getEntity());
+        log.info(" Status >> " + res.getStatus());
+        log.info(" Vary >> " + res.getHeaderString("Vary"));
+        log.info(" TCN >> " + res.getHeaderString("TCN"));
+        log.info(" Alternates >> " + res.getHeaderString("Alternates"));
+        log.info(" Content-Type >> " + res.getHeaderString("Content-type"));
+        log.info(" Content-Location >> " + res.getHeaderString("Content-Location"));
+        log.info(" Entity >> " + res.getEntity());
     }
 
-    public boolean checkAlternates(String url,String alternates) {
-        HashMap<String,MediaType> map =MediaTypeUtils.getResExtensionMimeMap();
-        StringBuilder sb=new StringBuilder("");
-        for(Entry<String,MediaType> e :map.entrySet()) {
-            sb.append("{\""+url+"."+e.getKey()+"\" 1.000 {type "+e.getValue().toString()+"}},");
+    public boolean checkAlternates(String url, String alternates) {
+        HashMap<String, MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
+        StringBuilder sb = new StringBuilder("");
+        for (Entry<String, MediaType> e : map.entrySet()) {
+            sb.append("{\"" + url + "." + e.getKey() + "\" 1.000 {type " + e.getValue().toString() + "}},");
         }
-        String alt=sb.toString().substring(0, sb.toString().length()-1);
-        List<String> alt1=Arrays.asList(alternates.split(","));
-        List<String> alt2=Arrays.asList(alt.split(","));
-        for(String test:alt2) {
-            if(!alt1.contains(test)) {
-                log.error("Alternates check failed >>> "+test + alt1.contains(test));
+        String alt = sb.toString().substring(0, sb.toString().length() - 1);
+        List<String> alt1 = Arrays.asList(alternates.split(","));
+        List<String> alt2 = Arrays.asList(alt.split(","));
+        for (String test : alt2) {
+            if (!alt1.contains(test)) {
+                log.error("Alternates check failed >>> " + test + alt1.contains(test));
                 return false;
             }
         }
         return true;
     }
-
 }
