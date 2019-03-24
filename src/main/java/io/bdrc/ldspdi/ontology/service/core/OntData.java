@@ -77,9 +77,10 @@ public class OntData implements Runnable {
                 log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
-                Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
+                Model tmp = ModelFactory.createDefaultModel();
                 m.add(tmp);
                 OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tmp);
+                om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
@@ -93,6 +94,7 @@ public class OntData implements Runnable {
             log.error("Error updating OntModel", ex);
         }
     }
+
     /*
      * public static void init(String ont) throws RestException { try { if (ont ==
      * null) { ont = "default"; } String url =
