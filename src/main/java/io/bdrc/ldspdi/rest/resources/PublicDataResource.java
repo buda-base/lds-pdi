@@ -250,7 +250,7 @@ public class PublicDataResource {
     public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException {
         ResponseBuilder builder = null;
         System.out.println("getExtOntologyHomePage WAS CALLED WITH >>" + base + "/" + other + " and format :" + format);
-        System.out.println(ServiceConfig.getConfig().getOntologies());
+        // System.out.println(ServiceConfig.getConfig().getOntologies());
         System.out.println("ONT PARAMS with base>> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString()) + " base >>" + info.getAbsolutePath().toString());
         System.out.println("ONT PARAMS full path >> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString() + other) + " base >>" + info.getAbsolutePath().toString() + other);
         boolean isBase = false;
@@ -261,7 +261,6 @@ public class PublicDataResource {
             tmp = tmp + "/";
         }
         if (ServiceConfig.getConfig().isBaseUri(tmp)) {
-            System.out.println("TMP BaseUri has path !!!!!!!!!!!!>> ");
             baseUri = tmp;
             isBase = true;
         }

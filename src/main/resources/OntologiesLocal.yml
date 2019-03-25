@@ -1,0 +1,22 @@
+ontologies:
+#Core ontologies
+   - name : 'core'
+     baseuri : 'http://localhost:8080/ontology/core/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/core/bdo.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/core'
+     graph: 'http://localhost:8080/ontology/core/ontologySchema'
+#admin ontology (still included into bdo, will be separated later)
+   - name : 'default'
+     baseuri : 'http://localhost:8080/ontology/admin/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/adm/admin.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/admin'
+     graph: 'http://localhost:8080/ontology/core/ontologySchema'
+#auth ontologies
+   - name : 'auth'
+     baseuri: 'http://localhost:8080/ontology/ext/auth/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/ext/auth/auth.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/ext/auth'
+     graph: 'http://localhost:8080/ontology/ext/authSchema'

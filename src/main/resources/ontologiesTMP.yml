@@ -1,0 +1,8 @@
+ontologies:
+#core ontology 
+   - name : 'core'
+     baseuri : 'http://purl.bdrc.io/ontology/core/'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/core/bdo.ttl'
+     type: 'rdfs'
+     endpoint: '/ontology/core'
+     graph: 'http://purl.bdrc.io/ontology/core/ontologySchema'
