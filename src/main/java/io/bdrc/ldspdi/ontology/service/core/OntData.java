@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import javax.ws.rs.core.EntityTag;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntProperty;
@@ -78,7 +80,11 @@ public class OntData implements Runnable {
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel();
-                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tmp);
+                OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+                OntDocumentManager odm = new OntDocumentManager();
+                odm.setProcessImports(false);
+                oms.setDocumentManager(odm);
+                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
                 om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
@@ -93,6 +99,8 @@ public class OntData implements Runnable {
     }
 
     public static void addOntModelByName(String name, OntModel om) {
+        System.out.println("Adding Model by name : " + name);
+        om.write(System.out, "RDFXML");
         models.put(name, om);
     }
 
@@ -318,11 +326,17 @@ public class OntData implements Runnable {
      * @return list of simple root OntClass(es)
      */
     public static List<OntClass> getSimpleRootClasses() {
-        final List<OntClass> classes = ontMod.listHierarchyRootClasses().toList();
+        // Iterator<OntClass> it = ontMod.listHierarchyRootClasses();
+        Iterator<OntClass> it = ontMod.listClasses();
         final List<OntClass> rez = new ArrayList<>();
-        for (final OntClass oc : classes) {
-            if (oc.getURI() != null) {
-                rez.add(oc);
+        while (it.hasNext()) {
+            try {
+                OntClass oc = it.next();
+                if (oc.getURI() != null && oc.isHierarchyRoot()) {
+                    rez.add(oc);
+                }
+            } catch (Exception ex) {
+
             }
         }
         Collections.sort(rez, OntData.ontClassComparator);

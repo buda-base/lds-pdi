@@ -22,8 +22,10 @@ package io.bdrc.ldspdi.rest.resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -47,8 +49,11 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFLanguages;
@@ -247,7 +252,7 @@ public class PublicDataResource {
     @GET
     @Path("/{base : .*}/{other}")
     @JerseyCacheControl()
-    public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException {
+    public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException, IOException {
         ResponseBuilder builder = null;
         System.out.println("getExtOntologyHomePage WAS CALLED WITH >>" + base + "/" + other + " and format :" + format);
         // System.out.println(ServiceConfig.getConfig().getOntologies());
@@ -274,32 +279,43 @@ public class PublicDataResource {
             OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
             OntData.setOntModelWithBase(baseUri);
             OntModel mod = OntData.ontMod;
+            mod.write(System.out, "TURTLE");
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
                 if (variant == null) {
                     return Response.status(406).build();
                 }
+                String url = ServiceConfig.getConfig().getOntologyByBase(baseUri).getFileurl();
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                InputStream input = connection.getInputStream();
+                OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+                OntDocumentManager odm = new OntDocumentManager();
+                odm.setProcessImports(false);
+                oms.setDocumentManager(odm);
+                OntModel om = ModelFactory.createOntologyModel(oms);
+                om.read(input, baseUri, "TURTLE");
+                input.close();
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
-                    builder = Response.ok(new Viewable("/ontologyHome.jsp", mod));
+                    builder = Response.ok(new Viewable("/ontologyHome.jsp", om));
                 } else {
                     final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType));
                     final StreamingOutput stream = new StreamingOutput() {
                         @Override
                         public void write(OutputStream os) throws IOException, WebApplicationException {
                             if (JenaLangStr == "STTL") {
-                                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(mod, pr.getBaseuri());
+                                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(om, pr.getBaseuri());
                                 writer.output(os);
                             } else {
-                                org.apache.jena.rdf.model.RDFWriter wr = mod.getWriter(JenaLangStr);
+                                org.apache.jena.rdf.model.RDFWriter wr = om.getWriter(JenaLangStr);
                                 if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
                                     wr.setProperty("xmlbase", pr.getBaseuri());
                                 }
                                 // here using the absolute path as baseUri since it has been recognized
                                 // as the base uri of a declared ontology (in ontologies.yml file)
-                                wr.write(mod, os, pr.getBaseuri());
+                                wr.write(om, os, pr.getBaseuri());
                             }
                         }
                     };
@@ -332,6 +348,43 @@ public class PublicDataResource {
         }
         return builder.build();
     }
+
+    /*
+     * @GET
+     * 
+     * @Path("/ontology/{namespace}")
+     * 
+     * @JerseyCacheControl() public Response getOntologySerialization(@Context final
+     * UriInfo info, @Context Request request, @HeaderParam("Accept") String format)
+     * throws IOException { ResponseBuilder builder = null; String URI =
+     * info.getRequestUri().toURL().toString(); System.out.println("URI >> " + URI);
+     * if (format != null) { Variant variant =
+     * request.selectVariant(MediaTypeUtils.resVariants); if (variant == null) {
+     * return Response.status(406).build(); } String url =
+     * ServiceConfig.getConfig().getOntologyByBase(URI).getFileurl();
+     * HttpURLConnection connection = (HttpURLConnection) new
+     * URL(url).openConnection(); InputStream input = connection.getInputStream();
+     * OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+     * om.read(input, URI, "TURTLE"); input.close(); MediaType mediaType =
+     * variant.getMediaType(); // browser request : serving html page if
+     * (mediaType.equals(MediaType.TEXT_HTML_TYPE)) { return
+     * Response.status(406).build(); } else {
+     * 
+     * final String JenaLangStr =
+     * MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType))
+     * ; final StreamingOutput stream = new StreamingOutput() {
+     * 
+     * @Override public void write(OutputStream os) throws IOException,
+     * WebApplicationException { if (JenaLangStr == "STTL") { final RDFWriter writer
+     * = TTLRDFWriter.getSTTLRDFWriter(om, URI); writer.output(os); } else {
+     * org.apache.jena.rdf.model.RDFWriter wr = om.getWriter(JenaLangStr); if
+     * (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) { wr.setProperty("xmlbase",
+     * URI); } // here using the absolute path as baseUri since it has been
+     * recognized // as the base uri of a declared ontology (in ontologies.yml file)
+     * wr.write(om, os, URI); } } }; builder = Response.ok(stream,
+     * MediaTypeUtils.getMimeFromExtension(MediaTypeUtils.getExtFromMime(mediaType))
+     * ); } } return null; }
+     */
 
     @GET
     @Path("/{base : .*}/{other}.{ext}")
