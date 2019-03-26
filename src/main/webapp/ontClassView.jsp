@@ -49,9 +49,9 @@
     <c:set var="uri" value="${model.getUri()}"/>
     <!-- PARENT CLASS(ES) -->    
     <c:if test = "${model.hasParent()}">
-        <c:if test = "${model.getParent().size()>0}">
+        <c:if test = "${model.getParent(true).size()>0}">
 	        <h4>Parent class(es): </h4>
-	        <c:forEach items="${model.getParent()}" var="par">    
+	        <c:forEach items="${model.getParent(true)}" var="par">    
 	            <a href="${par.getUri()}">${par.getId()}</a>
 	        </c:forEach> 
         </c:if> 
@@ -83,11 +83,11 @@
     </c:if>
     
     <!-- DOMAIN PROPERTIES -->
-    <c:if test = "${OntData.getDomainUsages(uri).size()>0}">
+    <c:if test = "${OntData.getDomainUsages(uri,true).size()>0}">
     <table id="specs">
         <tr><th>Root properties applying to the ${model.getId()} domain:</th></tr>
         <tr><td style="font-size:16px;line-height: 1.6;">
-        <c:forEach items="${OntData.getDomainUsages(uri)}" var="dom">                
+        <c:forEach items="${OntData.getDomainUsages(uri,true)}" var="dom">                
             <a href="${dom.getURI()}">${dom.getLocalName()}</a> /
         </c:forEach> 
         </td></tr>

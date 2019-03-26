@@ -53,7 +53,7 @@
 <c:otherwise>
 <b>Domain:</b> 
 <c:forEach items="${model.getDomain()}" var="dom">
-<a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+<a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
 </c:forEach>
 <br>
 </c:otherwise>
@@ -65,7 +65,7 @@
 <c:otherwise>
 <b>Range:</b> 
 <c:forEach items="${model.getRange()}" var="range">
-<a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+<a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
 </c:forEach>
 <br>
 </c:otherwise>
@@ -77,22 +77,22 @@
             <div style="white-space: pre-wrap;">${comm[0]}<span class="lang">${comm[1]}</span></div><hr/>
         </c:forEach> 
 </c:if>
-<c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
+<c:if test = "${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics: </b>
-<c:forEach items="${OntData.getOwlCharacteristics().getOwlProps(model.getUri())}" var="owlprop"> 
- <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> 
+<c:forEach items="${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri())}" var="owlprop"> 
+ <a href="${owlprop}">${OntData.getOwlCharacteristics(true).getPrefixed(owlprop)}</a> 
 </c:forEach>
 </c:if>
-<c:if test = "${OntData.getOwlCharacteristics().isInverseOfProp(model.getUri())}">
-<b>Is Inverse of: </b><a href="${OntData.getOwlCharacteristics().getInverseOfProp(model.getUri())}">
-${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics().getInverseOfProp(model.getUri()))}</a>
+<c:if test = "${OntData.getOwlCharacteristics(true).isInverseOfProp(model.getUri())}">
+<b>Is Inverse of: </b><a href="${OntData.getOwlCharacteristics(true).getInverseOfProp(model.getUri())}">
+${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacteristics(true).getInverseOfProp(model.getUri()))}</a>
 </c:if>
 
 <!-- SUB PROPS -->
-    <c:if test = "${model.getAllSubProps().size()>0}">
+    <c:if test = "${model.getAllSubProps(true).size()>0}">
         <h3>Sub properties: </h3>
         
-        <c:forEach items="${model.getAllSubProps()}" var="prop"> 
+        <c:forEach items="${model.getAllSubProps(true)}" var="prop"> 
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
@@ -105,7 +105,7 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
                 <c:otherwise>
                 <tr><td><b>Domain:</b></td><td>
                 <c:forEach items="${prop.getDomain()}" var="dom">
-                    <a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+                    <a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -117,7 +117,7 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
                 <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> 
                 <c:forEach items="${prop.getRange()}" var="range">
-                <a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+                <a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -127,10 +127,10 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
         
     </c:if> 
     <!-- PARENT PROPS -->
-    <c:if test = "${model.getParentProps().size()>0}">
+    <c:if test = "${model.getParentProps(true).size()>0}">
         <h3>Parent properties: </h3>
         
-        <c:forEach items="${model.getParentProps()}" var="prop">         
+        <c:forEach items="${model.getParentProps(true)}" var="prop">         
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
@@ -143,7 +143,7 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
                 <c:otherwise>
                 <tr><td><b>Domain:</b></td><td> 
                 <c:forEach items="${prop.getDomain()}" var="dom">
-                    <a href="${dom}">${OntData.ontMod.shortForm(dom)}</a>&nbsp; 
+                    <a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -155,7 +155,7 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
                 <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> 
                 <c:forEach items="${prop.getRange()}" var="range">
-                <a href="${range}">${OntData.ontMod.shortForm(range)}</a>&nbsp; 
+                <a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>

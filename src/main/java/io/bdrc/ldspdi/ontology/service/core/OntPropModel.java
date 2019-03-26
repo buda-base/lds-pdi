@@ -110,7 +110,7 @@ public class OntPropModel {
     }
 
     public ArrayList<OntPropModel> getAllSubProps(boolean global) throws RestException {
-        ArrayList<OntResource> res = OntData.getSubProps(uri);
+        ArrayList<OntResource> res = OntData.getSubProps(uri, global);
         ArrayList<OntPropModel> list = new ArrayList<>();
         for (OntResource r : res) {
             list.add(new OntPropModel(r.getURI(), global));
@@ -119,7 +119,7 @@ public class OntPropModel {
     }
 
     public ArrayList<OntPropModel> getParentProps(boolean global) throws RestException {
-        ArrayList<OntResource> res = OntData.getParentProps(uri);
+        ArrayList<OntResource> res = OntData.getParentProps(uri, global);
         ArrayList<OntPropModel> list = new ArrayList<>();
         for (OntResource r : res) {
             if (r != null && r.isURIResource()) {

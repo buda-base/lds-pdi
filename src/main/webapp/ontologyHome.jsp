@@ -50,12 +50,12 @@
 
 <!-- PREFIXES -->
 <a name="prefixes"></a> 
-<p style="text-align:center;font-size:20px;"><b>${OntData.getNumPrefixes()} Prefixes</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getNumPrefixes(false)} Prefixes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>prefix</th><th>name space</th></tr>
-<c:forEach items="${OntData.getPrefixMap().keySet()}" var="k">
+<c:forEach items="${OntData.getPrefixMap(false).keySet()}" var="k">
     <c:set var="val" value="${k}"/>
-    <tr><td>${k}:</td><td>${OntData.getPrefixMap().get(val)}</td></tr>
+    <tr><td>${k}:</td><td>${OntData.getPrefixMap(false).get(val)}</td></tr>
 </c:forEach> 
 </table> 
 
