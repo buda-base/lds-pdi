@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.EntityTag;
 
@@ -81,21 +82,27 @@ public class OntData implements Runnable {
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
-                System.out.println("Url=" + url);
                 log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
+                OntModelSpec oms1 = new OntModelSpec(OntModelSpec.OWL_MEM);
+                OntDocumentManager odm1 = new OntDocumentManager();
+                odm1.setProcessImports(false);
+                oms1.setDocumentManager(odm1);
                 Model tmp = ModelFactory.createDefaultModel();
-                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
+                OntModel om = ModelFactory.createOntologyModel(oms1, tmp);
                 om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                Set<String> l = om.listImportedOntologyURIs();
+                for (String s : l) {
+                    System.out.println("Import ignored : " + s);
+                }
                 ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
                 // md.add(tmp);
             }
             // ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            ontAllMod.write(System.out, "TURTLE");
-            System.out.println("Full Model size : " + ontAllMod.size());
+            // ontAllMod.write(System.out, "TURTLE");
 
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -103,8 +110,6 @@ public class OntData implements Runnable {
     }
 
     public static void addOntModelByName(String name, OntModel om) {
-        System.out.println("Adding Model by name : " + name);
-        om.write(System.out, "RDFXML");
         models.put(name, om);
     }
 

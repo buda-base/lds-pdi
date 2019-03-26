@@ -41,6 +41,17 @@
 <td style="vertical-align:middle;text-align:center;font-size:28px">Buddhist Digital Resource Center - Ontology homepage<br></td>
 </tr>
 </table>
+
+<c:if test = "${OntData.ontMod.listImportedOntologyURIs().size()>0}">
+<p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
+<table style="width:55%;margin:auto">
+<c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
+<tr><td><a href="${i}">${i}</a></td></tr>
+</c:forEach>
+</table>
+</c:if>
+
+<p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
 <a href="#prefixes">Prefixes / </a>
 <a href="#root">Root classes / </a>
