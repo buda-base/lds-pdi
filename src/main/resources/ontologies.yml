@@ -151,7 +151,7 @@ ontologies:
 #OutlineType ontology
    - name : 'OutlineType'
      baseuri: 'http://purl.bdrc.io/ontology/adm/types/OutlineType/'
-     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/adm/types/license_types.ttl'
+     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/repair/adm/types/outline_types.ttl'
      type: 'rdfs'
      endpoint: '/ontology/adm/types/OutlineType'
      graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
