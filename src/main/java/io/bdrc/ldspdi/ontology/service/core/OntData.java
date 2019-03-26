@@ -74,6 +74,11 @@ public class OntData implements Runnable {
             modelsBase = new HashMap<>();
             ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
             Model md = ModelFactory.createDefaultModel();
+            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            OntDocumentManager odm = new OntDocumentManager();
+            odm.setProcessImports(false);
+            oms.setDocumentManager(odm);
+            ontAllMod = ModelFactory.createOntologyModel(oms, md);
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
                 System.out.println("Url=" + url);
@@ -81,17 +86,14 @@ public class OntData implements Runnable {
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel();
-                OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-                OntDocumentManager odm = new OntDocumentManager();
-                odm.setProcessImports(false);
-                oms.setDocumentManager(odm);
                 OntModel om = ModelFactory.createOntologyModel(oms, tmp);
                 om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
-                md.add(tmp);
+                // md.add(tmp);
             }
-            ontAllMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, md);
+            // ontAllMod = ModelFactory.createOntologyModel(oms, md);
             ontAllMod.write(System.out, "TURTLE");
             System.out.println("Full Model size : " + ontAllMod.size());
 
