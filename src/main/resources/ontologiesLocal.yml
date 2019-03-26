@@ -19,14 +19,7 @@ ontologies:
      fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/adm/admin.ttl'
      type: 'rdfs'
      endpoint: '/ontology/admin'
-     graph: 'http://localhost:8080/ontology/core/ontologySchema'
-#global ontology
-   - name : 'global'
-     baseuri: 'http://localhost:8080/ontology/global/'
-     fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/global.ttl'
-     type: 'rdfs'
-     endpoint: '/ontology/global'
-     graph: 'http://localhost:8080/ontology/ext/ontologySchema'         
+     graph: 'http://localhost:8080/ontology/core/ontologySchema'    
 # TYPES ontologies
 #Binding ontology
    - name : 'Binding'

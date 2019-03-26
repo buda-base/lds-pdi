@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -35,7 +34,6 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
  *
@@ -49,42 +47,44 @@ public class OntClassModel {
     protected String uri;
     protected OntClass clazz;
 
-    public OntClassModel(String uri) {
+    public OntClassModel(String uri, boolean global) {
         this.uri = uri;
-        clazz = OntData.ontMod.getOntClass(uri);
+        if (global) {
+            clazz = OntData.ontAllMod.getOntClass(uri);
+        } else {
+            clazz = OntData.ontMod.getOntClass(uri);
+        }
     }
 
     public OntClassModel(OntClass c) {
 
         this.uri = c.getURI();
         clazz = c;
-   }
+    }
 
     public boolean isPresent() {
-        return clazz!=null;
+        return clazz != null;
     }
 
     public boolean isRootClassModel() {
-    	return OntData.getOntRootClasses().contains(this);
+        return OntData.getOntRootClasses().contains(this);
     }
 
     public String getUri() {
         return uri;
     }
 
-
     public String getId() {
         return OntData.ontMod.shortForm(uri);
     }
-
 
     public boolean hasParent() {
         return clazz.getSuperClass() != null;
     }
 
-    public ArrayList<OntClassModel> getParent() {
+    public ArrayList<OntClassModel> getParent(boolean global) {
         if (clazz.getSuperClass() != null) {
-            return new OntClassParent(uri).getParents();
+            return new OntClassParent(uri).getParents(global);
         }
         return null;
     }
@@ -94,11 +94,11 @@ public class OntClassModel {
         List<OntClassModel> models = new ArrayList<>();
 
         for (OntClass c : subs) {
-            if(!c.isAnon()) {
+            if (!c.isAnon()) {
                 models.add(new OntClassModel(c));
             }
         }
-        Collections.sort(models,OntData.ontClassModelComparator);
+        Collections.sort(models, OntData.ontClassModelComparator);
         return models;
     }
 
@@ -106,20 +106,20 @@ public class OntClassModel {
         List<OntClass> sups = clazz.listSuperClasses(true).toList();
         List<OntClassModel> models = new ArrayList<>();
         for (OntClass c : sups) {
-            if(!c.isAnon()) {
+            if (!c.isAnon()) {
                 models.add(new OntClassModel(c));
             }
         }
-        Collections.sort(models,OntData.ontClassModelComparator);
+        Collections.sort(models, OntData.ontClassModelComparator);
         return models;
     }
 
     @SuppressWarnings("unchecked")
     public List<Individual> getIndividuals() {
-        ExtendedIterator<Individual> it=(ExtendedIterator<Individual>)clazz.listInstances(true);
+        ExtendedIterator<Individual> it = (ExtendedIterator<Individual>) clazz.listInstances(true);
 
         List<Individual> inds = it.toList();
-        Collections.sort(inds,OntData.individualComparator);
+        Collections.sort(inds, OntData.individualComparator);
         return inds;
     }
 
@@ -137,7 +137,7 @@ public class OntClassModel {
         List<String[]> labels = new ArrayList<>();
 
         for (RDFNode node : clazz.listLabels(null).toList()) {
-            labels.add(new String[]{node.asLiteral().getString(),node.asLiteral().getLanguage()});
+            labels.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
         }
         return labels;
     }
@@ -155,20 +155,20 @@ public class OntClassModel {
     public List<String[]> getLangComments() {
         List<String[]> comments = new ArrayList<>();
         for (RDFNode node : clazz.listComments(null).toList()) {
-            comments.add(new String[]{node.asLiteral().getString(),node.asLiteral().getLanguage()});
+            comments.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
         }
         return comments;
     }
 
-    public List<OntProperty> getAllClassProperties(){
-        ArrayList<OntProperty> list=new ArrayList<>();
-        Triple tp=new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(),ResourceFactory.createResource(uri).asNode());
+    public List<OntProperty> getAllClassProperties() {
+        ArrayList<OntProperty> list = new ArrayList<>();
+        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(), ResourceFactory.createResource(uri).asNode());
         ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
         while (ext.hasNext()) {
-            Triple tpp=ext.next();
-            System.out.println("TRIPLE >>> "+tpp);
+            Triple tpp = ext.next();
+            System.out.println("TRIPLE >>> " + tpp);
             String st = tpp.getSubject().getURI();
-            OntProperty prop=OntData.ontMod.getOntProperty(st);
+            OntProperty prop = OntData.ontMod.getOntProperty(st);
             list.add(prop);
         }
         return list;

@@ -195,8 +195,8 @@ public class OntData implements Runnable {
         return qexec.execDescribe();
     }
 
-    public static ArrayList<OntProperty> getAllClassProps(String iri) {
-        OntClassModel clModel = new OntClassModel(iri);
+    public static ArrayList<OntProperty> getAllClassProps(String iri, boolean global) {
+        OntClassModel clModel = new OntClassModel(iri, global);
         final ArrayList<OntProperty> list = new ArrayList<>();
         if (clModel.clazz != null) {
             String qy = "";

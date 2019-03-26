@@ -329,11 +329,11 @@ public class PublicDataResource {
             if (builder == null) {
                 if (OntData.isClass(info.getAbsolutePath().toString(), true)) {
                     log.info("CLASS>>" + info.getAbsolutePath().toString());
-                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
+                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString(), true)));
                 } else {
                     log.info("PROP>>" + info.getAbsolutePath().toString());
-                    builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(info.getAbsolutePath().toString())));
-                    System.out.println("OntPropModel >>" + new OntPropModel(info.getAbsolutePath().toString()));
+                    builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(info.getAbsolutePath().toString(), true)));
+                    System.out.println("OntPropModel >>" + new OntPropModel(info.getAbsolutePath().toString(), true));
                 }
             }
         }
