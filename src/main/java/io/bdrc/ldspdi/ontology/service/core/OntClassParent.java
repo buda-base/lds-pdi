@@ -18,16 +18,22 @@ public class OntClassParent {
     boolean isAnonymous;
     OntClass sup3r;
     String uri;
+    boolean global;
 
     final static Logger log = LoggerFactory.getLogger(OntClassParent.class.getName());
 
-    public OntClassParent(String uri) {
+    public OntClassParent(String uri, boolean global) {
         this.uri = uri;
-        sup3r = OntData.ontMod.getOntClass(uri).getSuperClass();
+        this.global = global;
+        if (global) {
+            sup3r = OntData.ontAllMod.getOntClass(uri).getSuperClass();
+        } else {
+            sup3r = OntData.ontMod.getOntClass(uri).getSuperClass();
+        }
         isAnonymous = sup3r.isAnon();
     }
 
-    public ArrayList<OntClassModel> getParents(boolean global) {
+    public ArrayList<OntClassModel> getParents() {
         ArrayList<OntClassModel> list = new ArrayList<>();
         if (isAnonymous) {
             UnionClass uc = sup3r.asUnionClass();

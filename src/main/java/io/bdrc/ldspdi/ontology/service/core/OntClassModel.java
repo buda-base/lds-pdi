@@ -75,7 +75,7 @@ public class OntClassModel {
     }
 
     public String getId() {
-        return OntData.ontMod.shortForm(uri);
+        return OntData.ontAllMod.shortForm(uri);
     }
 
     public boolean hasParent() {
@@ -84,7 +84,7 @@ public class OntClassModel {
 
     public ArrayList<OntClassModel> getParent(boolean global) {
         if (clazz.getSuperClass() != null) {
-            return new OntClassParent(uri).getParents(global);
+            return new OntClassParent(uri, global).getParents();
         }
         return null;
     }
