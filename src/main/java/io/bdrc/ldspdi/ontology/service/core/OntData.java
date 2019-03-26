@@ -68,7 +68,7 @@ public class OntData implements Runnable {
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
     final static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
-    static {
+    public static void init() {
         try {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
