@@ -278,8 +278,8 @@ public class PublicDataResource {
         if (isBase) {
             OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
             OntData.setOntModelWithBase(baseUri);
+            // Using single ontology model
             OntModel mod = OntData.ontMod;
-            mod.write(System.out, "TURTLE");
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -323,68 +323,22 @@ public class PublicDataResource {
                 }
             }
         } else {
-            // if not a base uri, checking if a valid ontology matches the baseUri part of
-            // the request
-            // if so : serving properties or class html pages
-            OntParams ont = ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri() + base + "/");
-            if (ont != null) {
-                // OntData.getOntModelByName(ont.getName());
-                if (OntData.ontAllMod.getOntResource(info.getAbsolutePath().toString()) == null) {
-                    throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for" + info.getAbsolutePath().toString()));
+            if (OntData.ontAllMod.getOntResource(info.getAbsolutePath().toString()) == null) {
+                throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for" + info.getAbsolutePath().toString()));
+            }
+            if (builder == null) {
+                if (OntData.isClass(info.getAbsolutePath().toString(), true)) {
+                    log.info("CLASS>>" + info.getAbsolutePath().toString());
+                    builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
+                } else {
+                    log.info("PROP>>" + info.getAbsolutePath().toString());
+                    builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(info.getAbsolutePath().toString())));
+                    System.out.println("OntPropModel >>" + new OntPropModel(info.getAbsolutePath().toString()));
                 }
-                if (builder == null) {
-                    if (OntData.isClass(info.getAbsolutePath().toString(), true)) {
-                        log.info("CLASS>>" + info.getAbsolutePath().toString());
-                        builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
-                    } else {
-                        log.info("PROP>>" + info.getAbsolutePath().toString());
-                        builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(info.getAbsolutePath().toString())));
-                        System.out.println("OntPropModel >>" + new OntPropModel(info.getAbsolutePath().toString()));
-                    }
-                }
-            } else {
-                throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ontparams is null for " + info.getBaseUri() + base + "/"));
             }
         }
         return builder.build();
     }
-
-    /*
-     * @GET
-     * 
-     * @Path("/ontology/{namespace}")
-     * 
-     * @JerseyCacheControl() public Response getOntologySerialization(@Context final
-     * UriInfo info, @Context Request request, @HeaderParam("Accept") String format)
-     * throws IOException { ResponseBuilder builder = null; String URI =
-     * info.getRequestUri().toURL().toString(); System.out.println("URI >> " + URI);
-     * if (format != null) { Variant variant =
-     * request.selectVariant(MediaTypeUtils.resVariants); if (variant == null) {
-     * return Response.status(406).build(); } String url =
-     * ServiceConfig.getConfig().getOntologyByBase(URI).getFileurl();
-     * HttpURLConnection connection = (HttpURLConnection) new
-     * URL(url).openConnection(); InputStream input = connection.getInputStream();
-     * OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-     * om.read(input, URI, "TURTLE"); input.close(); MediaType mediaType =
-     * variant.getMediaType(); // browser request : serving html page if
-     * (mediaType.equals(MediaType.TEXT_HTML_TYPE)) { return
-     * Response.status(406).build(); } else {
-     * 
-     * final String JenaLangStr =
-     * MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType))
-     * ; final StreamingOutput stream = new StreamingOutput() {
-     * 
-     * @Override public void write(OutputStream os) throws IOException,
-     * WebApplicationException { if (JenaLangStr == "STTL") { final RDFWriter writer
-     * = TTLRDFWriter.getSTTLRDFWriter(om, URI); writer.output(os); } else {
-     * org.apache.jena.rdf.model.RDFWriter wr = om.getWriter(JenaLangStr); if
-     * (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) { wr.setProperty("xmlbase",
-     * URI); } // here using the absolute path as baseUri since it has been
-     * recognized // as the base uri of a declared ontology (in ontologies.yml file)
-     * wr.write(om, os, URI); } } }; builder = Response.ok(stream,
-     * MediaTypeUtils.getMimeFromExtension(MediaTypeUtils.getExtFromMime(mediaType))
-     * ); } } return null; }
-     */
 
     @GET
     @Path("/{base : .*}/{other}.{ext}")

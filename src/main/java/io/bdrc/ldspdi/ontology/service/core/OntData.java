@@ -73,12 +73,7 @@ public class OntData implements Runnable {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
             ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
-            OntModelSpec oSpec = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-            /*
-             * OntDocumentManager docMgr = new OntDocumentManager();
-             * docMgr.setProcessImports(false); oSpec.setDocumentManager(docMgr);
-             */
+            Model md = ModelFactory.createDefaultModel();
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
                 System.out.println("Url=" + url);
@@ -94,11 +89,11 @@ public class OntData implements Runnable {
                 om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
-                m.add(om);
+                md.add(tmp);
             }
-            ontAllMod = m;
-            // init with the full agregation of all ontologies models ?
-            // ontMod=ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+            ontAllMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, md);
+            ontAllMod.write(System.out, "TURTLE");
+            System.out.println("Full Model size : " + ontAllMod.size());
 
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
