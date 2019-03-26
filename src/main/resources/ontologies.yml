@@ -171,7 +171,7 @@ ontologies:
      graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
 #Unknown ontology
    - name : 'unknown'
-     baseuri: 'http://purl.bdrc.io/ontology/core/unknown/'
+     baseuri: 'http://purl.bdrc.io/ontology/core/Unknown/'
      fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/core/unknown-entities.ttl'
      type: 'rdfs'
      endpoint: ''
@@ -179,7 +179,7 @@ ontologies:
 # ROLES ontologies
 #Creators ontology
    - name : 'creator'
-     baseuri: 'http://purl.bdrc.io/ontology/roles/creator/'
+     baseuri: 'http://purl.bdrc.io/ontology/roles/Creator/'
      fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/roles/creators.ttl'
      type: 'rdfs'
      endpoint: ''
