@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.EntityTag;
 
@@ -67,7 +66,7 @@ public class OntData implements Runnable {
     public static HashMap<String, OntModel> models = new HashMap<>();
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-    final String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    final static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     static {
         try {
@@ -85,25 +84,16 @@ public class OntData implements Runnable {
                 log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
-                OntModelSpec oms1 = new OntModelSpec(OntModelSpec.OWL_MEM);
-                OntDocumentManager odm1 = new OntDocumentManager();
-                odm1.setProcessImports(false);
-                oms1.setDocumentManager(odm1);
                 Model tmp = ModelFactory.createDefaultModel();
-                OntModel om = ModelFactory.createOntologyModel(oms1, tmp);
+                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
                 om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
-                Set<String> l = om.listImportedOntologyURIs();
-                for (String s : l) {
-                    System.out.println("Import ignored : " + s);
-                }
                 ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
-                // md.add(tmp);
             }
-            // ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            // ontAllMod.write(System.out, "TURTLE");
-
+            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
+            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
+            readGithubJsonLDContext();
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
         }
@@ -161,26 +151,29 @@ public class OntData implements Runnable {
         try {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
-            final String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
             ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
-            Model m = ModelFactory.createDefaultModel();
+            Model md = ModelFactory.createDefaultModel();
+            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            OntDocumentManager odm = new OntDocumentManager();
+            odm.setProcessImports(false);
+            oms.setDocumentManager(odm);
+            ontAllMod = ModelFactory.createOntologyModel(oms, md);
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
-                System.out.println("Url=" + url);
                 log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
-                Model tmp = ModelFactory.createDefaultModel().read(stream, "", "TURTLE");
-                m.add(tmp);
-                OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tmp);
+                OntModelSpec oms1 = new OntModelSpec(OntModelSpec.OWL_MEM);
+                Model tmp = ModelFactory.createDefaultModel();
+                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
+                om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
-            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), m);
-            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("default").getGraph());
+            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
+            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
             readGithubJsonLDContext();
-            // purge models map to force reloading of updated models
-            ontMod = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
 
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
