@@ -169,9 +169,9 @@ ontologies:
      type: 'rdfs'
      endpoint: ''
      graph: 'http://purl.bdrc.io/ontology/ext/ontologySchema'
-#Unkown ontology
+#Unknown ontology
    - name : 'unknown'
-     baseuri: 'http://purl.bdrc.io/ontology/adm/unknown/'
+     baseuri: 'http://purl.bdrc.io/ontology/core/unknown/'
      fileurl: 'https://raw.githubusercontent.com/buda-base/owl-schema/master/core/unknown-entities.ttl'
      type: 'rdfs'
      endpoint: ''
