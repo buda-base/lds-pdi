@@ -328,12 +328,12 @@ public class PublicDataResource {
             // if so : serving properties or class html pages
             OntParams ont = ServiceConfig.getConfig().getOntologyByBase(info.getBaseUri() + base + "/");
             if (ont != null) {
-                OntData.getOntModelByName(ont.getName());
-                if (OntData.ontMod.getOntResource(info.getAbsolutePath().toString()) == null) {
+                // OntData.getOntModelByName(ont.getName());
+                if (OntData.ontAllMod.getOntResource(info.getAbsolutePath().toString()) == null) {
                     throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for" + info.getAbsolutePath().toString()));
                 }
                 if (builder == null) {
-                    if (OntData.isClass(info.getAbsolutePath().toString())) {
+                    if (OntData.isClass(info.getAbsolutePath().toString(), true)) {
                         log.info("CLASS>>" + info.getAbsolutePath().toString());
                         builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(info.getAbsolutePath().toString())));
                     } else {

@@ -55,6 +55,7 @@ public class OntData implements Runnable {
 
     public static InfModel infMod;
     public static OntModel ontMod;
+    public static OntModel ontAllMod;
     public static OntModel ontAuthMod;
     public static OWLPropsCharacteristics owlCharacteristics;
     public final static Logger log = LoggerFactory.getLogger(OntData.class.getName());
@@ -72,7 +73,12 @@ public class OntData implements Runnable {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
             ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
-            Model m = ModelFactory.createDefaultModel();
+            OntModelSpec oSpec = new OntModelSpec(OntModelSpec.OWL_MEM);
+            OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+            /*
+             * OntDocumentManager docMgr = new OntDocumentManager();
+             * docMgr.setProcessImports(false); oSpec.setDocumentManager(docMgr);
+             */
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
                 System.out.println("Url=" + url);
@@ -90,6 +96,7 @@ public class OntData implements Runnable {
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
                 m.add(om);
             }
+            ontAllMod = m;
             // init with the full agregation of all ontologies models ?
             // ontMod=ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
 
@@ -298,9 +305,15 @@ public class OntData implements Runnable {
         return map;
     }
 
-    public static boolean isClass(final String uri) {
-        if (ontMod.getOntResource(uri) != null) {
-            return ontMod.getOntResource(uri).isClass();
+    public static boolean isClass(final String uri, boolean global) {
+        OntModel md = null;
+        if (global) {
+            md = ontAllMod;
+        } else {
+            md = ontMod;
+        }
+        if (md.getOntResource(uri) != null) {
+            return md.getOntResource(uri).isClass();
         } else {
             return false;
         }
