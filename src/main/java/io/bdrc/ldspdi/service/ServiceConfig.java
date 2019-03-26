@@ -68,9 +68,9 @@ public class ServiceConfig {
 
     @SuppressWarnings("unchecked")
     public static Config loadOntologies() throws JsonParseException, JsonMappingException, IOException {
+        InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ontologies.yml");
         // InputStream input =
-        // ServiceConfig.class.getClassLoader().getResourceAsStream("ontologies.yml");
-        InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ontologiesLocal.yml");
+        // ServiceConfig.class.getClassLoader().getResourceAsStream("ontologiesLocal.yml");
         Yaml yaml = new Yaml();
         config = yaml.loadAs(input, Config.class);
         input.close();
