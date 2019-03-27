@@ -98,7 +98,9 @@ public class OntData implements Runnable {
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
             infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
-            QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
+            // QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,
+            // fusekiUrl.lastIndexOf('/')) + "/data",
+            // ServiceConfig.getConfig().getOntology("core").getGraph());
             readGithubJsonLDContext();
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);

@@ -74,9 +74,9 @@
 <a name="root"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getNumRootClasses()} simple root classes</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>local name</th><th>full URI</th></tr>
+<tr><th>local name</th></tr>
 <c:forEach items="${OntData.getOntRootClasses()}" var="root">    
-    <tr><td>${root.getId()}</td><td><a href="${root.getUri()}">${root.getUri()}</a></td></tr>
+    <tr><td><a href="${root.getUri()}">${root.getId()}</a></td></tr>
 </c:forEach> 
 </table> 
 
@@ -84,9 +84,9 @@
 <a name="all"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getAllClasses().size()} classes</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>local name</th><th>full URI</th></tr>
+<tr><th>local name</th></tr>
 <c:forEach items="${OntData.getAllClasses()}" var="cls">    
-    <tr><td>${cls.getLocalName()}</td><td><a href="${cls.getURI()}">${cls.getURI()}</a></td></tr>
+    <tr><td><a href="${cls.getURI()}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
 </c:forEach> 
 </table>
 
@@ -94,9 +94,9 @@
 <a name="allprops"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getAllProps().size()} properties</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>local name</th><th>full URI</th><th>property type</th></tr>
+<tr><th>local name</th><th>property type</th></tr>
 <c:forEach items="${OntData.getAllProps()}" var="prop">    
-    <tr><td>${prop.getLocalName()}</td><td><a href="${prop.getURI()}">${prop.getURI()}</a></td>
+    <tr><td><a href="${prop.getURI()}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
     <td><c:choose>
                 <c:when test="${prop.isObjectProperty() || prop.isInverseFunctionalProperty()}">
                 ObjectProperty
@@ -116,9 +116,9 @@
 <a name="indiv"></a>
 <p style="text-align:center;font-size:20px;"><b>${OntData.getAllIndividuals().size()} individuals</b></p>
 <table style="width:55%;margin:auto">
-<tr><th>Local name</th><th>Full URI</th><th> Class</th></tr>
+<tr><th>Local name</th><th> Class</th></tr>
 <c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
-    <tr><td>${ind.getLocalName()}</td><td><a href="${ind.getURI()}">${ind.getURI()}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
+    <tr><td><a href="${ind.getURI()}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
 </body>

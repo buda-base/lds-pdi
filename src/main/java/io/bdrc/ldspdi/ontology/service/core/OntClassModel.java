@@ -82,6 +82,10 @@ public class OntClassModel {
         return clazz.getSuperClass() != null;
     }
 
+    public String getShortName() {
+        return clazz.getLocalName();
+    }
+
     public ArrayList<OntClassModel> getParent(boolean global) {
         if (clazz.getSuperClass() != null) {
             return new OntClassParent(uri, global).getParents();
