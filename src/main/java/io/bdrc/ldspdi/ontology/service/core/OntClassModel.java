@@ -166,7 +166,6 @@ public class OntClassModel {
         ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
         while (ext.hasNext()) {
             Triple tpp = ext.next();
-            System.out.println("TRIPLE >>> " + tpp);
             String st = tpp.getSubject().getURI();
             OntProperty prop = OntData.ontMod.getOntProperty(st);
             list.add(prop);

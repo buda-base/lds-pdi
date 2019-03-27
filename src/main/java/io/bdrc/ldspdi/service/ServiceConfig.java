@@ -107,8 +107,4 @@ public class ServiceConfig {
         return "User-agent: *" + System.lineSeparator() + "Disallow: /";
     }
 
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
-        System.out.println(ServiceConfig.loadOntologies().getOntology("core-shapes"));
-    }
-
 }

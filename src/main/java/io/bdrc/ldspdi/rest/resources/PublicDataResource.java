@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.ByteArrayInputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -69,6 +71,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntParams;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
+import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
@@ -254,14 +257,10 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getExtOntologyHomePage(@Context final UriInfo info, @Context Request request, @HeaderParam("Accept") String format, @PathParam("base") String base, @PathParam("other") String other) throws RestException, IOException {
         ResponseBuilder builder = null;
-        System.out.println("getExtOntologyHomePage WAS CALLED WITH >>" + base + "/" + other + " and format :" + format);
-        // System.out.println(ServiceConfig.getConfig().getOntologies());
-        System.out.println("ONT PARAMS with base>> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString()) + " base >>" + info.getAbsolutePath().toString());
-        System.out.println("ONT PARAMS full path >> " + ServiceConfig.getConfig().getOntologyByBase(info.getAbsolutePath().toString() + other) + " base >>" + info.getAbsolutePath().toString() + other);
+        log.info("getExtOntologyHomePage WAS CALLED WITH >>" + base + "/" + other + " and format :" + format);
         boolean isBase = false;
         String baseUri = "";
         String tmp = info.getAbsolutePath().toString();
-        System.out.println("TMP BaseUri path >> " + tmp);
         if (!tmp.endsWith("/")) {
             tmp = tmp + "/";
         }
@@ -273,7 +272,6 @@ public class PublicDataResource {
             baseUri = info.getAbsolutePath().toString() + other;
             isBase = true;
         }
-        System.out.println("BaseUri >> " + baseUri + " is Base>>" + isBase);
         // Is the full request uri a baseuri?
         if (isBase) {
             OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
@@ -287,15 +285,21 @@ public class PublicDataResource {
                     return Response.status(406).build();
                 }
                 String url = ServiceConfig.getConfig().getOntologyByBase(baseUri).getFileurl();
-                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                InputStream input = connection.getInputStream();
+                // using cache if available
+                byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
+                if (byteArr == null) {
+                    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                    InputStream input = connection.getInputStream();
+                    byteArr = IOUtils.toByteArray(input);
+                    input.close();
+                    ResultsCache.addToCache(byteArr, url.hashCode());
+                }
                 OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
                 OntDocumentManager odm = new OntDocumentManager();
                 odm.setProcessImports(false);
                 oms.setDocumentManager(odm);
                 OntModel om = ModelFactory.createOntologyModel(oms);
-                om.read(input, baseUri, "TURTLE");
-                input.close();
+                om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
@@ -333,7 +337,6 @@ public class PublicDataResource {
                 } else {
                     log.info("PROP>>" + info.getAbsolutePath().toString());
                     builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(info.getAbsolutePath().toString(), true)));
-                    System.out.println("OntPropModel >>" + new OntPropModel(info.getAbsolutePath().toString(), true));
                 }
             }
         }
@@ -347,7 +350,7 @@ public class PublicDataResource {
     public Response getOntologyResourceAsFile(@Context final UriInfo info, @Context Request request, @PathParam("base") String base, @PathParam("other") String other, @PathParam("ext") String ext) throws RestException {
         String res = info.getAbsolutePath().toString();
         res = res.substring(0, res.lastIndexOf('.')) + "/";
-        System.out.println("RES >>>>> " + res);
+        log.info("In getOntologyResourceAsFile(), RES = " + res);
         ResponseBuilder builder = null;
         final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
         if (JenaLangStr == null) {

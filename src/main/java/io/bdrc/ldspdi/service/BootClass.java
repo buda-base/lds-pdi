@@ -58,7 +58,6 @@ public class BootClass implements ServletContextListener {
             HashMap<String, String> params = new HashMap<>();
             params.put("queryPath", queryPath);
             params.put("fusekiUrl", fuseki);
-            System.out.println("FUSEKI URL >>" + fuseki);
             params.put("propertyPath", propertyPath);
             ResultsCache.init();
             GitService.update(queryPath);

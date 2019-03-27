@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -46,6 +48,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -81,12 +84,15 @@ public class OntData implements Runnable {
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             for (String name : names) {
                 String url = ServiceConfig.getConfig().getOntology(name).fileurl;
-                log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
+                log.info("URL >> " + url);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
                 Model tmp = ModelFactory.createDefaultModel();
                 OntModel om = ModelFactory.createOntologyModel(oms, tmp);
-                om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                byte[] byteArr = IOUtils.toByteArray(stream);
+                om.read(new ByteArrayInputStream(byteArr), ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                // caching ttl file as byte array
+                ResultsCache.addToCache(byteArr, url.hashCode());
                 ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
@@ -163,10 +169,12 @@ public class OntData implements Runnable {
                 log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 InputStream stream = connection.getInputStream();
-                OntModelSpec oms1 = new OntModelSpec(OntModelSpec.OWL_MEM);
                 Model tmp = ModelFactory.createDefaultModel();
                 OntModel om = ModelFactory.createOntologyModel(oms, tmp);
-                om.read(stream, ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                byte[] byteArr = IOUtils.toByteArray(stream);
+                om.read(new ByteArrayInputStream(byteArr), ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
+                // caching ttl file as byte array
+                ResultsCache.addToCache(byteArr, url.hashCode());
                 ontAllMod.add(om);
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
