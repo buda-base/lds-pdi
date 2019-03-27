@@ -56,9 +56,11 @@ public class OntPropModel {
         }
         comments = new ArrayList<>();
         commentsLang = new ArrayList<>();
-        for (RDFNode node : prop.listComments(null).toList()) {
-            comments.add(node.toString());
-            commentsLang.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
+        if (prop != null) {
+            for (RDFNode node : prop.listComments(null).toList()) {
+                comments.add(node.toString());
+                commentsLang.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
+            }
         }
         StmtIterator it = null;
         if (global) {
