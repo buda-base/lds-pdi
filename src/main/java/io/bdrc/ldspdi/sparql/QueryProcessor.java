@@ -132,7 +132,7 @@ public class QueryProcessor {
         }
         log.info("Service fuseki >> " + fusekiUrl);
         log.info("Graph >> " + graph);
-        log.info("InfModel Size >> " + mod.size());
+        log.info("InfModel Size >> " + mod.listStatements().toSet().size());
         DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         access.putModel(graph, mod);
     }
@@ -217,5 +217,9 @@ public class QueryProcessor {
         System.out.println(m.size());
         qe.close();
         m.write(System.out, "TURTLE");
+
+        DatasetAccessor access = DatasetAccessorFactory.createHTTP("http://buda1.bdrc.io:13180/fuseki/bdrcrw/data");
+        access.deleteModel("http://purl.bdrc.io/ontology/ext/authSchema");
+
     }
 }

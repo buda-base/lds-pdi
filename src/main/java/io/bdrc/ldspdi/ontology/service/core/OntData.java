@@ -41,10 +41,12 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.reasoner.ReasonerRegistry;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.rulesys.RDFSRuleReasonerFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.ReasonerVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,13 +182,15 @@ public class OntData implements Runnable {
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
                 stream.close();
             }
-            System.out.println("Global model size :" + ontAllMod.size());
-            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
-            System.out.println("Inferred Global model size :" + infMod.size());
+            Resource config = ModelFactory.createDefaultModel().createResource().addProperty(ReasonerVocabulary.PROPsetRDFSLevel, "simple");
+            Reasoner reasoner = RDFSRuleReasonerFactory.theInstance().create(config);
+            log.info("Global model size :" + ontAllMod.size());
+            infMod = ModelFactory.createInfModel(reasoner, ontAllMod);
+            log.info("Inferred Global model size :" + infMod.listStatements().toList().size());
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
-            System.out.println("Auth model size :" + getOntModelByName("auth").size());
-            InfModel infModAuth = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), getOntModelByName("auth"));
-            System.out.println("Inferred Auth model size :" + infMod.size());
+            log.info("Auth model size :" + getOntModelByName("auth").size());
+            InfModel infModAuth = ModelFactory.createInfModel(reasoner, getOntModelByName("auth"));
+            log.info("Inferred Auth model size :" + infModAuth.listStatements().toList().size());
             QueryProcessor.updateOntology(infModAuth, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("auth").getGraph());
             readGithubJsonLDContext();
 
