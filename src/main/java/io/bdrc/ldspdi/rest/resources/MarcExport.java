@@ -182,7 +182,8 @@ public class MarcExport {
         titleLocalNameToMarcInfo.put("WorkTitlePortion", new MarcInfo(11, '0', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
-        f040.addSubfield(factory.newSubfield('e', "rda"));
+        // Columbia doesn't want RDA here
+        //f040.addSubfield(factory.newSubfield('e', "rda"));
         f040.addSubfield(factory.newSubfield('e', "NNC"));
         f336.addSubfield(factory.newSubfield('a', "text"));
         f336.addSubfield(factory.newSubfield('b', "txt"));
