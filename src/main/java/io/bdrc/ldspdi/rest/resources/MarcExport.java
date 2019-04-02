@@ -137,7 +137,7 @@ public class MarcExport {
     public static final EwtsConverter ewtsConverter = new EwtsConverter();
 
     // communicated by Columbia, XML leaders don't need addresses
-    public static final String baseLeaderStr = "     nam a22    3ia 4500";
+    public static final String baseLeaderStr = "     nam a2200003ia 4500";
     static final Leader leader = factory.newLeader(baseLeaderStr);
     static final ISBNValidator isbnvalidator = ISBNValidator.getInstance(false);
     final static DateTimeFormatter yymmdd = DateTimeFormatter.ofPattern("yyMMdd");
@@ -368,7 +368,7 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("     o     000 ||");
+        sb.append("     o d   000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
