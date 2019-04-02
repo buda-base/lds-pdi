@@ -52,7 +52,7 @@ public class ServiceConfig {
             input.close();
             /**
              * sets the PROD values of fuseki and queryPath properties Overrides test
-             * queryPath value *
+             * queryPath value
              **/
             Set<String> set = params.keySet();
             for (String st : set) {

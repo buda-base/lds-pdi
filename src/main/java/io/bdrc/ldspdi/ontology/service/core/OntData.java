@@ -97,10 +97,6 @@ public class OntData implements Runnable {
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
             }
-            infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
-            // QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0,
-            // fusekiUrl.lastIndexOf('/')) + "/data",
-            // ServiceConfig.getConfig().getOntology("core").getGraph());
             readGithubJsonLDContext();
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -177,13 +173,20 @@ public class OntData implements Runnable {
                 om.read(new ByteArrayInputStream(byteArr), ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
                 // caching ttl file as byte array
                 ResultsCache.addToCache(byteArr, url.hashCode());
-                ontAllMod.add(om);
+                if (!name.equals("auth")) {
+                    ontAllMod.add(om);
+                }
                 OntData.addOntModelByName(name, om);
                 OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
+                stream.close();
             }
+            System.out.println("Global model size :" + ontAllMod.size());
             infMod = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), ontAllMod);
+            System.out.println("Inferred Global model size :" + infMod.size());
             QueryProcessor.updateOntology(infMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
+            System.out.println("Auth model size :" + getOntModelByName("auth").size());
             InfModel infModAuth = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), getOntModelByName("auth"));
+            System.out.println("Inferred Auth model size :" + infMod.size());
             QueryProcessor.updateOntology(infModAuth, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("auth").getGraph());
             readGithubJsonLDContext();
 
