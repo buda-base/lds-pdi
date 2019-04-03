@@ -463,6 +463,7 @@ public class MarcExport {
                 final String name880 = get880String(names.get(0));
                 if (name880 != null) {
                     sb880.append(name880);
+                    i880.addScript("Tibt");
                     has880 = true;
                 }
             } else if (!otherNames.isEmpty()) {
@@ -471,6 +472,7 @@ public class MarcExport {
                 final String name880 = get880String(otherNames.get(0));
                 if (name880 != null) {
                     sb880.append(name880);
+                    i880.addScript("Tibt");
                     has880 = true;
                 }
             }
@@ -484,6 +486,7 @@ public class MarcExport {
                     if (title880 != null) {
                         sb880.append(" / ");
                         sb880.append(title880);
+                        i880.addScript("Tibt");
                     } else {
                         sb880.append(title);
                     }
@@ -605,11 +608,15 @@ public class MarcExport {
     private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880, final List<DataField> list880) {
         // again, we keep titles in order for consistency among marc queries
         final Map<String,List<Literal>> titles = new TreeMap<>();
-        StmtIterator si = main.listProperties(workTitle);
         String subtitleStr = null;
         String subtitleStr880 = null;
         Integer highestPrio = 999;
+        int nbChineseHanzi = 0;
+        int nbChinesePinyin = 0;
+        Literal firstChinesePinyin = null;
+        Literal firstChineseHanzi = null;
         List<Literal> highestPrioList = null;
+        StmtIterator si = main.listProperties(workTitle);
         while (si.hasNext()) {
             final Resource title = si.next().getResource();
             final Resource type = title.getPropertyResourceValue(RDF.type);
@@ -621,6 +628,14 @@ public class MarcExport {
                     subtitleStr = getLangStr(titleLit);
                     subtitleStr880 = get880String(titleLit);
                     continue;
+                }
+                final String lang = titleLit.getLanguage().toLowerCase();
+                if (lang.startsWith("zh-han")) {
+                    firstChineseHanzi = titleLit;
+                    nbChineseHanzi += 1;
+                } else if (lang.startsWith("zh-latn-pinyin")) {
+                    firstChinesePinyin = titleLit;
+                    nbChinesePinyin += 1;
                 }
                 final MarcInfo mi = titleLocalNameToMarcInfo.get(typeLocalName);
                 if (mi == null) {
@@ -639,6 +654,11 @@ public class MarcExport {
                 }
             }
         }
+        if (nbChineseHanzi != 1 || nbChinesePinyin != 1) {
+            firstChineseHanzi = null;
+            firstChinesePinyin = null;
+        }
+        boolean firstChineseDone = false;
         if (highestPrioList == null) {
             // no title...
             return;
@@ -654,14 +674,23 @@ public class MarcExport {
         while (si.hasNext()) {
             authorshipStatement = getLangStr(si.next().getLiteral());
         }
-        final Literal mainTitleL = highestPrioList.get(0);
+        Literal mainTitleL = highestPrioList.get(0);
         highestPrioList.remove(0);
         final DataField f245 = factory.newDataField("245", '0', '0');
-        String mainTitleS880 = get880String(mainTitleL);
+        String mainTitleS880;
+        if (mainTitleL == firstChinesePinyin || mainTitleL == firstChineseHanzi) {
+            mainTitleL = firstChinesePinyin;
+            firstChineseDone = true;
+            mainTitleS880 = firstChineseHanzi.getString();
+            i880.addScript("$1");
+        } else {
+            mainTitleS880 = get880String(mainTitleL);
+        }
         String curi880;
         final DataField f880_main = factory.newDataField("880", '0', '0');
         if (mainTitleS880 != null) {
             curi880 = i880.getNext();
+            i880.addScript("Tibt");
             list880.add(f880_main);
             f245.addSubfield(factory.newSubfield('6', "880-"+curi880));
             f880_main.addSubfield(factory.newSubfield('6', "245-"+curi880));
@@ -708,10 +737,23 @@ public class MarcExport {
             final MarcInfo mi = titleLocalNameToMarcInfo.get(e.getKey());
             final List<Literal> list = e.getValue();
             Collections.sort(list, compbcp);
-            for (final Literal l : list) {
+            for (Literal l : list) {
                 final DataField f246 = factory.newDataField("246", '1', mi.subindex2);
-                String titleS880 = get880String(l);
+                final String titleS880;
+                if (l == firstChinesePinyin || l == firstChineseHanzi) {
+                    if (!firstChineseDone) {
+                        l = firstChinesePinyin;
+                        firstChineseDone = true;
+                        titleS880 = firstChineseHanzi.getString();
+                        i880.addScript("$1");
+                    } else {
+                        continue;
+                    }
+                } else {
+                    titleS880 = get880String(l);
+                }
                 if (titleS880 != null) {
+                    i880.addScript("Tibt");
                     curi880 = i880.getNext();
                     final DataField f880 = factory.newDataField("880", '1', mi.subindex2);
                     f246.addSubfield(factory.newSubfield('6', "880-"+curi880));
@@ -732,7 +774,7 @@ public class MarcExport {
     }
 
     private static void addTopics(final Model m, final Resource main, final Record record) {
-        final StmtIterator si = main.listProperties(workIsAbout);
+        final StmtIterator si = main.listProperties(workIsAbout); // TODO: also workGenre?
         final DataField f653 = factory.newDataField("653", ' ', ' ');
         boolean hasTopic = false;
         while (si.hasNext()) {
@@ -956,12 +998,18 @@ public class MarcExport {
     public static final class Index880 {
         // https://www.oclc.org/bibformats/en/controlsubfields.html#subfield6
         private int nextIndex = 1;
+        public List<String> scripts = new ArrayList<>();
 
         public Index880() {}
 
         public String getNext() {
             nextIndex += 1;
             return String.format("%02d", nextIndex-1);
+        }
+
+        public void addScript(String script) {
+            if (!scripts.contains(script))
+                scripts.add(script);
         }
     }
 
@@ -1114,6 +1162,14 @@ public class MarcExport {
         f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
         record.addVariableField(f856);
+        if (!i880.scripts.isEmpty()) {
+            final DataField f066 = factory.newDataField("066", ' ', ' ');
+            if (i880.scripts.contains("Tibt"))
+                f066.addSubfield(factory.newSubfield('c', "Tibt"));
+            if (i880.scripts.contains("$1"))
+                f066.addSubfield(factory.newSubfield('c', "$1"));
+            record.addVariableField(f066);
+        }
         for (DataField df880 : list880) {
             record.addVariableField(df880);
         }

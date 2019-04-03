@@ -124,6 +124,9 @@ bdr:W23819  a    bdo:Work ;
                   [ a             bdo:WorkBibliographicalTitle ;
                     rdfs:label    "second bibliographical | ; / title"@en
                   ] ,
+                  [ a             bdo:WorkBibliographicalTitle ;
+                    rdfs:label    "卓尼文史资料（第三辑）"@zh-hans , "zhuo ni wen shi zi liao: 3"@zh-latn-pinyin
+                  ] ,
                   [ a             bdo:WorkColophonTitle ;
                     rdfs:label    "this is a colophon title"@en
                   ] ,
