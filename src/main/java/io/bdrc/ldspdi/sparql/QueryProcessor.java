@@ -209,17 +209,59 @@ public class QueryProcessor {
                 + "PREFIX  as:   <http://www.w3.org/ns/activitystreams#>\n" + "PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + "PREFIX  ldp:  <http://www.w3.org/ns/ldp#>\n"
                 + "PREFIX ad: <http://schemas.talis.com/2005/address/schema#>\n" + "PREFIX bd: <http://www.bigdata.com/rdf#>\n" + "\n" + "construct {?s ?p ?o} where {\n" + "graph <http://purl.bdrc.io/ontology/core/ontologySchema>\n"
                 + "  {?s ?p ?o}\n" + "}";
-        final Query q = QueryFactory.create(query);
+        // final Query q = QueryFactory.create(query);
 
-        final QueryExecution qe = QueryExecutionFactory.sparqlService("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query", q);
-        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-        Model m = qe.execConstruct();
-        System.out.println(m.size());
-        qe.close();
-        m.write(System.out, "TURTLE");
+        // final QueryExecution qe =
+        // QueryExecutionFactory.sparqlService("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query",
+        // q);
+        // qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+        // Model m = qe.execConstruct();
+        // System.out.println(m.size());
+        // qe.close();
+        // m.write(System.out, "TURTLE");
 
-        DatasetAccessor access = DatasetAccessorFactory.createHTTP("http://buda1.bdrc.io:13180/fuseki/bdrcrw/data");
-        access.deleteModel("http://purl.bdrc.io/ontology/ext/authSchema");
+        // DatasetAccessor access =
+        // DatasetAccessorFactory.createHTTP("http://buda1.bdrc.io:13180/fuseki/bdrcrw/data");
+        // access.deleteModel("http://purl.bdrc.io/ontology/ext/authSchema");
 
+        /*
+         * String update = "PREFIX  :     <http://purl.bdrc.io/ontology/core/>\n" +
+         * "PREFIX  bdan: <http://purl.bdrc.io/annotation/>\n" +
+         * "PREFIX  aut:  <http://purl.bdrc.io/ontology/ext/auth/>\n" +
+         * "PREFIX  bf:   <http://id.loc.gov/ontologies/bibframe/>\n" +
+         * "PREFIX  tbr:  <http://purl.bdrc.io/ontology/toberemoved/>\n" +
+         * "PREFIX  owl:  <http://www.w3.org/2002/07/owl#>\n" +
+         * "PREFIX  rsh:  <http://purl.bdrc.io/shacl/core/shape/>\n" +
+         * "PREFIX  xsd:  <http://www.w3.org/2001/XMLSchema#>\n" +
+         * "PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>\n" +
+         * "PREFIX  bdac: <http://purl.bdrc.io/anncollection/>\n" +
+         * "PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+         * "PREFIX  oa:   <http://www.w3.org/ns/oa#>\n" +
+         * "PREFIX  sh:   <http://www.w3.org/ns/shacl#>\n" +
+         * "PREFIX  tmp:  <http://purl.bdrc.io/ontology/tmp/>\n" +
+         * "PREFIX  dcterms: <http://purl.org/dc/terms/>\n" +
+         * "PREFIX  text: <http://jena.apache.org/text#>\n" +
+         * "PREFIX  foaf: <http://xmlns.com/foaf/0.1/>\n" +
+         * "PREFIX  bdd:  <http://purl.bdrc.io/data/>\n" +
+         * "PREFIX  f:    <java:io.bdrc.ldspdi.sparql.functions.>\n" +
+         * "PREFIX  adm:  <http://purl.bdrc.io/ontology/admin/>\n" +
+         * "PREFIX  vcard: <http://www.w3.org/2006/vcard/ns#>\n" +
+         * "PREFIX  bdo:  <http://purl.bdrc.io/ontology/core/>\n" +
+         * "PREFIX  iiif2: <http://iiif.io/api/presentation/2#>\n" +
+         * "PREFIX  adr:  <http://purl.bdrc.io/resource-auth/>\n" +
+         * "PREFIX  iiif3: <http://iiif.io/api/presentation/3#>\n" +
+         * "PREFIX  bdr:  <http://purl.bdrc.io/resource/>\n" +
+         * "PREFIX  as:   <http://www.w3.org/ns/activitystreams#>\n" +
+         * "PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+         * "PREFIX  ldp:  <http://www.w3.org/ns/ldp#>\n" +
+         * "PREFIX ad: <http://schemas.talis.com/2005/address/schema#>\n" +
+         * "PREFIX bd: <http://www.bigdata.com/rdf#>\n" + "\n" +
+         * "DELETE {?s adm:access bdr:AccessTemporarilyRestricted .}\n" +
+         * "INSERT {?s adm:access bdr:AccessRestrictedTemporarily .}\n" + "where {\n" +
+         * "{?s adm:access bdr:AccessTemporarilyRestricted .}\n" + "}";
+         * 
+         * RDFConnection conn = RDFConnectionFactory.connectFuseki(
+         * "http://buda1.bdrc.io:13180/fuseki/bdrcrw/update"); conn.update(update);
+         */
     }
 }
