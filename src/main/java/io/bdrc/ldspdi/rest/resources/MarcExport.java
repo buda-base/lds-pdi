@@ -97,6 +97,7 @@ public class MarcExport {
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
     public static final Property workTitle = ResourceFactory.createProperty(BDO+"workTitle");
     public static final Property workIsAbout = ResourceFactory.createProperty(BDO+"workIsAbout");
+    public static final Property workGenre = ResourceFactory.createProperty(BDO+"workGenre");
     public static final Property workNumberOf = ResourceFactory.createProperty(BDO+"workNumberOf");
     public static final Property workSeriesName = ResourceFactory.createProperty(BDO+"workSeriesName");
     public static final Property workSeriesNumber = ResourceFactory.createProperty(BDO+"workSeriesNumber");
@@ -985,6 +986,23 @@ public class MarcExport {
         return res;
     }
 
+    public static boolean isJournal(final Model m, final Resource workR) {
+        boolean res = false;
+        StmtIterator si = workR.listProperties(workGenre);
+        while (si.hasNext()) {
+            final String topic = si.next().getResource().getLocalName();
+            if (topic.equals("T297"))
+                res = true;
+        }
+        si = workR.listProperties(workIsAbout);
+        while (si.hasNext()) {
+            final String topic = si.next().getResource().getLocalName();
+            if (topic.equals("T297"))
+                res = true;
+        }
+        return res;
+    }
+
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
@@ -1058,7 +1076,9 @@ public class MarcExport {
             f500.addSubfield(factory.newSubfield('a', biblioNoteS));
             record.addVariableField(f500);
         }
-        addOutline(m, workR, record, bcp47lang); // 505
+        if (!isJournal(m, workR)) {
+            addOutline(m, workR, record, bcp47lang); // 505
+        }
         addAccess(m, workR, record); // 506
         // catalog info (summary)
         si = workR.listProperties(workCatalogInfo);
