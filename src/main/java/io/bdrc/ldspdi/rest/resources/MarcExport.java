@@ -168,14 +168,16 @@ public class MarcExport {
     static final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
 
     static {
+        // from Columbia:
+        // If you use first indicator 1 and subfield  $i, then there is no second indicator. It needs to be blank.
         titleLocalNameToMarcInfo.put("WorkTitlePageTitle", new MarcInfo(0, '5', null));
-        titleLocalNameToMarcInfo.put("WorkBibliographicalTitle", new MarcInfo(1, '3', "BDRC Bibliographical title:"));
+        titleLocalNameToMarcInfo.put("WorkBibliographicalTitle", new MarcInfo(1, ' ', "BDRC Bibliographical title:"));
         titleLocalNameToMarcInfo.put("WorkCoverTitle", new MarcInfo(2, '4', null));
         titleLocalNameToMarcInfo.put("WorkFullTitle", new MarcInfo(3, '3', null));
         titleLocalNameToMarcInfo.put("WorkHalfTitle", new MarcInfo(4, '3', null)); // or 3?
-        titleLocalNameToMarcInfo.put("WorkColophonTitle", new MarcInfo(5, '3', "Colophon title:"));
+        titleLocalNameToMarcInfo.put("WorkColophonTitle", new MarcInfo(5, ' ', "Colophon title:"));
         titleLocalNameToMarcInfo.put("WorkCopyrightPageTitle", new MarcInfo(6, '3', null));
-        titleLocalNameToMarcInfo.put("WorkDkarChagTitle", new MarcInfo(7, '3', "Table of contents title:"));
+        titleLocalNameToMarcInfo.put("WorkDkarChagTitle", new MarcInfo(7, ' ', "Table of contents title:"));
         titleLocalNameToMarcInfo.put("WorkOtherTitle", new MarcInfo(8, '3', null));
         titleLocalNameToMarcInfo.put("WorkRunningTitle", new MarcInfo(9, '7', null));
         titleLocalNameToMarcInfo.put("WorkSpineTitle", new MarcInfo(10, '8', null));
@@ -306,7 +308,7 @@ public class MarcExport {
             hasPubLocation = true;
         }
         if (!hasPubLocation) {
-            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified]"));
+            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified]:"));
         }
         si = main.listProperties(workPublisherName);
         boolean hasPubName = false;
@@ -319,7 +321,7 @@ public class MarcExport {
             hasPubName = true;
         }
         if (!hasPubName) {
-            f264.addSubfield(factory.newSubfield('b', "[publisher not identified]"));
+            f264.addSubfield(factory.newSubfield('b', "[publisher not identified],"));
         }
         si = main.listProperties(workEvent);
         boolean hasDate = false;
@@ -393,7 +395,7 @@ public class MarcExport {
         st = st.replaceAll("[^0-9]1 ?v\\.", "1 volume");
         st = st.replaceAll(" ?v\\.", " volumes");
         final DataField f300 = factory.newDataField("300", ' ', ' ');
-        f300.addSubfield(factory.newSubfield('a', st));
+        f300.addSubfield(factory.newSubfield('a', "1 online resource ("+st+")"));
         r.addVariableField(f300);
     }
 
@@ -500,14 +502,17 @@ public class MarcExport {
                     }
                 }
             }
+            // There should be a coma at the end, except when the date ends with a hyphen.
             if (birthYear == null) {
                 if (deathYear != null) {
                     sb.append(", ?-");
-                    sb.append(deathYear);
+                    sb.append(deathYear+",");
                     if (has880) {
                         sb880.append(", ?-");
-                        sb880.append(deathYear);
+                        sb880.append(deathYear+",");
                     }
+                } else {
+                    sb.append(',');
                 }
             } else {
                 sb.append(", ");
@@ -519,9 +524,9 @@ public class MarcExport {
                     sb880.append('-');
                 }
                 if (deathYear != null) {
-                    sb.append(deathYear);
+                    sb.append(deathYear+",");
                     if (has880) {
-                        sb880.append(deathYear);
+                        sb880.append(deathYear+",");
                     }
                 }
             }
