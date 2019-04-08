@@ -671,8 +671,13 @@ public class MarcExport {
         // authorship statement
         si = main.listProperties(workAuthorshipStatement);
         String authorshipStatement = null;
+        String authorshipStatement880 = null;
         while (si.hasNext()) {
-            authorshipStatement = getLangStr(si.next().getLiteral());
+            final Literal authorshipStatementL = si.next().getLiteral();
+            authorshipStatement = getLangStr(authorshipStatementL);
+            authorshipStatement880 = get880String(authorshipStatementL);
+            // not sure how to handle multiple authorship statements...
+            break;
         }
         Literal mainTitleL = highestPrioList.get(0);
         highestPrioList.remove(0);
@@ -729,7 +734,12 @@ public class MarcExport {
         if (authorshipStatement != null) {
             f245.addSubfield(factory.newSubfield('c', authorshipStatement+"."));
             if (mainTitleS880 != null) {
-                f880_main.addSubfield(factory.newSubfield('b', authorshipStatement+"."));
+                if (authorshipStatement880 != null) {
+                    f880_main.addSubfield(factory.newSubfield('b', authorshipStatement880+"."));
+                } else {
+                    f880_main.addSubfield(factory.newSubfield('b', authorshipStatement+"."));
+                }
+
             }
         }
         list245246.add(f245);

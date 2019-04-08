@@ -90,7 +90,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:creatorTerton  bdr:P326 ;
    bdo:itemBDRCHoldingStatement  "1" ;
    bdo:note      [ bdo:noteText  "tbrc holds digital scanned images, tiffs and pdf files"@en ] ;
-   bdo:workAuthorshipStatement  "recovered from its place of concealment by gu-ru chos-kyi-dban-phyug"@en ;
+   bdo:workAuthorshipStatement  "snga 'gyur rig mdzod rtsom sgrig lhan tshogs/"@bo-x-ewts ;
    bdo:workBiblioNote  "reproduced from the rare but incomplet manuscript set of mtshams-brag..."@en ;
    bdo:workCatalogInfo  "Treasure revelations of the Eight Pronouncements (Kagye). Discovered by Guru Chowang (1212-1270), the reincarnate successor of Nyangrel Nyima Ozer, discoverer of the first major cycle of Eight Pronouncement's treasures, the Kagye Desheg Dupa. Manuscript is incomplete and is from Tsamdrak Monastery in Bhutan. There probably existed a blockprint edition in six volumes for Gaje Monastery, an affiliate of Katok in Kham. A print of this set has not yet been found."@en ;
    bdo:workCreator  bdr:P326 ;
