@@ -405,7 +405,7 @@ public class MarcExport {
         nameList.add(l);
     }
 
-    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel, final Index880 i880, final List<DataField> list880) {
+    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
         StmtIterator si = main.listProperties(prop);
         while (si.hasNext()) {
             final Resource creator = si.next().getResource();
@@ -546,7 +546,7 @@ public class MarcExport {
             }
             f720_1_.addSubfield(factory.newSubfield('a', sb.toString()));
             f720_1_.addSubfield(factory.newSubfield('e', rel));
-            r.addVariableField(f720_1_);
+            list720.add(f720_1_);
         }
     }
 
@@ -605,7 +605,7 @@ public class MarcExport {
         return null;
     }
 
-    private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880, final List<DataField> list880) {
+    private static void addTitles(final Model m, final Resource main, final Record record, final String bcp47lang, final Index880 i880, final List<DataField> list880, final List<DataField> list245246) {
         // again, we keep titles in order for consistency among marc queries
         final Map<String,List<Literal>> titles = new TreeMap<>();
         String subtitleStr = null;
@@ -732,7 +732,7 @@ public class MarcExport {
                 f880_main.addSubfield(factory.newSubfield('b', authorshipStatement+"."));
             }
         }
-        record.addVariableField(f245);
+        list245246.add(f245);
         for (Entry<String,List<Literal>> e : titles.entrySet()) {
             final MarcInfo mi = titleLocalNameToMarcInfo.get(e.getKey());
             final List<Literal> list = e.getValue();
@@ -768,7 +768,7 @@ public class MarcExport {
                     f246.addSubfield(factory.newSubfield('i', mi.subfieldi));
                 }
                 f246.addSubfield(factory.newSubfield('a', getLangStr(l)));
-                record.addVariableField(f246);
+                list245246.add(f246);
             }
         }
     }
@@ -981,18 +981,18 @@ public class MarcExport {
         record.addVariableField(f505);
     }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880) {
-        addAuthorRel(m, main, r, creatorTerton, "author.", i880, list880);
-        addAuthorRel(m, main, r, creatorMainAuthor, "author.", i880, list880);
-        addAuthorRel(m, main, r, creatorTranslator, "translator.", i880, list880);
-        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.", i880, list880);
-        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.", i880, list880);
-        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.", i880, list880);
-        addAuthorRel(m, main, r, creatorCompiler, "editor.", i880, list880);
-        addAuthorRel(m, main, r, creatorReviser, "corrector.", i880, list880);
-        addAuthorRel(m, main, r, creatorScribe, "scribe.", i880, list880);
-        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.", i880, list880);
-        addAuthorRel(m, main, r, creatorArtist, "artist.", i880, list880);
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
+        addAuthorRel(m, main, r, creatorTerton, "author.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorMainAuthor, "author.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorTranslator, "translator.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorCompiler, "editor.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorReviser, "corrector.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorScribe, "scribe.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.", i880, list880, list720);
+        addAuthorRel(m, main, r, creatorArtist, "artist.", i880, list880, list720);
     }
 
     public static final class Index880 {
@@ -1051,6 +1051,17 @@ public class MarcExport {
         return res;
     }
 
+    public static void add066(final Record r, final Index880 i880) {
+        if (!i880.scripts.isEmpty()) {
+            final DataField f066 = factory.newDataField("066", ' ', ' ');
+            if (i880.scripts.contains("Tibt"))
+                f066.addSubfield(factory.newSubfield('c', "Tibt"));
+            if (i880.scripts.contains("$1"))
+                f066.addSubfield(factory.newSubfield('c', "$1"));
+            r.addVariableField(f066);
+        }
+    }
+
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
@@ -1095,7 +1106,16 @@ public class MarcExport {
             record.addVariableField(f050__4);
         }
         final List<DataField> list880 = new ArrayList<>();
-        addTitles(m, workR, record, bcp47lang, i880, list880); // 245
+        final List<DataField> list245246 = new ArrayList<>();
+        // this records 066, 245, 246 and 880 that we will use later
+        addTitles(m, workR, record, bcp47lang, i880, list880, list245246);
+        // same principle, finishing the 880 and 066 record, and lists the 720 records
+        final List<DataField> list720 = new ArrayList<>();
+        addAuthors(m, workR, record, i880, list880, list720);
+        add066(record, i880);
+        for (DataField df245246 : list245246) {
+            record.addVariableField(df245246);
+        }
         // edition statement
         si = workR.listProperties(workEditionStatement);
         while (si.hasNext()) {
@@ -1148,7 +1168,9 @@ public class MarcExport {
         record.addVariableField(f588);
         addTopics(m, workR, record); // 653
         record.addVariableField(f710_2);
-        addAuthors(m, workR, record, i880, list880); // 720
+        for (DataField df720 : list720) {
+            record.addVariableField(df720);
+        }
         // lccn
         si = workR.listProperties(workLccn);
         while (si.hasNext()) {
@@ -1162,14 +1184,6 @@ public class MarcExport {
         f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
         f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
         record.addVariableField(f856);
-        if (!i880.scripts.isEmpty()) {
-            final DataField f066 = factory.newDataField("066", ' ', ' ');
-            if (i880.scripts.contains("Tibt"))
-                f066.addSubfield(factory.newSubfield('c', "Tibt"));
-            if (i880.scripts.contains("$1"))
-                f066.addSubfield(factory.newSubfield('c', "$1"));
-            record.addVariableField(f066);
-        }
         for (DataField df880 : list880) {
             record.addVariableField(df880);
         }
