@@ -62,28 +62,23 @@ public class OntData implements Runnable {
     public static String JSONLD_CONTEXT;
     static EntityTag update;
     static Date lastUpdated;
-    // static String ont;
-    public static HashMap<String, OntModel> models = new HashMap<>();
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
     final static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     public static void init() {
         try {
-            models = new HashMap<>();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
-            FileManager fm = odm.getFileManager();
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
                 String uri = it.next();
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
-                ontAllMod = ModelFactory.createOntologyModel(oms, md);
-                // OntData.addOntModelByName(uri, om);
+                ontAllMod.add(om);
                 OntData.addOntModelByBase(uri, om);
             }
             readGithubJsonLDContext();
@@ -92,16 +87,8 @@ public class OntData implements Runnable {
         }
     }
 
-    public static void addOntModelByName(String name, OntModel om) {
-        models.put(name, om);
-    }
-
     public static void addOntModelByBase(String baseUri, OntModel om) {
         modelsBase.put(baseUri, om);
-    }
-
-    public static void setOntModelWithName(String name) throws RestException {
-        ontMod = getOntModelByName(name);
     }
 
     public static void setOntModelWithBase(String baseUri) throws RestException {
@@ -110,10 +97,6 @@ public class OntData implements Runnable {
 
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
         return modelsBase.get(baseUri);
-    }
-
-    public static OntModel getOntModelByName(String name) throws RestException {
-        return models.get(name);
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
@@ -142,7 +125,6 @@ public class OntData implements Runnable {
     @Override
     public void run() {
         try {
-            models = new HashMap<>();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
@@ -154,13 +136,15 @@ public class OntData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
-                ontAllMod = ModelFactory.createOntologyModel(oms, md);
+                if (!uri.equals("http://purl.bdrc.io/ontology/ext/auth/")) {
+                    ontAllMod.add(om);
+                }
                 OntData.addOntModelByBase(uri, om);
             }
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/core/").getGraph());
-            log.info("Auth model size :" + getOntModelByName("auth").size());
-            QueryProcessor.updateOntology(getOntModelByName("auth"), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/ext/auth/").getGraph());
+            log.info("Auth model size :" + getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth/").size());
+            QueryProcessor.updateOntology(getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth/"), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/ext/auth/").getGraph());
             readGithubJsonLDContext();
 
         } catch (Exception ex) {

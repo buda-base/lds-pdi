@@ -329,7 +329,7 @@ public class PublicDataResource {
             }
         } else {
             if (OntData.ontAllMod.getOntResource(info.getAbsolutePath().toString()) == null) {
-                throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for" + info.getAbsolutePath().toString()));
+                throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + info.getAbsolutePath().toString()));
             }
             if (builder == null) {
                 if (OntData.isClass(info.getAbsolutePath().toString(), true)) {

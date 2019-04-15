@@ -57,7 +57,7 @@ public class OntPolicy {
 
     @Override
     public String toString() {
-        return "OntPolicy [baseUri=" + baseUri + ", graph=" + graph + ", visible=" + visible + "]";
+        return "OntPolicy [baseUri=" + baseUri + ", graph=" + graph + ", fileUri=" + fileUri + ", visible=" + visible + "]";
     }
 
 }
