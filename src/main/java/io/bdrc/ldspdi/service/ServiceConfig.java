@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -38,7 +37,6 @@ public class ServiceConfig {
 
     static Properties prop = new Properties();
     public static HashMap<String, String> params;
-    public static Config config;
     public final static String FUSEKI_URL = "fusekiUrl";
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
@@ -63,18 +61,7 @@ public class ServiceConfig {
             log.error("ServiceConfig init error", ex);
             ex.printStackTrace();
         }
-        loadOntologies();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Config loadOntologies() throws JsonParseException, JsonMappingException, IOException {
-        InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ontologies.yml");
-        // InputStream input =
-        // ServiceConfig.class.getClassLoader().getResourceAsStream("ontologiesLocal.yml");
-        Yaml yaml = new Yaml();
-        config = yaml.loadAs(input, Config.class);
-        input.close();
-        return config;
+        OntPolicies.init();
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
@@ -88,7 +75,7 @@ public class ServiceConfig {
             ex.printStackTrace();
         }
         prop.setProperty(FUSEKI_URL, fusekiUrl);
-        loadOntologies();
+        OntPolicies.init();
     }
 
     public static boolean useAuth() {
@@ -97,10 +84,6 @@ public class ServiceConfig {
 
     public static String getProperty(String key) {
         return prop.getProperty(key);
-    }
-
-    public static Config getConfig() {
-        return config;
     }
 
     public static String getRobots() {

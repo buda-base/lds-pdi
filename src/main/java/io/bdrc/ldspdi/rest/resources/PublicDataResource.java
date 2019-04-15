@@ -67,11 +67,12 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
-import io.bdrc.ldspdi.ontology.service.core.OntParams;
+import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
@@ -264,17 +265,17 @@ public class PublicDataResource {
         if (!tmp.endsWith("/")) {
             tmp = tmp + "/";
         }
-        if (ServiceConfig.getConfig().isBaseUri(tmp)) {
+        if (OntPolicies.isBaseUri(tmp)) {
             baseUri = tmp;
             isBase = true;
         }
-        if (ServiceConfig.getConfig().isBaseUri(info.getAbsolutePath().toString() + other)) {
+        if (OntPolicies.isBaseUri(info.getAbsolutePath().toString() + other)) {
             baseUri = info.getAbsolutePath().toString() + other;
             isBase = true;
         }
         // Is the full request uri a baseuri?
         if (isBase) {
-            OntParams pr = ServiceConfig.getConfig().getOntologyByBase(baseUri);
+            OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
             OntData.setOntModelWithBase(baseUri);
             // Using single ontology model
             OntModel mod = OntData.ontMod;
@@ -284,7 +285,7 @@ public class PublicDataResource {
                 if (variant == null) {
                     return Response.status(406).build();
                 }
-                String url = ServiceConfig.getConfig().getOntologyByBase(baseUri).getFileurl();
+                String url = OntPolicies.getOntologyByBase(baseUri).getFileUri();
                 // using cache if available
                 byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
                 if (byteArr == null) {
@@ -310,16 +311,16 @@ public class PublicDataResource {
                         @Override
                         public void write(OutputStream os) throws IOException, WebApplicationException {
                             if (JenaLangStr == "STTL") {
-                                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(om, pr.getBaseuri());
+                                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(om, pr.getBaseUri());
                                 writer.output(os);
                             } else {
                                 org.apache.jena.rdf.model.RDFWriter wr = om.getWriter(JenaLangStr);
                                 if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                                    wr.setProperty("xmlbase", pr.getBaseuri());
+                                    wr.setProperty("xmlbase", pr.getBaseUri());
                                 }
                                 // here using the absolute path as baseUri since it has been recognized
                                 // as the base uri of a declared ontology (in ontologies.yml file)
-                                wr.write(om, os, pr.getBaseuri());
+                                wr.write(om, os, pr.getBaseUri());
                             }
                         }
                     };
@@ -356,10 +357,10 @@ public class PublicDataResource {
         if (JenaLangStr == null) {
             throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
         }
-        if (ServiceConfig.getConfig().isBaseUri(res)) {
-            OntParams params = ServiceConfig.getConfig().getOntologyByBase(res);
+        if (OntPolicies.isBaseUri(res)) {
+            OntPolicy params = OntPolicies.getOntologyByBase(res);
             final String baseUri = res;
-            Model model = OntData.getOntModelByName(params.getName());
+            Model model = OntData.getOntModelByBase(params.getBaseUri());
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
                 public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -369,9 +370,9 @@ public class PublicDataResource {
                     } else {
                         org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
                         if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                            wr.setProperty("xmlbase", params.getBaseuri());
+                            wr.setProperty("xmlbase", params.getBaseUri());
                         }
-                        wr.write(model, os, params.getBaseuri());
+                        wr.write(model, os, params.getBaseUri());
                     }
                 }
             };

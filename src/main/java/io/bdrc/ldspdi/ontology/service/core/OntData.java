@@ -1,9 +1,7 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -20,7 +18,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -41,13 +38,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.FileManager;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -64,7 +62,7 @@ public class OntData implements Runnable {
     public static String JSONLD_CONTEXT;
     static EntityTag update;
     static Date lastUpdated;
-    static String ont;
+    // static String ont;
     public static HashMap<String, OntModel> models = new HashMap<>();
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
@@ -74,27 +72,19 @@ public class OntData implements Runnable {
         try {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
-            ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager();
-            odm.setProcessImports(false);
-            oms.setDocumentManager(odm);
+            OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            FileManager fm = odm.getFileManager();
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            for (String name : names) {
-                String url = ServiceConfig.getConfig().getOntology(name).fileurl;
-                log.info("URL >> " + url);
-                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                InputStream stream = connection.getInputStream();
-                Model tmp = ModelFactory.createDefaultModel();
-                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
-                byte[] byteArr = IOUtils.toByteArray(stream);
-                om.read(new ByteArrayInputStream(byteArr), ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
-                // caching ttl file as byte array
-                ResultsCache.addToCache(byteArr, url.hashCode());
-                ontAllMod.add(om);
-                OntData.addOntModelByName(name, om);
-                OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
+            Iterator<String> it = odm.listDocuments();
+            while (it.hasNext()) {
+                String uri = it.next();
+                log.info("OntManagerDoc :" + uri);
+                OntModel om = odm.getOntology(uri, oms);
+                ontAllMod = ModelFactory.createOntologyModel(oms, md);
+                // OntData.addOntModelByName(uri, om);
+                OntData.addOntModelByBase(uri, om);
             }
             readGithubJsonLDContext();
         } catch (Exception ex) {
@@ -154,35 +144,23 @@ public class OntData implements Runnable {
         try {
             models = new HashMap<>();
             modelsBase = new HashMap<>();
-            ArrayList<String> names = ServiceConfig.getConfig().getValidNames();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager();
-            odm.setProcessImports(false);
-            oms.setDocumentManager(odm);
+            OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            FileManager fm = odm.getFileManager();
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            for (String name : names) {
-                String url = ServiceConfig.getConfig().getOntology(name).fileurl;
-                log.info("URL >> " + ServiceConfig.getConfig().getOntology(name).fileurl);
-                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                InputStream stream = connection.getInputStream();
-                Model tmp = ModelFactory.createDefaultModel();
-                OntModel om = ModelFactory.createOntologyModel(oms, tmp);
-                byte[] byteArr = IOUtils.toByteArray(stream);
-                om.read(new ByteArrayInputStream(byteArr), ServiceConfig.getConfig().getOntology(name).getBaseuri(), "TURTLE");
-                // caching ttl file as byte array
-                ResultsCache.addToCache(byteArr, url.hashCode());
-                if (!name.equals("auth")) {
-                    ontAllMod.add(om);
-                }
-                OntData.addOntModelByName(name, om);
-                OntData.addOntModelByBase(ServiceConfig.getConfig().getOntology(name).getBaseuri(), om);
-                stream.close();
+            Iterator<String> it = odm.listDocuments();
+            while (it.hasNext()) {
+                String uri = it.next();
+                log.info("OntManagerDoc :" + uri);
+                OntModel om = odm.getOntology(uri, oms);
+                ontAllMod = ModelFactory.createOntologyModel(oms, md);
+                OntData.addOntModelByBase(uri, om);
             }
             log.info("Global model size :" + ontAllMod.size());
-            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("core").getGraph());
+            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/core/").getGraph());
             log.info("Auth model size :" + getOntModelByName("auth").size());
-            QueryProcessor.updateOntology(getOntModelByName("auth"), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", ServiceConfig.getConfig().getOntology("auth").getGraph());
+            QueryProcessor.updateOntology(getOntModelByName("auth"), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/ext/auth/").getGraph());
             readGithubJsonLDContext();
 
         } catch (Exception ex) {
@@ -205,39 +183,6 @@ public class OntData implements Runnable {
         final String query = "describe  <" + uri + ">";
         final QueryExecution qexec = QueryExecutionFactory.create(query, ontAllMod);
         return qexec.execDescribe();
-    }
-
-    public static ArrayList<OntProperty> getAllClassProps(String iri, boolean global) {
-        OntClassModel clModel = new OntClassModel(iri, global);
-        final ArrayList<OntProperty> list = new ArrayList<>();
-        if (clModel.clazz != null) {
-            String qy = "";
-            try {
-                qy = Prefixes.getPrefixesString() + " select distinct  ?clazz ?p\n" + "where {\n" + "bind (<" + iri + "> as ?base)\n" + "graph <" + ServiceConfig.getConfig().getOntology(ont).getGraph() + ">{\n" + "?base rdfs:subClassOf+ ?clazz .\n"
-                        + "{ ?p rdfs:domain/(owl:unionOf/rdf:rest*/rdf:first)* ?clazz . }\n" + "}\n" + "}";
-            } catch (RestException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            final QueryExecution qexec = QueryProcessor.getResultSet(qy, null);
-            final ResultSet res = qexec.execSelect();
-            while (res.hasNext()) {
-                final QuerySolution qs = res.next();
-                final RDFNode node = qs.get("?p");
-                OntResource rsc = null;
-                if (global) {
-                    rsc = ontAllMod.getOntResource(node.asResource().getURI());
-                } else {
-                    rsc = ontMod.getOntResource(node.asResource().getURI());
-                }
-                if (rsc.isProperty()) {
-                    list.add(rsc.asProperty());
-                } else {
-                    System.out.println("Skipped " + node.asResource().getURI() + " property in getAllClassProps(" + iri + ")");
-                }
-            }
-        }
-        return list;
     }
 
     public static ArrayList<OntResource> getDomainUsages(final String uri, boolean global) throws RestException {

@@ -1,6 +1,9 @@
 package io.bdrc.ldspdi.sparql;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +36,8 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,5 +268,11 @@ public class QueryProcessor {
          * RDFConnection conn = RDFConnectionFactory.connectFuseki(
          * "http://buda1.bdrc.io:13180/fuseki/bdrcrw/update"); conn.update(update);
          */
+        HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf").openConnection();
+        InputStream stream = connection.getInputStream();
+        Model tmp = ModelFactory.createDefaultModel();
+        tmp.read(stream, RDFLanguages.strLangRDFXML);
+        tmp.write(System.out, "TURTLE");
+        stream.close();
     }
 }
