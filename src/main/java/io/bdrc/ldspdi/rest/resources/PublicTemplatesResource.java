@@ -67,7 +67,7 @@ public class PublicTemplatesResource {
     public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class.getName());
 
     @GET
-    @Path("/query/{file}")
+    @Path("/query/table/{file}")
     @JerseyCacheControl()
     @Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, "text/csv" })
     public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathParam("file") String file) throws RestException {
@@ -142,7 +142,7 @@ public class PublicTemplatesResource {
     }
 
     @POST
-    @Path("/query/{file}")
+    @Path("/query/table/{file}")
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getQueryTemplateResultsJsonPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file, HashMap<String, String> map, @Context UriInfo info) throws RestException {
@@ -167,7 +167,7 @@ public class PublicTemplatesResource {
     }
 
     @GET
-    @Path("/graph/{file}")
+    @Path("/query/graph/{file}")
     @JerseyCacheControl()
     public Response getGraphTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki, @QueryParam("format") final String format, @PathParam("file") String file, @Context Request request) throws RestException {
         String path = info.getPath() + info.relativize(info.getRequestUri());
@@ -183,7 +183,6 @@ public class PublicTemplatesResource {
         // process
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
         final String query = qfp.getParametizedQuery(hm, false);
-        log.info("Graph query >> " + query);
         // format is prevalent
         MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
         if (mediaType == null) {
@@ -199,7 +198,7 @@ public class PublicTemplatesResource {
     }
 
     @POST
-    @Path("/graph/{file}")
+    @Path("/query/graph/{file}")
     @JerseyCacheControl()
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki, @DefaultValue("application/ld+json") @HeaderParam("Accept") String accept, @PathParam("file") String file, @Context UriInfo info, @Context Request request,
