@@ -264,12 +264,12 @@ public class PublicDataResource {
         String tmp = info.getAbsolutePath().toString();
         log.info("getExtOntologyHomePage tmp is >>" + tmp);
         if (OntPolicies.isBaseUri(tmp)) {
-            baseUri = tmp;
+            baseUri = parseBaseUri(tmp);
             isBase = true;
         }
         log.info("getExtOntologyHomePage absolute path >>" + info.getAbsolutePath().toString() + other);
-        if (OntPolicies.isBaseUri(info.getAbsolutePath().toString() + other)) {
-            baseUri = info.getAbsolutePath().toString() + other;
+        if (OntPolicies.isBaseUri(parseBaseUri(info.getAbsolutePath().toString() + other))) {
+            baseUri = parseBaseUri(info.getAbsolutePath().toString() + other);
             isBase = true;
         }
         // Is the full request uri a baseuri?
@@ -357,8 +357,8 @@ public class PublicDataResource {
             throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
         }
         if (OntPolicies.isBaseUri(res)) {
-            OntPolicy params = OntPolicies.getOntologyByBase(res);
-            final String baseUri = res;
+            OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
+            final String baseUri = parseBaseUri(res);
             Model model = OntData.getOntModelByBase(params.getBaseUri());
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
