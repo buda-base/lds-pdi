@@ -89,8 +89,11 @@ public class OntPolicies {
         return valid;
     }
 
-    public static boolean isBaseUri(String base) {
-        return map.containsKey(base);
+    public static boolean isBaseUri(String s) {
+        if (s.endsWith("/") || s.endsWith("#")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return map.containsKey(s);
     }
 
     public static OntPolicy getOntologyByBase(String name) {

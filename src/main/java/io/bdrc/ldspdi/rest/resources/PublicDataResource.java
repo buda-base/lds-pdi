@@ -262,13 +262,12 @@ public class PublicDataResource {
         boolean isBase = false;
         String baseUri = "";
         String tmp = info.getAbsolutePath().toString();
-        if (!tmp.endsWith("/")) {
-            tmp = tmp + "/";
-        }
+        log.info("getExtOntologyHomePage tmp is >>" + tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = tmp;
             isBase = true;
         }
+        log.info("getExtOntologyHomePage absolute path >>" + info.getAbsolutePath().toString() + other);
         if (OntPolicies.isBaseUri(info.getAbsolutePath().toString() + other)) {
             baseUri = info.getAbsolutePath().toString() + other;
             isBase = true;
@@ -432,6 +431,13 @@ public class PublicDataResource {
             return smt.getObject().toString();
         }
         return null;
+    }
+
+    private String parseBaseUri(String s) {
+        if (s.endsWith("/") || s.endsWith("#")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s;
     }
 
 }

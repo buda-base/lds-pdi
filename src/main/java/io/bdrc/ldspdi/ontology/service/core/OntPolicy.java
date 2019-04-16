@@ -17,10 +17,17 @@ public class OntPolicy {
 
     public OntPolicy(String baseUri, String graph, String fileuri, boolean visible) {
         super();
-        this.baseUri = baseUri;
+        this.baseUri = parseBaseUri(baseUri);
         this.graph = graph;
         this.fileUri = fileuri;
         this.visible = visible;
+    }
+
+    private String parseBaseUri(String s) {
+        if (s.endsWith("/") || s.endsWith("#")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s;
     }
 
     public String getBaseUri() {
