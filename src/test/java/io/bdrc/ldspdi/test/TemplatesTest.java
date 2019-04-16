@@ -37,27 +37,24 @@ import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
-public class TemplatesTest extends JerseyTest{
+public class TemplatesTest extends JerseyTest {
 
-    private static FusekiServer server ;
+    private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
-    public final static Logger log=LoggerFactory.getLogger(ResServiceTest.class.getName());
-    public final static String[] methods= {"GET", "POST"};
+    public final static Logger log = LoggerFactory.getLogger(ResServiceTest.class.getName());
+    public final static String[] methods = { "GET", "POST" };
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl="http://localhost:2247/bdrcrw";
+        fusekiUrl = "http://localhost:2247/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
-        //Creating a fuseki server
-        server = FusekiServer.create()
-                .port(2247)
-                .add("/bdrcrw", srvds)
-                .build() ;
-        server.start() ;
+        // Creating a fuseki server
+        server = FusekiServer.create().port(2247).add("/bdrcrw", srvds).build();
+        server.start();
     }
 
     @AfterClass
@@ -68,139 +65,116 @@ public class TemplatesTest extends JerseyTest{
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(PublicTemplatesResource.class)
-                .register(OntData.class)
-                .register(RestExceptionMapper.class);
+        return new ResourceConfig(PublicTemplatesResource.class).register(OntData.class).register(RestExceptionMapper.class);
     }
 
     @Test
     public void simpleGet() throws JsonProcessingException, IOException {
         Map<String, String> args = new HashMap<>();
-        args.put("R_RES","bdr:R8LS12819");
-        Response res = target("/graph/graph").request()
-                .accept(MediaTypeUtils.MT_JSONLD)
-                .post(Entity.json(args));
+        args.put("R_RES", "bdr:R8LS12819");
+        Response res = target("/query/graph/graph").request().accept(MediaTypeUtils.MT_JSONLD).post(Entity.json(args));
         assertTrue(res.getStatus() == 200);
         String entity = res.readEntity(String.class);
-        final String expected = "{\n" +
-                "  \"@id\" : \"bdr:R8LS12819\",\n" +
-                "  \"adm:status\" : \"bdr:StatusReleased\",\n" +
-                "  \"@context\" : \"http://purl.bdrc.io/context.jsonld\"\n" +
-                "}\n";
+        final String expected = "{\n" + "  \"@id\" : \"bdr:R8LS12819\",\n" + "  \"adm:status\" : \"bdr:StatusReleased\",\n" + "  \"@context\" : \"http://purl.bdrc.io/context.jsonld\"\n" + "}\n";
         assertTrue(entity.equals(expected));
     }
 
     @Test
     public void wrongTemplateNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/wrongTemplateName").request()
-                .get();
-        String entity=res.readEntity(String.class);
+        Response res = target("/query/table/wrongTemplateName").request().get();
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.PARSE_ERR);
+        assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
     public void wrongTemplateNamePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
-        map.put("L_NAME","dgon gsar");
-        Response res = target("/query/wrongTemplateName").request()
-                .post(Entity.json(map));
-        String entity=res.readEntity(String.class);
+        map.put("L_NAME", "dgon gsar");
+        Response res = target("/query/table/wrongTemplateName").request().post(Entity.json(map));
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.PARSE_ERR);
+        assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
     public void TemplateGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/missingArg")
-                .queryParam("L_NAME", "rgyal")
-                .request()
-                .get();
-        System.out.println("STATUS >>"+res.getStatus());
+        Response res = target("/query/table/missingArg").queryParam("L_NAME", "rgyal").request().get();
+        System.out.println("STATUS >>" + res.getStatus());
         assertTrue(res.getStatus() == 200);
     }
 
     @Test
     public void TemplatePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
-        map.put("L_NAME","rgyal");
-        Response res = target("/query/missingArg").request()
-                .post(Entity.json(map));
+        map.put("L_NAME", "rgyal");
+        Response res = target("/query/table/missingArg").request().post(Entity.json(map));
         assertTrue(res.getStatus() == 200);
     }
 
     @Test
     public void missingParameter() throws JsonProcessingException, IOException {
-        for(String method:methods) {
-            Response res = target("/query/missingArg").request()
-                    .method(method);
-            String entity=res.readEntity(String.class);
+        for (String method : methods) {
+            Response res = target("/query/table/missingArg").request().method(method);
+            String entity = res.readEntity(String.class);
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode node=mapper.readTree(entity);
-            int code=Integer.parseInt(node.findValue("code").asText());
+            JsonNode node = mapper.readTree(entity);
+            int code = Integer.parseInt(node.findValue("code").asText());
             assertTrue(res.getStatus() == 500);
-            assertTrue(code==LdsError.MISSING_PARAM_ERR);
+            assertTrue(code == LdsError.MISSING_PARAM_ERR);
         }
     }
 
     @Test
     public void WrongParamNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/missingArg)")
-                .queryParam("WRONG", "rgyal")
-                .request()
-                .get();
-        String entity=res.readEntity(String.class);
+        Response res = target("/query/table/missingArg)").queryParam("WRONG", "rgyal").request().get();
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.PARSE_ERR);
+        assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
     public void WrongParamNamePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
-        map.put("WRONG","rgyal");
-        Response res = target("/query/missingArg").request()
-                .post(Entity.json(map));
-        String entity=res.readEntity(String.class);
+        map.put("WRONG", "rgyal");
+        Response res = target("/query/table/missingArg").request().post(Entity.json(map));
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.MISSING_PARAM_ERR);
+        assertTrue(code == LdsError.MISSING_PARAM_ERR);
     }
 
     @Test
     public void wrongGraphTemplateNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/graph/wrongTemplateName").request()
-                .get();
-        String entity=res.readEntity(String.class);
+        Response res = target("/query/graph/wrongTemplateName").request().get();
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.PARSE_ERR);
+        assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
     public void wrongGraphTemplateNamePost() throws JsonProcessingException, IOException {
-        Response res = target("/graph/wrongTemplateName").request()
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Content-Type","application/json")
-                .post(Entity.entity("{\"ddd\":\"\"}",MediaType.APPLICATION_JSON));
-        String entity=res.readEntity(String.class);
+        Response res = target("/query/graph/wrongTemplateName").request().accept(MediaType.APPLICATION_JSON).header("Content-Type", "application/json").post(Entity.entity("{\"ddd\":\"\"}", MediaType.APPLICATION_JSON));
+        String entity = res.readEntity(String.class);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(entity);
-        int code=Integer.parseInt(node.findValue("code").asText());
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
         assertTrue(res.getStatus() == 500);
-        assertTrue(code==LdsError.PARSE_ERR);
+        assertTrue(code == LdsError.PARSE_ERR);
     }
 
 }
