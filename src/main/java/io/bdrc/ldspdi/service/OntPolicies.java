@@ -82,8 +82,7 @@ public class OntPolicies {
         for (String s : keys) {
             OntPolicy p = map.get(s);
             if (p.isVisible()) {
-                String tmp = p.getBaseUri();
-                valid.add(tmp.substring(0, tmp.length() - 1));
+                valid.add(p.getBaseUri());
             }
         }
         return valid;
