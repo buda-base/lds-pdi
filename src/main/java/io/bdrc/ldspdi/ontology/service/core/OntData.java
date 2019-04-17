@@ -79,7 +79,7 @@ public class OntData implements Runnable {
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
                 ontAllMod.add(om);
-                OntData.addOntModelByBase(uri, om);
+                OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             readGithubJsonLDContext();
         } catch (Exception ex) {
@@ -139,12 +139,13 @@ public class OntData implements Runnable {
                 if (!uri.equals("http://purl.bdrc.io/ontology/ext/auth/")) {
                     ontAllMod.add(om);
                 }
-                OntData.addOntModelByBase(uri, om);
+                OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Global model size :" + ontAllMod.size());
-            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/core/").getGraph());
-            log.info("Auth model size :" + getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth/").size());
-            QueryProcessor.updateOntology(getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth/"), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase("http://purl.bdrc.io/ontology/ext/auth/").getGraph());
+            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
+            log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")).size());
+            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
             readGithubJsonLDContext();
 
         } catch (Exception ex) {
@@ -452,4 +453,12 @@ public class OntData implements Runnable {
             }
         }
     }
+
+    private static String parseBaseUri(String s) {
+        if (s.endsWith("/") || s.endsWith("#")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s;
+    }
+
 }
