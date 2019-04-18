@@ -160,6 +160,7 @@ public class PublicDataResource {
     public Response getResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
         final String prefixedRes = RES_PREFIX_SHORT + ':' + res;
         log.info("Call to getResourceGraphGET() with URL: {}, accept: {}", info.getPath(), format);
+        log.info("Call to getResourceGraphGET() " + info.getQueryParameters().keySet().contains("graph"));
         final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         if (format == null) {
             final String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
@@ -180,7 +181,7 @@ public class PublicDataResource {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
             }
         }
-        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null);
+        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
@@ -213,7 +214,7 @@ public class PublicDataResource {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()", e));
             }
         }
-        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null);
+        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
@@ -245,7 +246,7 @@ public class PublicDataResource {
         if (ext.equals("mrcx")) {
             return MarcExport.getResponse(media, RES_PREFIX + res);
         }
-        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null);
+        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
@@ -438,6 +439,17 @@ public class PublicDataResource {
             s = s.substring(0, s.length() - 1);
         }
         return s;
+    }
+
+    private String computeGraphType(UriInfo info) {
+        String type = "";
+        if (info.getQueryParameters().containsKey("graph")) {
+            type = "graph";
+        }
+        if (info.getQueryParameters().containsKey("describe")) {
+            type = "describe";
+        }
+        return type;
     }
 
 }

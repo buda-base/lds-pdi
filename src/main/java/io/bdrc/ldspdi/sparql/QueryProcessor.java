@@ -54,8 +54,15 @@ public class QueryProcessor {
 
     public final static Logger log = LoggerFactory.getLogger(QueryProcessor.class.getName());
 
-    public static Model getCoreResourceGraph(final String URI, String fusekiUrl, String prefixes) throws RestException {
-        return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
+    public static Model getCoreResourceGraph(final String URI, String fusekiUrl, String prefixes, String type) throws RestException {
+        switch (type) {
+        case "graph":
+            return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
+        case "describe":
+            return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
+        default:
+            return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
+        }
     }
 
     public static Model getSimpleResourceGraph(final String URI, final String queryName) throws RestException {
