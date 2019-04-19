@@ -116,6 +116,7 @@ public class ResServiceTest extends JerseyTest {
             if (ent.equals("html"))
                 continue;
             Response res = target("/resource/P1AG29." + ent).request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
+            System.out.println("GetResourceByExtension() status :" + res.getStatus());
             assertTrue(res.getStatus() == 200);
             assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
             assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
