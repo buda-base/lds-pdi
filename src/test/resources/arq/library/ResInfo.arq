@@ -2,10 +2,10 @@
 #QueryReturnType=Graph
 #QueryResults=A graph for the given resource.
 #QueryParams=R_RES
-#QueryUrl=/lib/Resgraph?R_RES=bdr:P360
+#QueryUrl=/ResInfo?R_RES=bdr:P360
 
 #param.R_RES.type=resource
 #param.R_RES.subtype=a Resource ID
 #param.R_RES.desc=the unique resource ID of the chosen resource
 
-construct {?s ?p ?o} where { graph ?R_RES { ?s ?p ?o } }
+Describe ?R_RES
