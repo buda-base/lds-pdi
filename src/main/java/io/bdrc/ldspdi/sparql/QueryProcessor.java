@@ -61,7 +61,7 @@ public class QueryProcessor {
         case "describe":
             return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
         default:
-            return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
+            return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
         }
     }
 
