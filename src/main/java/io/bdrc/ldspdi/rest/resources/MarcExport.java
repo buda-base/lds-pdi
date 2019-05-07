@@ -212,7 +212,7 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star."));
         f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
-        f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
+        f542_PD.addSubfield(factory.newSubfield('l', "Public domain"));
         f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
     }
 
@@ -372,7 +372,7 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("     o d   000 ||");
+        sb.append("     o     000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
@@ -1072,6 +1072,23 @@ public class MarcExport {
         }
     }
 
+    public static void add041(final Model m, final Record r, final List<String> langUrls) {
+        if (langUrls.isEmpty())
+            return;
+        // 0 means it's not a translation... maybe 1 should be indicated when it is?
+        final DataField f041 = factory.newDataField("041", '0', ' ');
+        for (final String langUrl : langUrls) {
+            final Resource langR = m.getResource(langUrl);
+            final Statement marcLangS = langR.getProperty(langMARCCode);
+            if (marcLangS != null) {
+                f041.addSubfield(factory.newSubfield('a', marcLangS.getString()));
+            }
+        }
+        r.addVariableField(f041);
+    }
+
+    public static final String langTibetan = BDR+"LangBo";
+
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
@@ -1083,14 +1100,26 @@ public class MarcExport {
         final List<String> langUrls = getLanguages(m, workR);
         String bcp47lang = null;
         String langMarcCode = null;
+        // request from Columbia, when we have multiple languages recorded, we should
+        // indicate Tibetan as the main language (since we cannot check every occurence of multiple
+        // languages).
+        // we first reorganize langUrls so that it contains Tibetan first in this case:
+        String mainLangUrl = null;
         if (langUrls.size() == 1) {
-            final Resource langR = m.getResource(langUrls.get(0));
+            mainLangUrl = langUrls.get(0);
+        } else {
+            final int idxTibt = langUrls.indexOf(langTibetan);
+            Collections.swap(langUrls, idxTibt, 0);
+            mainLangUrl = langTibetan;
+        }
+        if (mainLangUrl != null) {
+            final Resource langR = m.getResource(mainLangUrl);
             final Statement bcpLangS = langR.getProperty(langBCP47Lang);
             if (bcpLangS != null) {
                 bcp47lang = bcpLangS.getString();
             }
             final Statement marcLangS = langR.getProperty(langMARCCode);
-            if (bcpLangS != null) {
+            if (marcLangS != null) {
                 langMarcCode = marcLangS.getString();
             }
         }
@@ -1100,6 +1129,7 @@ public class MarcExport {
         f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+originalR.getLocalName()));
         record.addVariableField(f035);
         record.addVariableField(f040);
+        add041(m, record, langUrls);
         StmtIterator si = workR.listProperties(workLcCallNumber);
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
@@ -1184,9 +1214,14 @@ public class MarcExport {
         // lccn
         si = workR.listProperties(workLccn);
         while (si.hasNext()) {
-            final String lccn = si.next().getLiteral().getString();
+            String lccn = si.next().getLiteral().getString();
+            // from Columbia: spaces should be added at the end of the lccn string so that it spans
+            // 12 characters exactly, counting the 3 first spaces (so 9 for our lccn string)
+            for(int i = lccn.length(); i < 9; i++) {
+                lccn += ' ';
+            }
             final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   [LCCN] "+lccn));
+            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   "+lccn));
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
             record.addVariableField(f776_08);
         }
