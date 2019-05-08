@@ -71,16 +71,30 @@ bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
 bdr:T1193 skos:prefLabel "T1193"@en .
 
 bdr:W23819_0001 skos:prefLabel "first part"@en ;
+  bdo:workHasPart bdr:W23819_0001_P1 , bdr:W23819_0001_P2 ;
+  bdo:workPartIndex 1;
   bdo:workPartTreeIndex "1" .
 
 bdr:W23819_0017 skos:prefLabel "second part"@en ;
+  bdo:workPartIndex 2;
   bdo:workPartTreeIndex "2" .
 
 bdr:W23819_0056 skos:prefLabel "third part"@en ;
+  bdo:workPartIndex 3;
   bdo:workPartTreeIndex "3" .
 
 bdr:W23819_0074 skos:prefLabel "fourth part"@en ;
+  bdo:workPartIndex 4;
   bdo:workPartTreeIndex "4" .
+
+
+bdr:W23819_0001_P1 skos:prefLabel "first part, part one"@en ;
+  bdo:workPartIndex 1;
+  bdo:workPartTreeIndex "1.1" .
+
+bdr:W23819_0001_P2 skos:prefLabel "first part, part two"@en ;
+  bdo:workPartIndex 2;
+  bdo:workPartTreeIndex "1.2" .
 
 bdr:WSeriesParent a bdo:Work ;
   skos:prefLabel "parent series"@en .
