@@ -31,8 +31,11 @@ import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
@@ -964,7 +967,8 @@ public class MarcExport {
     }
 
     private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang) {
-        final StmtIterator si = main.listProperties(workHasPart);
+        final Selector selector = new SimpleSelector(null, workHasPart, (RDFNode) null);
+        final StmtIterator si =  m.listStatements(selector);
         final StringBuilder sb = new StringBuilder();
         final Map<String,Literal> parts = new TreeMap<>();
         int nbParts = 0;
@@ -1293,6 +1297,7 @@ public class MarcExport {
             m = getModelForMarc(resUri);
             main = m.getResource(resUri);
         }
+        //m.write(System.out, "TURTLE");
         final Resource origMain = m.getResource(resUri);
         final Record r = marcFromModel(m, main, origMain, itemMode);
         final StreamingOutput stream = new StreamingOutput() {

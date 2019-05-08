@@ -15,8 +15,7 @@ construct {
   ?o ?op ?oo .
   ?t skos:prefLabel ?to .
   ?series skos:prefLabel ?seriesl .
-  ?part skos:prefLabel ?partl .
-  ?part bdo:workPartTreeIndex ?partti .
+  ?part ?partp ?parto .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
@@ -36,9 +35,9 @@ construct {
     ?t skos:prefLabel ?to .
   }
   union {
-    ?R_RES bdo:workHasPart ?part .
-    ?part skos:prefLabel ?partl ;
-          bdo:workPartTreeIndex ?partti .
+    ?R_RES bdo:workHasPart+ ?part .
+    ?part ?partp ?parto .
+    FILTER (?partp = skos:prefLabel || ?partp = bdo:workHasPart || ?partp = bdo:workPartTreeIndex)
   }
   union {
     ?R_RES bdo:workNumberOf ?series .
