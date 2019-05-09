@@ -1119,10 +1119,12 @@ public class MarcExport {
         String mainLangUrl = null;
         if (langUrls.size() == 1) {
             mainLangUrl = langUrls.get(0);
-        } else {
+        } else if (langUrls.size() > 1) {
             final int idxTibt = langUrls.indexOf(langTibetan);
-            Collections.swap(langUrls, idxTibt, 0);
-            mainLangUrl = langTibetan;
+            if (idxTibt > 0) {
+                Collections.swap(langUrls, idxTibt, 0);
+            }
+            mainLangUrl = langUrls.get(0);
         }
         if (mainLangUrl != null) {
             final Resource langR = m.getResource(mainLangUrl);
