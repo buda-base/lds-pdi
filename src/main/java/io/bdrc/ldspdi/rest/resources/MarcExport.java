@@ -1106,7 +1106,7 @@ public class MarcExport {
         // maybe something like that could work?
         //record.addVariableField(factory.newControlField("003", "BDRC"));
         final LocalDateTime now = LocalDateTime.now();
-        record.addVariableField(factory.newControlField("005", now.format(f005_f)));
+        //record.addVariableField(factory.newControlField("005", now.format(f005_f)));
         record.addVariableField(f006);
         record.addVariableField(f007);
         final List<String> langUrls = getLanguages(m, workR);
@@ -1139,9 +1139,8 @@ public class MarcExport {
         addIsbn(m, workR, record, itemMode); // 020
         DataField f035 = factory.newDataField("035", ' ', ' ');
         f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+originalR.getLocalName()));
-        record.addVariableField(f035);
-        f035 = factory.newDataField("035", ' ', ' ');
-        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
+        if (itemMode)
+            f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
         record.addVariableField(f035);
         record.addVariableField(f040);
         add041(m, record, langUrls);
