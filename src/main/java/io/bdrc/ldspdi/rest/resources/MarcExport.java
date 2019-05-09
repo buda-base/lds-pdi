@@ -1083,16 +1083,22 @@ public class MarcExport {
     }
 
     public static void add041(final Model m, final Record r, final List<String> langUrls) {
-        if (langUrls.isEmpty())
+        if (langUrls.size() < 2)
             return;
         // 0 means it's not a translation... maybe 1 should be indicated when it is?
         final DataField f041 = factory.newDataField("041", '0', ' ');
+        final List<String> marcCodes = new ArrayList<String>();
         for (final String langUrl : langUrls) {
             final Resource langR = m.getResource(langUrl);
             final Statement marcLangS = langR.getProperty(langMARCCode);
             if (marcLangS != null) {
-                f041.addSubfield(factory.newSubfield('a', marcLangS.getString()));
+                marcCodes.add(marcLangS.getString());
             }
+        }
+        // codes should be sorted alphabetically
+        Collections.sort(marcCodes);
+        for (final String marcCode : marcCodes) {
+            f041.addSubfield(factory.newSubfield('a', marcCode));
         }
         r.addVariableField(f041);
     }
@@ -1119,22 +1125,25 @@ public class MarcExport {
         String mainLangUrl = null;
         if (langUrls.size() == 1) {
             mainLangUrl = langUrls.get(0);
-        } else if (langUrls.size() > 1) {
-            final int idxTibt = langUrls.indexOf(langTibetan);
-            if (idxTibt > 0) {
-                Collections.swap(langUrls, idxTibt, 0);
+            final Resource langR = m.getResource(mainLangUrl);
+            final Statement marcLangS = langR.getProperty(langMARCCode);
+            if (marcLangS != null) {
+                langMarcCode = marcLangS.getString();
             }
-            mainLangUrl = langUrls.get(0);
+        } else if (langUrls.size() > 1) {
+            langMarcCode = "mul";
+            final int idxTibt = langUrls.indexOf(langTibetan);
+            if (idxTibt != -1) {
+                mainLangUrl = langTibetan;
+            } else {
+                mainLangUrl = langUrls.get(0);
+            }
         }
         if (mainLangUrl != null) {
             final Resource langR = m.getResource(mainLangUrl);
             final Statement bcpLangS = langR.getProperty(langBCP47Lang);
             if (bcpLangS != null) {
                 bcp47lang = bcpLangS.getString();
-            }
-            final Statement marcLangS = langR.getProperty(langMARCCode);
-            if (marcLangS != null) {
-                langMarcCode = marcLangS.getString();
             }
         }
         add008(m, workR, record, langMarcCode, now);

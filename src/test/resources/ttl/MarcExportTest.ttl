@@ -64,6 +64,7 @@ bdr:LangBo
   skos:prefLabel "bod yig"@bo-x-ewts .
 
 bdr:LangSa :langMARCCode "san" ;
+  bdo:langBCP47Lang "sa" ;
   skos:prefLabel "Sanskrit"@en .
 
 bdr:T1082 skos:prefLabel "T1082"@en .
@@ -120,7 +121,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workIsbn    "014259153" ;
    bdo:workIsbn    "1-111456291" ;
    bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
-   bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
+   bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy , bdr:SaDeva ;
    #bdo:workOtherLangScript  bdr:SaDeva ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
    bdo:workLccn  "79902886" ;
