@@ -1,6 +1,8 @@
 package io.bdrc.ldspdi.test;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
@@ -67,6 +69,9 @@ public class MarcExportTest extends JerseyTest {
                 .get();
         System.out.println("result:");
         System.out.println(res.readEntity(String.class));
+        DateTimeFormatter f005_f = DateTimeFormatter.ofPattern("yyyyMMddHHmmss.S");
+        final LocalDateTime localDate = LocalDateTime.now();
+        System.out.println(localDate.format(f005_f));
     }
 
 }

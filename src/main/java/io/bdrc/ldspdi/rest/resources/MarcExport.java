@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,8 +31,11 @@ import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
@@ -138,13 +141,14 @@ public class MarcExport {
     public static final EwtsConverter ewtsConverter = new EwtsConverter();
 
     // communicated by Columbia, XML leaders don't need addresses
-    public static final String baseLeaderStr = "     nam a2200003ia 4500";
+    public static final String baseLeaderStr = "     nam a22000003ia4500";
     static final Leader leader = factory.newLeader(baseLeaderStr);
     static final ISBNValidator isbnvalidator = ISBNValidator.getInstance(false);
     final static DateTimeFormatter yymmdd = DateTimeFormatter.ofPattern("yyMMdd");
+    final static DateTimeFormatter f005_f = DateTimeFormatter.ofPattern("yyyyMMddHHmmss.S");
 
     // initialize static fields:
-    static final ControlField f006 = factory.newControlField("006", "m");
+    static final ControlField f006 = factory.newControlField("006", "m     o  d");
     static final ControlField f007 = factory.newControlField("007", "cr");
     static final DataField f040 = factory.newDataField("040", ' ', ' ');
     static final DataField f336 = factory.newDataField("336", ' ', ' ');
@@ -207,12 +211,12 @@ public class MarcExport {
         f506_restricted.addSubfield(factory.newSubfield('2', "star."));
         f506_open.addSubfield(factory.newSubfield('a', "Open Access."));
         f506_open.addSubfield(factory.newSubfield('f', "Unrestricted online access"));
-        f506_open.addSubfield(factory.newSubfield('2', "star."));
+        f506_open.addSubfield(factory.newSubfield('2', "star"));
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
-        f506_fairUse.addSubfield(factory.newSubfield('2', "star."));
+        f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
-        f542_PD.addSubfield(factory.newSubfield('l', "Public Domain"));
+        f542_PD.addSubfield(factory.newSubfield('l', "Public domain"));
         f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
     }
 
@@ -305,11 +309,12 @@ public class MarcExport {
             if (pubLocation.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('a', getLangStr(pubLocation)+" :"));
+            f264.addSubfield(factory.newSubfield('a', getLangStr(pubLocation)+" : "));
             hasPubLocation = true;
+            break;
         }
         if (!hasPubLocation) {
-            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified]:"));
+            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified] : "));
         }
         si = main.listProperties(workPublisherName);
         boolean hasPubName = false;
@@ -318,11 +323,11 @@ public class MarcExport {
             if (pubName.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('b', getLangStr(pubName)+","));
+            f264.addSubfield(factory.newSubfield('b', getLangStr(pubName)+", "));
             hasPubName = true;
         }
         if (!hasPubName) {
-            f264.addSubfield(factory.newSubfield('b', "[publisher not identified],"));
+            f264.addSubfield(factory.newSubfield('b', "[publisher not identified], "));
         }
         si = main.listProperties(workEvent);
         boolean hasDate = false;
@@ -346,10 +351,9 @@ public class MarcExport {
         r.addVariableField(f264);
     }
 
-    public static void add008(final Model m, final Resource main, final Record r, final String marcLang) {
+    public static void add008(final Model m, final Resource main, final Record r, final String marcLang, final LocalDateTime now) {
         final StringBuilder sb = new StringBuilder();
-        final LocalDate localDate = LocalDate.now();
-        sb.append(localDate.format(yymmdd));
+        sb.append(now.format(yymmdd));
         final Statement publishedYearS = main.getProperty(tmpPublishedYear);
         if (publishedYearS == null) {
             sb.append("b    ");
@@ -372,7 +376,7 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("     o d   000 ||");
+        sb.append(" ||||o|||| 000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
@@ -702,7 +706,12 @@ public class MarcExport {
         }
         String mainTitleS;
         // ma che buoni questi spaghetti!
-        if (subtitleStr != null || authorshipStatement != null) {
+        if (subtitleStr != null) {
+            mainTitleS = getLangStr(mainTitleL) + " : ";
+            if (mainTitleS880 != null) {
+                mainTitleS880 += " : ";
+            }
+        } else if (authorshipStatement != null) {
             mainTitleS = getLangStr(mainTitleL) + " / ";
             if (mainTitleS880 != null) {
                 mainTitleS880 += " / ";
@@ -735,9 +744,9 @@ public class MarcExport {
             f245.addSubfield(factory.newSubfield('c', authorshipStatement+"."));
             if (mainTitleS880 != null) {
                 if (authorshipStatement880 != null) {
-                    f880_main.addSubfield(factory.newSubfield('b', authorshipStatement880+"."));
+                    f880_main.addSubfield(factory.newSubfield('c', authorshipStatement880+"."));
                 } else {
-                    f880_main.addSubfield(factory.newSubfield('b', authorshipStatement+"."));
+                    f880_main.addSubfield(factory.newSubfield('c', authorshipStatement+"."));
                 }
 
             }
@@ -958,7 +967,8 @@ public class MarcExport {
     }
 
     private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang) {
-        final StmtIterator si = main.listProperties(workHasPart);
+        final Selector selector = new SimpleSelector(null, workHasPart, (RDFNode) null);
+        final StmtIterator si =  m.listStatements(selector);
         final StringBuilder sb = new StringBuilder();
         final Map<String,Literal> parts = new TreeMap<>();
         int nbParts = 0;
@@ -1072,34 +1082,79 @@ public class MarcExport {
         }
     }
 
+    public static void add041(final Model m, final Record r, final List<String> langUrls) {
+        if (langUrls.size() < 2)
+            return;
+        // 0 means it's not a translation... maybe 1 should be indicated when it is?
+        final DataField f041 = factory.newDataField("041", '0', ' ');
+        final List<String> marcCodes = new ArrayList<String>();
+        for (final String langUrl : langUrls) {
+            final Resource langR = m.getResource(langUrl);
+            final Statement marcLangS = langR.getProperty(langMARCCode);
+            if (marcLangS != null) {
+                marcCodes.add(marcLangS.getString());
+            }
+        }
+        // codes should be sorted alphabetically
+        Collections.sort(marcCodes);
+        for (final String marcCode : marcCodes) {
+            f041.addSubfield(factory.newSubfield('a', marcCode));
+        }
+        r.addVariableField(f041);
+    }
+
+    public static final String langTibetan = BDR+"LangBo";
+
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         record.addVariableField(factory.newControlField("001", "(BDRC) "+originalR.getURI()));
         // maybe something like that could work?
         //record.addVariableField(factory.newControlField("003", "BDRC"));
+        final LocalDateTime now = LocalDateTime.now();
+        //record.addVariableField(factory.newControlField("005", now.format(f005_f)));
         record.addVariableField(f006);
         record.addVariableField(f007);
         final List<String> langUrls = getLanguages(m, workR);
         String bcp47lang = null;
         String langMarcCode = null;
+        // request from Columbia, when we have multiple languages recorded, we should
+        // indicate Tibetan as the main language (since we cannot check every occurence of multiple
+        // languages).
+        // we first reorganize langUrls so that it contains Tibetan first in this case:
+        String mainLangUrl = null;
         if (langUrls.size() == 1) {
-            final Resource langR = m.getResource(langUrls.get(0));
+            mainLangUrl = langUrls.get(0);
+            final Resource langR = m.getResource(mainLangUrl);
+            final Statement marcLangS = langR.getProperty(langMARCCode);
+            if (marcLangS != null) {
+                langMarcCode = marcLangS.getString();
+            }
+        } else if (langUrls.size() > 1) {
+            langMarcCode = "mul";
+            final int idxTibt = langUrls.indexOf(langTibetan);
+            if (idxTibt != -1) {
+                mainLangUrl = langTibetan;
+            } else {
+                mainLangUrl = langUrls.get(0);
+            }
+        }
+        if (mainLangUrl != null) {
+            final Resource langR = m.getResource(mainLangUrl);
             final Statement bcpLangS = langR.getProperty(langBCP47Lang);
             if (bcpLangS != null) {
                 bcp47lang = bcpLangS.getString();
             }
-            final Statement marcLangS = langR.getProperty(langMARCCode);
-            if (bcpLangS != null) {
-                langMarcCode = marcLangS.getString();
-            }
         }
-        add008(m, workR, record, langMarcCode);
+        add008(m, workR, record, langMarcCode, now);
         addIsbn(m, workR, record, itemMode); // 020
-        final DataField f035 = factory.newDataField("035", ' ', ' ');
+        DataField f035 = factory.newDataField("035", ' ', ' ');
         f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+originalR.getLocalName()));
+        if (itemMode)
+            f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
         record.addVariableField(f035);
         record.addVariableField(f040);
+        add041(m, record, langUrls);
         StmtIterator si = workR.listProperties(workLcCallNumber);
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
@@ -1184,9 +1239,14 @@ public class MarcExport {
         // lccn
         si = workR.listProperties(workLccn);
         while (si.hasNext()) {
-            final String lccn = si.next().getLiteral().getString();
+            String lccn = si.next().getLiteral().getString();
+            // from Columbia: spaces should be added at the end of the lccn string so that it spans
+            // 12 characters exactly, counting the 3 first spaces (so 9 for our lccn string)
+            for(int i = lccn.length(); i < 9; i++) {
+                lccn += ' ';
+            }
             final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   [LCCN] "+lccn));
+            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   "+lccn));
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
             record.addVariableField(f776_08);
         }
@@ -1247,6 +1307,7 @@ public class MarcExport {
             m = getModelForMarc(resUri);
             main = m.getResource(resUri);
         }
+        //m.write(System.out, "TURTLE");
         final Resource origMain = m.getResource(resUri);
         final Record r = marcFromModel(m, main, origMain, itemMode);
         final StreamingOutput stream = new StreamingOutput() {

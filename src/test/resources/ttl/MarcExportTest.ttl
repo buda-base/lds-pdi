@@ -64,6 +64,7 @@ bdr:LangBo
   skos:prefLabel "bod yig"@bo-x-ewts .
 
 bdr:LangSa :langMARCCode "san" ;
+  bdo:langBCP47Lang "sa" ;
   skos:prefLabel "Sanskrit"@en .
 
 bdr:T1082 skos:prefLabel "T1082"@en .
@@ -71,16 +72,30 @@ bdr:T1183 skos:prefLabel "T1183"@bo-x-ewts .
 bdr:T1193 skos:prefLabel "T1193"@en .
 
 bdr:W23819_0001 skos:prefLabel "first part"@en ;
+  bdo:workHasPart bdr:W23819_0001_P1 , bdr:W23819_0001_P2 ;
+  bdo:workPartIndex 1;
   bdo:workPartTreeIndex "1" .
 
 bdr:W23819_0017 skos:prefLabel "second part"@en ;
+  bdo:workPartIndex 2;
   bdo:workPartTreeIndex "2" .
 
 bdr:W23819_0056 skos:prefLabel "third part"@en ;
+  bdo:workPartIndex 3;
   bdo:workPartTreeIndex "3" .
 
 bdr:W23819_0074 skos:prefLabel "fourth part"@en ;
+  bdo:workPartIndex 4;
   bdo:workPartTreeIndex "4" .
+
+
+bdr:W23819_0001_P1 skos:prefLabel "first part, part one"@en ;
+  bdo:workPartIndex 1;
+  bdo:workPartTreeIndex "1.1" .
+
+bdr:W23819_0001_P2 skos:prefLabel "first part, part two"@en ;
+  bdo:workPartIndex 2;
+  bdo:workPartTreeIndex "1.2" .
 
 bdr:WSeriesParent a bdo:Work ;
   skos:prefLabel "parent series"@en .
@@ -106,7 +121,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workIsbn    "014259153" ;
    bdo:workIsbn    "1-111456291" ;
    bdo:workIsAbout  bdr:T1082 , bdr:T1183 , bdr:T1193 ;
-   bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy ;
+   bdo:workLangScript  bdr:Bo , bdr:BoDbuCan , bdr:BoTibt , bdr:LanguageTaxonomy , bdr:SaDeva ;
    #bdo:workOtherLangScript  bdr:SaDeva ;
    bdo:workLcCallNumber  "bq7662.4 .g77 1979" ;
    bdo:workLccn  "79902886" ;
