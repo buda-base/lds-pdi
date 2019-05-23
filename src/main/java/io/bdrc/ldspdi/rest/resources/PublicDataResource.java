@@ -74,6 +74,7 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -89,6 +90,7 @@ public class PublicDataResource {
 
     public static final String RES_PREFIX_SHORT = "bdr";
     public static final String RES_PREFIX = "http://purl.bdrc.io/resource/";
+    public static final String PURL = ServiceConfig.getProperty("PURL");
 
     @GET
     @JerseyCacheControl()
@@ -187,6 +189,34 @@ public class PublicDataResource {
         }
         final String ext = MediaTypeUtils.getExtFromMime(mediaType);
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
+        return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
+    }
+
+    @GET
+    @Path("{prefixPart: [a-zA-Z]+}/{res}")
+    @JerseyCacheControl()
+    public Response getTestResourceGraph(@PathParam("res") final String res, @PathParam("prefixPart") String part, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info,
+            @Context Request request) throws RestException {
+        String prefixedRes = Prefixes.getPrefix(PURL + part + "/") + ':' + res;
+        String graphType = "graph";
+        if (Prefixes.getPrefix(PURL + part + "/").equals("bda")) {
+            graphType = "describe";
+        }
+        final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        if (format == null) {
+            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
+            ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
+        }
+        if (variant == null) {
+            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
+            ResponseBuilder rb = Response.status(406).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
+        }
+        MediaType mediaType = variant.getMediaType();
+        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
+        String ext = MediaTypeUtils.getExtFromMime(mediaType);
+        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
     }
 

@@ -33,12 +33,9 @@ public class RdfAuthFilter implements ContainerRequestFilter {
             boolean isSecuredEndpoint = true;
             ctx.setProperty("access", new Access());
             String token = getToken(ctx.getHeaderString("Authorization"));
-            System.out.println("TOKEN Filter >> " + token);
             TokenValidation validation = null;
             String path = ctx.getUriInfo().getPath();
-            System.out.println("PATH Filter >> " + path);
             Endpoint end = RdfAuthModel.getEndpoint(path);
-            System.out.println("ENDPOINT >> " + end);
             UserProfile prof = null;
             if (end == null) {
                 isSecuredEndpoint = false;
