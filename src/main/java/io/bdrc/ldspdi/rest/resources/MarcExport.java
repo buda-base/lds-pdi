@@ -1082,7 +1082,7 @@ public class MarcExport {
         }
     }
 
-    public static void add041(final Model m, final Record r, final List<String> langUrls) {
+    public static void add041(final Model m, final Record r, final List<String> langUrls, final String mainLangMarcCode) {
         if (langUrls.size() < 2)
             return;
         // 0 means it's not a translation... maybe 1 should be indicated when it is?
@@ -1094,6 +1094,11 @@ public class MarcExport {
             if (marcLangS != null) {
                 marcCodes.add(marcLangS.getString());
             }
+        }
+        // mainLangMarcCode is what appears in 008, when it is "mul", it should appear in the list
+        // (which is a bit counter-intuitive)
+        if (mainLangMarcCode.equals("mul")) {
+            marcCodes.add("mul");
         }
         // codes should be sorted alphabetically
         Collections.sort(marcCodes);
@@ -1135,6 +1140,8 @@ public class MarcExport {
             final int idxTibt = langUrls.indexOf(langTibetan);
             if (idxTibt != -1) {
                 mainLangUrl = langTibetan;
+                // when the work has some Tibetan language, we mark it as Tibetan
+                langMarcCode = "tib";
             } else {
                 mainLangUrl = langUrls.get(0);
             }
@@ -1154,7 +1161,7 @@ public class MarcExport {
             f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
         record.addVariableField(f035);
         record.addVariableField(f040);
-        add041(m, record, langUrls);
+        add041(m, record, langUrls, langMarcCode);
         StmtIterator si = workR.listProperties(workLcCallNumber);
         while (si.hasNext()) {
             String lccn = si.next().getLiteral().getString();
