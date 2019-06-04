@@ -70,7 +70,7 @@ public class MediaTypeUtils {
                 MT_TRIX).build();
 
         ExtToJena = new HashMap<>();
-        ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);        
+        ExtToJena.put("ttl",  TTLRDFWriter.strLangSttl);
         ExtToJena.put("nt",   RDFLanguages.strLangNTriples);
         ExtToJena.put("nq",   RDFLanguages.strLangNQuads);
         ExtToJena.put("trig", RDFLanguages.strLangTriG);
@@ -81,9 +81,9 @@ public class MediaTypeUtils {
         ExtToJena.put("rj",   RDFLanguages.strLangRDFJSON);
         ExtToJena.put("json", RDFLanguages.strLangRDFJSON);
         ExtToJena.put("trix", RDFLanguages.strLangTriX);
-        
+
         ExtToJenaLang = new HashMap<>();
-        ExtToJenaLang.put("ttl",  Lang.TURTLE);        
+        ExtToJenaLang.put("ttl",  Lang.TURTLE);
         ExtToJenaLang.put("nt",   Lang.NT);
         ExtToJenaLang.put("nq",   Lang.NQ);
         ExtToJenaLang.put("trig", Lang.TRIG);
@@ -94,10 +94,10 @@ public class MediaTypeUtils {
         ExtToJenaLang.put("rj",   Lang.RDFJSON);
         ExtToJenaLang.put("json", Lang.RDFJSON);
         ExtToJenaLang.put("trix", Lang.TRIX);
-        
+
         ExtToJenaRead = new HashMap<>(ExtToJena);
         ExtToJenaRead.put("ttl",  RDFLanguages.strLangTurtle);
-        
+
 
         MimeToExt = new HashMap<>();
         MimeToExt.put(MT_JSONLD_WA,   "jsonld");
@@ -105,6 +105,7 @@ public class MediaTypeUtils {
         MimeToExt.put(MT_MRCX_CU,     "mrcx");
         MimeToExt.put(MediaType.TEXT_HTML_TYPE,   "html");
         MimeToExt.put(MT_MRCX,   "mrcx");
+        MimeToExt.put(MediaType.TEXT_PLAIN_TYPE,   "txt");
         MimeToExt.put(MT_TTL,    "ttl");
         MimeToExt.put(MT_NT,     "nt");
         MimeToExt.put(MT_NQ,     "nq");
@@ -117,7 +118,8 @@ public class MediaTypeUtils {
         MimeToExt.put(MT_TRIX,   "trix");
 
         ExtToMime = new HashMap<>();
-        ExtToMime.put("mrcx", MT_MRCX);
+        ExtToMime.put("mrcx", MediaType.TEXT_PLAIN_TYPE);
+        ExtToMime.put("txt", MT_MRCX);
         ExtToMime.put("ttl",  MT_TTL);
         ExtToMime.put("nt",   MT_NT);
         ExtToMime.put("nq",   MT_NQ);
@@ -158,11 +160,11 @@ public class MediaTypeUtils {
     public static String getJenaFromExtension(String ext) {
         return ExtToJena.get(ext);
     }
-    
+
     public static Lang getJenaLangFromExtension(String ext) {
         return ExtToJenaLang.get(ext);
     }
-    
+
     public static String getJenaReadFromExtension(String ext) {
         return ExtToJenaRead.get(ext);
     }
