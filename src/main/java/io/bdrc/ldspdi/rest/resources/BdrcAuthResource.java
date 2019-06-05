@@ -86,13 +86,14 @@ public class BdrcAuthResource {
     @Path("/callbacks/github/bdrc-auth")
     // @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAuthModel() throws RestException {
-        if (ServiceConfig.useAuth()) {
-            log.info("updating Auth data model() >>");
-            Thread t = new Thread(new RdfAuthModel());
-            t.start();
-            return Response.ok("Auth Model was updated").build();
-        }
-        return Response.ok("Auth usage is disabled").build();
+        // if (ServiceConfig.useAuth()) {
+        System.out.println("updating Auth data model() >>");
+        log.info("updating Auth data model() >>");
+        Thread t = new Thread(new RdfAuthModel());
+        t.start();
+        return Response.ok("Auth Model was updated").build();
+        // }
+        // return Response.ok("Auth usage is disabled").build();
     }
 
     private ResponseBuilder setLastModified(ResponseBuilder builder) {

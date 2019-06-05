@@ -54,15 +54,15 @@ public class ResponseOutputStream {
     public static StreamingOutput getModelStream(final Model model, final String format, final String res, DocType docType) {
         return new StreamingOutput() {
             @Override
-            public void write(OutputStream os){
-                if(format.equals("jsonld")) {
+            public void write(OutputStream os) {
+                if (format.equals("jsonld")) {
                     final Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
                     JSONLDFormatter.jsonObjectToOutputStream(json, os);
                     return;
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
                 if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                    final RDFWriter writer=TTLRDFWriter.getSTTLRDFWriter(model,"");
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);
                     return;
                 }
@@ -81,7 +81,7 @@ public class ResponseOutputStream {
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
                 if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,"");
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);
                     return;
                 }
@@ -93,8 +93,8 @@ public class ResponseOutputStream {
     public static StreamingOutput getModelStream(final Model model) {
         return new StreamingOutput() {
             @Override
-            public void write(OutputStream os){
-                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model,"");
+            public void write(OutputStream os) {
+                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                 writer.output(os);
             }
         };
