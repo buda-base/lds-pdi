@@ -83,6 +83,7 @@ public class Utils {
         map.put("rj", "application/json");
         map.put("json", "application/json");
         map.put("trix", "application/trix+xml");
+        map.put("txt", "text/plain");
         return map;
     }
 
@@ -101,6 +102,7 @@ public class Utils {
         res.add("literal3");
         res.add("literal1");
         res.add("layers");
+        res.add("etext");
         res.add("MarcExportTest");
         return res;
     }

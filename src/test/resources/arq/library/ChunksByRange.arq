@@ -1,0 +1,22 @@
+#QueryScope=Etext
+#QueryReturnType=Table
+#QueryResults=Chunks in the asked range
+#QueryParams=R_RES,I_START,I_END
+#QueryUrl=/query/table/ChunksByRange?R_RES=bdr:UT4CZ5369_I1KG9127_0000&I_START=1000&I_END=2000
+
+#param.R_RES.type=URI
+#param.R_RES.subtype=bdo:Etext
+#param.R_RES.desc=the etext we want the chunks of
+#param.I_START.type=int
+#param.I_START.desc=the index of the first char that's needed
+#param.I_END.type=int
+#param.I_END.desc=the index of the last char that's needed
+
+select ?chunkcontent ?chunkstart ?chunkend 
+where { 
+    ?R_RES :eTextHasChunk ?c .
+    ?c :chunkContents ?chunkcontent ;
+       :sliceStartChar ?chunkstart ;
+       :sliceEndChar ?chunkend .
+    FILTER (?chunkstart <= ?I_END && ?chunkend >= ?I_START)
+}

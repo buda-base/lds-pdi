@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -256,7 +257,13 @@ public class PublicDataResource {
     @GET
     @Path("/resource/{res}.{ext}")
     @JerseyCacheControl()
-    public Response getFormattedResourceGraph(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") String fusekiUrl, @Context final UriInfo info) throws RestException {
+    public Response getFormattedResourceGraph(
+            @PathParam("res") final String res,
+            @PathParam("ext") final String ext,
+            @DefaultValue("0") @QueryParam("startChar") Integer startChar,
+            @DefaultValue("999999999") @QueryParam("endChar") Integer endChar,
+            @HeaderParam("fusekiUrl") String fusekiUrl,
+            @Context final UriInfo info) throws RestException {
         log.info("Call to getFormattedResourceGraph()");
         final String prefixedRes = RES_PREFIX_SHORT + ':' + res;
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
@@ -275,6 +282,9 @@ public class PublicDataResource {
         }
         if (ext.equals("mrcx")) {
             return MarcExport.getResponse(media, RES_PREFIX + res);
+        }
+        if (ext.equals("txt")) {
+            return TxtEtextExport.getResponse(RES_PREFIX + res, startChar, endChar);
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
         if (model.size() == 0) {

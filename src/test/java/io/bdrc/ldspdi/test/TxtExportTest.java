@@ -25,8 +25,7 @@ import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
-public class MarcExportTest extends JerseyTest {
-
+public class TxtExportTest extends JerseyTest {
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
@@ -35,17 +34,12 @@ public class MarcExportTest extends JerseyTest {
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl = "http://localhost:2251/bdrcrw";
+        fusekiUrl = "http://localhost:2252/bdrcrw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
-        //        try {
-        //            OntData.init();
-        //        } catch (RestException e) {
-        //            e.printStackTrace();
-        //        }
         // Creating a fuseki server
-        server = FusekiServer.create().port(2251).add("/bdrcrw", srvds).build();
+        server = FusekiServer.create().port(2252).add("/bdrcrw", srvds).build();
         server.start();
     }
 
@@ -62,11 +56,12 @@ public class MarcExportTest extends JerseyTest {
 
     @Test
     public void testSimpleRequestSimple() {
-        final Response res = target("/resource/W23819.mrcx")
+        final Response res = target("/resource/UT11577_004_0000.txt")
+                .queryParam("startChar", 1234)
+                .queryParam("endChar", 2444)
                 .request()
                 .get();
         System.out.println("result:");
         System.out.println(res.readEntity(String.class));
     }
-
 }
