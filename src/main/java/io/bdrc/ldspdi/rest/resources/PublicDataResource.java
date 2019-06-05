@@ -56,7 +56,6 @@ import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFLanguages;
@@ -257,13 +256,8 @@ public class PublicDataResource {
     @GET
     @Path("/resource/{res}.{ext}")
     @JerseyCacheControl()
-    public Response getFormattedResourceGraph(
-            @PathParam("res") final String res,
-            @PathParam("ext") final String ext,
-            @DefaultValue("0") @QueryParam("startChar") Integer startChar,
-            @DefaultValue("999999999") @QueryParam("endChar") Integer endChar,
-            @HeaderParam("fusekiUrl") String fusekiUrl,
-            @Context final UriInfo info) throws RestException {
+    public Response getFormattedResourceGraph(@PathParam("res") final String res, @PathParam("ext") final String ext, @DefaultValue("0") @QueryParam("startChar") Integer startChar, @DefaultValue("999999999") @QueryParam("endChar") Integer endChar,
+            @HeaderParam("fusekiUrl") String fusekiUrl, @Context final UriInfo info) throws RestException {
         log.info("Call to getFormattedResourceGraph()");
         final String prefixedRes = RES_PREFIX_SHORT + ':' + res;
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
@@ -313,12 +307,11 @@ public class PublicDataResource {
             baseUri = parseBaseUri(info.getAbsolutePath().toString() + other);
             isBase = true;
         }
+        log.info("getExtOntologyHomePage baseUri is >>" + baseUri);
         // Is the full request uri a baseuri?
         if (isBase) {
             OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
             OntData.setOntModelWithBase(baseUri);
-            // Using single ontology model
-            OntModel mod = OntData.ontMod;
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -339,7 +332,8 @@ public class PublicDataResource {
                 OntDocumentManager odm = new OntDocumentManager();
                 odm.setProcessImports(false);
                 oms.setDocumentManager(odm);
-                OntModel om = ModelFactory.createOntologyModel(oms);
+                // OntModel om = ModelFactory.createOntologyModel(oms);
+                OntModel om = OntData.getOntModelByBase(baseUri);
                 om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
