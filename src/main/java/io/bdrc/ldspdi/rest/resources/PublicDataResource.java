@@ -311,7 +311,6 @@ public class PublicDataResource {
         // Is the full request uri a baseuri?
         if (isBase) {
             OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
-            OntData.setOntModelWithBase(baseUri);
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -334,6 +333,7 @@ public class PublicDataResource {
                 oms.setDocumentManager(odm);
                 // OntModel om = ModelFactory.createOntologyModel(oms);
                 OntModel om = OntData.getOntModelByBase(baseUri);
+                OntData.setOntModel(om);
                 om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                 om.write(System.out, "JSON-LD");
                 MediaType mediaType = variant.getMediaType();
