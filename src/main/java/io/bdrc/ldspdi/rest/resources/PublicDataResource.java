@@ -335,6 +335,7 @@ public class PublicDataResource {
                 // OntModel om = ModelFactory.createOntologyModel(oms);
                 OntModel om = OntData.getOntModelByBase(baseUri);
                 om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
+                om.write(System.out, "JSON");
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
