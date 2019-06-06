@@ -7,6 +7,7 @@
 @prefix bdan:  <http://purl.bdrc.io/annotation/> .
 @prefix bdd:   <http://purl.bdrc.io/data/> .
 @prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
 @prefix bdr:   <http://purl.bdrc.io/resource/> .
 @prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
@@ -100,22 +101,40 @@ bdr:W23819_0001_P2 skos:prefLabel "first part, part two"@en ;
 bdr:WSeriesParent a bdo:Work ;
   skos:prefLabel "parent series"@en .
 
-bdr:W23819  a    bdo:Work ;
+bdr:CR472EFBB795AC  a  bdo:AgentAsCreator ;
+   bdo:agent     bdr:P326 ;
+   bdo:role      bdr:R0ER0025 .
+
+bdr:EV4E026CE83CC9  a  bdo:PublishedEvent ;
+   bdo:onYear    1979 .
+
+bdr:NT3E7BD9FC2E1D  a  bdo:Note ;
+   bdo:noteText  "tbrc holds digital scanned images, tiffs and pdf files"@en .
+
+bda:W23819  a    adm:AdminData , adm:Outline ;
+   bdo:isRoot    true ;
+   bdo:legacyOutlineNodeRID  "O1GS87647" ;
+   bdo:workLocation  bdr:WL3AA577C5BBD0 ;
+   adm:adminAbout  bdr:W23819 ;
+   adm:facetIndex  259 ;
+   adm:logEntry  bda:LG2309321EDCF2 , bda:LG23C19E2AF0EF , bda:LG8DF5D0BCB569 , bda:LG8F43D3E65D9A , bda:LG9B1FD3662E27 , bda:LGAD81B627AA59 , bda:LGC353A37A281D , bda:LGD4A3C7BF8860 , bda:LGF45BA14BD896 , bda:LGFAFBE7E04F09 , bda:LGFD6683FEE3D3 ;
+   adm:outlineAuthorStatement  "genesmith; outline prepared with the gracious support of the trace foundation"@en ;
+   adm:outlineType  bda:OutlineTypeNoType ;
+   adm:status    bda:StatusReleased .
+
+bdr:W23819  a    bdo:PublishedWork , bdo:Work ;
    skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts ;
-   bdo:creatorTerton  bdr:P326 ;
-   bdo:itemBDRCHoldingStatement  "1" ;
-   bdo:note      [ bdo:noteText  "tbrc holds digital scanned images, tiffs and pdf files"@en ] ;
+   bdo:creator   bdr:CR472EFBB795AC ;
+   bdo:isRoot    true ;
    bdo:workAuthorshipStatement  "snga 'gyur rig mdzod rtsom sgrig lhan tshogs/"@bo-x-ewts ;
    bdo:workBiblioNote  "reproduced from the rare but incomplet manuscript set of mtshams-brag..."@en ;
    bdo:workCatalogInfo  "Treasure revelations of the Eight Pronouncements (Kagye). Discovered by Guru Chowang (1212-1270), the reincarnate successor of Nyangrel Nyima Ozer, discoverer of the first major cycle of Eight Pronouncement's treasures, the Kagye Desheg Dupa. Manuscript is incomplete and is from Tsamdrak Monastery in Bhutan. There probably existed a blockprint edition in six volumes for Gaje Monastery, an affiliate of Katok in Kham. A print of this set has not yet been found."@en ;
-   bdo:workCreator  bdr:P326 ;
    bdo:workEvent  [ a             bdo:PublishedEvent ;
                     bdo:onYear    1979
                   ] ;
    bdo:workEditionStatement  "edition statement" ;
    bdo:workExtentStatement  "1 v." ;
    bdo:workHasItem  bdr:I23819 ;
-   bdo:workHasItemImageAsset  bdr:I23819 ;
    bdo:workHasPart  bdr:W23819_0001 , bdr:W23819_0017 , bdr:W23819_0056 , bdr:W23819_0074 ;
    bdo:workHollis  "014259153" ;
    bdo:workIsbn    "014259153" ;
@@ -133,6 +152,7 @@ bdr:W23819  a    bdo:Work ;
    bdo:workPublisherLocation  "paro"@en ;
    bdo:workPublisherName  "ngodrup and sherab drimay"@en ;
    bdo:workScanInfo  "scanned at tbrc, 115 5th ave., 7th floor, new york city, ny 10003 by rabten 2003"@en ;
+   bdo:note      bdr:NT3E7BD9FC2E1D ;
    bdo:workTitle  [ a             bdo:WorkBibliographicalTitle ;
                     rdfs:label    "bka' brgyad gsang ba yongs rdzogs/"@bo-x-ewts
                   ] ,
@@ -153,32 +173,8 @@ bdr:W23819  a    bdo:Work ;
                   ] ,
          [ a             bdo:WorkTitlePageTitle ;
            rdfs:label    "bka' brgyad gsan ba yon rdzogs"@bo-x-ewts
-         ] ;
-   bdo:workType  bdr:WorkTypePublishedWork ;
-   adm:access    bdr:AccessOpen ;
-   adm:gitRevision  "86d2726b249c9396cb08106bd343c4b84daa1ae7" ;
-   adm:license   bdr:LicensePublicDomain ;
-   adm:logEntry  [ adm:logDate   "2007-04-11T14:01:24.494Z"^^xsd:dateTime ;
-                   adm:logMessage  "edited notations; jann"@en ;
-                   adm:logWho    bdr:U00011
-                 ] ,
-         [ adm:logDate   "2016-12-06T22:56:27.985Z"^^xsd:dateTime ;
-           adm:logWho    bdr:U00021
-         ] ;
-   adm:outline   [ a             adm:Outline ;
-                   adm:legacyImageGroupRID  "O1GS87647" ;
-                   adm:logEntry  [ adm:logDate   "2008-01-01T15:58:56.75Z"^^xsd:dateTime ;
-                                   adm:logMessage  "outline completed"@en ;
-                                   adm:logWho    bdr:U00001
-                                 ] ,
-                         [ adm:logDate   "2012-09-17T15:47:50.719Z"^^xsd:dateTime ;
-                           adm:logMessage  "added T225 (chos spod)"@en ;
-                           adm:logWho    bdr:U00043
-                         ] ;
-                   adm:outlineAuthorStatement  "genesmith; outline prepared with the gracious support of the trace foundation"@en ;
-                   adm:outlineType  bdr:OutlineTypeNoType
-                 ] ;
-   adm:status    bdr:StatusReleased .
+         ] .
+
 
 bdr:P326  a      bdo:Person ;
    rdfs:seeAlso  "https://www.treasuryoflives.org/biographies/view/Guru-Chowang/5588"^^xsd:anyURI ;
@@ -229,5 +225,4 @@ bdr:P326  a      bdo:Person ;
          [ adm:logDate   "2016-06-29T14:43:59.122Z"^^xsd:dateTime ;
            adm:logMessage  "treasury link"@en ;
            adm:logWho    bdr:U00002
-         ] ;
-   adm:status    bdr:StatusReleased .
+         ] .
