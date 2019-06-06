@@ -45,6 +45,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
@@ -72,6 +75,7 @@ public class OntData implements Runnable {
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
@@ -133,6 +137,7 @@ public class OntData implements Runnable {
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            odm.setProcessImports(false);
             FileManager fm = odm.getFileManager();
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
@@ -463,6 +468,15 @@ public class OntData implements Runnable {
             s = s.substring(0, s.length() - 1);
         }
         return s;
+    }
+
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
+        OntData.init();
+        OntModel m = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth");
+        OntData.setOntModel(m);
+        m.write(System.out, "TURTLE");
+        System.out.println(m.size());
     }
 
 }
