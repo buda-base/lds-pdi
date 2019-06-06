@@ -95,6 +95,10 @@ public class OntData implements Runnable {
         ontMod = getOntModelByBase(baseUri);
     }
 
+    public static void setOntModel(OntModel mod) throws RestException {
+        ontMod = mod;
+    }
+
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
         return modelsBase.get(baseUri);
     }

@@ -25,7 +25,8 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     </servlet-mapping>
     <context-param>
         <param-name>fuseki</param-name>
-        <param-value>http://buda1.bdrc.io:13180/fuseki/bdrcrw/query</param-value>        
+        <!-- param-value>http://buda1.bdrc.io:13180/fuseki/bdrcrw/query</param-value--> 
+        <param-value>http://buda1.bdrc.io:13180/fuseki/rfc011rw/query</param-value>        
     </context-param>
     <context-param>
         <param-name>queryPath</param-name>

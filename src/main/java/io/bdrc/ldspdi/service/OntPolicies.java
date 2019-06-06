@@ -65,7 +65,6 @@ public class OntPolicies {
                 OntPolicy op = loadPolicy(r, fm);
                 map.put(op.getBaseUri(), op);
             }
-
             stream.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
