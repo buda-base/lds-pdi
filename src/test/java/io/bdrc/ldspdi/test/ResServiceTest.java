@@ -51,7 +51,7 @@ public class ResServiceTest extends JerseyTest {
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
     public final static Logger log = LoggerFactory.getLogger(ResServiceTest.class.getName());
-    public final static String[] methods = { "GET", "POST" };
+    public final static String[] methods = { "GET" /*, "POST" */};
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
