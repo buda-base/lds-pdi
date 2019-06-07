@@ -158,8 +158,7 @@ public class PublicDataResource {
     @GET
     @Path("/admindata/{res}")
     @JerseyCacheControl()
-    public Response getAdResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info,
-            @Context Request request) throws RestException {
+    public Response getAdResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
         final String prefix = "bda";
         final String prefixedRes = prefix + ':' + res;
         final String graphType = "describe";
@@ -175,6 +174,14 @@ public class PublicDataResource {
             return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
         }
         MediaType mediaType = variant.getMediaType();
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
+            try {
+                ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
+                return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
+            }
+        }
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
@@ -187,8 +194,7 @@ public class PublicDataResource {
     @GET
     @Path("/graph/{res}")
     @JerseyCacheControl()
-    public Response getGrResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info,
-            @Context Request request) throws RestException {
+    public Response getGrResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
         final String prefix = "bdg";
         final String prefixedRes = prefix + ':' + res;
         final String graphType = "graph";
@@ -204,6 +210,7 @@ public class PublicDataResource {
             return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
         }
         MediaType mediaType = variant.getMediaType();
+
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
@@ -216,8 +223,8 @@ public class PublicDataResource {
     @GET
     @Path("/admindata/{res}.{ext}")
     @JerseyCacheControl()
-    public Response getAdResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info,
-            @Context Request request) throws RestException {
+    public Response getAdResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request)
+            throws RestException {
         final String prefix = "bda";
         final String prefixedRes = prefix + ':' + res;
         final String graphType = "describe";
@@ -241,8 +248,8 @@ public class PublicDataResource {
     @GET
     @Path("/graph/{res}.{ext}")
     @JerseyCacheControl()
-    public Response getGrResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info,
-            @Context Request request) throws RestException {
+    public Response getGrResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request)
+            throws RestException {
         final String prefix = "bdg";
         final String prefixedRes = prefix + ':' + res;
         final String graphType = "graph";

@@ -49,8 +49,8 @@
 <tr><td><a href="${i}">${i}</a></td></tr>
 </c:forEach>
 </table>
-</c:if>
 
+</c:if>
 <p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
 <a href="#prefixes">Prefixes / </a>
