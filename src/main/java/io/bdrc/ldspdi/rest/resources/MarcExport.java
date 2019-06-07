@@ -83,20 +83,9 @@ public class MarcExport {
     public static final Property workAuthorshipStatement = ResourceFactory.createProperty(BDO+"workAuthorshipStatement");
     public static final Property workCatalogInfo = ResourceFactory.createProperty(BDO+"workCatalogInfo");
     public static final Property workBiblioNote = ResourceFactory.createProperty(BDO+"workBiblioNote");
-    public static final Property creatorTerton = ResourceFactory.createProperty(BDO+"creatorTerton");
-    // TODO: update
-    public static final Property creatorMainAuthor = ResourceFactory.createProperty(BDO+"creatorMainAuthor");
-    public static final Property creatorTranslator = ResourceFactory.createProperty(BDO+"creatorTranslator");
-    // TODO: update
-    public static final Property creatorIndicScholar = ResourceFactory.createProperty(BDO+"creatorPandita");
-    public static final Property creatorContributingAuthor = ResourceFactory.createProperty(BDO+"creatorContributingAuthor");
-    public static final Property creatorCommentator = ResourceFactory.createProperty(BDO+"creatorCommentator");
-    public static final Property creatorCompiler = ResourceFactory.createProperty(BDO+"creatorEditor");
-    // TODO: update
-    public static final Property creatorReviser = ResourceFactory.createProperty(BDO+"creatorReviserOfTranslation");
-    public static final Property creatorScribe = ResourceFactory.createProperty(BDO+"creatorScribe");
-    public static final Property creatorCalligrapher = ResourceFactory.createProperty(BDO+"creatorCalligrapher");
-    public static final Property creatorArtist = ResourceFactory.createProperty(BDO+"creatorArtist");
+    public static final Property creator = ResourceFactory.createProperty(BDO+"creator");
+    public static final Property role = ResourceFactory.createProperty(BDO+"role");
+    public static final Property agent = ResourceFactory.createProperty(BDO+"agent");
     public static final Property workEvent = ResourceFactory.createProperty(BDO+"workEvent");
     public static final Property workTitle = ResourceFactory.createProperty(BDO+"workTitle");
     public static final Property workIsAbout = ResourceFactory.createProperty(BDO+"workIsAbout");
@@ -116,8 +105,9 @@ public class MarcExport {
     public static final Property workIsbn = ResourceFactory.createProperty(BDO+"workIsbn");
     public static final Property workLccn = ResourceFactory.createProperty(BDO+"workLccn");
     public static final Property workLcCallNumber = ResourceFactory.createProperty(BDO+"workLcCallNumber");
-    public static final Property admAccess = ResourceFactory.createProperty(ADM+"access");
-    public static final Property admLicense = ResourceFactory.createProperty(ADM+"license");
+    public static final Property tmpAccess = ResourceFactory.createProperty(TMP+"access");
+    public static final Property tmpLicense = ResourceFactory.createProperty(TMP+"license");
+    public static final Property tmpStatus = ResourceFactory.createProperty(TMP+"status");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP+"publishedYear");
     public static final Property subclassOfTax = ResourceFactory.createProperty(BDO+"taxSubClassOf");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO+"publisherLocation");
@@ -279,7 +269,7 @@ public class MarcExport {
     }
 
     public static void addAccess(final Model m, final Resource main, final Record r) {
-        final Resource access = main.getPropertyResourceValue(admAccess);
+        final Resource access = main.getPropertyResourceValue(tmpAccess);
         if (access == null) {
             return; // maybe there should be a f506_unknown?
         } else {
@@ -409,17 +399,41 @@ public class MarcExport {
         nameList.add(l);
     }
 
-    public static void addAuthorRel(final Model m, final Resource main, final Record r, final Property prop, final String rel, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
-        StmtIterator si = main.listProperties(prop);
+    public static final Map<String,String> roleToName = new HashMap<>();
+    static {
+        roleToName.put("R0ER0025", "author."); // terton
+        roleToName.put("R0ER0019", "author."); // creatorMainAuthor
+        roleToName.put("R0ER0020", "translator."); // creatorTranslator
+        roleToName.put("R0ER0018", "consultant."); // creatorIndicScholar
+        roleToName.put("R0ER0016", "contributor."); // creatorContributingAuthor
+        roleToName.put("R0ER0014", "commentator for written text."); // creatorCommentator
+        roleToName.put("R0ER0014", "editor."); // creatorCompiler
+        roleToName.put("R0ER0023", "corrector."); // creatorReviser
+        roleToName.put("R0ER0024", "scribe."); // creatorScribe
+        roleToName.put("R0ER0013", "calligrapher."); // creatorCalligrapher
+        roleToName.put("R0ER0010", "artist."); // creatorArtist
+    }
+
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
+        StmtIterator si = main.listProperties(creator);
         while (si.hasNext()) {
-            final Resource creator = si.next().getResource();
+            final Resource agentAsRole = si.next().getResource();
+            final Resource roleR = agentAsRole.getPropertyResourceValue(role);
+            final Resource agentR = agentAsRole.getPropertyResourceValue(agent);
+            if (roleR == null || agentR == null) {
+                return;
+            }
+            String rel = roleToName.get(roleR.getLocalName());
+            if (rel == null) {
+                rel = "author.";
+            }
             // here we want to keep an order among the various names and titles
             // otherwise the output could be inconsistent among queries
             final List<Literal> names = new ArrayList<>();
             final List<Literal> otherNames = new ArrayList<>();
             final List<Literal> titles = new ArrayList<>();
             final List<Literal> otherTitles = new ArrayList<>();
-            StmtIterator nsi = creator.listProperties(personName);
+            StmtIterator nsi = agentR.listProperties(personName);
             while (nsi.hasNext()) {
                 final Resource name = nsi.next().getResource();
                 final Resource type = name.getPropertyResourceValue(RDF.type);
@@ -443,7 +457,7 @@ public class MarcExport {
             }
             Integer birthYear = null;
             Integer deathYear = null;
-            si = creator.listProperties(personEvent);
+            si = agentR.listProperties(personEvent);
             while (si.hasNext()) {
                 final Resource event = si.next().getResource();
                 final Resource eventType = event.getPropertyResourceValue(RDF.type);
@@ -599,6 +613,9 @@ public class MarcExport {
         final String lang = l.getLanguage();
         if ("bo-x-ewts".equals(lang)) {
             final String orig = l.getString();
+            if (orig.indexOf('x') > -1) {
+                return null;
+            }
             final List<String> warns = new ArrayList<>();
             final String u = ewtsConverter.toUnicode(orig, warns, true);
             if (warns.isEmpty()) {
@@ -1001,20 +1018,6 @@ public class MarcExport {
         record.addVariableField(f505);
     }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
-        addAuthorRel(m, main, r, creatorTerton, "author.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorMainAuthor, "author.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorTranslator, "translator.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorIndicScholar, "consultant.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorContributingAuthor, "contributor.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorCommentator, "commentator for written text.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorCompiler, "editor.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorReviser, "corrector.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorScribe, "scribe.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorCalligrapher, "calligrapher.", i880, list880, list720);
-        addAuthorRel(m, main, r, creatorArtist, "artist.", i880, list880, list720);
-    }
-
     public static final class Index880 {
         // https://www.oclc.org/bibformats/en/controlsubfields.html#subfield6
         private int nextIndex = 1;
@@ -1229,7 +1232,7 @@ public class MarcExport {
             record.addVariableField(f520);
         }
         record.addVariableField(f533);
-        final Resource license = workR.getPropertyResourceValue(admLicense);
+        final Resource license = workR.getPropertyResourceValue(tmpLicense);
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
         }
@@ -1273,8 +1276,16 @@ public class MarcExport {
             throw new RestException(404,new LdsError(LdsError.NO_GRAPH_ERR).setContext(resUri));
         }
         final Resource main = model.getResource(resUri);
-        final Resource type = main.getPropertyResourceValue(RDF.type);
-        if (!type.getLocalName().equals("Work")) {
+        final StmtIterator stmti = main.listProperties(RDF.type);
+        boolean isWork = false;
+        while (stmti.hasNext()) {
+            final Resource type = stmti.next().getObject().asResource();
+            if (type.getLocalName().contains("Work")) {
+                isWork = true;
+                break;
+            }
+        }
+        if (!isWork) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is not a Work"));
         }
         if (main.hasProperty(partOf)) {

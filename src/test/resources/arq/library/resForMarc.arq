@@ -12,13 +12,19 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 
 construct {
   ?R_RES ?p ?o .
+  ?R_RES tmp:status ?status .
+  ?R_RES tmp:access ?access .
+  ?R_RES tmp:license ?license .
+  ?R_RES tmp:restrictedInChina ?ric .
   ?o ?op ?oo .
   ?t skos:prefLabel ?to .
   ?series skos:prefLabel ?seriesl .
   ?part ?partp ?parto .
+  ?o bdo:personName ?pname .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .
+  ?aac ?aacp ?aaco .
   ?o bdo:personEvent ?pevent .
   ?pevent ?peventp ?pevento .
   ?ols ?olsp ?olso .
@@ -35,6 +41,16 @@ construct {
     ?t skos:prefLabel ?to .
   }
   union {
+    ?R_RES :workHasItem ?item .
+    ?item a :ItemImageAsset .
+    ?admItem adm:adminAbout ?item .
+    ?admItem adm:access ?access .
+    ?admItem adm:restrictedInChina ?ric .
+    ?admItem adm:contentLegal/adm:license ?license .
+    ?admWork adm:adminAbout ?R_RES .
+    ?admWork adm:status ?status .
+  }
+  union {
     ?R_RES bdo:workHasPart+ ?part .
     ?part ?partp ?parto .
     FILTER (?partp = skos:prefLabel || ?partp = bdo:workHasPart || ?partp = bdo:workPartTreeIndex)
@@ -44,15 +60,15 @@ construct {
     ?series skos:prefLabel ?seriesl .
   }
   union {
-    ?p rdfs:subclassOf* :workCreator .
-    ?R_RES ?p ?o .
-    ?o ?op ?oo .
+    ?R_RES bdo:creator ?aac .
+    ?aac ?aacp ?aaco .
+    ?aac bdo:agent ?o .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
   }
   union {
-    ?p rdfs:subclassOf* :workCreator .
-    ?R_RES ?p ?o .
+    ?R_RES bdo:creator ?aac .
+    ?aac bdo:agent ?o .
     ?o bdo:personEvent ?pevent .
     ?pevent ?peventp ?pevento .
   }
