@@ -20,6 +20,7 @@ construct {
   ?t skos:prefLabel ?to .
   ?series skos:prefLabel ?seriesl .
   ?part ?partp ?parto .
+  ?o bdo:personName ?pname .
   ?pname ?pnamep ?pnameo .
   ?pevent ?peventp ?pevento .
   ?R_RES tmp:publishedYear ?publishedYear .

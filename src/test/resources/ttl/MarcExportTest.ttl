@@ -8,6 +8,7 @@
 @prefix bdd:   <http://purl.bdrc.io/data/> .
 @prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
 @prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
 @prefix bdr:   <http://purl.bdrc.io/resource/> .
 @prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
@@ -103,13 +104,50 @@ bdr:WSeriesParent a bdo:Work ;
 
 bdr:CR472EFBB795AC  a  bdo:AgentAsCreator ;
    bdo:agent     bdr:P326 ;
-   bdo:role      bdr:R0ER0025 .
+   bdo:role      bdr:R0ER0020 .
 
 bdr:EV4E026CE83CC9  a  bdo:PublishedEvent ;
    bdo:onYear    1979 .
 
 bdr:NT3E7BD9FC2E1D  a  bdo:Note ;
    bdo:noteText  "tbrc holds digital scanned images, tiffs and pdf files"@en .
+
+bda:LD_BDRC_CC0
+  a adm:LegalData ;
+  adm:provider bda:CP021 ;
+  adm:copyrightOwner bda:CP021 ;
+  adm:license bda:LicenseCC0 ;
+  adm:termsOfUse bda:TermsOfUseBDRCGeneral ;
+  skos:prefLabel "Provided by BDRC under the CC0 license"@en ;
+.
+
+bda:LD_BDRC_PD
+  a adm:LegalData ;
+  adm:license bda:LicensePublicDomain ;
+  adm:provider bda:CP021 ;
+  adm:termsOfUse bda:TermsOfUseBDRCGeneral ;
+  skos:prefLabel "Provided by BDRC, Public domain"@en ;
+.
+
+bda:I23819  a    adm:AdminData ;
+   bdo:isRoot    true ;
+   adm:access    bda:AccessOpen ;
+   adm:adminAbout  bdr:I23819 ;
+   adm:contentLegal  bda:LD_BDRC_PD ;
+   adm:facetIndex  13 ;
+   adm:gitPath   "c1/I23819.trig" ;
+   adm:gitRepo   bda:GR0003 ;
+   adm:gitRevision  "1ef7cec76c101b4a15361c2c15c8dfa8e4bdce56" ;
+   adm:graphId   bdg:I23819 ;
+   adm:metadataLegal  bda:LD_BDRC_CC0 ;
+   adm:restrictedInChina  false ;
+   adm:status    bda:StatusReleased .
+
+bdr:I23819  a    bdo:Item , bdo:ItemImageAsset ;
+   bdo:isRoot    true ;
+   bdo:itemForWork  bdr:W23819 ;
+   bdo:itemHasVolume  bdr:V23819_I2833 , bdr:V23819_I2834 , bdr:V23819_I2835 , bdr:V23819_I2836 ;
+   bdo:itemVolumes  4 .
 
 bda:W23819  a    adm:AdminData , adm:Outline ;
    bdo:isRoot    true ;
