@@ -613,6 +613,9 @@ public class MarcExport {
         final String lang = l.getLanguage();
         if ("bo-x-ewts".equals(lang)) {
             final String orig = l.getString();
+            if (orig.indexOf('x') > -1) {
+                return null;
+            }
             final List<String> warns = new ArrayList<>();
             final String u = ewtsConverter.toUnicode(orig, warns, true);
             if (warns.isEmpty()) {
