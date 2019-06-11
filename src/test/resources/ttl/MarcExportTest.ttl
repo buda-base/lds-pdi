@@ -170,7 +170,7 @@ bdr:W23819  a    bdo:PublishedWork , bdo:Work ;
    bdo:workEvent  [ a             bdo:PublishedEvent ;
                     bdo:onYear    1979
                   ] ;
-   bdo:workEditionStatement  "edition statement" ;
+   bdo:workEditionStatement  "par gzhi1., par thengs 2."@bo-x-ewts ;
    bdo:workExtentStatement  "1 v." ;
    bdo:workHasItem  bdr:I23819 ;
    bdo:workHasPart  bdr:W23819_0001 , bdr:W23819_0017 , bdr:W23819_0056 , bdr:W23819_0074 ;
@@ -187,7 +187,7 @@ bdr:W23819  a    bdo:PublishedWork , bdo:Work ;
    bdo:workNumberOf bdr:WSeriesParent ;
    bdo:workNumberOfVolumes  4 ;
    bdo:workPagination  bdr:PaginationAbsolute ;
-   bdo:workPublisherLocation  "paro"@en ;
+   bdo:workPublisherLocation  "[bhutan]"@en ;
    bdo:workPublisherName  "ngodrup and sherab drimay"@en ;
    bdo:workScanInfo  "scanned at tbrc, 115 5th ave., 7th floor, new york city, ny 10003 by rabten 2003"@en ;
    bdo:note      bdr:NT3E7BD9FC2E1D ;

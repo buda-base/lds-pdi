@@ -110,7 +110,6 @@ public class MarcExport {
     public static final Property tmpStatus = ResourceFactory.createProperty(TMP+"status");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP+"publishedYear");
     public static final Property subclassOfTax = ResourceFactory.createProperty(BDO+"taxSubClassOf");
-    public static final Property publisherLocation = ResourceFactory.createProperty(BDO+"publisherLocation");
     public static final Property langBCP47Lang = ResourceFactory.createProperty(BDO+"langBCP47Lang");
     public static final Property langMARCCode = ResourceFactory.createProperty(BDO+"langMARCCode");
 
@@ -217,11 +216,21 @@ public class MarcExport {
     public static String getLangStr(final Literal l) {
         final String lang = l.getLanguage();
         if (lang == null || !"bo-x-ewts".equals(lang)) {
-            return StringUtils.capitalize(l.getString().replaceAll("[/|;]", ""));
+            return getLangStrNoConv(l);
         }
         String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
         alalc = alalc.replace("u0fbe", "x");
         return StringUtils.capitalize(alalc.replace('-', ' '));
+    }
+
+    public static String getLangStrNoConv(final Literal l) {
+        String st = l.getString();
+        if (st.startsWith("[")) {
+            st = "["+StringUtils.capitalize(st.substring(1));
+        } else {
+            st = StringUtils.capitalize(st);
+        }
+        return st.replaceAll("[/|;]", "");
     }
 
     public static Map<String,String> getPubLoctoCC() {
@@ -234,20 +243,20 @@ public class MarcExport {
         reader = new CSVReaderBuilder(in)
                 .withCSVParser(parser)
                 .build();
-        String[] line = null;
-        while (line != null) {
-            if (line.length > 1) {
-                if (line[1].length() < 3)
-                    res.put(line[0], " "+line[1]);
-                else
-                    res.put(line[0], line[1]);
-            }
-            try {
+        try {
+            String[] line = reader.readNext();;
+            while (line != null) {
+                if (line.length > 1) {
+                    if (line[1].length() < 3)
+                        res.put(line[0], line[1]+" ");
+                    else
+                        res.put(line[0], line[1]);
+                }
                 line = reader.readNext();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return res;
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return res;
         }
         return res;
     }
@@ -319,24 +328,16 @@ public class MarcExport {
         if (!hasPubName) {
             f264.addSubfield(factory.newSubfield('b', "[publisher not identified], "));
         }
-        si = main.listProperties(workEvent);
-        boolean hasDate = false;
-        while (si.hasNext()) {
-            final Resource event = si.next().getResource();
-            final Resource eventType = event.getPropertyResourceValue(RDF.type);
-            if (eventType == null || !eventType.getLocalName().equals("PublishedEvent")) {
-                continue;
-            }
-            final Statement onYearS = event.getProperty(onYear);
-            if (onYearS == null) {
-                continue;
-            }
-            int year = onYearS.getInt();
-            f264.addSubfield(factory.newSubfield('c', String.valueOf(year)+"."));
-            hasDate = true;
-        }
-        if (!hasDate) {
+        final Statement publishedYearS = main.getProperty(tmpPublishedYear);
+        if (publishedYearS == null) {
             f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
+        } else {
+            final int publishedYear = publishedYearS.getInt();
+            if (publishedYear > 9999 || publishedYear < 0) {
+                f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
+            } else {
+                f264.addSubfield(factory.newSubfield('c', String.valueOf(publishedYear)+"."));
+            }
         }
         r.addVariableField(f264);
     }
@@ -358,11 +359,11 @@ public class MarcExport {
             }
         }
         sb.append("uuuu");
-        final Statement publisherLocationS = main.getProperty(publisherLocation);
+        final Statement publisherLocationS = main.getProperty(workPublisherLocation);
         if (publisherLocationS == null) {
             sb.append(defaultCountryCode);
         } else {
-            final String pubLocStr = publisherLocationS.getObject().asLiteral().getString();
+            String pubLocStr = publisherLocationS.getObject().asLiteral().getString();
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
@@ -836,19 +837,19 @@ public class MarcExport {
             if (l == null)
                 continue;
             hasSeries = true;
-            f490.addSubfield(factory.newSubfield('a', getLangStr(l)));
+            f490.addSubfield(factory.newSubfield('a', getLangStr(l)+" ; "));
+        }
+        si = main.listProperties(workSeriesName);
+        while (si.hasNext()) {
+            final Literal series = si.next().getLiteral();
+            hasSeries = true;
+            f490.addSubfield(factory.newSubfield('a', getLangStr(series)+" ; "));
         }
         si = main.listProperties(workSeriesNumber);
         while (si.hasNext()) {
             final Literal series = si.next().getLiteral();
             hasSeries = true;
             f490.addSubfield(factory.newSubfield('v', getLangStr(series)));
-        }
-        si = main.listProperties(workSeriesName);
-        while (si.hasNext()) {
-            final Literal series = si.next().getLiteral();
-            hasSeries = true;
-            f490.addSubfield(factory.newSubfield('a', getLangStr(series)));
         }
         if (hasSeries)
             record.addVariableField(f490);
@@ -1199,7 +1200,11 @@ public class MarcExport {
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
-            f250.addSubfield(factory.newSubfield('a', getLangStr(editionStatement)+"."));
+            String f250str = getLangStrNoConv(editionStatement);
+            if (!f250str.endsWith(".")) {
+                f250str+=".";
+            }
+            f250.addSubfield(factory.newSubfield('a', f250str));
             record.addVariableField(f250);
         }
         addPubInfo(m, workR, record); // 264
@@ -1215,7 +1220,7 @@ public class MarcExport {
         while (si.hasNext()) {
             final Literal biblioNote = si.next().getLiteral();
             final DataField f500 = factory.newDataField("500", ' ', ' ');
-            String biblioNoteS = getLangStr(biblioNote);
+            String biblioNoteS = getLangStrNoConv(biblioNote);
             if (!biblioNoteS.endsWith(".")) {
                 biblioNoteS += ".";
             }
@@ -1231,7 +1236,7 @@ public class MarcExport {
         while (si.hasNext()) {
             final Literal catalogInfo = si.next().getLiteral();
             final DataField f520 = factory.newDataField("520", ' ', ' ');
-            f520.addSubfield(factory.newSubfield('a', getLangStr(catalogInfo)));
+            f520.addSubfield(factory.newSubfield('a', getLangStrNoConv(catalogInfo)));
             record.addVariableField(f520);
         }
         record.addVariableField(f533);
@@ -1259,8 +1264,8 @@ public class MarcExport {
                 lccn += ' ';
             }
             final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   "+lccn));
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
+            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   "+lccn));
             record.addVariableField(f776_08);
         }
         final DataField f856 = factory.newDataField("856", '4', '0');

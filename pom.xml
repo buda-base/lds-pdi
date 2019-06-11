@@ -73,7 +73,7 @@
     <dependency>
       <groupId>io.bdrc.ewtsconverter</groupId>
       <artifactId>ewts-converter</artifactId>
-      <version>1.4.2</version>
+      <version>1.4.4</version>
     </dependency>
     <dependency>
         <groupId>commons-validator</groupId>
