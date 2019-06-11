@@ -984,6 +984,25 @@ public class MarcExport {
         record.addVariableField(f546);
     }
 
+    public static String getLangStr505(final Literal l) {
+        final String lang = l.getLanguage();
+        if (lang == null || !"bo-x-ewts".equals(lang)) {
+            return getLangStrNoConv(l);
+        }
+        String[] parts = l.getString().split("/");
+        final StringBuilder res = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            final String part = parts[i].trim();
+            String alalc = TransConverter.ewtsToAlalc(part, true);
+            alalc = StringUtils.capitalize(alalc.replace("u0fbe", "x").replace('-', ' '));
+            res.append(alalc);
+            if (i < parts.length -1) {
+                res.append(". ");
+            }
+        }
+        return res.toString();
+    }
+
     private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang) {
         final Selector selector = new SimpleSelector(null, workHasPart, (RDFNode) null);
         final StmtIterator si =  m.listStatements(selector);
@@ -1011,7 +1030,7 @@ public class MarcExport {
         for (Literal l : parts.values()) {
             if (!first)
                 sb.append(" -- ");
-            sb.append(getLangStr(l));
+            sb.append(getLangStr505(l));
             first = false;
         }
         sb.append('.');
