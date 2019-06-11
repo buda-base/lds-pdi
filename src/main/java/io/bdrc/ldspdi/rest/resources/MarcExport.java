@@ -138,8 +138,8 @@ public class MarcExport {
     final static DateTimeFormatter f005_f = DateTimeFormatter.ofPattern("yyyyMMddHHmmss.S");
 
     // initialize static fields:
-    static final ControlField f006 = factory.newControlField("006", "m     o  d");
-    static final ControlField f007 = factory.newControlField("007", "cr");
+    static final ControlField f006 = factory.newControlField("006", "m     o  d        ");
+    static final ControlField f007 = factory.newControlField("007", "cr |||||||||||");
     static final DataField f040 = factory.newDataField("040", ' ', ' ');
     static final DataField f336 = factory.newDataField("336", ' ', ' ');
     static final DataField f337 = factory.newDataField("337", ' ', ' ');
@@ -154,7 +154,7 @@ public class MarcExport {
 
     static final DataField f542_PD = factory.newDataField("542", '1', ' ');
 
-    static final String defaultCountryCode = "   ";
+    static final String defaultCountryCode = "xx ";
     static final String defaultLang = "und";
 
 
@@ -181,7 +181,7 @@ public class MarcExport {
         f040.addSubfield(factory.newSubfield('b', "eng"));
         // Columbia doesn't want RDA here
         //f040.addSubfield(factory.newSubfield('e', "rda"));
-        f040.addSubfield(factory.newSubfield('e', "NNC"));
+        f040.addSubfield(factory.newSubfield('c', "NNC"));
         f336.addSubfield(factory.newSubfield('a', "text"));
         f336.addSubfield(factory.newSubfield('b', "txt"));
         f336.addSubfield(factory.newSubfield('2', "rdacontent"));
@@ -346,18 +346,18 @@ public class MarcExport {
         sb.append(now.format(yymmdd));
         final Statement publishedYearS = main.getProperty(tmpPublishedYear);
         if (publishedYearS == null) {
-            sb.append("b    ");
+            sb.append("nuuuu");
         } else {
             final int publishedYear = publishedYearS.getInt();
             if (publishedYear > 9999 || publishedYear < 0) {
-                sb.append("b    ");
+                sb.append("nuuuu");
             } else {
                 final String date = String.format("%04d", publishedYear);
                 sb.append('s');
                 sb.append(date);
             }
         }
-        sb.append("    ");
+        sb.append("uuuu");
         final Statement publisherLocationS = main.getProperty(publisherLocation);
         if (publisherLocationS == null) {
             sb.append(defaultCountryCode);
@@ -366,7 +366,7 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append(" ||||o|||| 000 ||");
+        sb.append("|||||o|||| 000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
@@ -1158,11 +1158,14 @@ public class MarcExport {
         }
         add008(m, workR, record, langMarcCode, now);
         addIsbn(m, workR, record, itemMode); // 020
-        DataField f035 = factory.newDataField("035", ' ', ' ');
+        final DataField f035 = factory.newDataField("035", ' ', ' ');
         f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+originalR.getLocalName()));
-        if (itemMode)
-            f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
         record.addVariableField(f035);
+        if (itemMode) {
+            DataField f035_2 = factory.newDataField("035", ' ', ' ');
+            f035_2.addSubfield(factory.newSubfield('a', "(BDRC)bdr:"+workR.getLocalName()));
+            record.addVariableField(f035_2);
+        }
         record.addVariableField(f040);
         add041(m, record, langUrls, langMarcCode);
         StmtIterator si = workR.listProperties(workLcCallNumber);
