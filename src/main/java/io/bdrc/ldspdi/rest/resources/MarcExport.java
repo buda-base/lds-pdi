@@ -190,9 +190,10 @@ public class MarcExport {
         f338.addSubfield(factory.newSubfield('a', "online resource"));
         f338.addSubfield(factory.newSubfield('b', "cr"));
         f338.addSubfield(factory.newSubfield('2', "rdacarrier"));
-        f533.addSubfield(factory.newSubfield('a', "Electronic reproduction"));
-        f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. :"));
-        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center."));
+        f533.addSubfield(factory.newSubfield('a', "Electronic reproduction."));
+        f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. : "));
+        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center "));
+        f533.addSubfield(factory.newSubfield('n', "Available via World Wide Web."));
         f710_2.addSubfield(factory.newSubfield('a', "Buddhist Digital Resource Center."));
         // see https://www.oclc.org/content/dam/oclc/digitalregistry/506F_vocabulary.pdf
         f506_restricted.addSubfield(factory.newSubfield('a', "Access restricted."));
@@ -347,27 +348,27 @@ public class MarcExport {
         sb.append(now.format(yymmdd));
         final Statement publishedYearS = main.getProperty(tmpPublishedYear);
         if (publishedYearS == null) {
-            sb.append("nuuuu");
+            sb.append("nuuuuuuuu");
         } else {
             final int publishedYear = publishedYearS.getInt();
             if (publishedYear > 9999 || publishedYear < 0) {
-                sb.append("nuuuu");
+                sb.append("nuuuuuuuu");
             } else {
                 final String date = String.format("%04d", publishedYear);
                 sb.append('s');
                 sb.append(date);
+                sb.append("    ");
             }
         }
-        sb.append("uuuu");
         final Statement publisherLocationS = main.getProperty(workPublisherLocation);
         if (publisherLocationS == null) {
             sb.append(defaultCountryCode);
         } else {
-            String pubLocStr = publisherLocationS.getObject().asLiteral().getString();
+            String pubLocStr = publisherLocationS.getObject().asLiteral().getString().toLowerCase().trim();
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("|||||o|||| 000 ||");
+        sb.append("|||||||||| 000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
