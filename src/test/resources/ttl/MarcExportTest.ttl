@@ -207,7 +207,7 @@ bdr:W23819  a    bdo:PublishedWork , bdo:Work ;
                     rdfs:label    "si khron bod rig pa'i zhib 'jug; si chuan zang xue/"@bo-x-ewts
                   ] ,
                   [ a             bdo:WorkSubtitle ;
-                    rdfs:label    "sub ti tel"@bo-x-ewts
+                    rdfs:label    "sub ti tel/"@bo-x-ewts
                   ] ,
          [ a             bdo:WorkTitlePageTitle ;
            rdfs:label    "bka' brgyad gsan ba yon rdzogs"@bo-x-ewts

@@ -191,8 +191,8 @@ public class MarcExport {
         f338.addSubfield(factory.newSubfield('b', "cr"));
         f338.addSubfield(factory.newSubfield('2', "rdacarrier"));
         f533.addSubfield(factory.newSubfield('a', "Electronic reproduction."));
-        f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. : "));
-        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center "));
+        f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. :"));
+        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center."));
         f533.addSubfield(factory.newSubfield('n', "Available via World Wide Web."));
         f710_2.addSubfield(factory.newSubfield('a', "Buddhist Digital Resource Center."));
         // see https://www.oclc.org/content/dam/oclc/digitalregistry/506F_vocabulary.pdf
@@ -221,7 +221,7 @@ public class MarcExport {
         }
         String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
         alalc = alalc.replace("u0fbe", "x");
-        return StringUtils.capitalize(alalc.replace('-', ' '));
+        return StringUtils.capitalize(alalc.replace('-', ' ').trim());
     }
 
     public static String getLangStrNoConv(final Literal l) {
@@ -231,7 +231,7 @@ public class MarcExport {
         } else {
             st = StringUtils.capitalize(st);
         }
-        return st.replaceAll("[/|;]", "");
+        return st.replaceAll("[/|;]", "").trim();
     }
 
     public static Map<String,String> getPubLoctoCC() {
@@ -309,12 +309,12 @@ public class MarcExport {
             if (pubLocation.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('a', getLangStr(pubLocation)+" : "));
+            f264.addSubfield(factory.newSubfield('a', getLangStr(pubLocation)+" :"));
             hasPubLocation = true;
             break;
         }
         if (!hasPubLocation) {
-            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified] : "));
+            f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified] :"));
         }
         si = main.listProperties(workPublisherName);
         boolean hasPubName = false;
@@ -323,11 +323,11 @@ public class MarcExport {
             if (pubName.getString().contains("s.")) {
                 continue;
             }
-            f264.addSubfield(factory.newSubfield('b', getLangStr(pubName)+", "));
+            f264.addSubfield(factory.newSubfield('b', getLangStr(pubName)+","));
             hasPubName = true;
         }
         if (!hasPubName) {
-            f264.addSubfield(factory.newSubfield('b', "[publisher not identified], "));
+            f264.addSubfield(factory.newSubfield('b', "[publisher not identified],"));
         }
         final Statement publishedYearS = main.getProperty(tmpPublishedYear);
         if (publishedYearS == null) {
@@ -726,12 +726,12 @@ public class MarcExport {
         String mainTitleS;
         // ma che buoni questi spaghetti!
         if (subtitleStr != null) {
-            mainTitleS = getLangStr(mainTitleL) + " : ";
+            mainTitleS = getLangStr(mainTitleL) + " :";
             if (mainTitleS880 != null) {
                 mainTitleS880 += " : ";
             }
         } else if (authorshipStatement != null) {
-            mainTitleS = getLangStr(mainTitleL) + " / ";
+            mainTitleS = getLangStr(mainTitleL) + " /";
             if (mainTitleS880 != null) {
                 mainTitleS880 += " / ";
             }
@@ -747,14 +747,14 @@ public class MarcExport {
         }
         if (subtitleStr != null) {
             if (authorshipStatement != null) {
-                f245.addSubfield(factory.newSubfield('b', subtitleStr+" / "));
+                f245.addSubfield(factory.newSubfield('b', subtitleStr+" /"));
             } else {
                 f245.addSubfield(factory.newSubfield('b', subtitleStr+"."));
             }
         }
         if (mainTitleS880 != null && subtitleStr880 != null) {
             if (authorshipStatement != null) {
-                f880_main.addSubfield(factory.newSubfield('b', subtitleStr880+" / "));
+                f880_main.addSubfield(factory.newSubfield('b', subtitleStr880+" /"));
             } else {
                 f880_main.addSubfield(factory.newSubfield('b', subtitleStr880+"."));
             }
@@ -838,13 +838,13 @@ public class MarcExport {
             if (l == null)
                 continue;
             hasSeries = true;
-            f490.addSubfield(factory.newSubfield('a', getLangStr(l)+" ; "));
+            f490.addSubfield(factory.newSubfield('a', getLangStr(l)+" ;"));
         }
         si = main.listProperties(workSeriesName);
         while (si.hasNext()) {
             final Literal series = si.next().getLiteral();
             hasSeries = true;
-            f490.addSubfield(factory.newSubfield('a', getLangStr(series)+" ; "));
+            f490.addSubfield(factory.newSubfield('a', getLangStr(series)+" ;"));
         }
         si = main.listProperties(workSeriesNumber);
         while (si.hasNext()) {
@@ -995,7 +995,7 @@ public class MarcExport {
         for (int i = 0; i < parts.length; i++) {
             final String part = parts[i].trim();
             String alalc = TransConverter.ewtsToAlalc(part, true);
-            alalc = StringUtils.capitalize(alalc.replace("u0fbe", "x").replace('-', ' '));
+            alalc = StringUtils.capitalize(alalc.replace("u0fbe", "x").replace('-', ' ').trim());
             res.append(alalc);
             if (i < parts.length -1) {
                 res.append(". ");
