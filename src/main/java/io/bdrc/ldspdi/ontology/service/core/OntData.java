@@ -151,6 +151,7 @@ public class OntData implements Runnable {
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
             log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")).size());
+            log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")));
             QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                     OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
             readGithubJsonLDContext();
