@@ -143,9 +143,9 @@ public class OntData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
-                if (!uri.equals("http://purl.bdrc.io/ontology/ext/auth/")) {
-                    ontAllMod.add(om);
-                }
+                // if (!uri.equals("http://purl.bdrc.io/ontology/ext/auth/")) {
+                ontAllMod.add(om);
+                // }
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Global model size :" + ontAllMod.size());

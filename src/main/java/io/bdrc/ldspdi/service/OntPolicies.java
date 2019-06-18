@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 
@@ -27,6 +29,7 @@ public class OntPolicies {
     public static HashMap<String, OntPolicy> map;
     private static Model mod;
     private static String defaultGraph;
+    public final static Logger log = LoggerFactory.getLogger(OntPolicies.class.getName());
 
     private static OntPolicy loadPolicy(Resource r, FileManager fm) {
         Statement st = r.getProperty(ResourceFactory.createProperty("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#publicURI"));
@@ -64,6 +67,7 @@ public class OntPolicies {
                 Resource r = it1.next();
                 OntPolicy op = loadPolicy(r, fm);
                 map.put(op.getBaseUri(), op);
+                log.info("loaded OntPolicy >> {}", op);
             }
             stream.close();
         } catch (IOException e) {
