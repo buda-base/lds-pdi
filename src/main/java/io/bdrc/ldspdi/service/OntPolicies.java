@@ -51,12 +51,13 @@ public class OntPolicies {
     public static void init() {
         try {
             map = new HashMap<>();
-            OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            OntDocumentManager odm = new OntDocumentManager(policiesUrl);
             FileManager fm = odm.getFileManager();
             HttpURLConnection connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
             InputStream stream = connection.getInputStream();
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
+            mod.write(System.out, "TURTLE");
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type, ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
                 Resource r = it2.next();
