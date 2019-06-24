@@ -103,9 +103,11 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         Query q = QueryFactory.create(prefixes + " describe " + URI);
+        log.info("getDescribeModel query: {}", q.toString());
         QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
         qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         Model model = qe.execDescribe();
+        log.info("getDescribeModel modelSize: {}", model.size());
         qe.close();
         return model;
     }

@@ -161,8 +161,8 @@ public class PublicDataResource {
     public Response getAdResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
         final String prefix = "bda";
         final String prefixedRes = prefix + ':' + res;
-        final String graphType = "describe";
         final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        log.info("Call to getAdResourceGraph with format: {} variant is {}", format, variant);
         if (format == null) {
             String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
             ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
@@ -174,6 +174,7 @@ public class PublicDataResource {
             return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
         }
         MediaType mediaType = variant.getMediaType();
+        log.info("Call to getAdResourceGraph mediaType is: {}", mediaType);
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
                 ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
@@ -183,6 +184,7 @@ public class PublicDataResource {
             }
         }
         Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
+
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
