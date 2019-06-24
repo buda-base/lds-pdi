@@ -182,7 +182,7 @@ public class PublicDataResource {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
             }
         }
-        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
+        Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }

@@ -59,11 +59,11 @@ public class QueryProcessor {
         case "graph":
             return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
         case "describe":
-            return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
+            return getDescribeModel(URI, fusekiUrl, prefixes);
         case "":
             return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
         default:
-            return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
+            return getDescribeModel(URI, fusekiUrl, prefixes);
         }
     }
 
@@ -92,6 +92,21 @@ public class QueryProcessor {
             qe.close();
             ResultsCache.addToCache(model, hash);
         }
+        return model;
+    }
+
+    public static Model getDescribeModel(final String URI, String fusekiUrl, String prefixes) throws RestException {
+        if (prefixes == null) {
+            prefixes = getPrefixes();
+        }
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        Query q = QueryFactory.create(prefixes + " describe " + URI);
+        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
+        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+        Model model = qe.execDescribe();
+        qe.close();
         return model;
     }
 
@@ -212,7 +227,7 @@ public class QueryProcessor {
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
         String query = "PREFIX  :     <http://purl.bdrc.io/ontology/core/>\n" + "PREFIX  bdan: <http://purl.bdrc.io/annotation/>\n" + "PREFIX  aut:  <http://purl.bdrc.io/ontology/ext/auth/>\n"
                 + "PREFIX  bf:   <http://id.loc.gov/ontologies/bibframe/>\n" + "PREFIX  tbr:  <http://purl.bdrc.io/ontology/toberemoved/>\n" + "PREFIX  owl:  <http://www.w3.org/2002/07/owl#>\n"
                 + "PREFIX  rsh:  <http://purl.bdrc.io/shacl/core/shape/>\n" + "PREFIX  xsd:  <http://www.w3.org/2001/XMLSchema#>\n" + "PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>\n" + "PREFIX  bdac: <http://purl.bdrc.io/anncollection/>\n"
@@ -281,7 +296,11 @@ public class QueryProcessor {
         InputStream stream = connection.getInputStream();
         Model tmp = ModelFactory.createDefaultModel();
         tmp.read(stream, RDFLanguages.strLangRDFXML);
-        tmp.write(System.out, "TURTLE");
+        // tmp.write(System.out, "TURTLE");
         stream.close();
+
+        Model m = QueryProcessor.getDescribeModel("bda:AccessOpen", null, null);
+        System.out.println("MODEL SIZE : " + m.size());
+        m.write(System.out, "TURTLE");
     }
 }
