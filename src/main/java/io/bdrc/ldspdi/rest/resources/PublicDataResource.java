@@ -174,7 +174,6 @@ public class PublicDataResource {
             return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
         }
         MediaType mediaType = variant.getMediaType();
-        log.info("Call to getAdResourceGraph mediaType is: {}", mediaType);
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
                 ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + prefixedRes));

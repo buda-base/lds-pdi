@@ -84,6 +84,7 @@ public class OntData implements Runnable {
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
+            updateFusekiDataset();
             readGithubJsonLDContext();
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -127,6 +128,12 @@ public class OntData implements Runnable {
 
     public static Date getLastUpdated() {
         return lastUpdated;
+    }
+
+    private static void updateFusekiDataset() throws RestException {
+        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
+        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
     }
 
     @Override

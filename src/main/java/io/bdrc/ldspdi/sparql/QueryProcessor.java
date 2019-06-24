@@ -103,11 +103,9 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         Query q = QueryFactory.create(prefixes + " describe " + URI);
-        log.info("getDescribeModel query: {}", q.toString());
         QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
         qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         Model model = qe.execDescribe();
-        log.info("getDescribeModel modelSize: {}", model.size());
         qe.close();
         return model;
     }
@@ -161,9 +159,7 @@ public class QueryProcessor {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        log.info("Service fuseki >> " + fusekiUrl);
-        log.info("Graph >> " + graph);
-        log.info("InfModel Size >> " + mod.listStatements().toSet().size());
+        log.info("Service fuseki >> {} Graph >> {} and InfModel Size >> ", fusekiUrl, graph, mod.listStatements().toSet().size());
         DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         access.putModel(graph, mod);
     }
