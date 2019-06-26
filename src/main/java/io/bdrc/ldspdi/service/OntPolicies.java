@@ -57,7 +57,6 @@ public class OntPolicies {
             InputStream stream = connection.getInputStream();
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
-            mod.write(System.out, "TURTLE");
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type, ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
                 Resource r = it2.next();
