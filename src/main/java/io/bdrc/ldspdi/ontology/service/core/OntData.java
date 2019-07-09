@@ -86,6 +86,7 @@ public class OntData implements Runnable {
             }
             updateFusekiDataset();
             readGithubJsonLDContext();
+            log.info("Done with OntData initialization !");
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
         }
