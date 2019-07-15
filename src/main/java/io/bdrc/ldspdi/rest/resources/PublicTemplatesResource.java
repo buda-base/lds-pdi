@@ -236,6 +236,17 @@ public class PublicTemplatesResource {
         return Response.ok().build();
     }
 
+    @GET
+    @Path("/clearcache")
+    public String clearCache() throws RestException {
+        log.info("clearing cache >>");
+        if (ResultsCache.clearCache()) {
+            return "OK";
+        } else {
+            return "ERROR";
+        }
+    }
+
     private static HashMap<String, String> getGraphResourceHeaders(String url, final String ext, final String tcn) {
         final HashMap<String, MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
         final HashMap<String, String> headers = new HashMap<>();

@@ -27,29 +27,33 @@ import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
 
-    public static CacheAccess<Integer,Object> CACHE ;
-    public final static Logger log=LoggerFactory.getLogger(ResultsCache.class.getName());
+    public static CacheAccess<Integer, Object> CACHE;
+    public final static Logger log = LoggerFactory.getLogger(ResultsCache.class.getName());
 
     public static void init() {
-        CACHE = JCS.getInstance( "ldspdi" );
+        CACHE = JCS.getInstance("ldspdi");
     }
 
     public static void addToCache(Object res, int hash) {
-        try{
-            CACHE.put(Integer.valueOf(hash), res );
-            res=null;
-        }
-        catch (CacheException e ){
-            log.error("Problem putting Results -->"+res+" in the cache, for key -->"+hash+ " Exception:"+e.getMessage());
+        try {
+            CACHE.put(Integer.valueOf(hash), res);
+            res = null;
+        } catch (CacheException e) {
+            log.error("Problem putting Results -->" + res + " in the cache, for key -->" + hash + " Exception:" + e.getMessage());
         }
     }
 
     public static Object getObjectFromCache(int hash) {
-        return CACHE.get( Integer.valueOf(hash));
+        return CACHE.get(Integer.valueOf(hash));
     }
 
-    public static void clearCache() {
-        CACHE.clear();
-        log.info("The ldspdi cache has been cleared");
+    public static boolean clearCache() {
+        try {
+            CACHE.clear();
+            log.info("The ldspdi cache has been cleared");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

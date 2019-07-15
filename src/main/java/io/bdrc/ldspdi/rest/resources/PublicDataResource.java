@@ -447,7 +447,6 @@ public class PublicDataResource {
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            final String baseUri = parseBaseUri(res);
             OntModel model = OntData.getOntModelByBase(params.getBaseUri());
             model.write(System.out, "TURTLE");
             final StreamingOutput stream = new StreamingOutput() {
