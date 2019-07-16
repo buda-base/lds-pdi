@@ -328,7 +328,7 @@ public class PublicDataResource {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()", e));
             }
         }
-        if (ext.equals("mrcx")) {
+        if (ext.startsWith("mrc")) {
             return MarcExport.getResponse(media, RES_PREFIX + res);
         }
         if (ext.equals("txt")) {

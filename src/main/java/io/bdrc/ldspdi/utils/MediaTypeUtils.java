@@ -24,6 +24,7 @@ public class MediaTypeUtils {
 
     public static final MediaType MT_MRCX_CU = MediaType.valueOf("application/marcxml+xml; profile=\"http://purl.bdrc.io/resource/MarcCUProfile\"");
     public static final MediaType MT_MRCX = new MediaType("application","marcxml+xml");
+    public static final MediaType MT_MRC = new MediaType("application","marc");
     public static final MediaType MT_CSV = new MediaType("text","csv");
     public static final MediaType MT_JSONLD = new MediaType("application","ld+json");
     public static final MediaType MT_RT = new MediaType("application","rdf+thrift");
@@ -52,7 +53,7 @@ public class MediaTypeUtils {
         resVariantsWithMarc = Variant.mediaTypes(MediaType.TEXT_HTML_TYPE,
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
                 MT_NT, MT_NQ, MT_TRIG, MT_RDF, MT_OWL,
-                MT_TRIX, MT_MRCX, MT_MRCX_CU).build();
+                MT_TRIX, MT_MRCX, MT_MRC, MT_MRCX_CU).build();
 
         resVariantsNoHtml = Variant.mediaTypes(
                 MT_JSONLD, MT_RT, MT_TTL, MediaType.APPLICATION_JSON_TYPE,
@@ -105,6 +106,7 @@ public class MediaTypeUtils {
         MimeToExt.put(MT_MRCX_CU,     "mrcx");
         MimeToExt.put(MediaType.TEXT_HTML_TYPE,   "html");
         MimeToExt.put(MT_MRCX,   "mrcx");
+        MimeToExt.put(MT_MRC,   "mrc");
         MimeToExt.put(MediaType.TEXT_PLAIN_TYPE,   "txt");
         MimeToExt.put(MT_TTL,    "ttl");
         MimeToExt.put(MT_NT,     "nt");
@@ -118,8 +120,9 @@ public class MediaTypeUtils {
         MimeToExt.put(MT_TRIX,   "trix");
 
         ExtToMime = new HashMap<>();
-        ExtToMime.put("mrcx", MediaType.TEXT_PLAIN_TYPE);
-        ExtToMime.put("txt", MT_MRCX);
+        ExtToMime.put("mrcx", MT_MRCX);
+        ExtToMime.put("mrc", MT_MRC);
+        ExtToMime.put("txt", MediaType.TEXT_PLAIN_TYPE);
         ExtToMime.put("ttl",  MT_TTL);
         ExtToMime.put("nt",   MT_NT);
         ExtToMime.put("nq",   MT_NQ);

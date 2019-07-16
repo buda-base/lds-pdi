@@ -62,7 +62,7 @@ public class MarcExportTest extends JerseyTest {
 
     @Test
     public void testSimpleRequestSimple() {
-        final Response res = target("/resource/I23819.mrcx")
+        final Response res = target("/resource/I23819.mrc")
                 .request()
                 .get();
         System.out.println("result:");

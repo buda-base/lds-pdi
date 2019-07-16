@@ -41,6 +41,8 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.marc4j.MarcStreamWriter;
+import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlWriter;
 import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
@@ -59,6 +61,7 @@ import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -1359,7 +1362,12 @@ public class MarcExport {
         final StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(final OutputStream os) throws IOException, WebApplicationException {
-                final MarcXmlWriter writer = new MarcXmlWriter(os, indent);
+                final MarcWriter writer;
+                if (mt.equals(MediaTypeUtils.MT_MRC)) {
+                    writer = new MarcStreamWriter(os, "UTF-8", true);
+                } else {
+                    writer = new MarcXmlWriter(os, indent);
+                }
                 writer.write(r);
                 writer.close();
             }
