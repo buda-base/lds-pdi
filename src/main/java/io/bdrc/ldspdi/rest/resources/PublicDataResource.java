@@ -476,6 +476,31 @@ public class PublicDataResource {
         return builder.build();
     }
 
+    @GET
+    @Path("/ontology/data/{ext}")
+    @Produces("text/html")
+    @JerseyCacheControl()
+    public Response getAllOntologyData(@Context final UriInfo info, @Context Request request, @PathParam("ext") String ext) throws RestException {
+        ResponseBuilder builder = null;
+        final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
+        if (JenaLangStr == null) {
+            throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
+        }
+        OntModel model = OntData.ontAllMod;
+        final StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                if (JenaLangStr == "STTL") {
+                    model.write(os, "TURTLE");
+                } else {
+                    model.write(os, JenaLangStr);
+                }
+            }
+        };
+        builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
+        return builder.build();
+    }
+
     @POST
     @Path("/callbacks/github/owl-schema")
     @Consumes(MediaType.APPLICATION_JSON)
