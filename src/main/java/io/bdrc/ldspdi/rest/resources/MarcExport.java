@@ -1140,7 +1140,7 @@ public class MarcExport {
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
-        record.addVariableField(factory.newControlField("001", "(BDRC) "+originalR.getURI()));
+        record.addVariableField(factory.newControlField("001", "(BDRC)bdr:"+originalR.getLocalName()));
         // maybe something like that could work?
         //record.addVariableField(factory.newControlField("003", "BDRC"));
         final LocalDateTime now = LocalDateTime.now();
