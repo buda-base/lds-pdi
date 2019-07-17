@@ -505,6 +505,17 @@ Allow-Methods=GET, POST, PUT, DELETE, OPTIONS, HEAD
 
 These parameter apply to the whole application.
 
+# Misc: clearing cache
+
+All cached results (from templates or various queries) can be cleared as follows:
+
+`curl -X POST http://{server:port}/clearcache `
+
+In the same way, ontology data can be refreshed inside ldspdi and its dedicated fuseki server as follows:
+
+`curl -X POST "http://purl.bdrc.io/callbacks/github/owl-schema"`
+
+the above url corresponds to a github webhook that is trigerred each time a change occurs in [owl-schema](https://github.com/buda-base/owl-schema)
 
 # Copyright and License
 
