@@ -236,7 +236,7 @@ public class PublicTemplatesResource {
         return Response.ok().build();
     }
 
-    @GET
+    @POST
     @Path("/clearcache")
     public String clearCache() throws RestException {
         log.info("clearing cache >>");
