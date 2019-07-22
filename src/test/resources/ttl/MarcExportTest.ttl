@@ -91,7 +91,7 @@ bdr:W23819_0074 skos:prefLabel "fourth part"@en ;
   bdo:workPartTreeIndex "4" .
 
 
-bdr:W23819_0001_P1 skos:prefLabel "le'u dang po/ sky bltams pa'i skor/"@bo-x-ewts ;
+bdr:W23819_0001_P1 skos:prefLabel "le'u dang po/ /sky bltams pa'i skor//"@bo-x-ewts ;
   bdo:workPartIndex 1;
   bdo:workPartTreeIndex "1.1" .
 

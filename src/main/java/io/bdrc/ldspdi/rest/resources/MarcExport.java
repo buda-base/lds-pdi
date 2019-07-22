@@ -993,7 +993,7 @@ public class MarcExport {
         if (lang == null || !"bo-x-ewts".equals(lang)) {
             return getLangStrNoConv(l);
         }
-        String[] parts = l.getString().split("/");
+        String[] parts = l.getString().split("(/ ?)+");
         final StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             final String part = parts[i].trim();
