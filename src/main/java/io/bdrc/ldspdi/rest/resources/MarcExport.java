@@ -65,6 +65,22 @@ import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
+/*
+ * Here's some knowledge that can be useful when dealing with libraries:
+ *
+ * There's a bug in the MARC Perl library that triggers warnings such as:
+ *
+ * utf8 "\xCA" does not map to Unicode at /usr/lib/x86_64-linux-gnu/perl/5.26/Encode.pm line 212
+ *
+ * This is due to https://rt.cpan.org/Public/Bug/Display.html?id=32332 (patch included!) and is not a bug in the records.
+ *
+ * Also, when serializing to .mrc, some library systems will only accept strict sizes:
+ *  - length of a field must be at most 9999 bytes
+ *  - length of a record must be at most 99999 bytes
+ *
+ * This means splitting (or just removing) the 505 field, which is the easiest leverage.
+ */
+
 public class MarcExport {
 
     public static final MarcFactory factory = MarcFactory.newInstance();
@@ -1007,10 +1023,10 @@ public class MarcExport {
         return res.toString();
     }
 
-    private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang) {
+    private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang, final boolean limitSize) {
         final Selector selector = new SimpleSelector(null, workHasPart, (RDFNode) null);
         final StmtIterator si =  m.listStatements(selector);
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         final Map<String,Literal> parts = new TreeMap<>();
         int nbParts = 0;
         // we keep the parts in order
@@ -1029,12 +1045,35 @@ public class MarcExport {
         // some works have just one first level (this is kind of weird), eg W1GS61415
         if (nbParts < 2)
             return;
-        final DataField f505 = factory.newDataField("505", '0', ' ');
+        DataField f505 = factory.newDataField("505", '0', ' ');
         boolean first = true;
+        int totalBytes = 10; // just to be sure
         for (Literal l : parts.values()) {
-            if (!first)
+            final String s505 = getLangStr505(l);
+            if (limitSize) {
+                int thisTotalBytes = s505.getBytes().length;
+                if (thisTotalBytes > 9990) {
+                    log.info("skipped 505 field as it was too long to fit in a mrc field");
+                    continue;
+                }
+                if (thisTotalBytes + totalBytes > 9990) {
+                    // we must split the 505 field so that each part is less than 9999 bytes:
+                    sb.append('.');
+                    f505.addSubfield(factory.newSubfield('a', sb.toString()));
+                    record.addVariableField(f505);
+                    f505 = factory.newDataField("505", '0', ' ');
+                    sb = new StringBuilder();
+                    first = true;
+                    totalBytes = thisTotalBytes;
+                } else {
+                    totalBytes += thisTotalBytes;
+                }
+            }
+            if (!first) {
                 sb.append(" -- ");
-            sb.append(getLangStr505(l));
+                totalBytes += 4;
+            }
+            sb.append(s505);
             first = false;
         }
         sb.append('.');
@@ -1137,7 +1176,7 @@ public class MarcExport {
 
     public static final String langTibetan = BDR+"LangBo";
 
-    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode) {
+    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode, final boolean limitSize) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         record.addVariableField(factory.newControlField("001", "(BDRC)bdr:"+originalR.getLocalName()));
@@ -1251,7 +1290,7 @@ public class MarcExport {
             record.addVariableField(f500);
         }
         if (!isJournal(m, workR)) {
-            addOutline(m, workR, record, bcp47lang); // 505
+            addOutline(m, workR, record, bcp47lang, limitSize); // 505
         }
         addAccess(m, workR, record); // 506
         // catalog info (summary)
@@ -1298,6 +1337,13 @@ public class MarcExport {
         for (DataField df880 : list880) {
             record.addVariableField(df880);
         }
+        // only for big errors, not that useful:
+        //List<MarcError> errors = record.getErrors();
+        //if (errors != null) { // annoyingly nullable...
+        //    for (MarcError me : record.getErrors()) {
+        //        System.out.println("test");
+        //    }
+        //}
         return record;
     }
 
@@ -1347,6 +1393,9 @@ public class MarcExport {
         boolean itemMode = false;
         final Model m;
         final Resource main;
+        // we could also imagine rendering mrc with longer fields / records
+        // but currently this doesn't play well with Columbia system
+        final boolean limitSize = mt.equals(MediaTypeUtils.MT_MRC);
         if (resUri.startsWith(ItemUriPrefix)) {
             itemMode = true;
             final String workUri = WorkUriPrefix+resUri.substring(ItemUriPrefixLen);
@@ -1358,13 +1407,13 @@ public class MarcExport {
         }
         //m.write(System.out, "TURTLE");
         final Resource origMain = m.getResource(resUri);
-        final Record r = marcFromModel(m, main, origMain, itemMode);
+        final Record r = marcFromModel(m, main, origMain, itemMode, limitSize);
         final StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(final OutputStream os) throws IOException, WebApplicationException {
                 final MarcWriter writer;
                 if (mt.equals(MediaTypeUtils.MT_MRC)) {
-                    writer = new MarcStreamWriter(os, "UTF-8", true);
+                    writer = new MarcStreamWriter(os, "UTF-8", !limitSize);
                 } else {
                     writer = new MarcXmlWriter(os, indent);
                 }
