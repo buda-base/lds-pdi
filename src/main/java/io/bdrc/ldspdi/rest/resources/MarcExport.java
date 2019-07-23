@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -1051,7 +1052,13 @@ public class MarcExport {
         for (Literal l : parts.values()) {
             final String s505 = getLangStr505(l);
             if (limitSize) {
-                int thisTotalBytes = s505.getBytes().length;
+                int thisTotalBytes;
+                try {
+                    thisTotalBytes = s505.getBytes("UTF-8").length;
+                } catch (UnsupportedEncodingException e) {
+                    log.error("error in UTF8 encoding", e); // very unlikely
+                    return;
+                }
                 if (thisTotalBytes > 9990) {
                     log.info("skipped 505 field as it was too long to fit in a mrc field");
                     continue;
