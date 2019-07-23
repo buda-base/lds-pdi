@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.marc4j.MarcException;
 import org.marc4j.MarcStreamWriter;
 import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlWriter;
@@ -1379,6 +1381,19 @@ public class MarcExport {
         return model;
     }
 
+    public static void remove505 (Record r) {
+        // removing all 505 fields
+        // this code is very weird but it's apparently the canonical way to do that
+        List<DataField> fields = r.getDataFields();
+        Iterator<DataField> i = fields.iterator();
+        while (i.hasNext()) {
+            DataField field = i.next();
+            if (field.getTag().equals("505")) {
+                i.remove();
+            }
+        }
+    }
+
     public static final String ItemUriPrefix = BDR+"I";
     public static final String WorkUriPrefix = BDR+"W";
     public static final int ItemUriPrefixLen = ItemUriPrefix.length();
@@ -1417,7 +1432,14 @@ public class MarcExport {
                 } else {
                     writer = new MarcXmlWriter(os, indent);
                 }
-                writer.write(r);
+                try {
+                    writer.write(r);
+                } catch (MarcException e) {
+                    // we suppose that the problem is that the record is too long:
+                    log.info("removing the outline so that the record fits in 99999 bytes");
+                    remove505(r);
+                    writer.write(r);
+                }
                 writer.close();
             }
         };
