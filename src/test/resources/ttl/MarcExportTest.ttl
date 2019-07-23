@@ -104,7 +104,7 @@ bdr:WSeriesParent a bdo:Work ;
 
 bdr:CR472EFBB795AC  a  bdo:AgentAsCreator ;
    bdo:agent     bdr:P326 ;
-   bdo:role      bdr:R0ER0020 .
+   bdo:role      bdr:R0ER0019 .
 
 bdr:EV4E026CE83CC9  a  bdo:PublishedEvent ;
    bdo:onYear    1979 .
@@ -216,7 +216,7 @@ bdr:W23819  a    bdo:PublishedWork , bdo:Work ;
 
 bdr:P326  a      bdo:Person ;
    rdfs:seeAlso  "https://www.treasuryoflives.org/biographies/view/Guru-Chowang/5588"^^xsd:anyURI ;
-   skos:prefLabel  "gu ru chos dbang"@bo-x-ewts ;
+   skos:prefLabel  "bstan 'dzin rnam rgyal rab dga'"@bo-x-ewts ;
    bdo:note      [ bdo:noteLocationStatement  "p. 2284" ;
                    bdo:noteText  "1212. gter ston gu ru chos dbang 'khrungs"@en ;
                    bdo:noteWork  bdr:W26372
@@ -244,11 +244,10 @@ bdr:P326  a      bdo:Person ;
          ] ;
    bdo:personGender  bdr:GenderMale ;
    bdo:personName  [ a             bdo:PersonPersonalName ;
-                     rdfs:label    "chos kyi dbang phyug"@bo-x-ewts
-                   ] ,
-         [ a             bdo:PersonPrimaryName ;
-           rdfs:label    "gu ru chos dbang"@bo-x-ewts , "gu ru chos kyi dbang phyug"@bo-x-ewts
-         ] ;
+                     rdfs:label    "bstan 'dzin rnam rgyal rab dga'"@bo-x-ewts ;
+                   ] , [ a             bdo:PersonPrimaryName ;
+                     rdfs:label    "bstan 'dzin rnam rgyal rab dga' 2"@bo-x-ewts ;
+                   ] ;
    bdo:personStudentOf  bdr:P7695 ;
    bdo:personTeacherOf  bdr:P7173 , bdr:P8510 ;
    adm:gitRevision  "8f50d23dfe6e8ae6ffaf227dbbef2470cebb2a12" ;

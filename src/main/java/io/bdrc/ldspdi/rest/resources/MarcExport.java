@@ -462,9 +462,6 @@ public class MarcExport {
                 final Resource type = name.getPropertyResourceValue(RDF.type);
                 final String typeLocalName = (type == null) ? "" : type.getLocalName();
                 switch(typeLocalName) {
-                case "":
-                    addCreatorName(m, name, otherNames);
-                    break;
                 case "PersonPrimaryName":
                     addCreatorName(m, name, names);
                     break;
@@ -475,7 +472,8 @@ public class MarcExport {
                     addCreatorName(m, name, otherTitles);
                     break;
                 default:
-                    continue;
+                    addCreatorName(m, name, otherNames);
+                    break;
                 }
             }
             Integer birthYear = null;
