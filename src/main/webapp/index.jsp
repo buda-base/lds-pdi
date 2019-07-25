@@ -112,5 +112,6 @@ using this general url format:</p>
 </c:forEach>
 </div>
 <br><br><hr><br>
+<p align="center">Powered by <a href="https://github.com/buda-base/lds-pdi">ldspdi</a></p>
 </body>
 </html>
