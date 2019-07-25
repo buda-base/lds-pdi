@@ -27,9 +27,13 @@ public class DocFileModel {
     public final static Logger log = LoggerFactory.getLogger(DocFileModel.class.getName());
     public Set<String> keys;
     public ArrayList<String> ontos;
+    public String brandName;
+    public String ontName;
     HashMap<String, ArrayList<QueryTemplate>> templ;
 
     public DocFileModel() throws RestException {
+        this.ontName = ServiceConfig.getProperty("ontName");
+        this.brandName = ServiceConfig.getProperty("brandName");
         this.files = getQueryTemplates();
         setContentModel();
     }
@@ -53,6 +57,14 @@ public class DocFileModel {
         }
         this.ontos = OntPolicies.getValidBaseUri();
         this.keys = templ.keySet();
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public String getOntName() {
+        return ontName;
     }
 
     public ArrayList<QueryTemplate> getTemplates(String key) {

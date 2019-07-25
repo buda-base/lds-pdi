@@ -47,8 +47,8 @@ function browse(){
 <h1>BDRC Public Data Interface</h1>
         <p>This resource provides direct data access to the BDRC Library</p>        
     
-<h2>Navigate through BDRC Ontology</h2>
-<p>You can use this service to access the current BDRC ontology and discover the data model:</p>
+<h2>Navigate through ${model.getOntName()}</h2>
+<p>You can use this service to access the current ${model.getOntName()} and discover the data model:</p>
 <p>ONTOLOGY SERVICE</p>
 <div> Browse an ontology : 
 <select id="uri">

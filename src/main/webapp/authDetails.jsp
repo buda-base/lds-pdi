@@ -183,5 +183,16 @@
     </tr>
 </c:forEach> 
 </table>
+<p style="text-align:center;font-size:20px;"><b>Personal Resources Access</b></p>
+<table style="width:95%;margin:auto">
+<tr><th>user</th><th>resource</th></tr>
+<c:forEach items="${RdfAuthModel.getPersonalAccess().keySet()}" var="k">
+    <c:set var="val" value="${k}"/>
+    <tr>
+       <td>${k}</td>       
+       <td><a href="${RdfAuthModel.getPersonalAccess().get(val)}">${RdfAuthModel.getPersonalAccess().get(val)}</a></td>
+    </tr>
+</c:forEach> 
+</table>
 </body>
 </html>
