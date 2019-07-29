@@ -38,22 +38,12 @@
 <body id="specs">
 <table style="margin:auto;width:60%;background-color:#f2f2f2;border:0px">
 <tr>
-
 <td><img src='${ServiceConfig.getProperty("brandLogo")}' style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
 <td style="vertical-align:middle;text-align:center;font-size:28px">${ServiceConfig.getProperty("ontName")} - Ontology homepage<br></td>
-
 </tr>
 </table>
 
-<c:if test = "${OntData.ontMod.listImportedOntologyURIs().size()>0}">
-<p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
-<table style="width:55%;margin:auto">
-<c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
-<tr><td><a href="${i}">${i}</a></td></tr>
-</c:forEach>
-</table>
 
-</c:if>
 <p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
 <a href="#prefixes">Prefixes / </a>
@@ -61,6 +51,7 @@
 <a href="#all">Classes / </a>
 <a href="#allprops">Properties / </a>
 <a href="#indiv">Individuals</a></p>
+<a href="#imports">Imports</a></p>
 
 <!-- PREFIXES -->
 <a name="prefixes"></a> 
@@ -124,5 +115,16 @@
     <tr><td><a href="${ind.getURI()}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
+
+<!-- ALL IMPORTS -->
+<a name="imports"></a>
+<c:if test = "${OntData.ontMod.listImportedOntologyURIs().size()>0}">
+<p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
+<table style="width:55%;margin:auto">
+<c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
+<tr><td><a href="${i}">${i}</a></td></tr>
+</c:forEach>
+</table>
+</c:if>
 </body>
 </html>
