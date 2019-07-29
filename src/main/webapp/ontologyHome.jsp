@@ -38,7 +38,7 @@
 <table style="margin:auto;width:60%;background-color:#f2f2f2;border:0px">
 <tr>
 
-<td><img src='${ServiceConfig.getProperty("brandLogo")' style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
+<td><img src='${ServiceConfig.getProperty("brandLogo")}' style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
 
 <td style="vertical-align:middle;text-align:center;font-size:28px">${model.getOntName()} - Ontology homepage<br></td>
 </tr>
