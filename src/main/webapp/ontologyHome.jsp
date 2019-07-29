@@ -50,7 +50,7 @@
 <a href="#root">Root classes / </a>
 <a href="#all">Classes / </a>
 <a href="#allprops">Properties / </a>
-<a href="#indiv">Individuals</a></p>
+<a href="#indiv">Individuals</a>
 <a href="#imports">Imports</a></p>
 
 <!-- PREFIXES -->
