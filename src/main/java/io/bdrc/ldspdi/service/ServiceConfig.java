@@ -58,8 +58,7 @@ public class ServiceConfig {
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
         try {
-            final String configPath = System.getProperty("ldspdi.configpath");
-            InputStream input = new FileInputStream(new File(configPath + "ldspdi.properties"));
+            InputStream input = new FileInputStream(new File("src/test/resources/ldspdiTest.properties"));
             // load a properties file
             prop.load(input);
             input.close();
