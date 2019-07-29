@@ -1,4 +1,4 @@
-<%@page import="io.bdrc.ldspdi.service.GitService"%>
+<%@page import="io.bdrc.ldspdi.service.*"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -41,14 +41,14 @@ function browse(){
     window.location.assign(x);
 }
 </script>
-<title>BDRC Public data Interface</title>
+<title>${ServiceConfig.getProperty("brandName")} Public data Interface</title>
 </head>
 <body>
-<h1>BDRC Public Data Interface</h1>
+<h1>${ServiceConfig.getProperty("brandName")} Public Data Interface</h1>
         <p>This resource provides direct data access to the BDRC Library</p>        
     
-<h2>Navigate through ${model.getOntName()}</h2>
-<p>You can use this service to access the current ${model.getOntName()} and discover the data model:</p>
+<h2>Navigate through ${ServiceConfig.getProperty("ontName")}</h2>
+<p>You can use this service to access the current ${ServiceConfig.getProperty("ontName")} and discover the data model:</p>
 <p>ONTOLOGY SERVICE</p>
 <div> Browse an ontology : 
 <select id="uri">
@@ -58,13 +58,14 @@ function browse(){
 </select>
 <button onclick="javascript:browse();" type="button"> Browse </button>
 </div> 
+
 </br>
 <div> View/download ontology files: 
 <select id="uri1">
 <c:forEach items="${model.ontos}" var="k">
   <option value="${k}">${k}</option>  
 </c:forEach>
-</select> 
+</select>
 Format:
 <select id="format">
   <option value="ttl">text/turtle=ttl</option>
