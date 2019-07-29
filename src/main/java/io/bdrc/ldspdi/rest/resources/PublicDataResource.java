@@ -91,7 +91,6 @@ public class PublicDataResource {
 
     public static final String RES_PREFIX_SHORT = "bdr";
     public static final String RES_PREFIX = "http://purl.bdrc.io/resource/";
-    public static final String PURL = ServiceConfig.getProperty("PURL");
 
     @GET
     @JerseyCacheControl()

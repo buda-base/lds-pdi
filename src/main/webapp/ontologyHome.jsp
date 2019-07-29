@@ -37,8 +37,10 @@
 <body id="specs">
 <table style="margin:auto;width:60%;background-color:#f2f2f2;border:0px">
 <tr>
-<td><img src="https://www.tbrc.org/browser/images/webcontent/Layout2017/BDRC.svg" style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
-<td style="vertical-align:middle;text-align:center;font-size:28px">Buddhist Digital Resource Center - Ontology homepage<br></td>
+
+<td><img src='${ServiceConfig.getProperty("brandLogo")' style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
+
+<td style="vertical-align:middle;text-align:center;font-size:28px">${model.getOntName()} - Ontology homepage<br></td>
 </tr>
 </table>
 

@@ -57,10 +57,6 @@ urlTemplatePath=/query/table
 # Url for templates returning jena Model (i.e graphs)
 urlGraphPath=/query/graph
 
-#PURL
-#The permanent root URL
-PURL=http://purl.bdrc.io/
-
 #### Templates execution and limitations ###### 
 #Sparql result set max size
 limit=500
@@ -75,6 +71,8 @@ taxtreeArqFile=Taxtree.arq
 # GET /resource/{resourceId} without extension or accept header is redirected to this url
 showUrl=http://library.bdrc.io/show/
 
-
+### BRANDING SETTINGS
 brandName=BDRC
+brandLogo=http://iiif.bdrc.io/static::logo.png/full/max/0/default.png
+
 ontName=Buddhist Digital Ontology
