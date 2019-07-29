@@ -39,8 +39,8 @@
 <tr>
 
 <td><img src="https://www.tbrc.org/browser/images/webcontent/Layout2017/BDRC.svg" style="margin-bottom:10px;margin-top:10px;vertical-align:middle;width:100px;"/></td>
+<td style="vertical-align:middle;text-align:center;font-size:28px">Buddhist Digital Resource Center - Ontology homepage<br></td>
 
-<td style="vertical-align:middle;text-align:center;font-size:28px">${model.getOntName()} - Ontology homepage<br></td>
 </tr>
 </table>
 
