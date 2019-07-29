@@ -1,0 +1,80 @@
+#fuseki dataset URL
+#This is the Uri of the fuseki server query service
+fusekiUrl=http://buda1.bdrc.io:13180/fuseki/bdrcrw/query
+
+#templates local dir
+#The root location of all the query templates used by ldspdi
+queryPath=/home/lds-queries/
+
+###### AUTH SECTION ########
+#activate/desactivate auth0
+#anything in this section is irrelevant if not using auth services (i.e useAuth=false)
+useAuth=false
+
+#The Uri of the auth ontology schema
+authGraph=http://purl.bdrc.io/graph/authSchema
+
+#The Uri of the auth data (groups, users, roles, policies, etc...)
+authDataGraph=http://purl.bdrc.io/graph/authData
+
+# a endpoint indicating in ms the last time the auth model was updated
+# this is used by other servers sharing the same authorization context (ontology and data)
+# so they can update their own auth data model when outdated.
+authUpdatePath=http://purl.bdrc.io/authmodel/updated
+
+# the custom auth policies definition
+policiesUrl=https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl
+
+###### END of AUTH SECTION ##########
+
+#ont management policies 
+# defines all the properties of each ontology along with all imports
+# to be used by a OntDocumentManager 
+ontPoliciesUrl=https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf
+
+#Json context url : points to the github repo containing the json context used in ld serialization
+jsonContextURL=https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld
+
+#default number of results by page
+pageSize=50
+
+#default page size for quick search
+qs_pageSize=100
+
+#cors headers settings
+Allow-Origin=*
+Allow-Headers=Origin,Authorization,Keep-Alive,User-Agent,If-Modified-Since,If-None-Match,Cache-Control,Prefer,Slug
+Allow-Credentials=true
+Allow-Methods=GET, POST, OPTIONS, HEAD
+Expose-Headers=Cache-Control,ETag,Last-Modified,Content-Type,Cache-Control,Vary,Access-Control-Max-Age,Link,Allow,Content-Location,Accept-Post,Location
+
+#cache settings
+Max-Age=86400
+
+#Url based templates
+# Url for templates returning Jena Result Sets (tables)
+urlTemplatePath=/query/table
+# Url for templates returning jena Model (i.e graphs)
+urlGraphPath=/query/graph
+
+#PURL
+#The permanent root URL
+PURL=http://purl.bdrc.io/
+
+#### Templates execution and limitations ###### 
+#Sparql result set max size
+limit=500
+#Sparql queries timeout (ms)
+timeout=5000
+
+#Taxonomy Tree template
+# Used by the io.bdrc.taxonomy package
+taxtreeArqFile=Taxtree.arq
+
+#Show redirect base url
+# GET /resource/{resourceId} without extension or accept header is redirected to this url
+showUrl=http://library.bdrc.io/show/
+
+
+brandName=BDRC
+ontName=Buddhist Digital Ontology
