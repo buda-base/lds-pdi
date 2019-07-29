@@ -132,6 +132,7 @@ public class OntData implements Runnable {
     }
 
     private static void updateFusekiDataset() throws RestException {
+        log.info("FUSEKI URL IS >>" + fusekiUrl);
         QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());

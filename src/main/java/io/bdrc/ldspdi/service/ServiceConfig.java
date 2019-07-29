@@ -1,5 +1,8 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -21,9 +24,7 @@ package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Properties;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,26 +37,17 @@ import io.bdrc.ldspdi.results.ResultsCache;
 public class ServiceConfig {
 
     static Properties prop = new Properties();
-    public static HashMap<String, String> params;
     public final static String FUSEKI_URL = "fusekiUrl";
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-    public static void init(HashMap<String, String> params) throws JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.params = params;
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
 
         try {
-            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            final String configPath = System.getProperty("ldspdi.configpath");
+            InputStream input = new FileInputStream(new File(configPath + "ldspdi.properties"));
             // load a properties file
             prop.load(input);
             input.close();
-            /**
-             * sets the PROD values of fuseki and queryPath properties Overrides test
-             * queryPath value
-             **/
-            Set<String> set = params.keySet();
-            for (String st : set) {
-                prop.setProperty(st, params.get(st));
-            }
 
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
@@ -66,7 +58,8 @@ public class ServiceConfig {
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
         try {
-            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            final String configPath = System.getProperty("ldspdi.configpath");
+            InputStream input = new FileInputStream(new File(configPath + "ldspdi.properties"));
             // load a properties file
             prop.load(input);
             input.close();
@@ -82,8 +75,16 @@ public class ServiceConfig {
         return Boolean.parseBoolean(prop.getProperty("useAuth"));
     }
 
+    public static boolean isBRDCBrand() {
+        return prop.getProperty("brand").equals("BDRC");
+    }
+
     public static String getProperty(String key) {
         return prop.getProperty(key);
+    }
+
+    public static Properties getProperties() {
+        return prop;
     }
 
     public static String getRobots() {

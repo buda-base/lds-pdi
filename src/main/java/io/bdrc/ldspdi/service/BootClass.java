@@ -3,9 +3,7 @@ package io.bdrc.ldspdi.service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Properties;
-import java.util.Set;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -51,29 +49,17 @@ public class BootClass implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
         try {
-            // final String configPath= System.getProperty("ldspdi.configpath");
-            final String fuseki = arg0.getServletContext().getInitParameter("fuseki");
-            final String queryPath = arg0.getServletContext().getInitParameter("queryPath");
-            final String propertyPath = arg0.getServletContext().getInitParameter("propertyPath");
-            HashMap<String, String> params = new HashMap<>();
-            params.put("queryPath", queryPath);
-            params.put("fusekiUrl", fuseki);
-            params.put("propertyPath", propertyPath);
+
+            final String configPath = System.getProperty("ldspdi.configpath");
+            ServiceConfig.init();
             ResultsCache.init();
-            GitService.update(queryPath);
-            ServiceConfig.init(params);
+            GitService.update(ServiceConfig.getProperty("queryPath"));
             OntData.init();
             TaxModel.fetchModel();
-            Properties props = new Properties();
-            props.load(BootClass.class.getClassLoader().getResourceAsStream("ldspdi.properties"));
-            InputStream is = new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
+            InputStream is = new FileInputStream(configPath + "ldspdi-private.properties");
             Properties private_props = new Properties();
             private_props.load(is);
-            private_props.putAll(props);
-            Set<String> set = params.keySet();
-            for (String st : set) {
-                private_props.setProperty(st, params.get(st));
-            }
+            private_props.putAll(ServiceConfig.getProperties());
             AuthProps.init(private_props);
             if (ServiceConfig.useAuth()) {
                 // RdfAuthModel.updateAuthData(fuseki);
