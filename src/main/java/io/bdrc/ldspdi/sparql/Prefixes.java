@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapStd;
@@ -15,18 +16,18 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-
 public class Prefixes {
 
     public final static Logger log = LoggerFactory.getLogger(Prefixes.class.getName());
     private final static PrefixMap pMap = new PrefixMapStd();
+    private final static HashMap<String, String> map = new HashMap<>();
     private static String prefixesString;
     private final static PrefixMapping PREFIXES_MAP = PrefixMapping.Factory.create();
 
     static {
         try {
             loadPrefixes();
-        }catch(RestException ex) {
+        } catch (RestException ex) {
             log.error("Prefixes initialization error", ex);
         }
     }
@@ -36,7 +37,7 @@ public class Prefixes {
     }
 
     public static void loadPrefixes() throws RestException {
-        loadPrefixes(ServiceConfig.getProperty(QueryConstants.QUERY_PATH)+"public/prefixes.txt");
+        loadPrefixes(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public/prefixes.txt");
     }
 
     public static void loadPrefixes(final String filePath) throws RestException {
@@ -52,18 +53,16 @@ public class Prefixes {
                 sb.append(line);
                 if (line.length() < 10 || line.startsWith("#"))
                     continue;
-                final String uri = line.substring(line.indexOf('<')+1, line.indexOf('>'));
+                final String uri = line.substring(line.indexOf('<') + 1, line.indexOf('>'));
                 final String prefix = line.substring(7, line.indexOf(':')).trim();
+                map.put(prefix, uri);
                 pMap.add(prefix, uri);
                 PREFIXES_MAP.setNsPrefix(prefix, uri);
             }
             prefixesString = sb.toString();
             br.close();
         } catch (IOException e) {
-            throw new RestException(500,new LdsError(LdsError.MISSING_RES_ERR).
-                    setContext("Couldn't read prefixes from "
-                            +filePath
-                            +"public/prefixes.txt",e));
+            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Couldn't read prefixes from " + filePath + "public/prefixes.txt", e));
         }
     }
 
@@ -71,26 +70,30 @@ public class Prefixes {
         return pMap;
     }
 
+    public static HashMap getMap() {
+        return map;
+    }
+
     public static PrefixMapping getPrefixMapping() {
         return PREFIXES_MAP;
     }
 
     public static String getFullIRI(String prefix) {
-        if(prefix!=null) {
+        if (prefix != null) {
             return PREFIXES_MAP.getNsPrefixURI(prefix);
         }
         return null;
     }
 
     public static String getPrefix(String IRI) {
-        if(IRI!=null) {
+        if (IRI != null) {
             return PREFIXES_MAP.getNsURIPrefix(IRI);
         }
         return "";
     }
 
     public static String getPrefixedIRI(String IRI) {
-        if(IRI!=null) {
+        if (IRI != null) {
             return PREFIXES_MAP.shortForm(IRI);
         }
         return "";

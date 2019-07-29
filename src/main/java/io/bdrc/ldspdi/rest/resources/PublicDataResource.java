@@ -56,6 +56,7 @@ import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFLanguages;
@@ -74,6 +75,7 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -269,6 +271,23 @@ public class PublicDataResource {
         }
         final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/prefixes")
+    @JerseyCacheControl()
+    public Response getPrefixes(@Context UriInfo info, @Context Request request) throws RestException {
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefixes(Prefixes.getMap());
+        StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                model.write(os, "TURTLE");
+            }
+        };
+        ResponseBuilder builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension("ttl"));
+        return builder.build();
     }
 
     @GET
