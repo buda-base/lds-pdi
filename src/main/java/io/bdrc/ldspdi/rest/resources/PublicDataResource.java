@@ -47,6 +47,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
@@ -212,16 +213,19 @@ public class PublicDataResource {
             return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
         }
         MediaType mediaType = variant.getMediaType();
-
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
+            try {
+                ResponseBuilder builder = Response.seeOther(new URI(info.getAbsolutePath() + ".trig")).status(Status.FOUND);
+                return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
+            }
+        }
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         String ext = MediaTypeUtils.getExtFromMime(mediaType);
-        if (ext.equals("html")) {
-            ext = "trig";
-            mediaType = MediaTypeUtils.MT_TRIG;
-        }
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
     }
