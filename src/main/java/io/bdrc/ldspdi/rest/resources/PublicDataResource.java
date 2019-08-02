@@ -218,6 +218,10 @@ public class PublicDataResource {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         }
         String ext = MediaTypeUtils.getExtFromMime(mediaType);
+        if (ext.equals("html")) {
+            ext = "trig";
+            mediaType = MediaTypeUtils.MT_TRIG;
+        }
         ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
     }
