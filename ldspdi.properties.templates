@@ -73,6 +73,6 @@ showUrl=http://library.bdrc.io/show/
 
 ### BRANDING SETTINGS
 brandName=BDRC
-brandLogo=http://iiif.bdrc.io/static::logo.png/full/max/0/default.png
+brandLogo=https://iiif.bdrc.io/static::logo.png/full/max/0/default.png
 
 ontName=Buddhist Digital Ontology

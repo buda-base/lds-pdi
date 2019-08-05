@@ -375,29 +375,22 @@ public class PublicDataResource {
         ResponseBuilder builder = null;
         log.info("getExtOntologyHomePage WAS CALLED WITH >>" + base + "/" + other + " and format :" + format);
         boolean isBase = false;
-        String baseUri = "";
-        String tmp = info.getAbsolutePath().toString();
-        log.info("getExtOntologyHomePage tmp is >>" + tmp);
-        if (OntPolicies.isBaseUri(tmp)) {
-            baseUri = parseBaseUri(tmp);
+        final String fullUrl = info.getAbsolutePath().toString();
+        final String httpUrl = Helpers.normalizeUrlHttp(fullUrl);
+        log.info("getExtOntologyHomePage httpUrl is >>" + httpUrl);
+        if (OntPolicies.isBaseUri(httpUrl)) {
             isBase = true;
         }
-        log.info("getExtOntologyHomePage absolute path >>" + info.getAbsolutePath().toString() + other);
-        if (OntPolicies.isBaseUri(parseBaseUri(info.getAbsolutePath().toString() + other))) {
-            baseUri = parseBaseUri(info.getAbsolutePath().toString() + other);
-            isBase = true;
-        }
-        log.info("getExtOntologyHomePage baseUri is >>" + baseUri);
         // Is the full request uri a baseuri?
         if (isBase) {
-            OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
+            OntPolicy pr = OntPolicies.getOntologyByBase(httpUrl);
             // if accept header is present
             if (format != null) {
                 Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
                 if (variant == null) {
                     return Response.status(406).build();
                 }
-                String url = OntPolicies.getOntologyByBase(baseUri).getFileUri();
+                String url = OntPolicies.getOntologyByBase(httpUrl).getFileUri();
                 // using cache if available
                 byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
                 if (byteArr == null) {
@@ -412,9 +405,9 @@ public class PublicDataResource {
                 odm.setProcessImports(false);
                 oms.setDocumentManager(odm);
                 // OntModel om = ModelFactory.createOntologyModel(oms);
-                OntModel om = OntData.getOntModelByBase(baseUri);
+                OntModel om = OntData.getOntModelByBase(httpUrl);
                 OntData.setOntModel(om);
-                om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
+                om.read(new ByteArrayInputStream(byteArr), httpUrl, "TURTLE");
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
@@ -460,21 +453,20 @@ public class PublicDataResource {
 
     @GET
     @Path("/{base : .*}/{other}.{ext}")
-    @Produces("text/html")
     @JerseyCacheControl()
     public Response getOntologyResourceAsFile(@Context final UriInfo info, @Context Request request, @PathParam("base") String base, @PathParam("other") String other, @PathParam("ext") String ext) throws RestException {
-        String res = info.getAbsolutePath().toString();
-        res = res.substring(0, res.lastIndexOf('.')) + "/";
-        log.info("In getOntologyResourceAsFile(), RES = " + res);
+        final String fullUrl = info.getAbsolutePath().toString();
+        final String noExtUrl = fullUrl.substring(0, fullUrl.lastIndexOf('.'));
+        final String httpUrl = Helpers.normalizeUrlHttp(noExtUrl);
+        log.info("In getOntologyResourceAsFile(), RES = " + httpUrl);
         ResponseBuilder builder = null;
         final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
         }
-        if (OntPolicies.isBaseUri(res)) {
-            OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
+        if (OntPolicies.isBaseUri(httpUrl)) {
+            OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(httpUrl));
             OntModel model = OntData.getOntModelByBase(params.getBaseUri());
-            model.write(System.out, "TURTLE");
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
                 // FOR SOME REASONS TO BE DISCOVERED: USING WRITERS LEADS TO HAVE ALL IMPORTS
@@ -497,7 +489,7 @@ public class PublicDataResource {
             builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
         } else {
             // to implement here : serving serialized single class or props
-            throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+            throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(httpUrl));
         }
         return builder.build();
     }

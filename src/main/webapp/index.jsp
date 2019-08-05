@@ -34,10 +34,15 @@
 <script type="text/javascript">
 function onto(){
     var x = document.getElementById("uri1").value+"."+document.getElementById("format").value;
+    // TODO: should be defined in some conf
+    if (x.startsWith("http://purl.bdrc.io") {
+        x = x.substring(5);
     window.location.assign(x);
 }
 function browse(){
     var x = document.getElementById("uri").value+"/";
+    if (x.startsWith("http://purl.bdrc.io") {
+        x = x.substring(5);
     window.location.assign(x);
 }
 </script>
@@ -82,7 +87,7 @@ Format:
 <h2>Instructions</h2>
 <p>Public queries are run via urls whose specifications are given below. However, you can get any resource turtle representation 
 using this general url format:</p>
-<p><a href="/resource/P1583.ttl">http://serverName:portNumber/resource/P1583</a></p>
+<p><a href="/resource/P1583.ttl">/resource/P1583</a></p>
 <p>where P1583 is a BDRC resource ID</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center">

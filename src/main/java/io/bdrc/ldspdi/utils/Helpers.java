@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
@@ -107,7 +106,7 @@ public class Helpers {
         Set<String> set=map.keySet();
         for(String key:set) {
             copy.put(key, map.getFirst(key));
-        }        
+        }
         return copy;
     }
 
@@ -146,5 +145,38 @@ public class Helpers {
         map.put("rows", sb.toString());
         StringSubstitutor s = new StringSubstitutor(map);
         return s.replace(multiChoiceTpl);
+    }
+
+    // normalizes a url and removes the protocol (for link display)
+    public static final String normalizeUrlNoProtocol(String s) {
+        int lastchar = s.length();
+        int firstchar = 5;
+        if (s.endsWith("/") || s.endsWith("#")) {
+            lastchar -= 1;
+        }
+        if (s.startsWith("https")) {
+            firstchar = 6;
+        }
+        if (s.startsWith("/")) {
+            firstchar = 0;
+        }
+        // we consider it starts with "http"
+        return s.substring(firstchar, lastchar);
+    }
+
+    // normalizes a url and removes the protocol (for link display)
+    public static final String normalizeUrlHttp(String s) {
+        int lastchar = s.length();
+        if (s.endsWith("/") || s.endsWith("#")) {
+            lastchar -= 1;
+        }
+        if (s.startsWith("http:")) {
+            return s.substring(0, lastchar);
+        }
+        if (s.startsWith("https")) {
+            return "http://"+s.substring(6, lastchar);
+        }
+        // we consider it has no protocol
+        return "http:"+s.substring(0, lastchar);
     }
 }
