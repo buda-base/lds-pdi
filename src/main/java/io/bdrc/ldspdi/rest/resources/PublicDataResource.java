@@ -412,15 +412,13 @@ public class PublicDataResource {
                 OntDocumentManager odm = new OntDocumentManager();
                 odm.setProcessImports(false);
                 oms.setDocumentManager(odm);
-                // OntModel om = ModelFactory.createOntologyModel(oms);
                 OntModel om = OntData.getOntModelByBase(baseUri);
                 OntData.setOntModel(om);
                 om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
-                    // builder = Response.ok(new Viewable("/ontologyHome.jsp", om));
-                    builder = Response.ok(new Viewable("/ontologyHome.jsp", path));
+                    builder = Response.ok(new Viewable("/ontologyHome.jsp"));
                 } else {
                     final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType));
                     final StreamingOutput stream = new StreamingOutput() {
@@ -434,8 +432,6 @@ public class PublicDataResource {
                                 if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
                                     wr.setProperty("xmlbase", pr.getBaseUri());
                                 }
-                                // here using the absolute path as baseUri since it has been recognized
-                                // as the base uri of a declared ontology (in ontologies.yml file)
                                 wr.write(om, os, pr.getBaseUri());
                             }
                         }
@@ -479,12 +475,8 @@ public class PublicDataResource {
             model.write(System.out, "TURTLE");
             final StreamingOutput stream = new StreamingOutput() {
                 @Override
-                // FOR SOME REASONS TO BE DISCOVERED: USING WRITERS LEADS TO HAVE ALL IMPORTS
-                // ADDED TO THE MODEL
                 public void write(OutputStream os) throws IOException, WebApplicationException {
                     if (JenaLangStr == "STTL") {
-                        // final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, baseUri);
-                        // writer.output(os);
                         model.write(os, "TURTLE");
                     } else {
                         org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
@@ -492,13 +484,11 @@ public class PublicDataResource {
                             wr.setProperty("xmlbase", params.getBaseUri());
                         }
                         model.write(os, JenaLangStr);
-                        // wr.write(model, os, params.getBaseUri());
                     }
                 }
             };
             builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
         } else {
-            // to implement here : serving serialized single class or props
             throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
         }
         return builder.build();
@@ -533,7 +523,6 @@ public class PublicDataResource {
     @Path("/callbacks/github/owl-schema")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOntology() throws RestException {
-        // To be reworked to include all declared ontologies
         log.info("updating Ontology models() >>");
         Thread t = new Thread(new OntData());
         t.start();

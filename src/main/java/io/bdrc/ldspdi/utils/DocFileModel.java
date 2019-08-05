@@ -84,7 +84,6 @@ public class DocFileModel {
 
     public static List<String> getQueryTemplates() throws RestException {
         List<String> files = new ArrayList<>();
-        System.out.println("DIRECTORY >>" + ServiceConfig.getProperty("queryPath") + "public");
         Path dpath = Paths.get(ServiceConfig.getProperty("queryPath") + "public");
         Stream<Path> walk;
         try {
@@ -96,23 +95,6 @@ public class DocFileModel {
             throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public in DocFileModel.getQueryTemplates()"));
         }
         walk.close();
-        /*
-         * if (Files.isDirectory(dpath)) { String tmp = null; try {
-         * DirectoryStream<Path> stream = Files.newDirectoryStream(dpath); for (Path
-         * path : stream) { System.out.println("PATH >>" + path); tmp = path.toString();
-         * // Filtering arq files if (tmp.endsWith(".arq")) {
-         * files.add(tmp.substring(tmp.lastIndexOf("/") + 1)); } } stream.close(); }
-         * catch (IOException e) { log.error("Error while getting query templates", e);
-         * e.printStackTrace(); throw new RestException(500, new
-         * LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(
-         * QueryConstants.QUERY_PATH) + "public/" + tmp +
-         * " in DocFileModel.getQueryTemplates()")); } } else { throw new
-         * RestException(500, new
-         * LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(
-         * QueryConstants.QUERY_PATH) + "public/ is an invalid path" +
-         * " in DocFileModel.getQueryTemplates()")); }
-         */
-        System.out.println("FILES >>" + files);
         return files;
     }
 
