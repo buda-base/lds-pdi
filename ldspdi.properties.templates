@@ -13,7 +13,7 @@
 
 #  /resource/{resourceId} with html accept header is redirected to this url + the short name of resourceId
 # For instance if the value is https://library.bdrc.io/show/ and the short name of /resource/P123 is bdr:P123
-# then accessing /resource/P123 will redirect to https://library.bdrc.io/show/bdr:P123
+# then accessing /resource/P123 in a web browser will redirect to https://library.bdrc.io/show/bdr:P123
 showUrl=https://library.bdrc.io/show/
 
 
