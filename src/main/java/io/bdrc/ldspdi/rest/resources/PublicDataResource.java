@@ -440,15 +440,15 @@ public class PublicDataResource {
                 }
             }
         } else {
-            if (OntData.ontAllMod.getOntResource(info.getAbsolutePath().toString()) == null) {
+            if (OntData.ontAllMod.getOntResource(tmp) == null) {
                 throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp));
             }
             if (builder == null) {
-                if (OntData.isClass(info.getAbsolutePath().toString(), true)) {
-                    log.info("CLASS>>" + info.getAbsolutePath().toString());
+                if (OntData.isClass(tmp, true)) {
+                    log.info("CLASS>>" + tmp);
                     builder = Response.ok(new Viewable("/ontClassView.jsp", new OntClassModel(tmp, true)));
                 } else {
-                    log.info("PROP>>" + info.getAbsolutePath().toString());
+                    log.info("PROP>>" + tmp);
                     builder = Response.ok(new Viewable("/ontPropView.jsp", new OntPropModel(tmp, true)));
                 }
             }
