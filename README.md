@@ -21,14 +21,14 @@ Moreover, webhooks must be setup in these two git repositories so the fuseki dat
 
 A location (/my/configfile/dir/) for the ldspdi.properties must be setup. 
 
-This location is given at startup on the command line as a system parameter names "ldspdi.configpath". 
+This location is given at startup on the command line as a system parameter named "ldspdi.configpath". 
 Example (using jetty):
 
 `mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/`
 
 ### Properties file (main settings):
 
-All props are defined in ldspdi.properties file. An example i shown [here](https://github.com/buda-base/lds-pdi/blob/master/ldspdi.properties.templates)
+All props are defined in ldspdi.properties file. An example is shown [here](https://github.com/buda-base/lds-pdi/blob/master/ldspdi.properties.templates)
 
 To configure fuseki dataset: 
 
