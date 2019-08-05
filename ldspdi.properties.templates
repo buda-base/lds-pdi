@@ -1,39 +1,54 @@
-#fuseki dataset URL
-#This is the Uri of the fuseki server query service
+#
+# LDS PDI configuration file
+#
+# Change the configuration to values that suit your needs and see
+# instructions in README.md on where to copy it.
+#
+# The most important values to change are the first 3, the rest should be
+# similar on most instances, except for the Auth part which is optional.
+#
+
+
+#### HTML redirect URL ####
+
+#  /resource/{resourceId} with html accept header is redirected to this url + the short name of resourceId
+# For instance if the value is https://library.bdrc.io/show/ and the short name of /resource/P123 is bdr:P123
+# then accessing /resource/P123 will redirect to https://library.bdrc.io/show/bdr:P123
+showUrl=https://library.bdrc.io/show/
+
+
+#### Fuseki dataset config ####
+
+# change this to the query url of your triple store dataset endpoint
 fusekiUrl=http://buda1.bdrc.io:13180/fuseki/bdrcrw/query
 
-#templates local dir
-#The root location of all the query templates used by ldspdi
-queryPath=/home/lds-queries/
 
-###### AUTH SECTION ########
-#activate/desactivate auth0
-#anything in this section is irrelevant if not using auth services (i.e useAuth=false)
-useAuth=false
+#### Home page info ####
 
-#The Uri of the auth ontology schema
-authGraph=http://purl.bdrc.io/graph/authSchema
+# Brand settings, change this with the name and logo url of your organization
+brandName=BDRC
+brandLogo=https://iiif.bdrc.io/static::logo.png/full/max/0/default.png
 
-#The Uri of the auth data (groups, users, roles, policies, etc...)
-authDataGraph=http://purl.bdrc.io/graph/authData
+# Change this if you're not using the BDO
+ontName=Buddhist Digital Ontology
 
-# a endpoint indicating in ms the last time the auth model was updated
-# this is used by other servers sharing the same authorization context (ontology and data)
-# so they can update their own auth data model when outdated.
-authUpdatePath=http://purl.bdrc.io/authmodel/updated
 
-# the custom auth policies definition
-policiesUrl=https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl
+#### SPARQL Templates ######
 
-###### END of AUTH SECTION ##########
+# SPARQL queries templates local directory path.
+# lds-pdi will automatically sync https://github.com/buda-base/lds-queries in this directory.
+queryPath=/usr/local/lds-queries/
 
-#ont management policies 
-# defines all the properties of each ontology along with all imports
-# to be used by a OntDocumentManager 
-ontPoliciesUrl=https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf
+# Sparql result set max size
+limit=500
+# Sparql queries timeout (ms)
+timeout=5000
 
-#Json context url : points to the github repo containing the json context used in ld serialization
-jsonContextURL=https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld
+# Template urls, you probably don't need to change that
+# Url for templates returning Jena Result Sets (tables)
+urlTemplatePath=/query/table
+# Url for templates returning jena Model (i.e graphs)
+urlGraphPath=/query/graph
 
 #default number of results by page
 pageSize=50
@@ -41,7 +56,21 @@ pageSize=50
 #default page size for quick search
 qs_pageSize=100
 
-#cors headers settings
+
+#### Ontology ####
+
+# Ontology management policies 
+# defines all the properties of each ontology along with all imports
+# to be used by a OntDocumentManager. Do not change if you want to use the BDO
+ontPoliciesUrl=https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf
+
+# Json context url : points to a url serving the jsonld context that will be served on /context.jsonld
+jsonContextURL=https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld
+
+
+#### Headers and cache ####
+
+#cors headers settings, don't change unless you know what you're doing
 Allow-Origin=*
 Allow-Headers=Origin,Authorization,Keep-Alive,User-Agent,If-Modified-Since,If-None-Match,Cache-Control,Prefer,Slug
 Allow-Credentials=true
@@ -51,28 +80,32 @@ Expose-Headers=Cache-Control,ETag,Last-Modified,Content-Type,Cache-Control,Vary,
 #cache settings
 Max-Age=86400
 
-#Url based templates
-# Url for templates returning Jena Result Sets (tables)
-urlTemplatePath=/query/table
-# Url for templates returning jena Model (i.e graphs)
-urlGraphPath=/query/graph
 
-#### Templates execution and limitations ###### 
-#Sparql result set max size
-limit=500
-#Sparql queries timeout (ms)
-timeout=5000
+#### Taxonomy Tree template ####
 
-#Taxonomy Tree template
-# Used by the io.bdrc.taxonomy package
+# Used by the io.bdrc.taxonomy package, for results of special queries in lib/
+# Do not change unless you know what you're doing
 taxtreeArqFile=Taxtree.arq
 
-#Show redirect base url
-# GET /resource/{resourceId} without extension or accept header is redirected to this url
-showUrl=http://library.bdrc.io/show/
 
-### BRANDING SETTINGS
-brandName=BDRC
-brandLogo=https://iiif.bdrc.io/static::logo.png/full/max/0/default.png
+###### AUTH SECTION ########
 
-ontName=Buddhist Digital Ontology
+# Anything in this section is irrelevant if not using auth services (i.e useAuth=false)
+# Do not change unless you know what you're doing
+
+# activate/desactivate auth0
+useAuth=false
+
+# The Uri of the auth ontology schema
+authGraph=http://purl.bdrc.io/graph/authSchema
+
+# The Uri of the auth data (groups, users, roles, policies, etc...)
+authDataGraph=http://purl.bdrc.io/graph/authData
+
+# a endpoint indicating in ms the last time the auth model was updated
+# this is used by other servers sharing the same authorization context (ontology and data)
+# so they can update their own auth data model when outdated.
+authUpdatePath=http://purl.bdrc.io/authmodel/updated
+
+# the custom auth policies definition
+policiesUrl=https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl
