@@ -418,7 +418,7 @@ public class PublicDataResource {
                 MediaType mediaType = variant.getMediaType();
                 // browser request : serving html page
                 if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
-                    builder = Response.ok(new Viewable("/ontologyHome.jsp"));
+                    builder = Response.ok(new Viewable("/ontologyHome.jsp", path));
                 } else {
                     final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(MediaTypeUtils.getExtFromMime(mediaType));
                     final StreamingOutput stream = new StreamingOutput() {
