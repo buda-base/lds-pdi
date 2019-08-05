@@ -37,7 +37,9 @@ ontName=Buddhist Digital Ontology
 
 # SPARQL queries templates local directory path.
 # lds-pdi will automatically sync https://github.com/buda-base/lds-queries in this directory.
-queryPath=/usr/local/lds-queries/
+#local and remote dir
+queryPath=/Users/marc/dev/lds-queries/
+git_remote_url="https://github.com/buda-base/lds-queries.git"
 
 # Sparql result set max size
 limit=500
