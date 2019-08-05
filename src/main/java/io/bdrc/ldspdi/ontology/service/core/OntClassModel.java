@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
+import java.io.IOException;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -33,6 +35,12 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.utils.Helpers;
 
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
@@ -175,6 +183,14 @@ public class OntClassModel {
             list.add(prop);
         }
         return list;
+    }
+
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        OntData.init();
+        OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextSlice", true);
+        System.out.println(mod.hasParent());
+        System.out.println(Helpers.neutralizeUrl(mod.getParent(true).get(0).getUri()));
     }
 
 }
