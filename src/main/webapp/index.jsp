@@ -34,10 +34,12 @@
 <script type="text/javascript">
 function onto(){
     var x = document.getElementById("uri1").value+"."+document.getElementById("format").value;
+    x = x.substring(5);
     window.location.assign(x);
 }
 function browse(){
     var x = document.getElementById("uri").value+"/";
+    x = x.substring(5);
     window.location.assign(x);
 }
 </script>
