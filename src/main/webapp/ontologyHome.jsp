@@ -47,11 +47,11 @@
 
 <p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
-<a href="#prefixes">Prefixes / </a>
-<a href="#root">Root classes / </a>
-<a href="#all">Classes / </a>
-<a href="#allprops">Properties / </a>
-<a href="#indiv">Individuals / </a>
+<a href="#prefixes">Prefixes</a> / 
+<a href="#root">Root classes</a> / 
+<a href="#all">Classes</a> / 
+<a href="#allprops">Properties</a> / 
+<a href="#indiv">Individuals</a> / 
 <a href="#imports">Imports</a></p>
 
 <!-- PREFIXES -->
