@@ -6,44 +6,6 @@ Contains a framework for executing external queries files through a rest API. In
 
 Moreover, each query file contains its own description that is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
 
-# Compiling and deploying
-
-```
-mvn clean package
-```
-# Configuration
-
-### Deployment on a tomcat server :
-in tomcat context.xml file, add the following lines:
-
-
-```
-<Parameter name="fuseki" value="http://<server:port>/fuseki/bdrcrw/query"
-         override="false"/>
-<Parameter name="queryPath" value="/local/path/to/"
-         override="false"/>
-
-```
-### Running it in tomcat from Eclipse IDE:
-
-update context.xml as above in workspaceDir/Servers/tomcatXXX/
-
-### Running it using Maven Jetty plugin:
-
-in src/main/webapp/WEB-INF/webdefault.xml set your local values in
-
-
-```
-<context-param>
-    <param-name>fuseki</param-name>
-    <param-value>http://<server;port>/fuseki/bdrcrw/query</param-value>;
-</context-param>
-<context-param>
-    <param-name>queryPath</param-name>
-    <param-value>/local/path/to/</param-value>
-</context-param>
-
-```
 # Query file repository
 
 All query templates files are automatically fetched from lds-queries github repository (https://github.com/BuddhistDigitalResourceCenter/lds-queries).
