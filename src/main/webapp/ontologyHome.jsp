@@ -2,6 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <%@page import="io.bdrc.ldspdi.ontology.service.core.*"%>
 <%@page import="io.bdrc.ldspdi.service.*"%>
+<%@page import="io.bdrc.ldspdi.utils.Helpers"%>
 <%@page import="java.util.List"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -46,11 +47,11 @@
 
 <p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
-<a href="#prefixes">Prefixes</a> / 
-<a href="#root">Root classes</a> / 
-<a href="#all">Classes</a> / 
-<a href="#allprops">Properties</a> / 
-<a href="#indiv">Individuals</a> / 
+<a href="#prefixes">Prefixes / </a>
+<a href="#root">Root classes / </a>
+<a href="#all">Classes / </a>
+<a href="#allprops">Properties / </a>
+<a href="#indiv">Individuals / </a>
 <a href="#imports">Imports</a></p>
 
 <!-- PREFIXES -->
@@ -70,7 +71,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
 <c:forEach items="${OntData.getOntRootClasses()}" var="root">    
-    <tr><td><a href="${OntData.getDisplayUrl(root.getUri())}">${root.getId()}</a></td></tr>
+    <tr><td><a href="${Helpers.neutralizeUrl(root.getUri())}">${root.getId()}</a></td></tr>
 </c:forEach> 
 </table> 
 
@@ -80,7 +81,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
 <c:forEach items="${OntData.getAllClasses()}" var="cls">    
-    <tr><td><a href="${OntData.getDisplayUrl(cls.getURI())}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
+    <tr><td><a href="${Helpers.neutralizeUrl(cls.getURI())}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
 </c:forEach> 
 </table>
 
@@ -90,7 +91,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>property type</th></tr>
 <c:forEach items="${OntData.getAllProps()}" var="prop">    
-    <tr><td><a href="${OntData.getDisplayUrl(prop.getURI())}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
+    <tr><td><a href="${Helpers.neutralizeUrl(prop.getURI())}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
     <td><c:choose>
                 <c:when test="${prop.isObjectProperty() || prop.isInverseFunctionalProperty()}">
                 ObjectProperty
@@ -112,7 +113,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>Local name</th><th> Class</th></tr>
 <c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
-    <tr><td><a href="${OntData.getDisplayUrl(ind.getURI())}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${OntData.getDisplayUrl(ind.getRDFType())}">${ind.getRDFType().getLocalName()}</a></td></tr>
+    <tr><td><a href="${Helpers.neutralizeUrl(ind.getURI())}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
 
@@ -122,7 +123,7 @@
 <p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
 <table style="width:55%;margin:auto">
 <c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
-<tr><td><a href="${OntData.getDisplayUrl(i)}">${i}</a></td></tr>
+<tr><td><a href="${Helpers.neutralizeUrl(i)}">${Helpers.neutralizeUrl(i)}</a></td></tr>
 </c:forEach>
 </table>
 </c:if>

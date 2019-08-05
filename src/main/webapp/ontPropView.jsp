@@ -43,7 +43,7 @@
 </style>
 </head>
 <body>
-<h2>Ontology Property - <a href="${model.getUri()}">${model.getName()}</a></h2>
+<h2>Ontology Property - <a href="${Helpers.neutralizeUrl(model.getUri())}">${model.getName()}</a></h2>
 <b>Type:</b> <a href="${model.getRdfTypeUri()}">${model.getRdfType()}</a><br>
 <b>Label:</b> ${model.getLabel()}<span class="lang">${model.getLabelLang()}</span><br>
 <c:choose>
@@ -53,7 +53,7 @@
 <c:otherwise>
 <b>Domain:</b> 
 <c:forEach items="${model.getDomain()}" var="dom">
-<a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
+<a href="${Helpers.neutralizeUrl(dom)}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
 </c:forEach>
 <br>
 </c:otherwise>
@@ -65,7 +65,7 @@
 <c:otherwise>
 <b>Range:</b> 
 <c:forEach items="${model.getRange()}" var="range">
-<a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
+<a href="${Helpers.neutralizeUrl(range)}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
 </c:forEach>
 <br>
 </c:otherwise>
@@ -95,7 +95,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
         <c:forEach items="${model.getAllSubProps(true)}" var="prop"> 
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
-            <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
+            <tr><td><b>Uri:</b></td><td> <a href="${Helpers.neutralizeUrl(prop.getUri())}">${prop.getUri()}</a></td></tr>            
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfTypeUri()}">${prop.getRdfType()}</a></td></tr>
             <tr><td><b>Label:</b></td><td>${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
@@ -105,7 +105,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
                 <c:otherwise>
                 <tr><td><b>Domain:</b></td><td>
                 <c:forEach items="${prop.getDomain()}" var="dom">
-                    <a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
+                    <a href="${Helpers.neutralizeUrl(dom)}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -117,7 +117,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
                 <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> 
                 <c:forEach items="${prop.getRange()}" var="range">
-                <a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
+                <a href="${Helpers.neutralizeUrl(range)}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -133,7 +133,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
         <c:forEach items="${model.getParentProps(true)}" var="prop">         
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
-            <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            
+            <tr><td><b>Uri:</b></td><td> <a href="${Helpers.neutralizeUrl(prop.getUri())}">${prop.getUri()}</a></td></tr>            
             <tr><td><b>Type:</b></td><td> <a href="${prop.getRdfTypeUri()}">${prop.getRdfType()}</a></td></tr>
             <tr><td><b>Label:</b></td><td> ${prop.getLabel()}<span class="lang">${prop.getLabelLang()}</span></td></tr>
             <c:choose>
@@ -143,7 +143,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
                 <c:otherwise>
                 <tr><td><b>Domain:</b></td><td> 
                 <c:forEach items="${prop.getDomain()}" var="dom">
-                    <a href="${dom}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
+                    <a href="${Helpers.neutralizeUrl(dom)}">${OntData.ontAllMod.shortForm(dom)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>
@@ -155,7 +155,7 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
                 <c:otherwise>           
                 <tr><td><b>Range:</b></td><td> 
                 <c:forEach items="${prop.getRange()}" var="range">
-                <a href="${range}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
+                <a href="${Helpers.neutralizeUrl(range)}">${OntData.ontAllMod.shortForm(range)}</a>&nbsp; 
                 </c:forEach>
                 </td></tr>
                 </c:otherwise>

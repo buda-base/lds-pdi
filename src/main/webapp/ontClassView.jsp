@@ -44,7 +44,7 @@
 </style>
 </head>
 <body style="margin-left:50px;width:80%;">
-<h2>Ontology Class - <a href="${model.getUri()}">${model.getId()}</a></h2>
+<h2>Ontology Class - <a href="${Helpers.neutralizeUrl(model.getUri())}">${model.getId()}</a></h2>
 <c:if test = "${model.isPresent()}">
     <c:set var="uri" value="${model.getUri()}"/>
     <!-- PARENT CLASS(ES) -->
@@ -52,7 +52,7 @@
         <c:if test = "${model.getParent(true).size()>0}">
             <h4>Parent class(es): </h4>
             <c:forEach items="${model.getParent(true)}" var="par">
-                <a href="${par.getUri()}">${par.getId()}</a>
+                <a href="${Helpers.neutralizeUrl(par.getUri())}">${par.getId()}</a>
             </c:forEach>
         </c:if>
     </c:if>
@@ -78,7 +78,7 @@
         <h4>Individuals:</h4>
         <c:forEach items="${model.getIndividuals()}" var="ind">
             <c:set var="val" value="${ind.getNameSpace()}"/>
-            <ul><li><a href="${ind.getURI()}">${Prefixes.getPrefix(val)}${ind.getLocalName()}</a></li></ul>
+            <ul><li><a href="${Helpers.neutralizeUrl(ind.getURI())}">${Prefixes.getPrefix(val)}${ind.getLocalName()}</a></li></ul>
         </c:forEach>
     </c:if>
 
@@ -88,7 +88,7 @@
         <tr><th>Root properties applying to the ${model.getId()} domain:</th></tr>
         <tr><td style="font-size:16px;line-height: 1.6;">
         <c:forEach items="${OntData.getDomainUsages(uri,true)}" var="dom">
-            <a href="${dom.getURI()}">${dom.getLocalName()}</a> /
+            <a href="${Helpers.neutralizeUrl(dom.getURI())}">${dom.getLocalName()}</a> /
         </c:forEach>
         </td></tr>
      </table>
@@ -105,7 +105,7 @@
             <tr><td><i><b>Sub properties of ${key}</b></i></td></tr>
             <tr><td>
             <c:forEach items="${OntData.getAllSubProps(uri,true).get(k)}" var="pr">
-                <a href="${pr.getURI()}">${pr.getLocalName()}</a> /
+                <a href="${Helpers.neutralizeUrl(pr.getURI())}">${pr.getLocalName()}</a> /
             </c:forEach>
             </td></tr>
         </table>
@@ -123,7 +123,7 @@
             <tr><th>Inherited domain properties from ${par.getId()}:</th></tr>
             <tr><td style="font-size:16px;line-height: 1.6;">
             <c:forEach items="${OntData.getDomainUsages(p_uri,true)}" var="dom">
-                <a href="${dom.getURI()}">${dom.getLocalName()}</a> /
+                <a href="${Helpers.neutralizeUrl(dom.getURI())}">${dom.getLocalName()}</a> /
             </c:forEach>
             </td></tr>
          </table>
@@ -137,7 +137,7 @@
         <tr><th>Properties whose range is ${model.getId()}:</th></tr>
         <tr><td style="font-size:16px;line-height: 1.6;">
         <c:forEach items="${OntData.getRangeUsages(uri,true)}" var="dom">
-            <a href="${dom.getURI()}">${dom.getLocalName()}</a> /
+            <a href="${Helpers.neutralizeUrl(dom.getURI())}">${dom.getLocalName()}</a> /
         </c:forEach>
         </td></tr>
      </table>
@@ -147,7 +147,7 @@
     <c:if test = "${model.getSubclasses().size()>0}">
         <h3>Subclasses:</h3>
         <c:forEach items="${model.getSubclasses()}" var="sub">
-            <ul><li><a href="${sub.getUri()}">${sub.getId()}</a></li></ul>
+            <ul><li><a href="${Helpers.neutralizeUrl(sub.getUri())}">${sub.getId()}</a></li></ul>
         </c:forEach>
     </c:if>
 </c:if>

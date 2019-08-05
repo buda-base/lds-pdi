@@ -1,13 +1,15 @@
 package io.bdrc.ldspdi.utils;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class DocFileModel {
 
-    ArrayList<String> files;
+    List<String> files;
     public final static Logger log = LoggerFactory.getLogger(DocFileModel.class.getName());
     public Set<String> keys;
     public ArrayList<String> ontos;
@@ -43,7 +45,8 @@ public class DocFileModel {
         templ = new HashMap<>();
 
         for (String file : files) {
-            final LdsQuery qfp = LdsQueryService.get(file);
+            String tmp = file.substring(file.lastIndexOf('/') + 1);
+            final LdsQuery qfp = LdsQueryService.get(tmp);
             QueryTemplate qt = qfp.getTemplate();
             String queryScope = qt.getQueryScope();
 
@@ -79,29 +82,37 @@ public class DocFileModel {
         return ontos;
     }
 
-    public static ArrayList<String> getQueryTemplates() throws RestException {
-        ArrayList<String> files = new ArrayList<>();
+    public static List<String> getQueryTemplates() throws RestException {
+        List<String> files = new ArrayList<>();
+        System.out.println("DIRECTORY >>" + ServiceConfig.getProperty("queryPath") + "public");
         Path dpath = Paths.get(ServiceConfig.getProperty("queryPath") + "public");
-        if (Files.isDirectory(dpath)) {
-            String tmp = null;
-            try {
-                DirectoryStream<Path> stream = Files.newDirectoryStream(dpath);
-                for (Path path : stream) {
-                    tmp = path.toString();
-                    // Filtering arq files
-                    if (tmp.endsWith(".arq")) {
-                        files.add(tmp.substring(tmp.lastIndexOf("/") + 1));
-                    }
-                }
-                stream.close();
-            } catch (IOException e) {
-                log.error("Error while getting query templates", e);
-                e.printStackTrace();
-                throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public/" + tmp + " in DocFileModel.getQueryTemplates()"));
-            }
-        } else {
-            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public/ is an invalid path" + " in DocFileModel.getQueryTemplates()"));
+        Stream<Path> walk;
+        try {
+            walk = Files.walk(dpath);
+            files = walk.map(x -> x.toString()).filter(f -> f.endsWith(".arq")).collect(Collectors.toList());
+        } catch (IOException e1) {
+            log.error("Error while getting query templates", e1);
+            e1.printStackTrace();
+            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public in DocFileModel.getQueryTemplates()"));
         }
+        walk.close();
+        /*
+         * if (Files.isDirectory(dpath)) { String tmp = null; try {
+         * DirectoryStream<Path> stream = Files.newDirectoryStream(dpath); for (Path
+         * path : stream) { System.out.println("PATH >>" + path); tmp = path.toString();
+         * // Filtering arq files if (tmp.endsWith(".arq")) {
+         * files.add(tmp.substring(tmp.lastIndexOf("/") + 1)); } } stream.close(); }
+         * catch (IOException e) { log.error("Error while getting query templates", e);
+         * e.printStackTrace(); throw new RestException(500, new
+         * LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(
+         * QueryConstants.QUERY_PATH) + "public/" + tmp +
+         * " in DocFileModel.getQueryTemplates()")); } } else { throw new
+         * RestException(500, new
+         * LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(
+         * QueryConstants.QUERY_PATH) + "public/ is an invalid path" +
+         * " in DocFileModel.getQueryTemplates()")); }
+         */
+        System.out.println("FILES >>" + files);
         return files;
     }
 

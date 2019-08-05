@@ -92,12 +92,6 @@ public class OntData implements Runnable {
         }
     }
 
-    public static String getDisplayUrl(String url) {
-        if (url.startsWith("http://purl.bdrc.io"))
-            return url.substring(5);
-        return url;
-    }
-
     public static void addOntModelByBase(String baseUri, OntModel om) {
         modelsBase.put(baseUri, om);
     }

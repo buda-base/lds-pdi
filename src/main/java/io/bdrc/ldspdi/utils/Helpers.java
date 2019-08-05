@@ -1,6 +1,5 @@
 package io.bdrc.ldspdi.utils;
 
-
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  *
@@ -43,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.sparql.functions.Wylie;
 
-
 public class Helpers {
 
     public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
@@ -52,29 +50,31 @@ public class Helpers {
 
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
-        stream = Helpers.class.getClassLoader().getResourceAsStream("/"+baseName);
+        stream = Helpers.class.getClassLoader().getResourceAsStream("/" + baseName);
         if (stream != null) {
             return stream;
         }
-        stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/"+baseName);
+        stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + baseName);
         if (stream != null) {
             return stream;
         }
-        final String fileBaseName = "src/main/resources/"+baseName;
+        final String fileBaseName = "src/main/resources/" + baseName;
         try {
             stream = new FileInputStream(fileBaseName);
             return stream;
         } catch (FileNotFoundException e) {
-            log.debug("FileNotFound: "+baseName);
+            log.debug("FileNotFound: " + baseName);
             return null;
         }
     }
 
+    public static String neutralizeUrl(String url) {
+        return url.substring(url.indexOf(':') + 1);
+    }
+
     public static String removeAccents(String text) {
-        String f=text;
-        return f == null ? null :
-            Normalizer.normalize(f, Form.NFD)
-            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String f = text;
+        return f == null ? null : Normalizer.normalize(f, Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
     public static boolean isTibUni(String s) {
@@ -83,28 +83,28 @@ public class Helpers {
 
     public static boolean isWylie(String s) {
         Wylie wl = new Wylie(true, false, false, true);
-        ArrayList<String> warn=new ArrayList<>();
+        ArrayList<String> warn = new ArrayList<>();
         wl.fromWylie(s, warn);
-        return warn.size()==0;
+        return warn.size() == 0;
     }
 
     public static String bdrcEncode(String url) {
-        String encoded=url.replace("\"", "%22");
-        encoded=encoded.replace(' ', '+');
-        encoded=encoded.replace("\'", "%27");
+        String encoded = url.replace("\"", "%22");
+        encoded = encoded.replace(' ', '+');
+        encoded = encoded.replace("\'", "%27");
         return encoded;
     }
 
     public static boolean isValidURI(String uri) {
-        String[] schemes = {"http","https"};
+        String[] schemes = { "http", "https" };
         UrlValidator urlValidator = new UrlValidator(schemes);
         return urlValidator.isValid(uri);
     }
 
-    public static HashMap<String,String> convertMulti(MultivaluedMap<String,String> map){
-        HashMap<String,String> copy=new HashMap<>();
-        Set<String> set=map.keySet();
-        for(String key:set) {
+    public static HashMap<String, String> convertMulti(MultivaluedMap<String, String> map) {
+        HashMap<String, String> copy = new HashMap<>();
+        Set<String> set = map.keySet();
+        for (String key : set) {
             copy.put(key, map.getFirst(key));
         }
         return copy;
@@ -115,9 +115,9 @@ public class Helpers {
         final BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
         final StringBuffer sb = new StringBuffer();
         try {
-            String line=buffer.readLine();
-            while(line != null) {
-                sb.append(line+System.lineSeparator());
+            String line = buffer.readLine();
+            while (line != null) {
+                sb.append(line + System.lineSeparator());
                 line = buffer.readLine();
 
             }
@@ -129,54 +129,19 @@ public class Helpers {
 
     public static String getMultiChoicesHtml(final String path, final boolean resource) {
         final StringBuilder sb = new StringBuilder();
-        for (final Entry<String,MediaType> e: MediaTypeUtils.getResExtensionMimeMap().entrySet()) {
+        for (final Entry<String, MediaType> e : MediaTypeUtils.getResExtensionMimeMap().entrySet()) {
             final String ext = e.getKey();
             final String mimeDesc = e.getValue().toString();
-            if(resource) {
-                sb.append("<tr><td><a href=\""+path+"."+ext+"\">"+path+"."+ext+"</a><td>"+
-                        mimeDesc+"</td></tr>\n");
+            if (resource) {
+                sb.append("<tr><td><a href=\"" + path + "." + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
             } else {
-                sb.append("<tr><td><a href=\""+path+"&format="+ext+"\">"+path+"."+ext+"</a><td>"+
-                        mimeDesc+"</td></tr>\n");
+                sb.append("<tr><td><a href=\"" + path + "&format=" + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
             }
         }
-        final HashMap<String,String> map = new HashMap<>();
+        final HashMap<String, String> map = new HashMap<>();
         map.put("path", path);
         map.put("rows", sb.toString());
         StringSubstitutor s = new StringSubstitutor(map);
         return s.replace(multiChoiceTpl);
-    }
-
-    // normalizes a url and removes the protocol (for link display)
-    public static final String normalizeUrlNoProtocol(String s) {
-        int lastchar = s.length();
-        int firstchar = 5;
-        if (s.endsWith("/") || s.endsWith("#")) {
-            lastchar -= 1;
-        }
-        if (s.startsWith("https")) {
-            firstchar = 6;
-        }
-        if (s.startsWith("/")) {
-            firstchar = 0;
-        }
-        // we consider it starts with "http"
-        return s.substring(firstchar, lastchar);
-    }
-
-    // normalizes a url and removes the protocol (for link display)
-    public static final String normalizeUrlHttp(String s) {
-        int lastchar = s.length();
-        if (s.endsWith("/") || s.endsWith("#")) {
-            lastchar -= 1;
-        }
-        if (s.startsWith("http:")) {
-            return s.substring(0, lastchar);
-        }
-        if (s.startsWith("https")) {
-            return "http://"+s.substring(6, lastchar);
-        }
-        // we consider it has no protocol
-        return "http:"+s.substring(0, lastchar);
     }
 }
