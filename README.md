@@ -1,56 +1,66 @@
 # LDS-PDI 
 
-(Linked Data Server - Public Data Interface)
+A.k.a. *Linked Data Server - Public Data Interface*
 
-Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
+## Features
 
-Moreover, each query file contains its own description that is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
+The server provides APIs to:
+- serve RDF resources in different serializations (ttl, jsonld, etc.)
+- serve an RDF vocabulary, providing convenient html pages to describe the classes and properties
+- run pre-defined SPARQL queries, passing arguments in URL
+- augment the SPARQL results with some facet information
 
-# Compiling and deploying
+The API and routes provided by the server are described in a separate document: [API.md](API.md).
 
-```
-mvn clean package
-```
-# Configuration
+## Deployment
 
-In order to work properly, ldspdi requires a **fuseki dataset**, a **query template** git repository and an **ontologies** git repository.
+### Running locally
 
-Moreover, webhooks must be setup in these two git repositories so the fuseki dataset can be updated when a change occur in an ontology or when adding/editing any query or graph template.
-
-### Configuration file
-
-A location (/my/configfile/dir/) for the ldspdi.properties must be setup. 
-
-This location is given at startup on the command line as a system parameter named "ldspdi.configpath". 
-Example (using jetty):
-
-`mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/`
-
-### Properties file (main settings):
-
-All props are defined in ldspdi.properties file. An example is shown [here](https://github.com/buda-base/lds-pdi/blob/master/ldspdi.properties.templates)
-
-To configure fuseki dataset: 
-
-`fusekiUrl=http://your.server:port/fuseki/bdrcrw/query`
-
-To synchronize local and remote template dir
-
-`queryPath=/Users/marc/dev/lds-queries/`
-
-`git_remote_url=https://github.com/buda-base/lds-queries.git`
-
-To synchronize and load ontologies from remote
-
-`ontPoliciesUrl=https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf`
-
-# Running
+You can run the server locally with a maven command:
 
 ```
 mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/
 ```
-# Home demo page
+
+See below for an example for an explanation of the configpath argument). This will make the server accessible on
+
 ```
 http://localhost:8080/index.jsp
 ```
 
+### Building a jar
+
+For deployment in a web server environment (Tomcat, Jetty, etc.) you can compile a jar file with:
+
+```
+mvn clean package
+```
+
+and deploy it in your environment.
+
+## Configuration
+
+### Configuration file
+
+The configuration of the server must be recorded in a property file named `ldspdi.properties` (see next paragraph for its location). A commented template is provided: [ldspdi.properties.template](ldspdi.properties.template), please use it as a documentation and model for the configuration file.
+
+### Configuration directory
+
+The path of the directory containing `ldspdi.properties` must be passed to the server through a system property called `ldspdi.configpath`. You can pass this value when starting your server from the command line, here's an example setting it when running locally:
+
+```
+mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/
+```
+
+##### In a buda-base environment
+
+Note that the [buda-base](https://github.com/buda-base/buda-base) environment sets the config path to `/etc/buda/ldspdi/`, so the only thing you need to is to copy your configuration file to `/etc/buda/ldspdi/ldspdi.properties`.
+
+### Webhooks (optional)
+
+In order for the SPARQL queries and the ontology synchronize in real time with the git repositories, you can use a webhook mechanism. Typically you can configure github to send a message to `/callbacks/github/owl-schema` and `/callbacks/github/lds-queries`. This is not necessary for the platform to function, and you can call these webhooks manually (in a daily cron for instance) to get updates.
+
+
+## Copyright and License
+
+All the code and API are Copyright (C) 2017 Buddhist Digital Resource Center and are under the Apache 2.0 Public License.
