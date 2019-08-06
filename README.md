@@ -92,6 +92,10 @@ In order for the SPARQL queries and the ontology synchronize in real time with t
 |POST|/query/graph/{file}| same as the GET version except that it only consumes json data. Example: *curl -v -H "Content-Type: application/json" -H "Accept: text/turtle" -d '{"R_RES":"bdr:V22084_I0886"}' http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline*|
 |POST|/callbacks/github/lds-queries|a webhook for updating the local repository of templates. It is trigerred by [github ldsqueries repo](https://github.com/buda-base/lds-queries)|
 |POST|/clearcache| empties all caches of the ldspdi server|
+|GET|/queries| provides a list of all the available public templates for that server in the json format (see [http://purl.bdrc.io/queries](http://purl.bdrc.io/queries))|
+|POST|/queries|same as above - no parameters|
+|GET|/queries/{template}|provides the json representation of the template specified by its name as the path variable {template} example: [http://purl.bdrc.io/queries/Etexts_count](http://purl.bdrc.io/queries/Etexts_count)|
+|POST|/queries/{template}|same as above|
 
 ## Copyright and License
 
