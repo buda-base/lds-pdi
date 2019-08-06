@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.export;
 
 import java.io.BufferedReader;
 import java.io.IOException;

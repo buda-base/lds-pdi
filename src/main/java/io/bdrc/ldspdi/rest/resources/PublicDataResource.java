@@ -67,6 +67,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.export.MarcExport;
+import io.bdrc.ldspdi.export.TxtEtextExport;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
@@ -109,20 +111,6 @@ public class PublicDataResource {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 os.write(ServiceConfig.getRobots().getBytes());
-            }
-        };
-        return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    @GET
-    @Path("/shacl/{file}")
-    public Response getShaclFile(@Context UriInfo info, @PathParam("file") final String file) {
-        log.info("Call getRobots()");
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                InputStream str = PublicDataResource.class.getClassLoader().getResourceAsStream(file + ".ttl");
-                os.write(IOUtils.toByteArray(str));
             }
         };
         return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).build();
@@ -384,8 +372,8 @@ public class PublicDataResource {
             isBase = true;
         }
         log.info("getExtOntologyHomePage absolute path >>" + info.getAbsolutePath().toString() + other);
-        if (OntPolicies.isBaseUri(parseBaseUri(info.getAbsolutePath().toString() + other))) {
-            baseUri = parseBaseUri(info.getAbsolutePath().toString() + other);
+        if (OntPolicies.isBaseUri(parseBaseUri(tmp + other))) {
+            baseUri = parseBaseUri(tmp + other);
             isBase = true;
         }
         log.info("getExtOntologyHomePage baseUri is >>" + baseUri);
