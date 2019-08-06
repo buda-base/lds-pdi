@@ -1,5 +1,7 @@
 # LDS-PDI 
 
+[TOC]
+
 (Linked Data Server - Public Data Interface)
 
 Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
@@ -28,36 +30,13 @@ mvn jetty:run
 http://localhost:8080/index.jsp
 ```
 
-# Ontology browsing service
-```
-http://localhost:8080/demo/ontOverview.jsp
-```
-
-OR (by classes)
-
-```
-http://localhost:8080/ontology/admin/Product
-
-http://localhost:8080/ontology/core/Work
-```
-
-#### View the ontology file 
-
-You can view/download the ontology file at the following url:
-
-```
-http://localhost:8080/ontology.{ext}
-```
-
-where {ext} can be any of the supported mime types and file extensions shown below, "jsonld" excepted.
-
 # Json Context of lds-pdi
 ```
 GET or POST: http://localhost:8080/context.jsonld
 ```
 # Resources
 
-### GET && POST
+## GET && POST
 /resource/{res} 
 
 (returns turtle format by default)
@@ -74,7 +53,7 @@ Ex POST : curl -X POST http://localhost:8080/resource/P634.rdf
 Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"res":"P1583","ext":"jsonld"}' http://localhost:8080/resource
 ```
 
-##### Supported mime types and file extensions
+##Supported mime types and file extensions
 
 text/turtle=ttl (default : processed by BDRC STTLWriter)
 
@@ -102,7 +81,7 @@ application/trix+xml=trix
 
 # Query templates
 
-### GET && POST
+## GET && POST
 
 lds-pdi serves paginated results based on several parameters values.
 
@@ -223,7 +202,7 @@ limit ?I_LIM
 ```
 Note : the parameter placeholder of the query must match the value of QueryParams.
 
-### Guidelines for creating query templates
+## Guidelines for creating query templates
 
 ldspdi performs a strict parameter evaluation in order to prevent Sparql injection. It therefore requires parameter types to be specified. Parameter types are as follows :
 
@@ -313,6 +292,7 @@ http:/localhost:8080/queries/{template name} (without .arq extension)
 In addition to general metadata (QueryScope, Id, domain, etc...), there two types of metadata : **param** and **output**
 
 an example of param metadata is as follows:
+
 ```
 #param.L_NAME.type=string
 #param.L_NAME.langTag=LG_NAME
@@ -320,7 +300,9 @@ an example of param metadata is as follows:
 #param.L_NAME.example=("'od zer" OR "ye shes")
 ```
 
+
 **param** and **output** have the same syntax : 
+
 ```
 #{metadataType}.{variable_name}.{data_name}
 ```
@@ -429,28 +411,6 @@ template: " select distinct ?s ?lit WHERE { { (?s ?sc ?lit) text:query ( skos:pr
 demoLink: "/query/Res_byName?L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
 }
 ```
-# Quick search support
-
-lds-pdi offers a quick cross language "search by name" feature using simple Urls as follows:
-
-exact name search:
-```
-http://localhost:8080/resource/{type}/exact/{name}
-```
-fuzzy search (returns only the first 100 results):
-```
-http://localhost:8080/resource/{type}/{name}
-```
-{type} must be one of the following : 
-
-work ; person ; place ; role ; lineage ;
-
-#### Examples:
-```
-http://localhost:8080/resource/person/exact/西岡祖秀
-
-http://localhost:8080/resource/work/stong pa nyid bdun cu
-```
 
 # CORS support
 
@@ -465,19 +425,7 @@ Allow-Credentials=true
 Allow-Methods=GET, POST, PUT, DELETE, OPTIONS, HEAD
 ```
 
-These parameter apply to the whole application.
-
-# Misc: clearing cache
-
-All cached results (from templates or various queries) can be cleared as follows:
-
-`curl -X POST http://{server:port}/clearcache `
-
-In the same way, ontology data can be refreshed inside ldspdi and its dedicated fuseki server as follows:
-
-`curl -X POST "http://purl.bdrc.io/callbacks/github/owl-schema"`
-
-the above url corresponds to a github webhook that is trigerred each time a change occurs in [owl-schema](https://github.com/buda-base/owl-schema)
+These parameters apply to the whole application.
 
 # Copyright and License
 

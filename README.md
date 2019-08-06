@@ -1,8 +1,10 @@
-# LDS-PDI 
+**LDS-PDI server**
 
 A.k.a. *Linked Data Server - Public Data Interface*
+[TOC]
 
 ## Features
+
 
 The server provides APIs to:
 - serve RDF resources in different serializations (ttl, jsonld, etc.)
@@ -52,9 +54,7 @@ The path of the directory containing `ldspdi.properties` must be passed to the s
 mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/
 ```
 
-##### In a buda-base environment
-
-Note that the [buda-base](https://github.com/buda-base/buda-base) environment sets the config path to `/etc/buda/ldspdi/`, so the only thing you need to is to copy your configuration file to `/etc/buda/ldspdi/ldspdi.properties`.
+Note that the [buda-base](https://github.com/buda-base/buda-base) environment sets the config path to `/etc/buda/ldspdi/`, so the only thing you need to do is to copy your configuration file to `/etc/buda/ldspdi/ldspdi.properties`.
 
 ### Webhooks (optional)
 
