@@ -96,63 +96,6 @@ public class PublicTemplatesResource {
         return Response.ok(new Viewable("/resPage.jsp", model)).build();
     }
 
-    /*
-     * @GET
-     * 
-     * @Path("/private/{file}")
-     * 
-     * @JerseyCacheControl()
-     * 
-     * @Produces({ MediaType.APPLICATION_JSON, "text/csv" }) public Response
-     * getRawQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl")
-     * final String fusekiUrl, @PathParam("file") String file) throws RestException
-     * { log.info("Call to getQueryTemplateResults() {}, params: {}", file,
-     * info.getQueryParameters()); // Settings HashMap<String, String> hm =
-     * Helpers.convertMulti(info.getQueryParameters());
-     * hm.put(QueryConstants.REQ_URI,
-     * info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
-     * hm.put(QueryConstants.REQ_METHOD, "GET"); // process final LdsQuery qfp =
-     * LdsQueryService.get(file + ".arq", "private"); final String query =
-     * qfp.getPrefixedQuery(); ResultSetWrapper res =
-     * QueryProcessor.getResults(query, fusekiUrl,
-     * hm.get(QueryConstants.RESULT_HASH), Integer.toString(Integer.MAX_VALUE));
-     * String fmt = hm.get(QueryConstants.FORMAT); if ("json".equals(fmt)) { return
-     * Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res, hm)),
-     * MediaType.APPLICATION_JSON_TYPE).header("Content-Disposition",
-     * "attachment; filename=\"" + file + ".json\"").build(); } if
-     * ("csv".equals(fmt)) { return Response.ok(res.getCsvStreamOutput(hm),
-     * MediaTypeUtils.MT_CSV).header("Content-Disposition",
-     * "attachment; filename=\"" + file + ".csv\"").build(); } return
-     * Response.noContent().build(); }
-     */
-
-    /*
-     * @GET
-     * 
-     * @Path("/test/{file}")
-     * 
-     * @JerseyCacheControl()
-     * 
-     * @Produces(MediaType.APPLICATION_JSON) public Response
-     * testTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final
-     * String fuseki, @PathParam("file") String file) throws RestException {
-     * 
-     * log.info("Call to testTemplateResults() " + file + "Params >>" +
-     * info.getQueryParameters()); // Settings HashMap<String, String> hm =
-     * Helpers.convertMulti(info.getQueryParameters());
-     * hm.put(QueryConstants.REQ_URI,
-     * info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
-     * 
-     * // process final LdsQuery qfp = LdsQueryService.get(file + ".arq",
-     * "library"); final String query = qfp.getParametizedQuery(hm, true); // The
-     * output we build using jackson ResultSetWrapper res =
-     * QueryProcessor.getResults(query, fuseki, hm.get(QueryConstants.RESULT_HASH),
-     * hm.get(QueryConstants.PAGE_SIZE)); // FusekiResultSet model=new
-     * FusekiResultSet(res); HashMap<String, Object> model =
-     * res.getFusekiResultSet(); return
-     * Response.ok(ResponseOutputStream.getJsonResponseStream(model)).build(); }
-     */
-
     @POST
     @Path("/query/table/{file}")
     @JerseyCacheControl()
