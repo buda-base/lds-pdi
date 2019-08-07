@@ -74,6 +74,10 @@ public class PublicTemplatesResource {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters());
         // Settings
         HashMap<String, String> hm = Helpers.convertMulti(info.getQueryParameters());
+        String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
+        if (pageNumber == null) {
+            pageNumber = "1";
+        }
         hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
         hm.put(QueryConstants.REQ_METHOD, "GET");
         // process
@@ -88,10 +92,10 @@ public class PublicTemplatesResource {
             return Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res, hm)), MediaType.APPLICATION_JSON_TYPE).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"").build();
         }
         if ("csv".equals(fmt)) {
-            return Response.ok(res.getCsvStreamOutput(hm, true), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + ".csv\"").build();
+            return Response.ok(res.getCsvStreamOutput(hm, true), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"").build();
         }
         if ("csv_f".equals(fmt)) {
-            return Response.ok(res.getCsvStreamOutput(hm, false), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + ".csv\"").build();
+            return Response.ok(res.getCsvStreamOutput(hm, false), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"").build();
         }
         hm.put(QueryConstants.REQ_METHOD, "GET");
         hm.put("query", qfp.getQueryHtml());

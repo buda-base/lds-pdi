@@ -100,7 +100,7 @@ input[type=submit]:hover {
 	</td>
 	<td>
 	<c:if test="${model.getParamList().size()>0}">
-		<form action="/query/${model.getId()}">
+		<form action="/query/table/${model.getId()}">
 			<c:forEach items="${model.getParamList()}" var="p">
 			    <c:set var="val" value="${p}"/>
                 <c:if test="${!p.equals(\"NONE\")}">
@@ -108,7 +108,11 @@ input[type=submit]:hover {
 	            <input type="text" id="${p}" name="${p}" value='${model.getParamValue(val)}'><br>
 	            </c:if>
 			</c:forEach>
-			<br>		    		    		  
+			Page number<br>
+			<input type="text" id="pageNumber" name="pageNumber" value='${model.getPageNumber()}'><br>
+			Page size<br>
+            <input type="text" id="pageSize" name="pageSize" value='${model.getPageSize()}'><br>
+			<br>					    		    		  
 		    <input type="submit" value="Submit">
 		</form>
 	</c:if>	
