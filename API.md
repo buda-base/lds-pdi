@@ -198,6 +198,7 @@ curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo
 #### Controling the output
 
 You can pass query parameters to control the output format:
+
 | Parameter name | Possible values | Default |
 | ----- | ----- | ----- |
 | `format` | `csv` or `json` | `json` |
