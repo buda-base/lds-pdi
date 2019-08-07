@@ -113,26 +113,26 @@ lds-pdi serves paginated results based on several parameters values.
 pLinks is an object giving prev and next pages for GET request (prevGet & nextGet) along with post json request params of the current, next and previous pages (For request posting json)
 
 ```
-Ex GET: http://localhost:8080/query/Res_byName?L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
-Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/Res_byName
+Ex GET: http://localhost:8080/query/table/Res_byName?L_NAME=("mkhan chen" AND ("'od zer" OR "ye shes"))&L_LANG=@bo-x-ewts&I_LIM=100
+Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://localhost:8080/query/table/Res_byName
 ```
 
 ## JSON and CVS output
 
-You can get json or cvs output formats (using the `/query` endpoints) by adding &format=json or &format=csv to your URL request:
+You can get json or cvs output formats (using the `/query/table` endpoints) by adding &format=json or &format=csv to your URL request:
 
 **Ex :**
 ```
-http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=json&pageSize=50&pageNumber=1
+http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&format=json&pageSize=50&pageNumber=1
 ```
 or (for a csv detailed response - values + datatypes)
 ```
-http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1
+http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1
 ```
 or (for a csv simplified response - values only)
 
 ```
-http://purl.bdrc.io/query/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1&profile=simple
+http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1&profile=simple
 ```
 Ex Testing POST JSON : 
 
@@ -196,31 +196,30 @@ Note : the parameter placeholder of the query must match the value of QueryPara
 
 ldspdi performs a strict parameter evaluation in order to prevent Sparql injection. It therefore requires parameter types to be specified. Parameter types are as follows :
 
-Literal : each literal parameter name must be prefixed by « L_ » (Ex : L_NAME)
-
-Literal Lang: each literal parameter can be associated with a language using a parameter prefixed by LG_ (Ex : if you want L_FOO to be searched in the ewts language, you must add a LG_FOO=bo-x-ewts to your request and declare it in the #QueryParams section of your template).
-
-Integer : each literal parameter name must be prefixed by « I_ » (Ex : I_LIM)
-
-Resource : each Resource ID parameter must be prefixed by « R_ » (Ex : R_RES)
-
+- *Literal*: each literal parameter name must be prefixed by `L_` (ex : `L_NAME`)
+- *Literal lang tag*: each literal parameter can be associated with a lang tag using a parameter prefixed by `LG_` (Ex : if you want `L_FOO` to be associated with the `bar` lang tag, you can add `LG_FOO=bar` to your request and declare it in the `QueryParams` section of your template).
+- *Integer*: each literal parameter name must be prefixed by `I_` (ex : `I_LIM`)
+- *Resource*: each URI parameter must be prefixed `R_` (ex : `R_RES`)
 
 Additional rule : Filter on variables should be the last ones in a query
 
 ex:
-```
+
+```sparql
 FILTER (contains(?root_name, ?NAME ))
 
 FILTER ((contains(?comment_type, "commentary" ))
 ```
 
 will fail because it is subject to an injection attack while :
-```
+
+```sparql
 FILTER ((contains(?comment_type, "commentary" ))
 
 FILTER (contains(?root_name, ?NAME ))
 ```
-will go through without any issue.
+
+will be considered safe.
 
 ### Example :
 
@@ -283,7 +282,7 @@ In addition to general metadata (QueryScope, Id, domain, etc...), there two type
 
 an example of param metadata is as follows:
 
-```
+```spaql
 #param.L_NAME.type=string
 #param.L_NAME.langTag=LG_NAME
 #param.L_NAME.isLucene=true
@@ -293,7 +292,7 @@ an example of param metadata is as follows:
 
 **param** and **output** have the same syntax : 
 
-```
+```sparql
 #{metadataType}.{variable_name}.{data_name}
 ```
 
@@ -310,7 +309,7 @@ For a Resource param (prefixed by `R_`): only `{type}`, `{subType}`, `{desc}` ar
 For all output metadata, only only {type}{desc} are valid data_name.
 
 #### metadata declaration complete model example
-```
+```sparql
 #param.L_NAME.type=
 #param.L_NAME.langTag=
 #param.L_NAME.isLucene=
@@ -329,14 +328,15 @@ For all output metadata, only only {type}{desc} are valid data_name.
 
 # Graph templates
 
-graph templates are templates producing a graph instead of a value or a table-like set of results. Graph templates use the `CONSTRUCT` SPARQL keyword.
+graph templates are templates producing a graph instead of a table set of results. Graph templates use the `CONSTRUCT` SPARQL keyword.
 They follow the same rules as query templates regarding self description features except for output fields descriptions which don't make any sense in the case of a graphed result.
 
-**The root for the endpoint is `/graph` (`/query` being used by query templates)**
+The root for the endpoint is `/query/graph`
 
 Example:
+
 ```
-/graph/graphTest?R_RES=bdr:W22084
+/query/graph/graphTest?R_RES=bdr:W22084
 ```
 
 
