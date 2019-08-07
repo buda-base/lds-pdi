@@ -33,12 +33,29 @@ brandLogo=https://iiif.bdrc.io/static::logo.png/full/max/0/default.png
 ontName=Buddhist Digital Ontology
 
 
+#### Endpoint Prefixes ####
+
+# You need to set this up with the URIs and short prefixes of your data
+
+# This is used in the /resource endpoint:
+endpoints.resource.shortprefix = bdr:
+endpoints.resource.fullprefix = http://purl.bdrc.io/resource/
+
+# This is used in the /graph endpoint (you may not need this)
+endpoints.graph.shortprefix = bdg:
+endpoints.graph.fullprefix = http://purl.bdrc.io/graph/
+
+# You may not need this, this is used in the /admindata endpoint
+endpoints.admindata.shortprefix = bda:
+endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
+
+
 #### SPARQL Templates ######
 
 # SPARQL queries templates local directory path.
 # lds-pdi will automatically sync https://github.com/buda-base/lds-queries in this directory.
 #local and remote dir
-queryPath=/Users/marc/dev/lds-queries/
+queryPath=/usr/local/lds-queries/
 git_remote_url="https://github.com/buda-base/lds-queries.git"
 
 # Sparql result set max size
