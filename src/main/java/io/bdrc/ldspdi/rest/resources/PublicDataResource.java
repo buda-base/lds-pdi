@@ -92,8 +92,10 @@ public class PublicDataResource {
 
     public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class.getName());
 
-    public static final String RES_PREFIX_SHORT = "bdr";
-    public static final String RES_PREFIX = "http://purl.bdrc.io/resource/";
+    public static final String RES_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.resource.shortprefix");
+    public static final String RES_PREFIX = ServiceConfig.getProperty("endpoints.resource.fullprefix");
+    public static final String ADM_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.admindata.shortprefix");
+    public static final String GRAPH_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.graph.shortprefix");
 
     @GET
     @JerseyCacheControl()
@@ -149,8 +151,7 @@ public class PublicDataResource {
     @Path("/admindata/{res}")
     @JerseyCacheControl()
     public Response getAdResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
-        final String prefix = "bda";
-        final String prefixedRes = prefix + ':' + res;
+        final String prefixedRes = ADM_PREFIX_SHORT + res;
         final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         log.info("Call to getAdResourceGraph with format: {} variant is {}", format, variant);
         if (format == null) {
@@ -186,8 +187,7 @@ public class PublicDataResource {
     @Path("/graph/{res}")
     @JerseyCacheControl()
     public Response getGrResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
-        final String prefix = "bdg";
-        final String prefixedRes = prefix + ':' + res;
+        final String prefixedRes = GRAPH_PREFIX_SHORT + res;
         final String graphType = "graph";
         final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         if (format == null) {
@@ -223,8 +223,7 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getAdResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request)
             throws RestException {
-        final String prefix = "bda";
-        final String prefixedRes = prefix + ':' + res;
+        final String prefixedRes = ADM_PREFIX_SHORT + res;
         final String graphType = "describe";
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
         if (media == null) {
@@ -248,8 +247,7 @@ public class PublicDataResource {
     @JerseyCacheControl()
     public Response getGrResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request)
             throws RestException {
-        final String prefix = "bdg";
-        final String prefixedRes = prefix + ':' + res;
+        final String prefixedRes = GRAPH_PREFIX_SHORT + res;
         final String graphType = "graph";
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
         if (media == null) {
@@ -289,7 +287,7 @@ public class PublicDataResource {
     @Path("/resource/{res}")
     @JerseyCacheControl()
     public Response getResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
-        final String prefixedRes = RES_PREFIX_SHORT + ':' + res;
+        final String prefixedRes = RES_PREFIX_SHORT + res;
         log.info("Call to getResourceGraphGET() with URL: {}, accept: {}", info.getPath(), format);
         log.info("Call to getResourceGraphGET() " + info.getQueryParameters().keySet().contains("graph"));
         final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
@@ -327,7 +325,7 @@ public class PublicDataResource {
     public Response getFormattedResourceGraph(@PathParam("res") final String res, @PathParam("ext") final String ext, @DefaultValue("0") @QueryParam("startChar") Integer startChar, @DefaultValue("999999999") @QueryParam("endChar") Integer endChar,
             @HeaderParam("fusekiUrl") String fusekiUrl, @Context final UriInfo info) throws RestException {
         log.info("Call to getFormattedResourceGraph()");
-        final String prefixedRes = RES_PREFIX_SHORT + ':' + res;
+        final String prefixedRes = RES_PREFIX_SHORT + res;
         final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);

@@ -43,15 +43,6 @@ public class BdrcAuthResource {
     }
 
     @GET
-    @Path("/auth/location")
-    public Response getLocation() {
-        log.info("Call getLocation()");
-        ResponseBuilder builder = Response.ok(new Viewable("/auth.jsp"));
-        builder = setLastModified(builder);
-        return builder.build();
-    }
-
-    @GET
     @Path("/resource-auth/{res}")
     public Response getAuthResource(@PathParam("res") final String res) throws RestException {
         log.info("Call getAuthResource()");
