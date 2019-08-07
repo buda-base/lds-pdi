@@ -52,6 +52,21 @@ If the `Accept:` header is `html` (when the url is open through a web browser fo
 
 This endpoint is similar to the previous one, except that the serialization of data depends on the extension (`{ext}`).
 
+#### Admindata and grand endpoint
+
+The endpoints at
+
+- `/admindata/{res}`
+- `/admindata/{res}.{ext}`
+
+behave in the same way. The endpoints at
+
+- `/graph/{res}`
+- `/graph/{res}.{ext}`
+
+are intended for RDF graphs and behave in a slightly different way: they use the `library/Resgraph.arq` SPARQL query, and they do not redirect to html pages.
+
+
 ### Supported RDF mime types and extensions
 
 | Mime type | Ext | note |
