@@ -69,6 +69,7 @@ public class JsonAPIResource {
     @GET
     @Path("/queries")
     @JerseyCacheControl()
+    @Produces(MediaType.APPLICATION_JSON)
     public Response queriesListGet() throws RestException {
         log.info("Call to queriesListGet()");
         return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();
@@ -86,6 +87,7 @@ public class JsonAPIResource {
     @GET
     @Path("/queries/{template}")
     @JerseyCacheControl()
+    @Produces(MediaType.APPLICATION_JSON)
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
         log.info("Call to queryDescGet()");
         final LdsQuery qfp = LdsQueryService.get(name + ".arq");
