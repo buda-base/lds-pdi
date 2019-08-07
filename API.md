@@ -1,92 +1,82 @@
-# LDS-PDI 
+# LDS-PDI API
 
-[TOC]
+## Table of public ldspdi endpoints
 
-(Linked Data Server - Public Data Interface)
+### Data endpoints
 
-Contains a framework for executing external queries files through a rest API. Integrates lds-search and lds-rest projects and extends ontology-service project.
+|Method| Endpoint |  output |
+|------|---|---|
+|GET|  `/robots.txt`   | `User-agent: * Disallow: /` |
+|GET|   `/cache`  |  Cache and memory monitoring | 
+|GET|`/context.jsonld`| the jsonld context used for jsonld serialization|  
+|GET|`/admindata/{res}`| displays some admindata about the resource res (example: /admindata/P1583)|
+|GET|`/graph/{res}`|returns a serialization of the model of the given resource based on the value of the Accept header - trig is the default serialization (example: /graph/P1583)|
+|GET|`/admindata/{res}.{ext}`|displays a serialization of the model of the admindata for the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
+|GET|`/graph/{res}.{ext}`|displays a serialization of the graph of the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
+|GET|`/prefixes`| a turtle serialization of all the prefixes used by the ldspdi server|
+|GET|`/resource/{res}`|displays resource metadata according to the value of the Accept header - text/html leads to a pretty view of this data (example: /resource/P1583)|
+|GET|`/resource/{res}.{ext}`|displays a serialization of the metadata of the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
+|GET|`/{base : .*}/{other}`|generic endpointusing wildcards in order to serve the ontology (as a whole or as individuals resources of any ontology) (example: [http://purl.bdrc.io/ontology/core/](http://purl.bdrc.io/ontology/core/) serves a pretty html view of the core ontology while [http://purl.bdrc.io/ontology/core/Person](http://purl.bdrc.io/ontology/core/Person) serves a pretty html view of the Person class of the core ontology|
+|GET|`/{base : .*}/{other}.{ext}`| return serialization of the requested ontology according to the extension (see Supported mime types and file extensions section in API.md). Example: [http://purl.bdrc.io/ontology/core.ttl](http://purl.bdrc.io/ontology/core.ttl) |
+|GET|`/ontology/data/{ext}`| get all ontologies in a single model, serialized according to the given extension (see Supported mime types and file extensions section in API.md) See [http://purl.bdrc.io/ontology/data/ttl](http://purl.bdrc.io/ontology/data/ttl) |
+|POST|`/callbacks/github/owl-schema`| a webhook for updating the ontologies models from the owl-schema git repo and updating fuseki dataset ontology schemas|
 
-Moreover, each query file contains its own description that is used to dynamically generate a html file containing the Sparql Public Data Interface specifications  
+### SPARQL Query templates
 
-# Query file repository
+|Method| Endpoint |  output |
+|------|---|---|
+|GET|`/query/table/{file}`| the outcome of a template returning a jena result set where {file} is the name of the arq template (without its extension). When the templates requires parameters (as in most cases) a queryString must be provided; example: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329). By default the results are provided as an html table. However adding a "format" parameter to the query string can leads to an json or csv output; example: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=json](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=json) or [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv). In the case we want csv, we can specify a profile param to get a light version of the csv, as follows: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv&profile=simple] (http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv&profile=simple) NOTE: You can also specify the page size and page number, as follows, when requesting html output [http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&pageSize=120&pageNumber=1] (http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&pageSize=120&pageNumber=1)|
+|POST|`/query/table/{file}`|Same as the GET version except that query params are sent as a json object and that the output is always a json representation of the result set. Example: *curl -v -H "Content-Type: application/json" -d '{"R_RES":"bdr:W23703"}' http://purl.bdrc.io/query/table/volumesForWork*|
+|GET|`/query/graph/{file}`|the outcome of a template returning a graph where {file} is the name of the arq template (without its extension). When the templates requires parameters (as in most cases) a queryString must be provided; example: [http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline?R_RES=bdr:V22084_I0886](http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline?R_RES=bdr:V22084_I0886). the serialization of the graph is based on the value of the Accept header. Default serialization is jsonld, alternatives links are provided in Alternates header when no Accept header is provided|
+|POST|`/query/graph/{file}`| same as the GET version except that it only consumes json data. Example: *curl -v -H "Content-Type: application/json" -H "Accept: text/turtle" -d '{"R_RES":"bdr:V22084_I0886"}' http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline*|
+|POST|`/callbacks/github/lds-queries`|a webhook for updating the local repository of templates. It is trigerred by [github ldsqueries repo](https://github.com/buda-base/lds-queries)|
+|POST|`/clearcache`| empties all caches of the ldspdi server|
+|GET|`/queries`| provides a list of all the available public templates for that server in the json format (see [http://purl.bdrc.io/queries](http://purl.bdrc.io/queries))|
+|POST|`/queries`|same as above - no parameters|
+|GET|`/queries/{template}`|provides the json representation of the template specified by its name as the path variable {template} example: [http://purl.bdrc.io/queries/Etexts_count](http://purl.bdrc.io/queries/Etexts_count)|
+|POST|`/queries/{template}`|same as above|
 
-All query templates files are automatically fetched from lds-queries github repository (https://github.com/BuddhistDigitalResourceCenter/lds-queries).
-This repository is being cloned locally to the location specified by the queryPath parameter mentionned above.
+## Details
 
-Any authorized user for the github lds-queries repo can therefore create, TEST thoroughly (10 times better than one), and share queries by pushing them to the github repository.
+## Resource endpoints
 
-Changes will appear after refreshing
-```
-http://localhost:8080/index.jsp
-```
+#### `/resource/{res}`
 
-# Running
+Returns a serialization of the data about the resource using the SPARQL query `library/ResInfo.arq`.
 
-```
-mvn jetty:run
-```
-# Home demo page
-```
-http://localhost:8080/index.jsp
-```
+The returned data corresponds to the `Accept:` header of the request (see below for supported values). In case of no `Accept:` header, the endpoint returns a `303` http code with a list of possible serializations.
 
-# Json Context of lds-pdi
-```
-GET or POST: http://localhost:8080/context.jsonld
-```
-# Resources
+If the `Accept:` header is `html` (when the url is open through a web browser for instance), then the response is a `302` redirect to a html page that can be configured.
 
-## GET && POST
-/resource/{res} 
+#### `/resource/{res}.{ext}`
 
-(returns turtle format by default)
-```
-Ex GET: http://localhost:8080/resource/P1583
-Ex POST: curl -X POST http://localhost:8080/resource/P1583
-```
-/resource/{res}.{ext}
+This endpoint is similar to the previous one, except that the serialization of data depends on the extension (`{ext}`).
 
-(returns format according to extensions {ext} - see below for supported formats/ext mapping)
-```
-Ex GET: http://localhost:8080/resource/P1583.jsonld
-Ex POST : curl -X POST http://localhost:8080/resource/P634.rdf
-Ex POST JSON : curl -H "Content-Type: application/json" -X POST -d '{"res":"P1583","ext":"jsonld"}' http://localhost:8080/resource
-```
+### Supported RDF mime types and extensions
 
-##Supported mime types and file extensions
+| Mime type | Ext | note |
+|------|---|---|
+| `text/turtle` | `ttl` | processed by `STTLWriter` (see [lib](https://github.com/buda-base/jena-stable-turtle/)) |
+| `application/n-triples` | `nt` | |
+| `application/n-quads` | `nq` | |
+| `text/trig` | `trig` | processed by `STrigWriter` (see [lib](https://github.com/buda-base/jena-stable-turtle/)) |
+| `application/rdf+xml` | `rdf` | |
+| `application/owl+xml` | `owl` | |
+| `application/ld+json` | `jsonld` | processed by `JSONLDFormatter` |
+| `application/rdf+thrift` | `rt` | |
+| `application/rdf+thrift` | `trdf` | |
+| `application/json` | `rj` | |
+| `application/json` | `json` | This is different from Json-ld and is probably not what you want |
+| `application/trix+xml` | `trix` | |
 
-text/turtle=ttl (default : processed by BDRC STTLWriter)
+## Query templates
 
-application/n-triples=nt
-
-application/n-quads=nq
-
-text/trig=trig
-
-application/rdf+xml=rdf
-
-application/owl+xml=owl
-
-application/ld+json=jsonld (processed by BDRC JSONLDFormatter)
-
-application/rdf+thrift=rt
-
-application/rdf+thrift=trdf
-
-application/json=rj
-
-application/json=json
-
-application/trix+xml=trix
-
-# Query templates
-
-## GET && POST
+### GET && POST
 
 lds-pdi serves paginated results based on several parameters values.
 
-/query/{template id} : POST requests return the following JSON format :
-```
+`/query/{template id}` : POST requests return the following JSON format :
+```json
 {
   "pageNumber" : 1,
   "numberOfPages" : 2,
@@ -129,7 +119,7 @@ Ex POST: curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&L
 
 ## JSON and CVS output
 
-You can get json or cvs output formats (using GET on the /query endpoints) by adding &format=json or &format=csv to your URL request:
+You can get json or cvs output formats (using the `/query` endpoints) by adding &format=json or &format=csv to your URL request:
 
 **Ex :**
 ```
@@ -149,7 +139,7 @@ Ex Testing POST JSON :
 
 1) Create a file test.json :
 
-```
+```json
 {
   "L_NAME": "(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))",
   "LG_NAME": "bo-x-ewts",
@@ -168,7 +158,7 @@ This framework will automatically add new sparql query templates to the index pa
 
 New query files must have the .arq extension and are formatted as follows :
 
-```
+```sparql
 #QueryScope=General
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
@@ -235,7 +225,7 @@ will go through without any issue.
 ### Example :
 
 
-```
+```sparql
 #QueryScope=General
 #QueryReturnType=Table
 #QueryResults=A table containing the Id and matching literal for the given query and language tag with the given limit
@@ -252,7 +242,7 @@ WHERE {
 ```
 
 
-```
+```sparql
 #QueryScope=Person
 #QueryReturnType=Table
 #QueryResults=All the detailed admin info (notes, status, log entries) about the person data
@@ -309,11 +299,11 @@ an example of param metadata is as follows:
 
 #### param metadata specs
 
-For a Literal param (prefixed by L_): only {type}{langTag}{isLucene}{example} are valid data_name.
+For a Literal param (prefixed by `L_`): only `{type}`, `{langTag}`, `{isLucene}`, `{example}` are valid data_name.
 
-For a Integer param (prefixed by I_): only {type}{desc} are valid data_name.
+For a Integer param (prefixed by `I_`): only `{type}`, `{desc}` are valid data_name.
 
-For a Resource param (prefixed by R_): only {type}{subType}{desc} are valid data_name. the subtype indicates whether this param is a resource ID(bdr:P1583) or a resource type (:Work)
+For a Resource param (prefixed by `R_`): only `{type}`, `{subType}`, `{desc}` are valid data_name. the subtype indicates whether this param is a resource URI (ex: `bdr:P1583`) or a resource type (:Work)
 
 #### output metadata specs
 
@@ -339,10 +329,10 @@ For all output metadata, only only {type}{desc} are valid data_name.
 
 # Graph templates
 
-graph templates are templates producing a graph instead of a value or a table-like set of results. Graph templates use the CONSTRUCT sparql keyword.
+graph templates are templates producing a graph instead of a value or a table-like set of results. Graph templates use the `CONSTRUCT` SPARQL keyword.
 They follow the same rules as query templates regarding self description features except for output fields descriptions which don't make any sense in the case of a graphed result.
 
-**The root for the endpoint is /graph (/query being used by query templates)**
+**The root for the endpoint is `/graph` (`/query` being used by query templates)**
 
 Example:
 ```
@@ -359,13 +349,14 @@ GET or POST: http://localhost:8080/queries
 ```
 
 returns JSON objects of the form
-```
+```json
 {
-id: "Etexts_contents",
-href: "/queries/Etexts_contents",
-description: "A table containing the Resource ID, etext contents and score for the given query and language tag with the given limit"
-},
+  "id": "Etexts_contents",
+  "href": "/queries/Etexts_contents",
+  "description": "A table containing the Resource ID, etext contents and score for the given query and language tag with the given limit"
+}
 ```
+
 Where descLink is a link to the JSON query template representation.
 
 ## Query templates description
@@ -373,60 +364,42 @@ Where descLink is a link to the JSON query template representation.
 GET or POST: http://localhost:8080/queries/{template_name}
 ```
 returns JSON queryTemplate object :
-```
+
+```json
 {
-id: "Res_byName",
-domain: "public",
-queryScope: "General",
-queryResults: "A table containing the Id and matching literal for the given query and language tag with the given limit",
-queryReturn: "Table",
-queryParams: "L_NAME,LG_NAME,I_LIM",
-params: [
-{
-type: "string",
-name: "L_NAME",
-langTag: "LG_NAME",
-isLuceneParam: "true",
-example: "("'od zer" OR "ye shes")"
-},
-{
-type: "int",
-name: "I_LIM",
-description: "the maximum number of results"
+  "id": "Res_byName",
+  "domain": "public",
+  "queryScope": "General",
+  "queryResults": "A table containing the Id and matching literal for the given query and language tag with the given limit",
+  "queryReturn": "Table",
+  "queryParams": "L_NAME,LG_NAME,I_LIM",
+  "params": [
+    {
+      "type": "string",
+      "name": "L_NAME",
+      "langTag": "LG_NAME",
+      "isLuceneParam": true,
+      "example": "(\"'od zer\" OR \"ye shes\")"
+    },
+    {
+      "type": "int",
+      "name": "I_LIM",
+      "description": "the maximum number of results"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "?s",
+      "type": "URI",
+      "description": "the resource URI"
+    },
+    {
+      "name": "?lit",
+      "type": "string",
+      "description": "the label/pref. label of the resource"
+    }
+  ],
+  "template": " select distinct ?s ?lit WHERE { { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . } union { (?b ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . ?s ?t ?b . } } limit ?I_LIM",
+  "demoLink": "/query/Res_byName?L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
 }
-],
-outputs: [
-{
-name: "?s",
-type: "URI",
-description: "the resource URI"
-},
-{
-name: "?lit",
-type: "string",
-description: "the label/pref. label of the resource"
-}
-],
-template: " select distinct ?s ?lit WHERE { { (?s ?sc ?lit) text:query ( skos:prefLabel ?L_NAME ) . } union { (?b ?sc ?lit) text:query ( rdfs:label ?L_NAME ) . ?s ?t ?b . } } limit ?I_LIM",
-demoLink: "/query/Res_byName?L_NAME=(%22mkhan+chen%22+AND+(%22%27od+zer%22+OR+%22ye+shes%22))&LG_NAME=bo-x-ewts&I_LIM=100"
-}
 ```
-
-# CORS support
-
-lds-pdi offers CORS support. Cors configuration parameters can be specified in the ldspdi.properties file, as follows:
-
-```
-#cors settings
-
-Allow-Origin=*
-Allow-Headers=origin, content-type, accept, authorization
-Allow-Credentials=true
-Allow-Methods=GET, POST, PUT, DELETE, OPTIONS, HEAD
-```
-
-These parameters apply to the whole application.
-
-# Copyright and License
-
-All the code and API are Copyright (C) 2017 Buddhist Digital Resource Center and are under the Apache 2.0 Public License.
