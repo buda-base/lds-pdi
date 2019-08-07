@@ -33,12 +33,29 @@ brandLogo=https://iiif.bdrc.io/static::logo.png/full/max/0/default.png
 ontName=Buddhist Digital Ontology
 
 
+#### Endpoint Prefixes ####
+
+# You need to set this up with the URIs and short prefixes of your data
+
+# This is used in the /resource endpoint:
+endpoints.resource.shortprefix = bdr:
+endpoints.resource.fullprefix = http://purl.bdrc.io/resource/
+
+# This is used in the /graph endpoint (you may not need this)
+endpoints.graph.shortprefix = bdg:
+endpoints.graph.fullprefix = http://purl.bdrc.io/graph/
+
+# You may not need this, this is used in the /admindata endpoint
+endpoints.admindata.shortprefix = bda:
+endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
+
+
 #### SPARQL Templates ######
 
-# SPARQL queries templates local directory path.
-# lds-pdi will automatically sync https://github.com/buda-base/lds-queries in this directory.
-#local and remote dir
-queryPath=/Users/marc/dev/lds-queries/
+# SPARQL queries templates local directory path, no need to change this
+# in a buda-base environment.
+# lds-pdi will automatically sync the configured git repo in this directory:
+queryPath=/usr/local/ldspdi/queries/
 git_remote_url="https://github.com/buda-base/lds-queries.git"
 
 # Sparql result set max size
@@ -46,14 +63,15 @@ limit=500
 # Sparql queries timeout (ms)
 timeout=5000
 
-# Template urls, you probably don't need to change that
+# Template urls, you probably don't need to change that:
+
 # Url for templates returning Jena Result Sets (tables)
 urlTemplatePath=/query/table
 # Url for templates returning jena Model (i.e graphs)
 urlGraphPath=/query/graph
 
 #default number of results by page
-pageSize=50
+pageSize=100
 
 #default page size for quick search
 qs_pageSize=100
