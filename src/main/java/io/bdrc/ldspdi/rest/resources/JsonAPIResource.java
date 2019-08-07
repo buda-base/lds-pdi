@@ -72,16 +72,16 @@ public class JsonAPIResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response queriesListGet() throws RestException {
         log.info("Call to queriesListGet()");
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList))).build();
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList)), MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @POST
     @Path("/queries")
     @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
-    public ArrayList<QueryListItem> queriesListPost() throws RestException {
+    public Response queriesListPost() throws RestException {
         log.info("Call to queriesListPost()");
-        return getQueryListItems(fileList);
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList)), MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @GET
@@ -91,17 +91,17 @@ public class JsonAPIResource {
     public Response queryDescGet(@PathParam("template") String name) throws RestException {
         log.info("Call to queryDescGet()");
         final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-        return Response.ok(ResponseOutputStream.getJsonResponseStream(qfp.getTemplate())).build();
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(qfp.getTemplate()), MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @POST
     @Path("/queries/{template}")
     @JerseyCacheControl()
     @Produces(MediaType.APPLICATION_JSON)
-    public QueryTemplate queryDescPost(@PathParam("template") String name) throws RestException {
+    public Response queryDescPost(@PathParam("template") String name) throws RestException {
         log.info("Call to queryDescPost()");
         final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-        return qfp.getTemplate();
+        return Response.ok(ResponseOutputStream.getJsonResponseStream(qfp.getTemplate()), MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     private ArrayList<QueryListItem> getQueryListItems(List<String> filesList) throws RestException {
