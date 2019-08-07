@@ -229,10 +229,9 @@ You can pass query parameters to control the output format:
 
 | Parameter name | Possible values | Default |
 | ----- | ----- | ----- |
-| `format` | `csv` or `json` | `json` |
-| `pageSize` | integer | ? |
+| `format` | `csv` (simple), `csv_f` (full) or `json` | `json` |
+| `pageSize` | integer | 50 |
 | `pageNumber` | integer | 1 |
-| `profile` | `simple` or ? | ? |
 
 Example:
 

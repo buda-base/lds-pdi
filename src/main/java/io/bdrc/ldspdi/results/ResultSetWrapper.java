@@ -38,11 +38,9 @@ import com.opencsv.CSVWriter;
 
 import io.bdrc.ldspdi.sparql.QueryConstants;
 
-
 public class ResultSetWrapper {
 
-
-    public final static Logger log=LoggerFactory.getLogger(ResultSetWrapper.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(ResultSetWrapper.class.getName());
 
     public long execTime;
     public int numResults;
@@ -51,26 +49,26 @@ public class ResultSetWrapper {
     public int hash;
     public List<QuerySolution> querySolutions;
     public List<String> vars;
-    public HashMap<String,List<String>> head;
+    public HashMap<String, List<String>> head;
     public ArrayList<Row> rows;
     public ArrayList<QueryMvcSolutionItem> mvc_rows;
-    public static final String DEL=",";
+    public static final String DEL = ",";
 
-    public ResultSetWrapper(ResultSet rs, long execTime,int pageSize) {
-        this.pageSize=pageSize;
+    public ResultSetWrapper(ResultSet rs, long execTime, int pageSize) {
+        this.pageSize = pageSize;
         vars = rs.getResultVars();
-        head=new HashMap<>();
-        head.put("vars",rs.getResultVars());
-        this.execTime=execTime;
-        numResults=0;
+        head = new HashMap<>();
+        head.put("vars", rs.getResultVars());
+        this.execTime = execTime;
+        numResults = 0;
         mvc_rows = new ArrayList<>();
         querySolutions = new ArrayList<>();
         rows = new ArrayList<>();
-        while(rs.hasNext()) {
+        while (rs.hasNext()) {
             QuerySolution qs = rs.next();
             querySolutions.add(qs);
-            rows.add(new Row(vars,qs));
-            QueryMvcSolutionItem mvc_row=new QueryMvcSolutionItem(qs,vars);
+            rows.add(new Row(vars, qs));
+            QueryMvcSolutionItem mvc_row = new QueryMvcSolutionItem(qs, vars);
             mvc_rows.add(mvc_row);
             numResults++;
         }
@@ -80,7 +78,7 @@ public class ResultSetWrapper {
         }
     }
 
-    public HashMap<String,List<String>> getHead() {
+    public HashMap<String, List<String>> getHead() {
         return head;
     }
 
@@ -131,36 +129,35 @@ public class ResultSetWrapper {
             headers = new String[vars.size()];
             factor = 1;
         } else {
-            headers = new String[3*vars.size()];
+            headers = new String[3 * vars.size()];
             factor = 3;
         }
         int varIdx = 0;
         for (String var : vars) {
-            headers[factor*varIdx] = var;
+            headers[factor * varIdx] = var;
             if (!simple) {
-                headers[factor*varIdx+1] = var+"-type";
-                headers[factor*varIdx+2] = var+"-lang";
+                headers[factor * varIdx + 1] = var + "-type";
+                headers[factor * varIdx + 2] = var + "-lang";
             }
-            varIdx +=1;
+            varIdx += 1;
         }
         w.writeNext(headers);
     }
 
-    public Object getCsvStreamOutput(HashMap<String,String> options) {
-        final boolean simple = "simple".equals(options.get("profile"));
+    public Object getCsvStreamOutput(HashMap<String, String> options, boolean simple) {
         final String pageNum = options.getOrDefault(QueryConstants.PAGE_NUMBER, "1");
         final int pageNumber = Integer.parseInt(pageNum);
-        final int offset = (pageNumber-1)*pageSize;
+        final int offset = (pageNumber - 1) * pageSize;
         if (pageNumber > numberOfPages || pageNumber < 0) {
             return null;
         }
-        final int maxIdx = Math.min(offset+pageSize, numResults);
+        final int maxIdx = Math.min(offset + pageSize, numResults);
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException {
                 CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(os));
                 writeCsvHeaders(simple, csvWriter);
-                for (int x=offset; x < maxIdx; x++) {
+                for (int x = offset; x < maxIdx; x++) {
                     QuerySolution qs = querySolutions.get(x);
                     if (simple)
                         QSWriter.writeCsvSimple(qs, vars, csvWriter);
@@ -173,12 +170,12 @@ public class ResultSetWrapper {
         return stream;
     }
 
-    public HashMap<String,Object> getFusekiResultSet(){
-        HashMap<String,Object> res=new HashMap<>();
-        HashMap<String,ArrayList<Row>> results=new HashMap<>();
+    public HashMap<String, Object> getFusekiResultSet() {
+        HashMap<String, Object> res = new HashMap<>();
+        HashMap<String, ArrayList<Row>> results = new HashMap<>();
         results.put("bindings", getRows());
         res.put("head", head);
-        res.put("results",results);
+        res.put("results", results);
         return res;
     }
 
