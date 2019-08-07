@@ -16,9 +16,9 @@ public class TaxModel {
     static Model model = null;
 
     public static void fetchModel() throws RestException {
-        final LdsQuery qfp = LdsQueryService.get(ServiceConfig.getProperty("taxtreeArqFile"),"library");
-        final Map<String,String> map = new HashMap<>();
-        map.put("R_RES","bdr:O9TAXTBRC201605");
+        final LdsQuery qfp = LdsQueryService.get(ServiceConfig.getProperty("taxtreeArqFile"), "library");
+        final Map<String, String> map = new HashMap<>();
+        map.put("R_RES", ServiceConfig.getProperty("taxonomyRoot"));
         final String query = qfp.getParametizedQuery(map, false);
         model = QueryProcessor.getGraph(query);
     }

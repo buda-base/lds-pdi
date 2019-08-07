@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.formatters.JSONLDFormatter;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.TaxNode;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
@@ -34,7 +35,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class Taxonomy {
 
     public static Map<String, TaxNode> allNodes = new HashMap<>();
-    public static final String ROOTURI = "http://purl.bdrc.io/resource/O9TAXTBRC201605";
+    public static final String ROOTURI = ServiceConfig.getProperty("taxonomyRoot");
     public static TaxNode ROOT = new TaxNode(ROOTURI);
     public final static String HASSUBCLASS = "http://purl.bdrc.io/ontology/core/taxHasSubClass";
     public final static Node hasSubClass = ResourceFactory.createProperty(HASSUBCLASS).asNode();
