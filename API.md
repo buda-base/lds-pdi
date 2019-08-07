@@ -2,39 +2,50 @@
 
 ## Summary Table of endpoints
 
-### Data endpoints
+### Public Data endpoints
 
-|Method| Endpoint |  output |
-|------|---|---|
-|GET|  `/robots.txt`   | `User-agent: * Disallow: /` |
-|GET|   `/cache`  |  Cache and memory monitoring | 
-|GET|`/context.jsonld`| the jsonld context used for jsonld serialization|  
-|GET|`/admindata/{res}`| displays some admindata about the resource res (example: /admindata/P1583)|
-|GET|`/graph/{res}`|returns a serialization of the model of the given resource based on the value of the Accept header - trig is the default serialization (example: /graph/P1583)|
-|GET|`/admindata/{res}.{ext}`|displays a serialization of the model of the admindata for the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
-|GET|`/graph/{res}.{ext}`|displays a serialization of the graph of the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
-|GET|`/prefixes`| a turtle serialization of all the prefixes used by the ldspdi server|
-|GET|`/resource/{res}`|displays resource metadata according to the value of the Accept header - text/html leads to a pretty view of this data (example: /resource/P1583)|
-|GET|`/resource/{res}.{ext}`|displays a serialization of the metadata of the given resource, according to the extension (see Supported mime types and file extensions section in API.md)|
-|GET|`/{base : .*}/{other}`|generic endpointusing wildcards in order to serve the ontology (as a whole or as individuals resources of any ontology) (example: [http://purl.bdrc.io/ontology/core/](http://purl.bdrc.io/ontology/core/) serves a pretty html view of the core ontology while [http://purl.bdrc.io/ontology/core/Person](http://purl.bdrc.io/ontology/core/Person) serves a pretty html view of the Person class of the core ontology|
-|GET|`/{base : .*}/{other}.{ext}`| return serialization of the requested ontology according to the extension (see Supported mime types and file extensions section in API.md). Example: [http://purl.bdrc.io/ontology/core.ttl](http://purl.bdrc.io/ontology/core.ttl) |
-|GET|`/ontology/data/{ext}`| get all ontologies in a single model, serialized according to the given extension (see Supported mime types and file extensions section in API.md) See [http://purl.bdrc.io/ontology/data/ttl](http://purl.bdrc.io/ontology/data/ttl) |
-|POST|`/callbacks/github/owl-schema`| a webhook for updating the ontologies models from the owl-schema git repo and updating fuseki dataset ontology schemas|
+See [Resource Endpoints](#resource-endpoints) section for a full description.
+
+Endpoint |  output |
+---|---|
+`/resource/{res}` | displays RDF data about the resource, serialized according to the HTTP `Accept` header (see [Supported mime types](#supported-rdf-mime-types-and-extensions)) - with a html header leading to a redirection to a configurable html page |
+`/resource/{res}.{ext}`| similar endpoint where the RDF serialization is determined by the extension |
+`/admindata/{res}`| idem |
+`/admindata/{res}.{ext}`| idem |
+`/graph/{res}`| idem |
+`/graph/{res}.{ext}`| idem |
+`/prefixes`| a turtle serialization of all the prefixes used by the ldspdi server [example in bdrc.io](http://purl.bdrc.io/prefixes) |
+
+
+### Ontology endpoints
+
+Endpoint |  output |
+---|---|
+`/{base : .*}/{other}`| generic endpoint using wildcards in order to serve the various URIs of the ontology. When open in a web browser, serves an html representation. Ex: [/ontology/core/](http://purl.bdrc.io/ontology/core/), [bdo:Person](http://purl.bdrc.io/ontology/core/Person)|
+`/{base : .*}/{other}.{ext}`| return serialization of the requested ontology URI according to the extension (see [Supported mime types](#supported-rdf-mime-types-and-extensions)). Ex: [/ontology/core.ttl](http://purl.bdrc.io/ontology/core.ttl) |
+`/ontology/data/{ext}`| get the complete ontology as a single model, serialized according to the given extension |
+`/context.jsonld`| the JSON-LD context |
+
+### Administrative Endpoints
+
+Endpoint |  output |
+---|---|
+`/robots.txt`   | `User-agent: * Disallow: /` (configurable) |
+`/cache`  |  Cache and memory monitoring |
+`/callbacks/github/owl-schema`| (`POST` only) a webhook for updating the ontologies models from the owl-schema git repo and updating fuseki dataset ontology schemas |
+`/callbacks/github/lds-queries`| (`POST` only) a webhook for updating the SPARQL queries templates |
+`/clearcache`| (`POST` only) empties all caches of the ldspdi server|
 
 ### SPARQL Query templates
 
-|Method| Endpoint |  output |
-|------|---|---|
-|GET|`/query/table/{file}`| the outcome of a template returning a jena result set where {file} is the name of the arq template (without its extension). When the templates requires parameters (as in most cases) a queryString must be provided; example: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329). By default the results are provided as an html table. However adding a "format" parameter to the query string can leads to an json or csv output; example: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=json](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=json) or [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv](http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv). In the case we want csv, we can specify a profile param to get a light version of the csv, as follows: [http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv&profile=simple] (http://purl.bdrc.io/query/table/Work_ImgList?R_RES=bdr:W29329&format=csv&profile=simple) NOTE: You can also specify the page size and page number, as follows, when requesting html output [http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&pageSize=120&pageNumber=1] (http://purl.bdrc.io/query/table/volumesForWork?R_RES=bdr:W23703&pageSize=120&pageNumber=1)|
-|POST|`/query/table/{file}`|Same as the GET version except that query params are sent as a json object and that the output is always a json representation of the result set. Example: *curl -v -H "Content-Type: application/json" -d '{"R_RES":"bdr:W23703"}' http://purl.bdrc.io/query/table/volumesForWork*|
-|GET|`/query/graph/{file}`|the outcome of a template returning a graph where {file} is the name of the arq template (without its extension). When the templates requires parameters (as in most cases) a queryString must be provided; example: [http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline?R_RES=bdr:V22084_I0886](http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline?R_RES=bdr:V22084_I0886). the serialization of the graph is based on the value of the Accept header. Default serialization is jsonld, alternatives links are provided in Alternates header when no Accept header is provided|
-|POST|`/query/graph/{file}`| same as the GET version except that it only consumes json data. Example: *curl -v -H "Content-Type: application/json" -H "Accept: text/turtle" -d '{"R_RES":"bdr:V22084_I0886"}' http://purl.bdrc.io/query/graph/IIIFPres_volumeOutline*|
-|POST|`/callbacks/github/lds-queries`|a webhook for updating the local repository of templates. It is trigerred by [github ldsqueries repo](https://github.com/buda-base/lds-queries)|
-|POST|`/clearcache`| empties all caches of the ldspdi server|
-|GET|`/queries`| provides a list of all the available public templates for that server in the json format (see [http://purl.bdrc.io/queries](http://purl.bdrc.io/queries))|
-|POST|`/queries`|same as above - no parameters|
-|GET|`/queries/{template}`|provides the json representation of the template specified by its name as the path variable {template} example: [http://purl.bdrc.io/queries/Etexts_count](http://purl.bdrc.io/queries/Etexts_count)|
-|POST|`/queries/{template}`|same as above|
+See the section [Query templates](#query-templates) for a full description.
+
+Endpoint |  output |
+---|---|
+`/queries`| provides a list of all the available public templates in json ([example on bdrc.io](http://purl.bdrc.io/queries)) |
+`/queries/{template}`| provides the json representation of the template ([example on bdrc.io](http://purl.bdrc.io/queries/Etexts_count))|
+`/query/table/{template}`| the result of the query associated with a `SELECT` SPARQL template |
+`/query/graph/{file}`| the result of a `CONSTRICT` SPARQL template |
 
 ## Details
 
@@ -210,6 +221,8 @@ or using curl:
 curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://purl.bdrc.io/query/table/Res_byName
 ```
 
+When called in `POST`, the endpoint only accepts and produces JSON.
+
 #### Controling the output
 
 You can pass query parameters to control the output format:
@@ -253,4 +266,4 @@ For queries returning a graph, the endpoint is `/query/graph/{template_id}`. Exa
 /query/graph/graphTest?R_RES=bdr:W22084
 ```
 
-The returned value is a model, serialized according to the value `Accept:` header.
+The returned value is a model, serialized according to the value of the HTTP `Accept:` header, with JSON-LD being the default.
