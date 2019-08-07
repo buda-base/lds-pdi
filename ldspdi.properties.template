@@ -52,10 +52,10 @@ endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
 
 #### SPARQL Templates ######
 
-# SPARQL queries templates local directory path.
-# lds-pdi will automatically sync https://github.com/buda-base/lds-queries in this directory.
-#local and remote dir
-queryPath=/usr/local/lds-queries/
+# SPARQL queries templates local directory path, no need to change this
+# in a buda-base environment.
+# lds-pdi will automatically sync the configured git repo in this directory:
+queryPath=/usr/local/ldspdi/queries/
 git_remote_url="https://github.com/buda-base/lds-queries.git"
 
 # Sparql result set max size
@@ -63,14 +63,15 @@ limit=500
 # Sparql queries timeout (ms)
 timeout=5000
 
-# Template urls, you probably don't need to change that
+# Template urls, you probably don't need to change that:
+
 # Url for templates returning Jena Result Sets (tables)
 urlTemplatePath=/query/table
 # Url for templates returning jena Model (i.e graphs)
 urlGraphPath=/query/graph
 
 #default number of results by page
-pageSize=50
+pageSize=100
 
 #default page size for quick search
 qs_pageSize=100
