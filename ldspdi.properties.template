@@ -4,10 +4,13 @@
 # Change the configuration to values that suit your needs and see
 # instructions in README.md on where to copy it.
 #
-# The most important values to change are the first 3, the rest should be
+# The most important values to change are the first 4, the rest should be
 # similar on most instances, except for the Auth part which is optional.
 #
 
+#indicates that the current server is BUDA server
+#should be false for partners deployment of the ldspdi server
+isBUDA=true
 
 #### HTML redirect URL ####
 
