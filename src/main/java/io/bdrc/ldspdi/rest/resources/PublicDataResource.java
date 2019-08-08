@@ -184,41 +184,6 @@ public class PublicDataResource {
     }
 
     @GET
-    @Path("/graph/{res}")
-    @JerseyCacheControl()
-    public Response getGrResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
-        final String prefixedRes = GRAPH_PREFIX_SHORT + res;
-        final String graphType = "graph";
-        final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
-        if (format == null) {
-            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
-            ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
-            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
-        }
-        if (variant == null) {
-            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
-            ResponseBuilder rb = Response.status(406).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
-            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
-        }
-        MediaType mediaType = variant.getMediaType();
-        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
-            try {
-                ResponseBuilder builder = Response.seeOther(new URI(info.getAbsolutePath() + ".trig")).status(Status.FOUND);
-                return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
-            } catch (URISyntaxException e) {
-                throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
-            }
-        }
-        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
-        if (model.size() == 0) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
-        }
-        String ext = MediaTypeUtils.getExtFromMime(mediaType);
-        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
-        return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
-    }
-
-    @GET
     @Path("/admindata/{res}.{ext}")
     @JerseyCacheControl()
     public Response getAdResourceGraphExt(@PathParam("res") final String res, @PathParam("ext") final String ext, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request)
@@ -266,6 +231,41 @@ public class PublicDataResource {
         return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
     }
 
+    @GET
+    @Path("/graph/{res}")
+    @JerseyCacheControl()
+    public Response getGrResourceGraph(@PathParam("res") final String res, @HeaderParam("fusekiUrl") final String fusekiUrl, @HeaderParam("Accept") String format, @Context UriInfo info, @Context Request request) throws RestException {
+        final String prefixedRes = GRAPH_PREFIX_SHORT + res;
+        final String graphType = "graph";
+        final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
+        if (format == null) {
+            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
+            ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
+        }
+        if (variant == null) {
+            String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
+            ResponseBuilder rb = Response.status(406).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+            return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
+        }
+        MediaType mediaType = variant.getMediaType();
+        if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
+            try {
+                ResponseBuilder builder = Response.seeOther(new URI(info.getAbsolutePath() + ".trig")).status(Status.FOUND);
+                return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
+            } catch (URISyntaxException e) {
+                throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
+            }
+        }
+        Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
+        if (model.size() == 0) {
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+        }
+        String ext = MediaTypeUtils.getExtFromMime(mediaType);
+        ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
+        return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
+    }
+
     @SuppressWarnings("unchecked")
     @GET
     @Path("/prefixes")
@@ -304,7 +304,16 @@ public class PublicDataResource {
         final MediaType mediaType = variant.getMediaType();
         if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
-                ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
+                // ResponseBuilder builder = Response.seeOther(new
+                // URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
+                String type = getDilaResourceType(res);
+                System.out.println("TYPE >>>>>>>>> " + type);
+                if (!type.equals("")) {
+                    type = type + "/?fromInner=";
+                } else {
+                    type = RES_PREFIX_SHORT;
+                }
+                ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + type + res));
                 return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
@@ -334,7 +343,16 @@ public class PublicDataResource {
         }
         if (media.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
-                ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
+                // ResponseBuilder builder = Response.seeOther(new
+                // URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
+                String type = getDilaResourceType(res);
+                System.out.println("TYPE >>>>>>>>> " + type);
+                if (!type.equals("")) {
+                    type = type + "/?fromInner=";
+                } else {
+                    type = RES_PREFIX_SHORT;
+                }
+                ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + type + res));
                 return setHeaders(builder, getResourceHeaders(info.getPath(), null, null, null)).build();
             } catch (URISyntaxException e) {
                 throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()", e));
@@ -568,6 +586,21 @@ public class PublicDataResource {
         }
         if (info.getQueryParameters().containsKey("describe")) {
             type = "describe";
+        }
+        return type;
+    }
+
+    private String getDilaResourceType(String res) {
+        String type = "";
+        boolean buda = Boolean.parseBoolean(ServiceConfig.getProperty("isBUDA"));
+        if (buda) {
+            return "";
+        }
+        if (res.startsWith("A")) {
+            return "person";
+        }
+        if (res.startsWith("P")) {
+            return "place";
         }
         return type;
     }
