@@ -165,26 +165,28 @@ public class QueryProcessor {
     }
 
     public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {
-
-        if (hash != null) {
-            return (ResultSetWrapper) ResultsCache.getObjectFromCache(Integer.parseInt(hash));
-        }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        long start = System.currentTimeMillis();
-        final QueryExecution qe = getResultSet(query, fusekiUrl);
-        final ResultSet jrs = qe.execSelect();
-        long elapsed = System.currentTimeMillis() - start;
-        int psz = Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
-        if (pageSize != null) {
-            psz = Integer.parseInt(pageSize);
+        if (hash != null) {
+            return (ResultSetWrapper) ResultsCache.getObjectFromCache(Integer.parseInt(hash));
         }
-        final ResultSetWrapper res = new ResultSetWrapper(jrs, elapsed, psz);
-        qe.close();
-        final int new_hash = Objects.hashCode(res);
-        res.setHash(new_hash);
-        ResultsCache.addToCache(res, Objects.hashCode(res));
+        int new_hash = Objects.hashCode(query);
+        ResultSetWrapper res = (ResultSetWrapper) ResultsCache.getObjectFromCache(new_hash);
+        if (res == null) {
+            long start = System.currentTimeMillis();
+            final QueryExecution qe = getResultSet(query, fusekiUrl);
+            final ResultSet jrs = qe.execSelect();
+            long elapsed = System.currentTimeMillis() - start;
+            int psz = Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
+            if (pageSize != null) {
+                psz = Integer.parseInt(pageSize);
+            }
+            res = new ResultSetWrapper(jrs, elapsed, psz);
+            qe.close();
+            res.setHash(new_hash);
+            ResultsCache.addToCache(res, new_hash);
+        }
         return res;
     }
 

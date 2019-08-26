@@ -71,9 +71,9 @@ public class PublicTemplatesResource {
     @JerseyCacheControl()
     @Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, "text/csv" })
     public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathParam("file") String file) throws RestException {
-        log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters());
-        // Settings
+        log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters()); // Settings
         HashMap<String, String> hm = Helpers.convertMulti(info.getQueryParameters());
+
         String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
         if (pageNumber == null) {
             pageNumber = "1";
