@@ -78,7 +78,7 @@ public class QueryConstants {
     public final static String INT_ARGS_PARAMPREFIX = "I_";
     public final static String LITERAL_ARGS_PARAMPREFIX = "L_";
     public final static String LITERAL_LG_ARGS_PARAMPREFIX = "LG_";
-    public final static String LITERAL_SEARCH_LIMIT = "LI_NAME";
+    public final static String LITERAL_LIMITPREFIX = "LI_";
     public final static String RES_ARGS_PARAMPREFIX = "R_";
 
     // Query Params types
