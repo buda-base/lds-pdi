@@ -59,7 +59,6 @@ public class LdsQuery {
     private ArrayList<Param> params;
     private ArrayList<Output> outputs;
     private String prefixedQuery;
-    private String literalParamName;
 
     public final static Logger log = LoggerFactory.getLogger(LdsQuery.class.getName());
 
@@ -217,7 +216,6 @@ public class LdsQuery {
                 }
                 // Param is a Lang param --> check if the corresponding lit param is present
                 if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
-                    literalParamName = arg.substring(arg.indexOf("_") + 1);
                     String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX + arg.substring(arg.indexOf("_") + 1);
                     if (!params.contains(expectedLiteralParam)) {
                         check = "Arg syntax is incorrect : query does not have a literal variable " + expectedLiteralParam + " corresponding to lang " + arg + " variable";
@@ -235,7 +233,7 @@ public class LdsQuery {
     }
 
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
-        log.info("Get Parametized query map params >> {}", converted);
+        // log.info("Get Parametized query map params >> {}", converted);
         if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
         }
@@ -276,10 +274,9 @@ public class LdsQuery {
 
             }
             if (st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
-                String li_name = converted.get(QueryConstants.LITERAL_LIMITPREFIX + literalParamName);
-                log.info("PARAM_NAME " + QueryConstants.LITERAL_LIMITPREFIX + literalParamName + " >> " + li_name);
-                if (li_name == null) {
-                    li_name = ServiceConfig.getProperty("text_query_limit");
+                String lim = converted.get(QueryConstants.LITERAL_LIMITPREFIX + st.substring(st.indexOf('_') + 1));
+                if (lim == null) {
+                    lim = ServiceConfig.getProperty("text_query_limit");
                 }
                 if (litParams.keySet().contains(st)) {
                     String lang = converted.get(litParams.get(st)).toLowerCase();
@@ -288,11 +285,11 @@ public class LdsQuery {
                     } catch (IllformedLocaleException ex) {
                         return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
                     }
-                    queryStr.setLiteral(st, converted.get(st), lang + " " + li_name);
+                    queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
 
                 } else {
                     // Some literals do not have a lang associated with them
-                    queryStr.setLiteral(st, converted.get(st) + " " + li_name);
+                    queryStr.setLiteral(st, converted.get(st) + " " + lim);
                 }
             }
         }
