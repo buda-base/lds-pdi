@@ -159,11 +159,11 @@ public class LdsQuery {
     }
 
     private ArrayList<Param> buildParams(HashMap<String, HashMap<String, String>> p_map) throws RestException {
+        // log.info("Build query params >> {}", p_map);
         ArrayList<Param> p = new ArrayList<>();
         Set<String> names = p_map.keySet();
         for (String name : names) {
             HashMap<String, String> mp = p_map.get(name);
-
             switch (mp.get(QueryConstants.PARAM_TYPE)) {
             case QueryConstants.STRING_PARAM:
                 StringParam stp = new StringParam(name);
@@ -234,6 +234,7 @@ public class LdsQuery {
     }
 
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
+        // log.info("Get Parametized query map params >> {}", converted);
         if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
         }
@@ -274,6 +275,10 @@ public class LdsQuery {
 
             }
             if (st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
+                String li_name = converted.get(QueryConstants.LITERAL_SEARCH_LIMIT);
+                if (li_name == null) {
+                    li_name = ServiceConfig.getProperty("text_query_limit");
+                }
                 if (litParams.keySet().contains(st)) {
                     String lang = converted.get(litParams.get(st)).toLowerCase();
                     try {
@@ -281,10 +286,11 @@ public class LdsQuery {
                     } catch (IllformedLocaleException ex) {
                         return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
                     }
-                    queryStr.setLiteral(st, converted.get(st), lang);
+                    queryStr.setLiteral(st, converted.get(st), lang + " " + li_name);
+
                 } else {
                     // Some literals do not have a lang associated with them
-                    queryStr.setLiteral(st, converted.get(st));
+                    queryStr.setLiteral(st, converted.get(st) + " " + li_name);
                 }
             }
         }

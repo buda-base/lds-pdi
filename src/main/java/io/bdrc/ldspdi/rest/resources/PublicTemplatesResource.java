@@ -83,6 +83,7 @@ public class PublicTemplatesResource {
         // process
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
         final String query = qfp.getParametizedQuery(hm, true);
+        log.info("Parametized Query >> : {}", query);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
         }
