@@ -65,6 +65,8 @@ git_remote_url="https://github.com/buda-base/lds-queries.git"
 limit=500
 # Sparql queries timeout (ms)
 timeout=5000
+#text:query search limit
+text_query_limit=1000
 
 # Template urls, you probably don't need to change that:
 
