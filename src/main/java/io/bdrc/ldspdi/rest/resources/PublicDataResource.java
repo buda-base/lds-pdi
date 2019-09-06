@@ -343,10 +343,7 @@ public class PublicDataResource {
         }
         if (media.equals(MediaType.TEXT_HTML_TYPE)) {
             try {
-                // ResponseBuilder builder = Response.seeOther(new
-                // URI(ServiceConfig.getProperty("showUrl") + prefixedRes));
                 String type = getDilaResourceType(res);
-                System.out.println("TYPE >>>>>>>>> " + type);
                 if (!type.equals("")) {
                     type = type + "/?fromInner=";
                 } else {

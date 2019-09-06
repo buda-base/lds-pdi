@@ -26,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +62,7 @@ public class ResponseOutputStream {
                     return;
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
-                if (JenaFormat == null || JenaFormat.equals("STTL")) {
+                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                     final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);
                     return;
@@ -80,7 +81,7 @@ public class ResponseOutputStream {
                     return;
                 }
                 final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
-                if (JenaFormat == null || JenaFormat.equals("STTL")) {
+                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                     final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);
                     return;
