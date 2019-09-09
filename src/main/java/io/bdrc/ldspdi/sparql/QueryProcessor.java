@@ -37,6 +37,8 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionRemote;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +88,8 @@ public class QueryProcessor {
             map.put("R_RES", URI);
             String query = qfp.getParametizedQuery(map, false);
             Query q = QueryFactory.create(query);
-            QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
-            qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-            model = qe.execDescribe();
-            qe.close();
+            RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
+            model = conn.queryDescribe(q);
             ResultsCache.addToCache(model, hash);
         }
         return model;
@@ -103,10 +103,8 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         Query q = QueryFactory.create(prefixes + " describe " + URI);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
-        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-        Model model = qe.execDescribe();
-        qe.close();
+        RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
+        Model model = conn.queryDescribe(q);
         return model;
     }
 
@@ -122,10 +120,8 @@ public class QueryProcessor {
         if (model == null) {
             log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
-            final QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, q);
-            qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
-            model = qe.execConstruct();
-            qe.close();
+            RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
+            model = conn.queryConstruct(q);
             ResultsCache.addToCache(model, hash);
         }
         return model;
@@ -141,7 +137,6 @@ public class QueryProcessor {
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        // Model m=access.getModel(AuthProps.getProperty("authDataGraph"));
         Model m = access.getModel(ServiceConfig.getProperty(graph));
         return m;
     }
@@ -195,16 +190,6 @@ public class QueryProcessor {
             QueryExecution qexec = QueryExecutionFactory.create(query, model);
             Model m = qexec.execDescribe();
             return m;
-        } catch (Exception ex) {
-            throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
-        }
-    }
-
-    public static ResultSet getResultsFromModel(String query, Model model) throws RestException {
-        try {
-            QueryExecution qexec = QueryExecutionFactory.create(query, model);
-            ResultSet res = qexec.execSelect();
-            return res;
         } catch (Exception ex) {
             throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
         }
