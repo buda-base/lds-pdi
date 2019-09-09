@@ -37,8 +37,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.reasoner.ReasonerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,11 +143,6 @@ public class Helpers {
         map.put("rows", sb.toString());
         StringSubstitutor s = new StringSubstitutor(map);
         return s.replace(multiChoiceTpl);
-    }
-
-    public static void main(String[] args) {
-        Model m = ReasonerRegistry.theRegistry().getAllDescriptions();
-        m.write(System.out, "TURTLE");
     }
 
 }
