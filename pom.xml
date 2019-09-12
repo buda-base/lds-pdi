@@ -4,16 +4,19 @@
   <groupId>io.bdrc</groupId>
   <artifactId>lds-pdi</artifactId>
   <packaging>war</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <name>lds-pdi Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jersey.version>2.27</jersey.version>
+    <jersey.version>2.29</jersey.version>
     <jena.version>3.9.0</jena.version>
+    <springboot.version>2.1.8.RELEASE</springboot.version>
     <jcs.version>2.2.1</jcs.version>
     <jetty.version>9.4.12.v20180830</jetty.version>
-  </properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>  
   <repositories>
     <repository>
       <id>apache-repo-snapshots</id>
@@ -26,39 +29,47 @@
       </snapshots>
     </repository>
   </repositories>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.glassfish.jersey</groupId>
-        <artifactId>jersey-bom</artifactId>
-        <version>${jersey.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>    
+    <version>2.1.8.RELEASE</version>    
+    </parent>  
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server -->
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-server</artifactId>
+  <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jersey -->
+	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-jersey</artifactId>	    
+	</dependency>	
+	<dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>        
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc -->
+	<dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>        
+    </dependency>
+    <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>                 
+    </dependency>    
+    <!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-jasper -->
+	<dependency>
+	    <groupId>org.apache.tomcat.embed</groupId>
+	    <artifactId>tomcat-embed-jasper</artifactId>	    
+	</dependency>    
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc-jsp -->
     <dependency>
       <groupId>org.glassfish.jersey.ext</groupId>
-      <artifactId>jersey-mvc</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>jersey-mvc-jsp</artifactId>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
+    <dependency>
+      <groupId>org.glassfish.jersey.test-framework</groupId>
+      <artifactId>jersey-test-framework-core</artifactId> 
+    </dependency>    
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
-      <!-- scope>provided</scope-->
+      <artifactId>javax.servlet-api</artifactId> 
     </dependency>
     <dependency>
       <groupId>io.bdrc</groupId>
@@ -107,8 +118,7 @@
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>2.9.7</version>
+      <artifactId>jackson-annotations</artifactId>      
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-rdfconnection -->
     <dependency>
@@ -124,36 +134,13 @@
     </dependency>
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <artifactId>junit</artifactId>      
       <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc-jsp -->
-    <dependency>
-      <groupId>org.glassfish.jersey.ext</groupId>
-      <artifactId>jersey-mvc-jsp</artifactId>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework/jersey-test-framework-core -->
-    <dependency>
-      <groupId>org.glassfish.jersey.test-framework</groupId>
-      <artifactId>jersey-test-framework-core</artifactId>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework.providers/jersey-test-framework-provider-jetty -->
-    <dependency>
-      <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-      <artifactId>jersey-test-framework-provider-jetty</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2 -->
-    <dependency>
-      <groupId>org.glassfish.jersey.inject</groupId>
-      <artifactId>jersey-hk2</artifactId>
-    </dependency>
+    </dependency>    
     <!-- following javax business is for Java 9 onwards -->
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
-      <version>2.3.0</version>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
@@ -171,39 +158,6 @@
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>
       <version>3.22.0-GA</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-jetty-servlet -->
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-jetty-servlet</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-webapp</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson -->
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-json-jackson</artifactId>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-util</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-http -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-http</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
     <dependency>
@@ -235,14 +189,7 @@
       <artifactId>commons-jcs-jcache</artifactId>
       <version>${jcs.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-    <!--  dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.7.25</version>
-      <scope>test</scope>
-    </dependency-->
+    </dependency>    
     <!-- https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/jstl-api -->
     <dependency>
       <groupId>jstl</groupId>
@@ -265,88 +212,77 @@
     <dependency>
       <groupId>io.bdrc</groupId>
       <artifactId>bdrc-auth-lib</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+        </exclusion>
+      </exclusions>
       <version>1.2.0</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.topbraid/shacl -->
-    <dependency>
-        <groupId>org.topbraid</groupId>
-        <artifactId>shacl</artifactId>
-        <version>1.1.0</version>
-    </dependency>
+    </dependency>    
 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 	<dependency>
 	    <groupId>org.yaml</groupId>
-	    <artifactId>snakeyaml</artifactId>
-	    <version>1.23</version>
+	    <artifactId>snakeyaml</artifactId>	    
 	</dependency>
-	  
   </dependencies> 
   <build>
     <finalName>lds-pdi</finalName>
     <plugins>
+    <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-surefire-plugin</artifactId>
+         <configuration>
+           <useSystemClassLoader>false</useSystemClassLoader>
+         </configuration>                   
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <inherited>true</inherited>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <showDeprecation>true</showDeprecation>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>${jetty.version}</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <webApp>
-            <context-path>/</context-path>
-            <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
-            <containerIncludeJarPattern>^$</containerIncludeJarPattern>
-            <defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>
-          </webApp>
+          <mainClass>io.bdrc.ldspdi.service.SpringBootLdspdi</mainClass>
+          <classifier>exec</classifier>
         </configuration>
-      </plugin>
-      <plugin>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <attachClasses>true</attachClasses>
-          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-          <webResources>
-            <resource>
-              <directory>src/main/webapp</directory>
-              <filtering>true</filtering>
-            </resource>
-            <resource>
-              <directory>src/main/resources</directory>
-            </resource>
-          </webResources>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
-        <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-        </configuration>
-        </plugin>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>3.1.8</version>
-        <dependencies>
-          <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
-          <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs</artifactId>
-            <version>3.1.8</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>      
     </plugins>
+    <resources>    
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>META-INF</directory>
+        <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>application.yml</include>          
+        </includes>
+      </resource>
+    </resources>
+    <testResources>
+       <testResource>
+         <directory>src/main/resources</directory>
+       </testResource>
+    </testResources>
   </build>
 </project>
