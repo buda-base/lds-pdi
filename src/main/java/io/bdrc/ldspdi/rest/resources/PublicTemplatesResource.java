@@ -114,7 +114,8 @@ public class PublicTemplatesResource {
 	public Response getQueryTemplateResultsJsonPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file, HashMap<String, String> map, @Context UriInfo info) throws RestException {
 		log.info("Call to getQueryTemplateResultsJsonPost()");
 		if (map == null || map.size() == 0) {
-			throw new RestException(500, new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map));
+			LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
+			return Response.status(500).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(map, true);
@@ -156,7 +157,7 @@ public class PublicTemplatesResource {
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + hm.toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 
 		}
 		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
@@ -174,7 +175,7 @@ public class PublicTemplatesResource {
 		log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
 		if (variant == null) {
 			LdsError lds = new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()");
-			return Response.status(406).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(406, lds))).build();
+			return Response.status(406).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(406, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
@@ -187,7 +188,7 @@ public class PublicTemplatesResource {
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + map.toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		return Response.ok(ResponseOutputStream.getModelStream(model, MediaTypeUtils.getExtFromMime(mediaType)), mediaType).build();
 	}

@@ -10,6 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -54,7 +55,7 @@ public class BdrcAuthResource {
 		Model m = QueryProcessor.getGraphFromModel(query, QueryProcessor.getAuthGraph(null, "authDataGraph"));
 		if (m.size() == 0) {
 			LdsError lds = new LdsError(LdsError.MISSING_RES_ERR).setContext(res);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(m, "ttl"), MediaTypeUtils.getMimeFromExtension("ttl"));
 		builder = setLastModified(builder);

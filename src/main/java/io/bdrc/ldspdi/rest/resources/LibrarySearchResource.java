@@ -37,6 +37,7 @@ import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -107,7 +108,8 @@ public class LibrarySearchResource {
 			res = ResourceResults.getResultsMap(model);
 			break;
 		default:
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		return Response.ok(ResponseOutputStream.getJsonResponseStream(res), MediaType.APPLICATION_JSON_TYPE).build();
 	}
@@ -182,7 +184,9 @@ public class LibrarySearchResource {
 			res = ResourceResults.getResultsMap(model);
 			break;
 		default:
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(file));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+
 		}
 		return Response.ok(ResponseOutputStream.getJsonResponseStream(res), MediaType.APPLICATION_JSON_TYPE).build();
 	}

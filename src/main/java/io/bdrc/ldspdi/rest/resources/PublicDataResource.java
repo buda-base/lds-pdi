@@ -191,7 +191,7 @@ public class PublicDataResource {
 		Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -217,7 +217,7 @@ public class PublicDataResource {
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -242,7 +242,7 @@ public class PublicDataResource {
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -277,7 +277,7 @@ public class PublicDataResource {
 		Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -340,7 +340,7 @@ public class PublicDataResource {
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -383,7 +383,7 @@ public class PublicDataResource {
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -463,7 +463,7 @@ public class PublicDataResource {
 		} else {
 			if (OntData.ontAllMod.getOntResource(tmp) == null) {
 				LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
-				return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+				return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 			}
 			if (builder == null) {
 				if (OntData.isClass(tmp, true)) {
@@ -490,7 +490,7 @@ public class PublicDataResource {
 		final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
 		if (JenaLangStr == null) {
 			LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		if (OntPolicies.isBaseUri(res)) {
 			OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
@@ -513,7 +513,7 @@ public class PublicDataResource {
 			builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
 		} else {
 			LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		return builder.build();
 	}
@@ -526,7 +526,8 @@ public class PublicDataResource {
 		ResponseBuilder builder = null;
 		final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
 		if (JenaLangStr == null) {
-			throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
+			LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString());
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		OntModel model = OntData.ontAllMod;
 		final StreamingOutput stream = new StreamingOutput() {
