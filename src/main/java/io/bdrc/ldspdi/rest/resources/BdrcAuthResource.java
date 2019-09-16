@@ -25,6 +25,8 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.ErrorMessage;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
 @Component
@@ -50,6 +52,10 @@ public class BdrcAuthResource {
 		log.info("Call getAuthResource()");
 		String query = "describe <http://purl.bdrc.io/resource-auth/" + res + ">";
 		Model m = QueryProcessor.getGraphFromModel(query, QueryProcessor.getAuthGraph(null, "authDataGraph"));
+		if (m.size() == 0) {
+			LdsError lds = new LdsError(LdsError.MISSING_RES_ERR).setContext(res);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+		}
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(m, "ttl"), MediaTypeUtils.getMimeFromExtension("ttl"));
 		builder = setLastModified(builder);
 		return builder.build();

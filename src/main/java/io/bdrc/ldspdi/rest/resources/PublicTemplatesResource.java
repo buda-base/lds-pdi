@@ -59,6 +59,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -144,7 +145,6 @@ public class PublicTemplatesResource {
 		}
 		// Settings
 		HashMap<String, String> hm = Helpers.convertMulti(info.getQueryParameters());
-
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(hm, false);
@@ -155,7 +155,9 @@ public class PublicTemplatesResource {
 		}
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " in getGraphTemplateResults()"));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + hm.toString());
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
+
 		}
 		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext), mediaType);
@@ -171,7 +173,8 @@ public class PublicTemplatesResource {
 		final Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
 		log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
 		if (variant == null) {
-			throw new RestException(406, new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()"));
+			LdsError lds = new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()");
+			return Response.status(406).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(406, lds))).build();
 		}
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
@@ -183,7 +186,8 @@ public class PublicTemplatesResource {
 		}
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " in getGraphTemplateResultsPost()"));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + map.toString());
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		return Response.ok(ResponseOutputStream.getModelStream(model, MediaTypeUtils.getExtFromMime(mediaType)), mediaType).build();
 	}

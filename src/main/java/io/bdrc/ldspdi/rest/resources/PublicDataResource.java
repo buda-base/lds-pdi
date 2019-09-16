@@ -86,6 +86,7 @@ import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -188,9 +189,9 @@ public class PublicDataResource {
 			}
 		}
 		Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
-
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -215,7 +216,8 @@ public class PublicDataResource {
 		}
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -239,7 +241,8 @@ public class PublicDataResource {
 		}
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -273,7 +276,8 @@ public class PublicDataResource {
 		}
 		Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -335,7 +339,8 @@ public class PublicDataResource {
 		}
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
@@ -377,7 +382,8 @@ public class PublicDataResource {
 		}
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(info));
 		if (model.size() == 0) {
-			throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
+			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), media);
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
@@ -456,7 +462,8 @@ public class PublicDataResource {
 			}
 		} else {
 			if (OntData.ontAllMod.getOntResource(tmp) == null) {
-				throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp));
+				LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
+				return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 			}
 			if (builder == null) {
 				if (OntData.isClass(tmp, true)) {
@@ -482,7 +489,8 @@ public class PublicDataResource {
 		ResponseBuilder builder = null;
 		final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
 		if (JenaLangStr == null) {
-			throw new RestException(404, new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString()));
+			LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(info.getAbsolutePath().toString());
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		if (OntPolicies.isBaseUri(res)) {
 			OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
@@ -504,7 +512,8 @@ public class PublicDataResource {
 			};
 			builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
 		} else {
-			throw new RestException(404, new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString()));
+			LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString());
+			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).build();
 		}
 		return builder.build();
 	}

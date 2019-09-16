@@ -29,75 +29,87 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.restapi.exceptions.ErrorMessage;
 
 public class ResponseOutputStream {
 
-    public static final ObjectMapper om = new ObjectMapper();
-    public static boolean prettyPrint = false;
+	public static final ObjectMapper om = new ObjectMapper();
+	public static boolean prettyPrint = false;
 
-    public static StreamingOutput getJsonResponseStream(Object toJson) {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                if (prettyPrint)
-                    om.writerWithDefaultPrettyPrinter().writeValue(os, toJson);
-                else
-                    om.writeValue(os, toJson);
-            }
-        };
-    }
+	public static StreamingOutput getJsonResponseStream(Object toJson) {
+		return new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) throws IOException, WebApplicationException {
+				if (prettyPrint)
+					om.writerWithDefaultPrettyPrinter().writeValue(os, toJson);
+				else
+					om.writeValue(os, toJson);
+			}
+		};
+	}
 
-    public static StreamingOutput getModelStream(final Model model, final String format, final String res, DocType docType) {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) {
-                if (format.equals("jsonld")) {
-                    final Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
-                    JSONLDFormatter.jsonObjectToOutputStream(json, os);
-                    return;
-                }
-                final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
-                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                    writer.output(os);
-                    return;
-                }
-                model.write(os, JenaFormat);
-            }
-        };
-    }
+	public static StreamingOutput getModelStream(final Model model, final String format, final String res, DocType docType) {
+		return new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) {
+				if (format.equals("jsonld")) {
+					final Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
+					JSONLDFormatter.jsonObjectToOutputStream(json, os);
+					return;
+				}
+				final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+					writer.output(os);
+					return;
+				}
+				model.write(os, JenaFormat);
+			}
+		};
+	}
 
-    public static StreamingOutput getModelStream(final Model model, final String format) {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) {
-                if (format.equals("jsonld")) {
-                    JSONLDFormatter.writeModelAsCompact(model, os);
-                    return;
-                }
-                final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
-                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                    writer.output(os);
-                    return;
-                }
-                model.write(os, JenaFormat);
-            }
-        };
-    }
+	public static StreamingOutput getModelStream(final Model model, final String format) {
+		return new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) {
+				if (format.equals("jsonld")) {
+					JSONLDFormatter.writeModelAsCompact(model, os);
+					return;
+				}
+				final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+					writer.output(os);
+					return;
+				}
+				model.write(os, JenaFormat);
+			}
+		};
+	}
 
-    public static StreamingOutput getModelStream(final Model model) {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) {
-                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                writer.output(os);
-            }
-        };
-    }
+	public static StreamingOutput getModelStream(final Model model) {
+		return new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) {
+				final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+				writer.output(os);
+			}
+		};
+	}
+
+	public static StreamingOutput getExceptionStream(ErrorMessage msg) {
+		return new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) throws JsonGenerationException, JsonMappingException, IOException {
+				new ObjectMapper().writer().writeValue(os, msg);
+			}
+		};
+	}
 }
