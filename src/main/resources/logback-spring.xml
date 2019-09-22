@@ -33,7 +33,7 @@
       </encoder>
     </appender>    
   </springProfile>
-  <root level="debug">
+  <root level="warning">
     <appender-ref ref="default" />
   </root>
 </configuration>

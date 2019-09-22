@@ -25,9 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.Normalizer;
-import java.text.Normalizer.Form;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -39,8 +36,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.bdrc.ldspdi.sparql.functions.Wylie;
 
 public class Helpers {
 
@@ -66,26 +61,6 @@ public class Helpers {
             log.debug("FileNotFound: " + baseName);
             return null;
         }
-    }
-
-    public static String neutralizeUrl(String url) {
-        return url.substring(url.indexOf(':') + 1);
-    }
-
-    public static String removeAccents(String text) {
-        String f = text;
-        return f == null ? null : Normalizer.normalize(f, Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-    }
-
-    public static boolean isTibUni(String s) {
-        return s.matches("[\u0f00-\u0fff]+");
-    }
-
-    public static boolean isWylie(String s) {
-        Wylie wl = new Wylie(true, false, false, true);
-        ArrayList<String> warn = new ArrayList<>();
-        wl.fromWylie(s, warn);
-        return warn.size() == 0;
     }
 
     public static String bdrcEncode(String url) {

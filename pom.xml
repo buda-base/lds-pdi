@@ -73,10 +73,10 @@
       <artifactId>javax.servlet-api</artifactId> 
     </dependency>
     <dependency>
-      <groupId>io.bdrc</groupId>
-      <artifactId>jsonld-java</artifactId>
-      <version>0.12.3</version>
-    </dependency>
+    <groupId>com.github.jsonld-java</groupId>
+    	<artifactId>jsonld-java</artifactId>
+    	<version>0.12.5</version>
+	</dependency>
     <dependency>
       <groupId>org.marc4j</groupId>
       <artifactId>marc4j</artifactId>

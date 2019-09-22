@@ -190,7 +190,6 @@ public class OntClassModel {
         OntData.init();
         OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextSlice", true);
         System.out.println(mod.hasParent());
-        System.out.println(Helpers.neutralizeUrl(mod.getParent(true).get(0).getUri()));
     }
 
 }
