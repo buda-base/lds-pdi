@@ -2,35 +2,44 @@ package io.bdrc.ldspdi.test;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
-
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
+import io.bdrc.ldspdi.service.SpringBootLdspdi;
 
-public class TxtExportTest extends JerseyTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@AutoConfigureWebTestClient
+@SpringBootTest(classes = SpringBootLdspdi.class)
+@ActiveProfiles("local")
+public class TxtExportTest {
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
-    public final static Logger log = LoggerFactory.getLogger(CsvTest.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(TxtExportTest.class.getName());
+    
+    @Autowired
+	private WebTestClient webClient;
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
@@ -49,19 +58,15 @@ public class TxtExportTest extends JerseyTest {
         server.join();
     }
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(PublicDataResource.class).register(RestExceptionMapper.class);
-    }
-
     @Test
     public void testSimpleRequestSimple() {
-        final Response res = target("/resource/UT11577_004_0000.txt")
+        final ResponseSpec res = this.webClient.get().uri(uriBuilder -> uriBuilder
+        	    .path("/resource/UT11577_004_0000.txt")
                 .queryParam("startChar", 1234)
                 .queryParam("endChar", 2444)
-                .request()
-                .get();
-        System.out.println("result:");
-        System.out.println(res.readEntity(String.class));
+    	    .build())
+            .exchange();
+        res.expectStatus().isOk();
+        System.out.println(res.toString());
     }
 }
