@@ -23,7 +23,7 @@ showUrl=https://library.bdrc.io/show/
 #### Fuseki dataset config ####
 
 # change this to the query url of your triple store dataset endpoint
-fusekiUrl=http://buda1.bdrc.io:13180/fuseki/bdrcrw/query
+fusekiUrl=http://buda1.bdrc.io:13180/fuseki/corerw/query
 
 
 #### Home page info ####

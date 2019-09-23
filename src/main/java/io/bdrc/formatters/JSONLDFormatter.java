@@ -188,7 +188,7 @@ public class JSONLDFormatter {
     public static Map<String,Object> getBDOContext() {
         Map<String, Map<String,Object>> map = null;
         try {
-            URL url = new URL("https://raw.githubusercontent.com/BuddhistDigitalResourceCenter/owl-schema/master/context.jsonld");
+            URL url = new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld");
             map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});
         } catch (Exception e) {
             log.error("Error reading context file :"+ e);

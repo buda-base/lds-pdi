@@ -7,7 +7,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
          <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
          <init-param>
              <param-name>logVerbosityLevel</param-name>
-             <param-value>DEBUG</param-value>
+             <param-value>INFO</param-value>
          </init-param>
          <init-param>
              <param-name>fork</param-name>
