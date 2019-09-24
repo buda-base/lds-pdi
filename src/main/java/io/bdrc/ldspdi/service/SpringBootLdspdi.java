@@ -31,6 +31,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 	public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class.getName());
 
 	public static void main(String[] args) throws Exception {
+
 		final String configPath = System.getProperty("ldspdi.configpath");
 		ServiceConfig.init();
 		ResultsCache.init();

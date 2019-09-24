@@ -24,65 +24,46 @@ import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import io.bdrc.ldspdi.results.ResultsCache;
 
 public class ServiceConfig {
 
 	static Properties prop = new Properties();
 	public final static String FUSEKI_URL = "fusekiUrl";
-	public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
+	public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 	// static PrometheusMeterRegistry prometheusRegistry;
 
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
 
 		try {
+
 			final String configPath = System.getProperty("ldspdi.configpath");
 			log.info("getting properties from {}", configPath);
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
-			// InputStream input = new FileInputStream(new File(configPath +
-			// "ldspdi.properties"));
-			// load a properties file
 			prop.load(input);
 			input.close();
-
+			Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "org.apache.jena"));
+			for (String log : loggers) {
+				Logger logger = (Logger) LoggerFactory.getLogger(log);
+				logger.setLevel(Level.toLevel(Integer.parseInt(getProperty("logLevel"))));
+				logger.setAdditive(false);
+			}
 		} catch (IOException ex) {
 			log.error("ServiceConfig init error", ex);
 		}
-		initMonitoring();
 		OntPolicies.init();
-	}
-
-	private static void initMonitoring() {
-		/*
-		 * prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
-		 * prometheusRegistry.config().meterFilter(new PrometheusRenameFilter()); Timer
-		 * timer = prometheusRegistry.timer("resource"); timer.record(() -> { try {
-		 * TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException ignored) { }
-		 * }); Timer timer1 = prometheusRegistry.timer("query.table.get"); Counter
-		 * counter = Counter.builder("instance").
-		 * description("indicates instance count of the object").tags("dev",
-		 * "performance").register(prometheusRegistry); try { HttpServer server =
-		 * HttpServer.create(new InetSocketAddress(8088), 0);
-		 * server.createContext("/prometheus", httpExchange -> { String response =
-		 * prometheusRegistry.scrape(); List<Meter> list =
-		 * prometheusRegistry.getMeters();
-		 * System.out.println(">>>>>>>>> REGISTRY METERS " + list); for (Meter m : list)
-		 * { System.out.println("ID > " + m.getId()); System.out.println("m > " +
-		 * m.toString()); } httpExchange.sendResponseHeaders(200,
-		 * response.getBytes().length); try (OutputStream os =
-		 * httpExchange.getResponseBody()) { os.write(response.getBytes()); } });
-		 * prometheusRegistry.config().commonTags("application", "LDSPDI"); new
-		 * Thread(server::start).start(); } catch (IOException e) { throw new
-		 * RuntimeException(e); }
-		 */
 	}
 
 	public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
