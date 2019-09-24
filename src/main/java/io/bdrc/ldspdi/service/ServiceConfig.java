@@ -54,7 +54,7 @@ public class ServiceConfig {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			prop.load(input);
 			input.close();
-			// initLogs();
+			initLogs();
 
 		} catch (IOException ex) {
 			log.error("ServiceConfig init error", ex);
