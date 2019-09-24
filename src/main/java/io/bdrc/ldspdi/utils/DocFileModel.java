@@ -19,7 +19,6 @@ import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -84,7 +83,7 @@ public class DocFileModel {
 
 	public static List<String> getQueryTemplates() throws RestException {
 		List<String> files = new ArrayList<>();
-		Path dpath = Paths.get(ServiceConfig.getProperty("queryPath") + "public");
+		Path dpath = Paths.get(ServiceConfig.LOCAL_QUERIES_DIR + "public");
 		Stream<Path> walk;
 		try {
 			walk = Files.walk(dpath);
@@ -92,7 +91,7 @@ public class DocFileModel {
 		} catch (IOException e1) {
 			log.error("Error while getting query templates", e1);
 			e1.printStackTrace();
-			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public in DocFileModel.getQueryTemplates()"));
+			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
 		}
 		walk.close();
 		return files;

@@ -48,7 +48,6 @@ import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
@@ -120,7 +119,7 @@ public class JsonAPIResource {
 
 	private static List<String> getQueryTemplates() throws RestException {
 		List<String> files = new ArrayList<>();
-		java.nio.file.Path dpath = Paths.get(ServiceConfig.getProperty("queryPath") + "public");
+		java.nio.file.Path dpath = Paths.get(ServiceConfig.LOCAL_QUERIES_DIR + "public");
 		Stream<java.nio.file.Path> walk;
 		try {
 			walk = Files.walk(dpath);
@@ -128,7 +127,7 @@ public class JsonAPIResource {
 		} catch (IOException e1) {
 			log.error("Error while getting query templates", e1);
 			e1.printStackTrace();
-			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.getProperty(QueryConstants.QUERY_PATH) + "public in DocFileModel.getQueryTemplates()"));
+			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
 		}
 		walk.close();
 		return files;

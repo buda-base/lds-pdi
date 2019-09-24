@@ -42,24 +42,23 @@ public class ServiceConfig {
 
 	static Properties prop = new Properties();
 	public final static String FUSEKI_URL = "fusekiUrl";
+	public static String LOCAL_QUERIES_DIR;
 	public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
-	// static PrometheusMeterRegistry prometheusRegistry;
 
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
 
 		try {
-
+			String tmp = System.getProperty("user.dir");
+			// we need to go up from the current dir so we don't have git conflicts (nested
+			// repo in the dev environnement)
+			LOCAL_QUERIES_DIR = tmp.substring(0, tmp.lastIndexOf("/") + 1) + "/lds-queries/";
 			final String configPath = System.getProperty("ldspdi.configpath");
 			log.info("getting properties from {}", configPath);
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			prop.load(input);
 			input.close();
-			Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "org.apache.jena"));
-			for (String log : loggers) {
-				Logger logger = (Logger) LoggerFactory.getLogger(log);
-				logger.setLevel(Level.toLevel(Integer.parseInt(getProperty("logLevel"))));
-				logger.setAdditive(false);
-			}
+			initLogs();
+
 		} catch (IOException ex) {
 			log.error("ServiceConfig init error", ex);
 		}
@@ -72,12 +71,22 @@ public class ServiceConfig {
 			// load a properties file
 			prop.load(input);
 			input.close();
+			initLogs();
 			ResultsCache.init();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		prop.setProperty(FUSEKI_URL, fusekiUrl);
 		OntPolicies.init();
+	}
+
+	private static void initLogs() {
+		Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "org.apache.jena"));
+		for (String log : loggers) {
+			Logger logger = (Logger) LoggerFactory.getLogger(log);
+			logger.setLevel(Level.toLevel(Integer.parseInt(getProperty("logLevel"))));
+			logger.setAdditive(false);
+		}
 	}
 
 	public static boolean useAuth() {

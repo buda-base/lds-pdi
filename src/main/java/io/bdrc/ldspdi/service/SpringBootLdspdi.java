@@ -35,7 +35,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 		final String configPath = System.getProperty("ldspdi.configpath");
 		ServiceConfig.init();
 		ResultsCache.init();
-		GitService.update(ServiceConfig.getProperty("queryPath"));
+		GitService.update(ServiceConfig.LOCAL_QUERIES_DIR);
 		OntData.init();
 		TaxModel.fetchModel();
 		Properties props = null;
