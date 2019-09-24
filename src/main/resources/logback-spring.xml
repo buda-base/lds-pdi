@@ -22,18 +22,18 @@
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
     </appender>
-    <logger name="custom" level="info" additivity="true">
+    <logger name="custom" level="INFO" additivity="true">
         <appender-ref ref="default" />
-    </logger>
+    </logger> 
   </springProfile>  
   <springProfile name="local">
     <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
-    </appender>    
+    </appender>
   </springProfile>
-  <root level="warning">
+  <root level="info">
     <appender-ref ref="default" />
   </root>
 </configuration>
