@@ -48,10 +48,7 @@ public class ServiceConfig {
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
 
 		try {
-			String tmp = System.getProperty("user.dir");
-			// we need to go up from the current dir so we don't have git conflicts (nested
-			// repo in the dev environnement)
-			LOCAL_QUERIES_DIR = tmp.substring(0, tmp.lastIndexOf("/") + 1) + "/lds-queries/";
+		    LOCAL_QUERIES_DIR = System.getProperty("user.dir")+"/../lds-queries/";
 			final String configPath = System.getProperty("ldspdi.configpath");
 			log.info("getting properties from {}", configPath);
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");

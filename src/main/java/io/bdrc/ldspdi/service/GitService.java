@@ -39,16 +39,14 @@ public class GitService implements Runnable {
 
 	final static Logger log = LoggerFactory.getLogger(GitService.class.getName());
 
-	public static void update(String localPath) {
-
-		GIT_LOCAL_PATH = localPath;
+	public static void update() {
 		FileRepositoryBuilder builder = new FileRepositoryBuilder();
 		File localGit = new File(GitService.GIT_LOCAL_PATH + "/.git");
-		log.info("LOCAL GIT >> " + localGit);
+		log.info("LOCAL GIT >> {}", localGit);
 		File WlocalGit = new File(GitService.GIT_LOCAL_PATH);
-		log.info("WLOCAL GIT >> " + WlocalGit);
+		log.info("WLOCAL GIT >> {}", WlocalGit);
 		boolean isGitRepo = RepositoryCache.FileKey.isGitRepository(localGit, FS.DETECTED);
-		log.info("IS GIT >> " + isGitRepo);
+		log.info("IS GIT >> {}", isGitRepo);
 		// init local git dir and clone remote repository if not present locally
 		if (!isGitRepo) {
 			initRepo();
@@ -56,20 +54,18 @@ public class GitService implements Runnable {
 			try {
 				localRepo = builder.setGitDir(localGit).setWorkTree(WlocalGit).readEnvironment() // scan environment GIT_* variables
 						.build();
-
 			} catch (IOException ex) {
 				ex.printStackTrace();
 				log.error("Git was unable to setup repository at init time " + localGit.getPath() + " directory ", ex.getMessage());
-
+				return;
 			}
 			updateRepo();
 		}
-
 	}
 
 	private static void initRepo() {
 		try {
-			log.info("REMOTE URL >> " + GitService.GIT_REMOTE_URL);
+			log.info("Cloning {} into dir {}", GitService.GIT_REMOTE_URL, GitService.GIT_LOCAL_PATH);
 			Git result = Git.cloneRepository().setDirectory(new File(GitService.GIT_LOCAL_PATH)).setURI(GitService.GIT_REMOTE_URL).setProgressMonitor(new TextProgressMonitor()).call();
 			result.checkout().setName("master").call();
 			result.close();
@@ -83,7 +79,7 @@ public class GitService implements Runnable {
 
 	private static void updateRepo() {
 		try {
-			log.info("LOCAL REPO >> " + localRepo);
+			log.info("LOCAL REPO >> {}", localRepo);
 			Git git = new Git(localRepo);
 			git.pull().setProgressMonitor(new TextProgressMonitor()).call();
 			git.close();
@@ -96,7 +92,7 @@ public class GitService implements Runnable {
 
 	@Override
 	public void run() {
-		update(ServiceConfig.LOCAL_QUERIES_DIR);
+		update();
 	}
 
 }
