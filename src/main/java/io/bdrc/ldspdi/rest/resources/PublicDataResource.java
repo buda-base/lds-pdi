@@ -112,11 +112,11 @@ public class PublicDataResource {
 	@GET
 	@JerseyCacheControl()
 	@Path("index")
-	@Produces("text/html;charset=utf-8")
+	@Produces(MediaType.TEXT_XML)
 	public Response getIndexPage() throws RestException, IOException {
 		log.info("Call to getIndexPage()");
 		DocFileModel dfm = new DocFileModel();
-		return Response.ok(new Viewable("/index.jsp", dfm)).build();
+		return Response.ok(new Viewable("/index.jsp", dfm)).encoding("UTF-8").build();
 	}
 
 	@GET
@@ -129,7 +129,7 @@ public class PublicDataResource {
 				os.write(ServiceConfig.getRobots().getBytes());
 			}
 		};
-		return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).build();
+		return Response.ok(stream, MediaType.TEXT_PLAIN_TYPE).encoding("UTF-8").build();
 	}
 
 	@GET
@@ -137,15 +137,15 @@ public class PublicDataResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Response getCacheInfo() {
 		log.info("Call to getCacheInfo()");
-		return Response.ok(new Viewable("/cache.jsp", new CacheAccessModel())).build();
+		return Response.ok(new Viewable("/cache.jsp", new CacheAccessModel())).encoding("UTF-8").build();
 	}
 
 	@GET
 	@Path("choice")
-	@Produces("text/html;charset=utf-8")
+	@Produces(MediaType.TEXT_HTML)
 	public Response getMultiChoice(@QueryParam("path") String it, @Context UriInfo info) {
 		log.info("Call to getMultiChoice() with path={}", it);
-		return Response.ok(new Viewable("/multiChoice.jsp", info.getBaseUri() + it)).build();
+		return Response.ok(new Viewable("/multiChoice.jsp", info.getBaseUri() + it)).encoding("UTF-8").build();
 	}
 
 	@GET
@@ -158,7 +158,7 @@ public class PublicDataResource {
 			builder = Response.ok(OntData.JSONLD_CONTEXT, MediaTypeUtils.MT_JSONLD);
 			builder.header("Last-Modified", OntData.getLastUpdated()).tag(tag);
 		}
-		return builder.build();
+		return builder.encoding("UTF-8").build();
 	}
 
 	@GET
@@ -170,12 +170,12 @@ public class PublicDataResource {
 		log.info("Call to getAdResourceGraph with format: {} variant is {}", format, variant);
 		if (format == null) {
 			String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
-			ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+			ResponseBuilder rb = Response.status(300).encoding("UTF-8").entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
 			return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
 		}
 		if (variant == null) {
 			String html = Helpers.getMultiChoicesHtml(info.getPath(), true);
-			ResponseBuilder rb = Response.status(406).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+			ResponseBuilder rb = Response.status(406).encoding("UTF-8").entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
 			return setHeaders(rb, getResourceHeaders(info.getPath(), null, "List", null)).build();
 		}
 		MediaType mediaType = variant.getMediaType();
@@ -190,10 +190,10 @@ public class PublicDataResource {
 		Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+			return Response.status(404).encoding("UTF-8").entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
-		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
+		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
 	}
 
@@ -207,7 +207,7 @@ public class PublicDataResource {
 		final MediaType media = MediaTypeUtils.getMimeFromExtension(ext);
 		if (media == null) {
 			final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
-			final ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
+			final ResponseBuilder rb = Response.status(300).encoding("UTF-8").entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
 			return rb.build();
 		}
 		if (media.equals(MediaType.TEXT_HTML_TYPE)) {
@@ -218,7 +218,7 @@ public class PublicDataResource {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
 			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
-		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
+		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
 	}
 
@@ -233,7 +233,7 @@ public class PublicDataResource {
 		if (media == null) {
 			final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
 			final ResponseBuilder rb = Response.status(300).entity(html).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + info.getPath());
-			return rb.build();
+			return rb.encoding("UTF-8").build();
 		}
 		if (media.equals(MediaType.TEXT_HTML_TYPE)) {
 			throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
@@ -241,9 +241,9 @@ public class PublicDataResource {
 		final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+			return Response.status(404).encoding("UTF-8").entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
-		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media);
+		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, prefixedRes, null), media).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
 	}
 
@@ -267,7 +267,7 @@ public class PublicDataResource {
 		MediaType mediaType = variant.getMediaType();
 		if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
 			try {
-				ResponseBuilder builder = Response.seeOther(new URI(info.getAbsolutePath() + ".trig")).status(Status.FOUND);
+				ResponseBuilder builder = Response.seeOther(new URI(info.getAbsolutePath() + ".trig")).status(Status.FOUND).encoding("UTF-8");
 				return setHeaders(builder, getResourceHeaders(info.getPath(), null, "Choice", null)).build();
 			} catch (URISyntaxException e) {
 				throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphGet()", e));
@@ -279,7 +279,7 @@ public class PublicDataResource {
 			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		String ext = MediaTypeUtils.getExtFromMime(mediaType);
-		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
+		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
 	}
 
@@ -297,7 +297,7 @@ public class PublicDataResource {
 			}
 		};
 		ResponseBuilder builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension("ttl"));
-		return builder.build();
+		return builder.encoding("UTF-8").build();
 	}
 
 	@GET
@@ -341,7 +341,7 @@ public class PublicDataResource {
 			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
 		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
-		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType);
+		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), mediaType).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, "Choice", getEtag(model, res))).build();
 	}
 
@@ -366,7 +366,7 @@ public class PublicDataResource {
 				} else {
 					type = RES_PREFIX_SHORT;
 				}
-				ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + type + res));
+				ResponseBuilder builder = Response.seeOther(new URI(ServiceConfig.getProperty("showUrl") + type + res)).encoding("UTF-8");
 				return setHeaders(builder, getResourceHeaders(info.getPath(), null, null, null)).build();
 			} catch (URISyntaxException e) {
 				throw new RestException(500, new LdsError(LdsError.URI_SYNTAX_ERR).setContext("getResourceGraphPost()", e));
@@ -383,7 +383,7 @@ public class PublicDataResource {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
 			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
-		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), media);
+		final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, RES_PREFIX + res, null), media).encoding("UTF-8");
 		return setHeaders(builder, getResourceHeaders(info.getPath(), ext, null, getEtag(model, res))).build();
 	}
 
@@ -473,7 +473,7 @@ public class PublicDataResource {
 				}
 			}
 		}
-		return builder.build();
+		return builder.encoding("UTF-8").build();
 	}
 
 	@GET
@@ -512,7 +512,7 @@ public class PublicDataResource {
 			LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(info.getAbsolutePath().toString());
 			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
 		}
-		return builder.build();
+		return builder.encoding("UTF-8").build();
 	}
 
 	@GET
@@ -538,7 +538,7 @@ public class PublicDataResource {
 			}
 		};
 		builder = Response.ok(stream, MediaTypeUtils.getMimeFromExtension(ext));
-		return builder.build();
+		return builder.encoding("UTF-8").build();
 	}
 
 	@POST
