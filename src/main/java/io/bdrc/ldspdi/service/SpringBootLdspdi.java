@@ -45,7 +45,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			log.error("Primary config could not be load in ServiceConfig");
-			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e));
+			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
 		}
 		ResultsCache.init();
 		GitService.update(ServiceConfig.LOCAL_QUERIES_DIR);
