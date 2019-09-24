@@ -37,15 +37,15 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 		GitService.update(ServiceConfig.getProperty("queryPath"));
 		OntData.init();
 		TaxModel.fetchModel();
-		InputStream is = new FileInputStream(configPath + "ldspdi-private.properties");
-		Properties private_props = new Properties();
-		private_props.load(is);
-		private_props.putAll(ServiceConfig.getProperties());
-		AuthProps.init(private_props);
 		if (ServiceConfig.useAuth()) {
 			// RdfAuthModel.updateAuthData(fuseki);
 			// For applications
 			RdfAuthModel.readAuthModel();
+		    InputStream is = new FileInputStream(configPath + "ldspdi-private.properties");
+		    Properties private_props = new Properties();
+		    private_props.load(is);
+		    private_props.putAll(ServiceConfig.getProperties());
+		    AuthProps.init(private_props);
 		}
 		log.info("SpringBootLdspdi has been properly initialized");
 		SpringApplication.run(SpringBootLdspdi.class, args);
