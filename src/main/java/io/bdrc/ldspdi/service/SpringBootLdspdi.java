@@ -22,6 +22,7 @@ import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
 
@@ -35,10 +36,17 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
 	public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class.getName());
 
-	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
+	public static void main(String[] args) throws JsonParseException, JsonMappingException, RestException {
 
 		final String configPath = System.getProperty("ldspdi.configpath");
-		ServiceConfig.init();
+		try {
+			ServiceConfig.init();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			log.error("Primary config could not be load in ServiceConfig");
+			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e));
+		}
 		ResultsCache.init();
 		GitService.update(ServiceConfig.LOCAL_QUERIES_DIR);
 		OntData.init();
@@ -51,7 +59,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 			is.close();
 		} catch (IOException e) {
 			log.warn("No custom properties file could be found: using default props");
-			e.printStackTrace();
+
 		}
 
 		if (ServiceConfig.useAuth()) {
