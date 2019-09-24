@@ -66,14 +66,12 @@ public class GitService implements Runnable {
 	private static void initRepo() {
 		try {
 			log.info("Cloning {} into dir {}", GitService.GIT_REMOTE_URL, GitService.GIT_LOCAL_PATH);
-			Git result = Git.cloneRepository().setDirectory(new File(GitService.GIT_LOCAL_PATH)).setURI(GitService.GIT_REMOTE_URL).setProgressMonitor(new TextProgressMonitor()).call();
+			Git result = Git.cloneRepository().setDirectory(new File(GitService.GIT_LOCAL_PATH)).setURI(GitService.GIT_REMOTE_URL).call();
 			result.checkout().setName("master").call();
 			result.close();
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			log.error(" Git was unable to pull repository : " + GitService.GIT_REMOTE_URL + " directory ", ex.getMessage());
-
 		}
 	}
 
@@ -83,10 +81,8 @@ public class GitService implements Runnable {
 			Git git = new Git(localRepo);
 			git.pull().setProgressMonitor(new TextProgressMonitor()).call();
 			git.close();
-
 		} catch (Exception ex) {
 			log.error(" Git was unable to pull repository : " + GitService.GIT_REMOTE_URL + " directory " + ex.getMessage());
-
 		}
 	}
 

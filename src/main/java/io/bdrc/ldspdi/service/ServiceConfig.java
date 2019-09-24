@@ -48,7 +48,7 @@ public class ServiceConfig {
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
 
 		try {
-		    LOCAL_QUERIES_DIR = System.getProperty("user.dir")+"/../lds-queries/";
+		    LOCAL_QUERIES_DIR = System.getProperty("user.dir")+"/lds-queries/";
 			final String configPath = System.getProperty("ldspdi.configpath");
 			log.info("getting properties from {}", configPath);
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
