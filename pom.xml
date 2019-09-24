@@ -66,6 +66,12 @@
       <groupId>org.glassfish.jersey.test-framework</groupId>
       <artifactId>jersey-test-framework-core</artifactId>
       <scope>test</scope>
+      <exclusions>
+      <exclusion>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+      </exclusion>
+      </exclusions>
     </dependency> 
     <dependency>
     	<groupId>com.github.jsonld-java</groupId>
@@ -100,7 +106,7 @@
         <exclusion>
           <artifactId>jsonld-java</artifactId>
           <groupId>com.github.jsonld-java</groupId>
-        </exclusion>
+        </exclusion>        
       </exclusions>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
@@ -109,6 +115,12 @@
       <artifactId>jena-fuseki-main</artifactId>
       <version>${jena.version}</version>
       <scope>test</scope>
+      <exclusions>
+      <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
