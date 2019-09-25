@@ -23,7 +23,7 @@ showUrl=https://library.bdrc.io/show/
 #### Fuseki dataset config ####
 
 # change this to the query url of your triple store dataset endpoint
-fusekiUrl=http://buda1.bdrc.io:13180/fuseki/corerw/query
+fusekiUrl=http://localhost:13180/fuseki/corerw/query
 
 
 #### Home page info ####
@@ -55,11 +55,14 @@ endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
 
 #### SPARQL Templates ######
 
-# SPARQL queries templates local directory path, no need to change this
-# in a buda-base environment.
-# lds-pdi will automatically sync the configured git repo in this directory:
-queryPath=/usr/local/ldspdi/queries/
-git_remote_url="https://github.com/buda-base/lds-queries.git"
+# SPARQL queries templates git repository, no need to change in a BUDA environment.
+
+git_remote_url=https://github.com/buda-base/lds-queries.git
+
+# Directory where the git repository will be cloned, by default in
+# the execution directory (user.dir variable), uncomment to override:
+# queryPath=/usr/local/ldspdi/queries/
+
 
 # Sparql result set max size
 limit=500
