@@ -24,18 +24,13 @@ import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import io.bdrc.ldspdi.results.ResultsCache;
 
 public class ServiceConfig {
@@ -45,7 +40,8 @@ public class ServiceConfig {
 	public static String LOCAL_QUERIES_DIR;
 	public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-	// getting the default properties from ldspdi.properties that is packaged with the jar
+	// getting the default properties from ldspdi.properties that is packaged with
+	// the jar
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
 		try {
 			LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
