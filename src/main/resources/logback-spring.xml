@@ -2,7 +2,7 @@
 <configuration>
   <!-- see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html#_profile_specific_configuration -->
   <springProfile name="PROD">    
-    <appender name="default" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="defaultprod" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <file>./log/ldspdi.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
         <fileNamePattern>./log/ldspdi.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -17,20 +17,18 @@
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
     </appender>
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
-      </encoder>
-    </appender>
+    <root level="WARN">
+        <appender-ref ref="defaultprod" />
+    </root>
   </springProfile>  
   <springProfile name="local">
-    <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="defaultlocal" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
     </appender>
+    <root level="WARN">
+        <appender-ref ref="defaultlocal" />
+    </root>
   </springProfile>
-  <root level="WARN">
-    <appender-ref ref="default" />
-  </root>
 </configuration>
