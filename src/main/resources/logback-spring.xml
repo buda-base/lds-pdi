@@ -22,7 +22,7 @@
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
     </appender>
-    <logger name="custom" level="INFO" additivity="true">
+    <logger name="custom" level="WARN" additivity="true">
         <appender-ref ref="default" />
     </logger> 
   </springProfile>  
@@ -33,7 +33,7 @@
       </encoder>
     </appender>
   </springProfile>
-  <root level="info">
+  <root level="WARN">
     <appender-ref ref="default" />
   </root>
 </configuration>

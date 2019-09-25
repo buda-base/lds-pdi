@@ -37,20 +37,13 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 	public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class.getName());
 
 	public static void main(String[] args) throws JsonParseException, JsonMappingException, RestException {
-
 		final String configPath = System.getProperty("ldspdi.configpath");
 		try {
 			ServiceConfig.init();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			log.error("Primary config could not be load in ServiceConfig");
+			log.error("Primary config could not be load in ServiceConfig", e1);
 			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
 		}
-		ResultsCache.init();
-		GitService.update();
-		OntData.init();
-		TaxModel.fetchModel();
 		Properties props = ServiceConfig.getProperties();
 		InputStream is;
 		try {
@@ -59,9 +52,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 			is.close();
 		} catch (IOException e) {
 			log.warn("No custom properties file could be found: using default props");
-
 		}
-
 		if (ServiceConfig.useAuth()) {
 			try {
 				is = new FileInputStream(configPath + "ldspdi-private.properties");
@@ -75,6 +66,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 			AuthProps.init(props);
 			RdfAuthModel.readAuthModel();
 		}
+	    ResultsCache.init();
+	    GitService.update();
+	    OntData.init();
+	    TaxModel.fetchModel();
 		log.info("SpringBootLdspdi has been properly initialized");
 		SpringApplication.run(SpringBootLdspdi.class, args);
 	}

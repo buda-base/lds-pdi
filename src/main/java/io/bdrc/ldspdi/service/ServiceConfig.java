@@ -45,17 +45,15 @@ public class ServiceConfig {
 	public static String LOCAL_QUERIES_DIR;
 	public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
+	// getting the default properties from ldspdi.properties that is packaged with the jar
 	public static void init() throws JsonParseException, JsonMappingException, IOException {
-
 		try {
 			LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
-			final String configPath = System.getProperty("ldspdi.configpath");
-			log.info("getting properties from {}", configPath);
+			log.info("getting properties from packaged ldspdi.properties");
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			prop.load(input);
 			input.close();
 			initLogs();
-
 		} catch (IOException ex) {
 			log.error("ServiceConfig init error", ex);
 		}
@@ -78,11 +76,13 @@ public class ServiceConfig {
 	}
 
 	private static void initLogs() {
-		Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "org.apache.jena"));
-		for (String log : loggers) {
-			Logger logger = (Logger) LoggerFactory.getLogger(log);
-			logger.setLevel(Level.toLevel(Integer.parseInt(getProperty("logLevel"))));
+		Set<String> loggers = new HashSet<>(Arrays.asList("org.apache", "org.eclipse"));
+		for (String l : loggers) {
+			Logger logger = (Logger) LoggerFactory.getLogger(l);
+			final Level lv = Level.toLevel(Integer.parseInt(getProperty("depLogLevel")));
+			logger.setLevel(lv);
 			logger.setAdditive(false);
+			log.info("set log level of {} to {}", l, lv);
 		}
 	}
 

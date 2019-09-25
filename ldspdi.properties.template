@@ -59,11 +59,6 @@ endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
 
 git_remote_url=https://github.com/buda-base/lds-queries.git
 
-# Directory where the git repository will be cloned, by default in
-# the execution directory (user.dir variable), uncomment to override:
-# queryPath=/usr/local/ldspdi/queries/
-
-
 # Sparql result set max size
 limit=500
 # Sparql queries timeout (ms)
