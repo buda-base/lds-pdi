@@ -1,20 +1,23 @@
 package io.bdrc.ldspdi.rest.features;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
-public class CharsetResponseFilter implements ContainerResponseFilter {
-    @Override
-    public void filter(ContainerRequestContext request, ContainerResponseContext response) {
-        MediaType type = response.getMediaType();
-        if (type != null) {
-            String contentType = type.toString();
-            if (!contentType.contains("charset")) {
-                contentType = contentType + ";charset=utf-8";
-                response.getHeaders().putSingle("Content-Type", contentType);
-            }
-        }
-    }
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(3)
+public class CharsetResponseFilter implements Filter {
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		response.setCharacterEncoding("utf-8");
+		chain.doFilter(request, response);
+	}
 }

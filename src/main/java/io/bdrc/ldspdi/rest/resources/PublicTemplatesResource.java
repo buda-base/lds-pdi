@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
@@ -71,7 +71,7 @@ public class PublicTemplatesResource {
 
 	@GET
 	@Path("/query/table/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, "text/csv" })
 	public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathParam("file") String file) throws RestException {
 		log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters()); // Settings
@@ -109,7 +109,7 @@ public class PublicTemplatesResource {
 
 	@POST
 	@Path("/query/table/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getQueryTemplateResultsJsonPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file, HashMap<String, String> map, @Context UriInfo info) throws RestException {
 		log.info("Call to getQueryTemplateResultsJsonPost()");
@@ -135,7 +135,7 @@ public class PublicTemplatesResource {
 
 	@GET
 	@Path("/query/graph/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	public Response getGraphTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki, @QueryParam("format") final String format, @PathParam("file") String file, @Context Request request) throws RestException {
 		String path = info.getPath() + info.relativize(info.getRequestUri());
 		Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
@@ -167,7 +167,7 @@ public class PublicTemplatesResource {
 
 	@POST
 	@Path("/query/graph/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki, @DefaultValue("application/ld+json") @HeaderParam("Accept") String accept, @PathParam("file") String file, @Context UriInfo info, @Context Request request,
 			HashMap<String, String> map) throws RestException {

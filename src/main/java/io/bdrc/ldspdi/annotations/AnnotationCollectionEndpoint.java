@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.formatters.JSONLDFormatter.DocType;
-import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
@@ -71,7 +71,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     // whole collections (no subset)
     public Response getWholeCollection(@PathParam("res") final String res,
             @HeaderParam("Accept") final String accept,
@@ -100,7 +100,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}.{ext}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     public Response getWholeCollectionSuffix(@PathParam("res") final String res,
             @PathParam("ext") final String ext,
             @HeaderParam("Prefer") final String preferHeader,
@@ -120,7 +120,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/p{ptype}/{pnum}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     // Pages of whole collections
     // this is almost identical as the getWholeCollection because collections currently
     // have only one page. The only difference is the json serialization.
@@ -153,7 +153,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/p{ptype}/{pnum}.{ext}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     public Response getWholeCollectionPageSuffix(@PathParam("res") final String res,
             @PathParam("ext") final String ext,
             @PathParam("ptype") final char ptype,
@@ -177,7 +177,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/sub/{subtype}/{subcoordinates}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     // Collection subset
     // a subcollection corresponding to a page or character range
     public Response getCollectionSubset(@PathParam("res") final String res,
@@ -208,7 +208,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/sub/{subtype}/{subcoordinates}.{ext}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     public Response getCollectionSubsetSuffix(@PathParam("res") final String res,
             @PathParam("ext") final String ext,
             @PathParam("subtype") final String subtype,
@@ -231,7 +231,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     // Collection subset page
     public Response getCollectionSubsetPage(@PathParam("res") final String res,
             @HeaderParam("Accept") final String accept,
@@ -265,7 +265,7 @@ public class AnnotationCollectionEndpoint {
 
     @GET
     @Path("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}.{ext}")
-    @JerseyCacheControl()
+    @SpringCacheControl()
     public Response getCollectionSubsetPageSuffix(@PathParam("res") final String res,
             @PathParam("ext") final String ext,
             @PathParam("subtype") final String subtype,

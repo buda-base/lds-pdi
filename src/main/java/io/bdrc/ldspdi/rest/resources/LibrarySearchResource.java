@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.library.ChunksResults;
 import io.bdrc.ldspdi.results.library.EtextResults;
 import io.bdrc.ldspdi.results.library.PersonAllResults;
@@ -50,7 +50,7 @@ public class LibrarySearchResource {
 
 	@POST
 	@Path("/lib/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLibGraphPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") final String file, HashMap<String, String> map) throws RestException {
 
@@ -116,7 +116,7 @@ public class LibrarySearchResource {
 
 	@GET
 	@Path("/lib/{file}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLibGraphGet(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file) throws RestException {
 

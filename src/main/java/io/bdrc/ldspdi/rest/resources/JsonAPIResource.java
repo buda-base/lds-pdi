@@ -43,8 +43,7 @@ import org.springframework.stereotype.Component;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
-import io.bdrc.ldspdi.rest.features.GZIPWriterInterceptor;
-import io.bdrc.ldspdi.rest.features.JerseyCacheControl;
+import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
@@ -63,13 +62,12 @@ public class JsonAPIResource {
 		super();
 		ResourceConfig config = new ResourceConfig(JsonAPIResource.class);
 		config.register(CorsFilter.class);
-		config.register(GZIPWriterInterceptor.class);
 		fileList = getQueryTemplates();
 	}
 
 	@GET
 	@Path("/queries")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queriesListGet() throws RestException {
 		log.info("Call to queriesListGet()");
@@ -78,7 +76,7 @@ public class JsonAPIResource {
 
 	@POST
 	@Path("/queries")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queriesListPost() throws RestException {
 		log.info("Call to queriesListPost()");
@@ -87,7 +85,7 @@ public class JsonAPIResource {
 
 	@GET
 	@Path("/queries/{template}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryDescGet(@PathParam("template") String name) throws RestException {
 		log.info("Call to queryDescGet()");
@@ -97,7 +95,7 @@ public class JsonAPIResource {
 
 	@POST
 	@Path("/queries/{template}")
-	@JerseyCacheControl()
+	@SpringCacheControl()
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryDescPost(@PathParam("template") String name) throws RestException {
 		log.info("Call to queryDescPost()");

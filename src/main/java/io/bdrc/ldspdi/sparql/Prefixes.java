@@ -70,7 +70,7 @@ public class Prefixes {
 		return pMap;
 	}
 
-	public static HashMap getMap() {
+	public static HashMap<String, String> getMap() {
 		return map;
 	}
 

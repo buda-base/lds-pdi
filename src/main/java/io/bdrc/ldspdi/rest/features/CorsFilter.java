@@ -20,24 +20,32 @@ package io.bdrc.ldspdi.rest.features;
  ******************************************************************************/
 
 import java.io.IOException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.ext.Provider;
 
-import io.bdrc.ldspdi.service.ServiceConfig;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
-@Provider
-public class CorsFilter implements ContainerResponseFilter {
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-    @Override
-    public void filter(ContainerRequestContext request,
-            ContainerResponseContext response) throws IOException {
-        response.getHeaders().add("Access-Control-Allow-Origin", ServiceConfig.getProperty("Allow-Origin"));
-        response.getHeaders().add("Access-Control-Allow-Headers",ServiceConfig.getProperty("Allow-Headers"));
-        response.getHeaders().add("Access-Control-Allow-Credentials", ServiceConfig.getProperty("Allow-Credentials"));
-        response.getHeaders().add("Access-Control-Allow-Methods",ServiceConfig.getProperty("Allow-Methods"));
-        response.getHeaders().add("Access-Control-Expose-Headers",ServiceConfig.getProperty("Expose-Headers"));
-        response.getHeaders().add("Access-Control-Max-Age",ServiceConfig.getProperty("Max-Age"));
-    }
+@Component
+@Order(2)
+public class CorsFilter implements Filter {
+
+	static final int ACCESS_CONTROL_MAX_AGE_IN_SECONDS = 24 * 60 * 60;
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		((HttpServletResponse) response).addHeader("Access-Control-Allow-Origin", "*");
+		((HttpServletResponse) response).addHeader("Access-Control-Allow-Credentials", "true");
+		((HttpServletResponse) response).addHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+		((HttpServletResponse) response).addHeader("Access-Control-Allow-Headers",
+				"Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Keep-Alive, User-Agent, If-Modified-Since, If-None-Match, Cache-Control");
+		((HttpServletResponse) response).addHeader("Access-Control-Expose-Headers", "Cache-Control, ETag, Last-Modified, Content-Type, Cache-Control, Vary, Access-Control-Max-Age");
+		((HttpServletResponse) response).addHeader("Access-Control-Max-Age", Integer.toString(ACCESS_CONTROL_MAX_AGE_IN_SECONDS));
+		chain.doFilter(request, response);
+	}
 }
