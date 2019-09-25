@@ -53,7 +53,6 @@ public class ServiceConfig {
 			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
 			prop.load(input);
 			input.close();
-			initLogs();
 		} catch (IOException ex) {
 			log.error("ServiceConfig init error", ex);
 		}
@@ -66,24 +65,12 @@ public class ServiceConfig {
 			// load a properties file
 			prop.load(input);
 			input.close();
-			initLogs();
 			ResultsCache.init();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		prop.setProperty(FUSEKI_URL, fusekiUrl);
 		OntPolicies.init();
-	}
-
-	private static void initLogs() {
-		Set<String> loggers = new HashSet<>(Arrays.asList("org.apache", "org.eclipse"));
-		for (String l : loggers) {
-			Logger logger = (Logger) LoggerFactory.getLogger(l);
-			final Level lv = Level.toLevel(Integer.parseInt(getProperty("depLogLevel")));
-			logger.setLevel(lv);
-			logger.setAdditive(false);
-			log.info("set log level of {} to {}", l, lv);
-		}
 	}
 
 	public static boolean useAuth() {

@@ -79,10 +79,10 @@ public class GitService implements Runnable {
 		try {
 			log.info("LOCAL REPO >> {}", localRepo);
 			Git git = new Git(localRepo);
-			git.pull().setProgressMonitor(new TextProgressMonitor()).call();
+			git.pull().call();
 			git.close();
 		} catch (Exception ex) {
-			log.error(" Git was unable to pull repository : " + GitService.GIT_REMOTE_URL + " directory " + ex.getMessage());
+			log.error(" Git was unable to pull in directory {}, message: {}", localRepo, ex.getMessage());
 		}
 	}
 
