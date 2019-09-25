@@ -61,24 +61,13 @@
     <dependency>
       <groupId>org.glassfish.jersey.ext</groupId>
       <artifactId>jersey-mvc-jsp</artifactId>
-      <exclusions>
-      <exclusion>
-          <groupId>org.glassfish.jersey.ext</groupId>
-          <artifactId>jersey-mvc</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc -->
-	<dependency>
-	    <groupId>org.glassfish.jersey.ext</groupId>
-	    <artifactId>jersey-mvc</artifactId>	    
-	    <exclusions>
-      <exclusion>
+      <exclusions>      
+        <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
-      </exclusions>
-	</dependency>
+      </exclusions>      
+    </dependency>    
     <dependency>
       <groupId>org.glassfish.jersey.test-framework</groupId>
       <artifactId>jersey-test-framework-core</artifactId>
