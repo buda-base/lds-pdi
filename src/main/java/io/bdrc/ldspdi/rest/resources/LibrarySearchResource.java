@@ -2,22 +2,22 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.util.HashMap;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.library.ChunksResults;
@@ -36,158 +36,154 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-@Component
-@Path("/")
+@RestController
+@RequestMapping("/")
 public class LibrarySearchResource {
 
-	public final static Logger log = LoggerFactory.getLogger(LibrarySearchResource.class.getName());
-	public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    public final static Logger log = LoggerFactory.getLogger(LibrarySearchResource.class.getName());
+    public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
-	@POST
-	@Path("/lib/{file}")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLibGraphPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") final String file, HashMap<String, String> map) throws RestException {
+    @PostMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> getLibGraphPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") final String file, @RequestBody HashMap<String, String> map) throws RestException {
 
-		log.info("Call to getLibGraphPost() with template name >> " + file);
-		Thread t = null;
-		AsyncSparql async = null;
-		if (file.equals("rootSearchGraph")) {
-			async = new AsyncSparql(fusekiUrl, "Etexts_count.arq", map);
-			t = new Thread(async);
-			t.run();
-		}
-		final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-		final String query = qfp.getParametizedQuery(map, false);
-		System.out.println("QUERY =" + query);
-		final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
-		HashMap<String, Object> res = null;
-		switch (file) {
-		case "rootSearchGraph":
-			log.info("MAP >>> " + map);
-			int etext_count = 0;
-			if (t != null) {
-				try {
-					t.join();
-					ResultSet rs = async.getRes();
-					etext_count = rs.next().getLiteral("?c").getInt();
-				} catch (InterruptedException e) {
-					throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphPost()", e));
-				}
-			}
-			res = RootResults.getResultsMap(model, etext_count);
-			break;
-		case "personFacetGraph":
-			res = PersonResults.getResultsMap(model);
-			break;
-		case "workFacetGraph":
-		case "workAllAssociations":
-			res = WorkAllResults.getResultsMap(model);
-			break;
-		case "allAssocResource":
-			res = ResourceResults.getResultsMap(model);
-			break;
-		case "personAllAssociations":
-			res = PersonAllResults.getResultsMap(model);
-			break;
-		case "topicAllAssociations":
-			res = TopicAllResults.getResultsMap(model);
-			break;
-		case "placeAllAssociations":
-			res = PlaceAllResults.getResultsMap(model);
-			break;
-		case "chunksFacetGraph":
-			res = ChunksResults.getResultsMap(model);
-			break;
-		case "roleAllAssociations":
-			res = ResourceResults.getResultsMap(model);
-			break;
-		default:
-			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
-		}
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(res), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+        log.info("Call to getLibGraphPost() with template name >> " + file);
+        Thread t = null;
+        AsyncSparql async = null;
+        if (file.equals("rootSearchGraph")) {
+            async = new AsyncSparql(fusekiUrl, "Etexts_count.arq", map);
+            t = new Thread(async);
+            t.run();
+        }
+        final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
+        final String query = qfp.getParametizedQuery(map, false);
+        System.out.println("QUERY =" + query);
+        final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
+        HashMap<String, Object> res = null;
+        switch (file) {
+        case "rootSearchGraph":
+            log.info("MAP >>> " + map);
+            int etext_count = 0;
+            if (t != null) {
+                try {
+                    t.join();
+                    ResultSet rs = async.getRes();
+                    etext_count = rs.next().getLiteral("?c").getInt();
+                } catch (InterruptedException e) {
+                    throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphPost()", e));
+                }
+            }
+            res = RootResults.getResultsMap(model, etext_count);
+            break;
+        case "personFacetGraph":
+            res = PersonResults.getResultsMap(model);
+            break;
+        case "workFacetGraph":
+        case "workAllAssociations":
+            res = WorkAllResults.getResultsMap(model);
+            break;
+        case "allAssocResource":
+            res = ResourceResults.getResultsMap(model);
+            break;
+        case "personAllAssociations":
+            res = PersonAllResults.getResultsMap(model);
+            break;
+        case "topicAllAssociations":
+            res = TopicAllResults.getResultsMap(model);
+            break;
+        case "placeAllAssociations":
+            res = PlaceAllResults.getResultsMap(model);
+            break;
+        case "chunksFacetGraph":
+            res = ChunksResults.getResultsMap(model);
+            break;
+        case "roleAllAssociations":
+            res = ResourceResults.getResultsMap(model);
+            break;
+        default:
+            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+        }
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(res));
+    }
 
-	@GET
-	@Path("/lib/{file}")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLibGraphGet(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file) throws RestException {
+    @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file) throws RestException {
 
-		log.info("Call to getLibGraphGet() with template name >> " + file);
-		HashMap<String, String> map = Helpers.convertMulti(info.getQueryParameters());
-		Thread t = null;
-		AsyncSparql async = null;
-		if (file.equals("rootSearchGraph")) {
-			async = new AsyncSparql(fusekiUrl, "Etexts_count.arq", map);
-			t = new Thread(async);
-			t.run();
-		}
-		final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-		final String query = qfp.getParametizedQuery(map, false);
-		System.out.println("QUERY =" + query);
-		log.debug("Call to getLibGraphGet() with query >> " + query);
-		final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
-		HashMap<String, Object> res = null;
-		switch (file) {
-		case "rootSearchGraph":
-			int etext_count = 0;
-			if (t != null) {
-				try {
-					t.join();
-					ResultSet rs = async.getRes();
-					etext_count = rs.next().getLiteral("?c").getInt();
-				} catch (InterruptedException e) {
-					throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphGet()", e));
-				}
-			}
+        log.info("Call to getLibGraphGet() with template name >> " + file);
+        HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
+        Thread t = null;
+        AsyncSparql async = null;
+        if (file.equals("rootSearchGraph")) {
+            async = new AsyncSparql(fusekiUrl, "Etexts_count.arq", map);
+            t = new Thread(async);
+            t.run();
+        }
+        final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
+        final String query = qfp.getParametizedQuery(map, false);
+        System.out.println("QUERY =" + query);
+        log.debug("Call to getLibGraphGet() with query >> " + query);
+        final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
+        HashMap<String, Object> res = null;
+        switch (file) {
+        case "rootSearchGraph":
+            int etext_count = 0;
+            if (t != null) {
+                try {
+                    t.join();
+                    ResultSet rs = async.getRes();
+                    etext_count = rs.next().getLiteral("?c").getInt();
+                } catch (InterruptedException e) {
+                    throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphGet()", e));
+                }
+            }
 
-			res = RootResults.getResultsMap(model, etext_count);
-			break;
-		case "personFacetGraph":
-			res = PersonResults.getResultsMap(model);
-			break;
-		case "workAllAssociations":
-			res = WorkAllResults.getResultsMap(model);
-			break;
-		case "workFacetGraph":
-			res = WorkResults.getResultsMap(model);
-			break;
-		case "allAssocResource":
-			res = ResourceResults.getResultsMap(model);
-			break;
-		case "personAllAssociations":
-			res = PersonAllResults.getResultsMap(model);
-			break;
-		case "topicAllAssociations":
-			res = TopicAllResults.getResultsMap(model);
-			break;
-		case "placeAllAssociations":
-			res = PlaceAllResults.getResultsMap(model);
-			break;
-		case "etextFacetGraph":
-			res = EtextResults.getResultsMap(model);
-			break;
-		case "chunksByEtextGraph":
-			res = EtextResults.getResultsMap(model);
-			break;
-		case "chunksFacetGraph":
-			res = ChunksResults.getResultsMap(model);
-			break;
-		case "roleAllAssociations":
-			res = ResourceResults.getResultsMap(model);
-			break;
-		default:
-			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+            res = RootResults.getResultsMap(model, etext_count);
+            break;
+        case "personFacetGraph":
+            res = PersonResults.getResultsMap(model);
+            break;
+        case "workAllAssociations":
+            res = WorkAllResults.getResultsMap(model);
+            break;
+        case "workFacetGraph":
+            res = WorkResults.getResultsMap(model);
+            break;
+        case "allAssocResource":
+            res = ResourceResults.getResultsMap(model);
+            break;
+        case "personAllAssociations":
+            res = PersonAllResults.getResultsMap(model);
+            break;
+        case "topicAllAssociations":
+            res = TopicAllResults.getResultsMap(model);
+            break;
+        case "placeAllAssociations":
+            res = PlaceAllResults.getResultsMap(model);
+            break;
+        case "etextFacetGraph":
+            res = EtextResults.getResultsMap(model);
+            break;
+        case "chunksByEtextGraph":
+            res = EtextResults.getResultsMap(model);
+            break;
+        case "chunksFacetGraph":
+            res = ChunksResults.getResultsMap(model);
+            break;
+        case "roleAllAssociations":
+            res = ResourceResults.getResultsMap(model);
+            break;
+        default:
+            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
-		}
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(res), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+        }
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(res));
+    }
+
 }
