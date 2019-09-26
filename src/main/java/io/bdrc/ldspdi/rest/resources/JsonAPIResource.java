@@ -27,18 +27,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
@@ -47,88 +46,80 @@ import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-@Component
-@Path("/")
+@RestController
+@RequestMapping("/")
 public class JsonAPIResource {
 
-	public final static Logger log = LoggerFactory.getLogger(JsonAPIResource.class.getName());
-	private List<String> fileList;
+    public final static Logger log = LoggerFactory.getLogger(JsonAPIResource.class.getName());
+    private List<String> fileList;
 
-	public JsonAPIResource() throws RestException {
-		super();
-		ResourceConfig config = new ResourceConfig(JsonAPIResource.class);
-		config.register(CorsFilter.class);
-		fileList = getQueryTemplates();
-	}
+    public JsonAPIResource() throws RestException {
+        super();
+        ResourceConfig config = new ResourceConfig(JsonAPIResource.class);
+        config.register(CorsFilter.class);
+        fileList = getQueryTemplates();
+    }
 
-	@GET
-	@Path("/queries")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queriesListGet() throws RestException {
-		log.info("Call to queriesListGet()");
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList)), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+    @GetMapping(value = "/queries", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> queriesListGet() throws RestException {
+        log.info("Call to queriesListGet()");
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(getQueryListItems(fileList)));
+    }
 
-	@POST
-	@Path("/queries")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queriesListPost() throws RestException {
-		log.info("Call to queriesListPost()");
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(getQueryListItems(fileList)), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+    @PostMapping(value = "/queries", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> queriesListPost() throws RestException {
+        log.info("Call to queriesListPost()");
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(getQueryListItems(fileList)));
+    }
 
-	@GET
-	@Path("/queries/{template}")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queryDescGet(@PathParam("template") String name) throws RestException {
-		log.info("Call to queryDescGet()");
-		final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(qfp.getTemplate()), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+    @GetMapping(value = "/queries/{template}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> queryDescGet(@PathVariable("template") String name) throws RestException {
+        log.info("Call to queryDescGet()");
+        final LdsQuery qfp = LdsQueryService.get(name + ".arq");
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(qfp.getTemplate()));
+    }
 
-	@POST
-	@Path("/queries/{template}")
-	@SpringCacheControl()
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queryDescPost(@PathParam("template") String name) throws RestException {
-		log.info("Call to queryDescPost()");
-		final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-		return Response.ok(ResponseOutputStream.getJsonResponseStream(qfp.getTemplate()), MediaType.APPLICATION_JSON_TYPE).build();
-	}
+    @PostMapping(value = "/queries/{template}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SpringCacheControl()
+    public ResponseEntity<StreamingResponseBody> queryDescPost(@PathVariable("template") String name) throws RestException {
+        log.info("Call to queryDescPost()");
+        final LdsQuery qfp = LdsQueryService.get(name + ".arq");
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(qfp.getTemplate()));
+    }
 
-	private ArrayList<QueryListItem> getQueryListItems(List<String> filesList) throws RestException {
-		ArrayList<QueryListItem> items = new ArrayList<>();
-		for (String file : filesList) {
-			String tmp = file.substring(file.lastIndexOf('/') + 1);
-			// final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-			final LdsQuery qfp = LdsQueryService.get(tmp);
-			QueryTemplate qt = qfp.getTemplate();
-			items.add(new QueryListItem(qt.getId(), "/queries/" + qt.getId(), qt.getQueryResults()));
-		}
-		return items;
-	}
+    private ArrayList<QueryListItem> getQueryListItems(List<String> filesList) throws RestException {
+        ArrayList<QueryListItem> items = new ArrayList<>();
+        for (String file : filesList) {
+            String tmp = file.substring(file.lastIndexOf('/') + 1);
+            // final LdsQuery qfp = LdsQueryService.get(file + ".arq");
+            final LdsQuery qfp = LdsQueryService.get(tmp);
+            QueryTemplate qt = qfp.getTemplate();
+            items.add(new QueryListItem(qt.getId(), "/queries/" + qt.getId(), qt.getQueryResults()));
+        }
+        return items;
+    }
 
-	private static List<String> getQueryTemplates() throws RestException {
-		List<String> files = new ArrayList<>();
-		java.nio.file.Path dpath = Paths.get(ServiceConfig.LOCAL_QUERIES_DIR + "public");
-		Stream<java.nio.file.Path> walk;
-		try {
-			walk = Files.walk(dpath);
-			files = walk.map(x -> x.toString()).filter(f -> f.endsWith(".arq")).collect(Collectors.toList());
-		} catch (IOException e1) {
-			log.error("Error while getting query templates", e1);
-			e1.printStackTrace();
-			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
-		}
-		walk.close();
-		return files;
-	}
+    private static List<String> getQueryTemplates() throws RestException {
+        List<String> files = new ArrayList<>();
+        java.nio.file.Path dpath = Paths.get(ServiceConfig.LOCAL_QUERIES_DIR + "public");
+        Stream<java.nio.file.Path> walk;
+        try {
+            walk = Files.walk(dpath);
+            files = walk.map(x -> x.toString()).filter(f -> f.endsWith(".arq")).collect(Collectors.toList());
+        } catch (IOException e1) {
+            log.error("Error while getting query templates", e1);
+            e1.printStackTrace();
+            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
+        }
+        walk.close();
+        return files;
+    }
 
 }
