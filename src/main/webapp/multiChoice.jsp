@@ -39,14 +39,14 @@
 <br>
 <table id="specs" style="width:60%;">
 <tr><th>Link</th><th>Mime Type</th></tr> 
-<c:forEach items="${MediaTypeUtils.getExtensionMimeMap().keySet()}" var="k">
+<c:forEach items="${BudaMediaTypes.getExtensionMimeMap().keySet()}" var="k">
 <c:set var="val" value="${k}"/>
 <c:choose>
 <c:when test="${it.contains('/resource/')}">
-<tr><td><a href="${it}.${k}">${it}.${k}</a><td>${MediaTypeUtils.getExtensionMimeMap().get(val)}</td></tr>
+<tr><td><a href="${it}.${k}">${it}.${k}</a><td>${BudaMediaTypes.getExtensionMimeMap().get(val)}</td></tr>
 </c:when>
 <c:otherwise>
-<tr><td><a href="${it}&format=${k}">${it}&format=${k}</a><td>${MediaTypeUtils.getExtensionMimeMap().get(val)}</td></tr>
+<tr><td><a href="${it}&format=${k}">${it}&format=${k}</a><td>${BudaMediaTypes.getExtensionMimeMap().get(val)}</td></tr>
 </c:otherwise>
 </c:choose>  
 </c:forEach>

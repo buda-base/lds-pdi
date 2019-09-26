@@ -379,15 +379,17 @@ public class PublicDataResource {
 
 	}
 
-	@GetMapping(value = "/{base : .*}/{other}")
+	// @GetMapping(value = "/{base : .*}/{other}")
+	@GetMapping(value = "/{base:[a-z]+}/{other}")
 	@SpringCacheControl()
-	public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader String format, @PathVariable String base, @PathVariable String other) throws RestException, IOException {
+	public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base, @PathVariable String other) throws RestException, IOException {
 		ResponseBuilder builder = null;
 		String path = request.getRequestURI();
-		log.info("getExtOntologyHomePage WAS CALLED WITH >> {}/{} and format: {}", base, other, format);
+		log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
 		boolean isBase = false;
 		String baseUri = "";
 		String tmp = request.getRequestURL().toString().replace("https", "http");
+		// String tmp = "http://purl.bdrc.io/ontology/admin";
 		log.info("getExtOntologyHomePage tmp is >> {}", tmp);
 		if (OntPolicies.isBaseUri(tmp)) {
 			baseUri = parseBaseUri(tmp);

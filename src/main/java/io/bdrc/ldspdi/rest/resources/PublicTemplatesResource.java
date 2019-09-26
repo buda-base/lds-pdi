@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.ByteArrayInputStream;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -21,29 +23,29 @@ package io.bdrc.ldspdi.rest.resources;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
 
 import org.apache.jena.rdf.model.Model;
-import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.ResultPage;
@@ -56,33 +58,34 @@ import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
-import io.bdrc.ldspdi.utils.ResponseOutputStream;
 import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-@Component
-@Path("/")
+@RestController
+@RequestMapping("/")
 public class PublicTemplatesResource {
 
 	public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class.getName());
 
-	@GET
-	@Path("/query/table/{file}")
+	@GetMapping(value = "/query/table/{file}")
 	@SpringCacheControl()
-	@Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, "text/csv" })
-	public Response getQueryTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathParam("file") String file) throws RestException {
-		log.info("Call to getQueryTemplateResults() {}, params: {}", file, info.getQueryParameters()); // Settings
-		HashMap<String, String> hm = Helpers.convertMulti(info.getQueryParameters());
+	public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathVariable("file") String file) throws RestException {
+		log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
+		HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
 
 		String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
 		if (pageNumber == null) {
 			pageNumber = "1";
 		}
-		hm.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
+		hm.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
 		hm.put(QueryConstants.REQ_METHOD, "GET");
+		Set<Entry<String, String>> set = hm.entrySet();
+		for (Entry<String, String> e : set) {
+			log.info("Key {} and value {}", e.getKey(), e.getValue());
+		}
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(hm, true);
@@ -93,132 +96,145 @@ public class PublicTemplatesResource {
 		ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
 		String fmt = hm.get(QueryConstants.FORMAT);
 		if ("json".equals(fmt)) {
-			return Response.ok(ResponseOutputStream.getJsonResponseStream(new Results(res, hm)), MediaType.APPLICATION_JSON_TYPE).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"").build();
+			Results r = new Results(res, hm);
+			byte[] buff = Helpers.getJsonStream(r);
+			return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
+					.body(new InputStreamResource(new ByteArrayInputStream(buff)));
 		}
 		if ("csv".equals(fmt)) {
-			return Response.ok(res.getCsvStreamOutput(hm, true), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"").build();
+			byte[] buff = res.getCsvAsBytes(hm, true);
+			return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
+					.body(new InputStreamResource(new ByteArrayInputStream(buff)));
+
 		}
 		if ("csv_f".equals(fmt)) {
-			return Response.ok(res.getCsvStreamOutput(hm, false), MediaTypeUtils.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"").build();
+			byte[] buff = res.getCsvAsBytes(hm, false);
+			return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
+					.body(new InputStreamResource(new ByteArrayInputStream(buff)));
 		}
 		hm.put(QueryConstants.REQ_METHOD, "GET");
 		hm.put("query", qfp.getQueryHtml());
-		ResultPage model = new ResultPage(res, hm.get(QueryConstants.PAGE_NUMBER), hm, qfp.getTemplate());
-		return Response.ok(new Viewable("/resPage.jsp", model)).build();
+		ResultPage mod = new ResultPage(res, hm.get(QueryConstants.PAGE_NUMBER), hm, qfp.getTemplate());
+		ModelAndView model = new ModelAndView();
+		model.addObject("model", mod);
+		model.setViewName("resPage");
+		return (ModelAndView) model;
 	}
 
-	@POST
-	@Path("/query/table/{file}")
+	@PostMapping(value = "/query/table/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@SpringCacheControl()
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQueryTemplateResultsJsonPost(@HeaderParam("fusekiUrl") final String fuseki, @PathParam("file") String file, HashMap<String, String> map, @Context UriInfo info) throws RestException {
+	public Object getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map, HttpServletRequest request)
+			throws RestException {
 		log.info("Call to getQueryTemplateResultsJsonPost()");
 		if (map == null || map.size() == 0) {
 			LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
-			return Response.status(500).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+			return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+
 		}
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(map, true);
 		if (query.startsWith(QueryConstants.QUERY_ERROR)) {
-			return Response.ok(ResponseOutputStream.getJsonResponseStream(query)).build();
+			return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getStream(query));
 		} else {
 			Results rp = null;
 			ResultSetWrapper res = QueryProcessor.getResults(query, fuseki, map.get(QueryConstants.RESULT_HASH), map.get(QueryConstants.PAGE_SIZE));
 			map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
 			map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
-			map.put(QueryConstants.REQ_URI, info.getRequestUri().toString().replace(info.getBaseUri().toString(), "/"));
-
-			rp = new Results(res, map);
-			return Response.ok(ResponseOutputStream.getJsonResponseStream(rp)).build();
+			map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
+			Results r = new Results(res, map);
+			byte[] buff = Helpers.getJsonStream(r);
+			return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().body(new InputStreamResource(new ByteArrayInputStream(buff)));
 		}
 	}
 
-	@GET
-	@Path("/query/graph/{file}")
+	@GetMapping(value = "/query/graph/{file}")
 	@SpringCacheControl()
-	public Response getGraphTemplateResults(@Context UriInfo info, @HeaderParam("fusekiUrl") final String fuseki, @QueryParam("format") final String format, @PathParam("file") String file, @Context Request request) throws RestException {
-		String path = info.getPath() + info.relativize(info.getRequestUri());
-		Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
+	public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
+			@RequestParam(value = "format", defaultValue = "jsonld") final String format, @PathVariable("file") String file) throws RestException {
+		String path = request.getServletPath();
+		MediaType variant = BudaMediaTypes.selectVariant(request.getHeader("Accept"), BudaMediaTypes.graphVariants);
 		log.info("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}", path, format, variant);
 		if (format == null && variant == null) {
-			final ResponseBuilder rb = Response.status(300).entity(Helpers.getMultiChoicesHtml(path, false)).header("Content-Type", "text/html").header("Content-Location", info.getBaseUri() + "choice?path=" + path);
-			return setHeaders(rb, getGraphResourceHeaders(path, null, "List")).build();
+			HttpHeaders hh = new HttpHeaders();
+			hh.setAll(getGraphResourceHeaders(path, null, "List"));
+			return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + path).body(Helpers.getStream(Helpers.getMultiChoicesHtml(path, false)));
+
 		}
 		// Settings
-		HashMap<String, String> hm = Helpers.convertMulti(info.getQueryParameters());
+		HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(hm, false);
 		// format is prevalent
-		MediaType mediaType = MediaTypeUtils.getMimeFromExtension(format);
+		MediaType mediaType = BudaMediaTypes.getMimeFromExtension(format);
 		if (mediaType == null) {
-			mediaType = variant.getMediaType();
+			mediaType = variant;
 		}
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + hm.toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+			return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
 		}
-		final String ext = MediaTypeUtils.getExtFromMime(mediaType);
-		ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext), mediaType);
-		return setHeaders(builder, getGraphResourceHeaders(path, ext, "Choice")).build();
+		final String ext = BudaMediaTypes.getExtFromMime(mediaType);
+		HttpHeaders hh = new HttpHeaders();
+		hh.setAll(getGraphResourceHeaders(path, ext, "Choice"));
+		return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext));
+
 	}
 
-	@POST
-	@Path("/query/graph/{file}")
+	@PostMapping(value = "/query/graph/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@SpringCacheControl()
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getGraphTemplateResultsPost(@HeaderParam("fusekiUrl") final String fuseki, @DefaultValue("application/ld+json") @HeaderParam("Accept") String accept, @PathParam("file") String file, @Context UriInfo info, @Context Request request,
-			HashMap<String, String> map) throws RestException {
-		final Variant variant = request.selectVariant(MediaTypeUtils.graphVariants);
+	public ResponseEntity<StreamingResponseBody> getGraphTemplateResultsPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @RequestHeader(value = "Accept", defaultValue = "application/ld+json") String accept,
+			@PathVariable("file") String file, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
+		if (accept.equals("*/*")) {
+			accept = "application/ld+json";
+		}
+		final MediaType variant = BudaMediaTypes.selectVariant(accept, BudaMediaTypes.graphVariants);
 		log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
 		if (variant == null) {
 			LdsError lds = new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()");
-			return Response.status(406).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(406, lds))).type(MediaType.APPLICATION_JSON).build();
+			return ResponseEntity.status(406).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(406, lds)));
 		}
 		// process
 		final LdsQuery qfp = LdsQueryService.get(file + ".arq");
 		final String query = qfp.getParametizedQuery(map, false);
 		// format is prevalent
-		MediaType mediaType = MediaTypeUtils.getMimeFromExtension(accept);
+		MediaType mediaType = BudaMediaTypes.getMimeFromExtension(accept);
 		if (mediaType == null) {
-			mediaType = variant.getMediaType();
+			mediaType = variant;
 		}
 		Model model = QueryProcessor.getGraph(query, fuseki, null);
 		if (model.size() == 0) {
 			LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + map.toString());
-			return Response.status(404).entity(ResponseOutputStream.getExceptionStream(ErrorMessage.getErrorMessage(404, lds))).type(MediaType.APPLICATION_JSON).build();
+			return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 		}
-		return Response.ok(ResponseOutputStream.getModelStream(model, MediaTypeUtils.getExtFromMime(mediaType)), mediaType).build();
+		return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType)));
 	}
 
-	@POST
-	@Path("/callbacks/github/lds-queries")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateQueries() throws RestException {
+	@PostMapping(value = "/callbacks/github/lds-queries", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateQueries() throws RestException {
 		log.info("updating query templates >>");
 		Thread t = new Thread(new GitService());
 		t.start();
 		Prefixes.loadPrefixes();
 		LdsQueryService.clearCache();
 		ResultsCache.clearCache();
-		return Response.ok().build();
+		return ResponseEntity.ok().body("Lds-queries have been updated");
 	}
 
-	@POST
-	@Path("/clearcache")
-	public String clearCache() throws RestException {
+	@PostMapping(value = "/clearcache")
+	public ResponseEntity<String> clearCache() throws RestException {
 		log.info("clearing cache >>");
 		if (ResultsCache.clearCache()) {
-			return "OK";
+			return ResponseEntity.ok().body("OK");
 		} else {
-			return "ERROR";
+			return ResponseEntity.ok().body("ERROR");
 		}
 	}
 
 	private static HashMap<String, String> getGraphResourceHeaders(String url, final String ext, final String tcn) {
-		final HashMap<String, MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
+		final HashMap<String, MediaType> map = BudaMediaTypes.getResExtensionMimeMap();
 		final HashMap<String, String> headers = new HashMap<>();
 
 		if (ext != null) {
@@ -237,13 +253,6 @@ public class PublicTemplatesResource {
 		headers.put("TCN", tcn);
 		headers.put("Vary", "Negotiate, Accept");
 		return headers;
-	}
-
-	private static ResponseBuilder setHeaders(ResponseBuilder builder, HashMap<String, String> headers) {
-		for (String key : headers.keySet()) {
-			builder.header(key, headers.get(key));
-		}
-		return builder;
 	}
 
 }

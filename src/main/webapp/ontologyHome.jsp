@@ -71,7 +71,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
 <c:forEach items="${OntData.getOntRootClasses()}" var="root">    
-    <tr><td><a href="${Helpers.neutralizeUrl(root.getUri())}">${root.getId()}</a></td></tr>
+    <tr><td><a href="${root.getUri()}">${root.getId()}</a></td></tr>
 </c:forEach> 
 </table> 
 
@@ -81,7 +81,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
 <c:forEach items="${OntData.getAllClasses()}" var="cls">    
-    <tr><td><a href="${Helpers.neutralizeUrl(cls.getURI())}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
+    <tr><td><a href="${cls.getURI()}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
 </c:forEach> 
 </table>
 
@@ -91,7 +91,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>property type</th></tr>
 <c:forEach items="${OntData.getAllProps()}" var="prop">    
-    <tr><td><a href="${Helpers.neutralizeUrl(prop.getURI())}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
+    <tr><td><a href="${prop.getURI()}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
     <td><c:choose>
                 <c:when test="${prop.isObjectProperty() || prop.isInverseFunctionalProperty()}">
                 ObjectProperty
@@ -113,7 +113,7 @@
 <table style="width:55%;margin:auto">
 <tr><th>Local name</th><th> Class</th></tr>
 <c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
-    <tr><td><a href="${Helpers.neutralizeUrl(ind.getURI())}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
+    <tr><td><a href="${ind.getURI()}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
 
@@ -123,7 +123,7 @@
 <p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
 <table style="width:55%;margin:auto">
 <c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
-<tr><td><a href="${Helpers.neutralizeUrl(i)}">${Helpers.neutralizeUrl(i)}</a></td></tr>
+<tr><td><a href="${i}">${i}</a></td></tr>
 </c:forEach>
 </table>
 </c:if>

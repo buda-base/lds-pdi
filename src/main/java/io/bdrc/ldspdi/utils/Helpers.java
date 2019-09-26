@@ -27,10 +27,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.text.StringSubstitutor;
@@ -40,6 +41,7 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +51,9 @@ import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.formatters.TTLRDFWriter;
 
 public class Helpers {
+
+	public static final ObjectMapper om = new ObjectMapper();
+	public static boolean prettyPrint = false;
 
 	public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
 
@@ -96,6 +101,15 @@ public class Helpers {
 		return copy;
 	}
 
+	public static HashMap<String, String> convertMulti(Map<String, String[]> map) {
+		HashMap<String, String> copy = new HashMap<>();
+		Set<String> set = map.keySet();
+		for (String key : set) {
+			copy.put(key, map.get(key)[0]);
+		}
+		return copy;
+	}
+
 	public static StringBuffer getTemplateStr(String tlpPath) {
 		final InputStream stream = getResourceOrFile(tlpPath);
 		final BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
@@ -115,7 +129,7 @@ public class Helpers {
 
 	public static String getMultiChoicesHtml(final String path, final boolean resource) {
 		final StringBuilder sb = new StringBuilder();
-		for (final Entry<String, MediaType> e : MediaTypeUtils.getResExtensionMimeMap().entrySet()) {
+		for (final Entry<String, MediaType> e : BudaMediaTypes.getResExtensionMimeMap().entrySet()) {
 			final String ext = e.getKey();
 			final String mimeDesc = e.getValue().toString();
 			if (resource) {
@@ -142,14 +156,32 @@ public class Helpers {
 	}
 
 	public static StreamingResponseBody getJsonObjectStream(Object obj) {
-		ObjectMapper om = new ObjectMapper();
+		try {
+			om.writer().writeValue(System.out, obj);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		final StreamingResponseBody stream = new StreamingResponseBody() {
 			@Override
-			public void writeTo(final OutputStream os) throws IOException {
-				om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
+			public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+				if (prettyPrint)
+					om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
+				else
+					om.writeValue(os, obj);
 			}
 		};
 		return stream;
+	}
+
+	public static byte[] getJsonStream(Object obj) {
+		try {
+			return om.writeValueAsBytes(obj);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new byte[0];
 	}
 
 	public static StreamingResponseBody getModelStream(final Model model, final String format, final String res, DocType docType) {
@@ -161,7 +193,27 @@ public class Helpers {
 					JSONLDFormatter.jsonObjectToOutputStream(json, os);
 					return;
 				}
-				final String JenaFormat = MediaTypeUtils.getJenaFromExtension(format);
+				final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
+				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+					writer.output(os);
+					return;
+				}
+				model.write(os, JenaFormat);
+			}
+		};
+		return stream;
+	}
+
+	public static StreamingResponseBody getModelStream(final Model model, final String format) {
+		StreamingResponseBody stream = new StreamingResponseBody() {
+			@Override
+			public void writeTo(OutputStream os) {
+				if (format.equals("jsonld")) {
+					JSONLDFormatter.writeModelAsCompact(model, os);
+					return;
+				}
+				final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
 				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
 					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
 					writer.output(os);
