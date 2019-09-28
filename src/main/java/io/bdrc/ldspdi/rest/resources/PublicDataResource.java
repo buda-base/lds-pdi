@@ -115,8 +115,7 @@ public class PublicDataResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Response getIndexPage() throws RestException, IOException {
 		log.info("Call to getIndexPage()");
-		DocFileModel dfm = new DocFileModel();
-		return Response.ok(new Viewable("/index.jsp", dfm)).build();
+		return Response.ok(new Viewable("/index.jsp", DocFileModel.class)).build();
 	}
 
 	@GET
@@ -548,7 +547,7 @@ public class PublicDataResource {
 		log.info("updating Ontology models() >>");
 		Thread t = new Thread(new OntData());
 		t.start();
-		return Response.ok("Ontologies were updated").build();
+		return Response.ok("Ontologies are being updated").build();
 	}
 
 	private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {

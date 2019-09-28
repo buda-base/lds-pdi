@@ -56,6 +56,7 @@ import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.ldspdi.utils.ResponseOutputStream;
@@ -202,6 +203,7 @@ public class PublicTemplatesResource {
 		t.start();
 		Prefixes.loadPrefixes();
 		LdsQueryService.clearCache();
+		DocFileModel.clearCache();
 		ResultsCache.clearCache();
 		return Response.ok().build();
 	}

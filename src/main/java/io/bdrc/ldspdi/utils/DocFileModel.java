@@ -24,23 +24,20 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class DocFileModel {
 
-	List<String> files;
+	static List<String> files;
 	public final static Logger log = LoggerFactory.getLogger(DocFileModel.class.getName());
-	public Set<String> keys;
-	public ArrayList<String> ontos;
-	public String brandName;
-	public String ontName;
-	HashMap<String, ArrayList<QueryTemplate>> templ;
+	public static Set<String> keys;
+	public static ArrayList<String> ontos;
+	public static String brandName = ServiceConfig.getProperty("brandName");
+	public static String ontName = ServiceConfig.getProperty("ontName");
+	static HashMap<String, ArrayList<QueryTemplate>> templ;
 
-	public DocFileModel() throws RestException {
-		this.ontName = ServiceConfig.getProperty("ontName");
-		this.brandName = ServiceConfig.getProperty("brandName");
-		this.files = getQueryTemplates();
-		setContentModel();
-	}
-
-	public void setContentModel() throws RestException {
-
+    public static void clearCache() throws RestException {
+       setContentModel();
+    }
+	
+	public static void setContentModel() throws RestException {
+	    files = getQueryTemplates();
 		templ = new HashMap<>();
 
 		for (String file : files) {
@@ -57,8 +54,8 @@ public class DocFileModel {
 				templ.put(queryScope, qtlist);
 			}
 		}
-		this.ontos = OntPolicies.getValidBaseUri();
-		this.keys = templ.keySet();
+		ontos = OntPolicies.getValidBaseUri();
+		keys = templ.keySet();
 	}
 
 	public String getBrandName() {
@@ -90,7 +87,6 @@ public class DocFileModel {
 			files = walk.map(x -> x.toString()).filter(f -> f.endsWith(".arq")).collect(Collectors.toList());
 		} catch (IOException e1) {
 			log.error("Error while getting query templates", e1);
-			e1.printStackTrace();
 			throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
 		}
 		walk.close();
