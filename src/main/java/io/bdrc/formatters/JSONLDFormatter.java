@@ -44,17 +44,18 @@ import io.bdrc.ldspdi.utils.Helpers;
 /*******************************************************************************
  * Copyright (c) 2017-2018 Buddhist Digital Resource Center (BDRC)
  *
- * If this file is a derivation of another work the license header will appear below;
- * otherwise, this work is licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the License.
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
  *
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -62,13 +63,13 @@ import io.bdrc.ldspdi.utils.Helpers;
 
 public class JSONLDFormatter {
 
-    protected final static Map<DocType,Object> typeToFrameObject = new EnumMap<>(DocType.class);
+    protected final static Map<DocType, Object> typeToFrameObject = new EnumMap<>(DocType.class);
     static final ObjectMapper mapper = new ObjectMapper();
-    public static final Map<String,Object> bdoContextObject = getBDOContext();
-    public static final Map<String,Object> annContextObject = getAnnMergedContext();
-    public static final Map<String,Object> oaContextObject = getOaMergedContext();
+    public static final Map<String, Object> bdoContextObject = getBDOContext();
+    public static final Map<String, Object> annContextObject = getAnnMergedContext();
+    public static final Map<String, Object> oaContextObject = getOaMergedContext();
     public static final String BDR = "http://purl.bdrc.io/resource/";
-    public final static Logger log=LoggerFactory.getLogger(JSONLDFormatter.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(JSONLDFormatter.class.getName());
     public final static String simpleContext = "http://purl.bdrc.io/context.jsonld";
     public final static String annoContext = "http://www.w3.org/ns/anno.jsonld";
     public final static String oaContext = "http://www.w3.org/ns/oa.jsonld";
@@ -87,27 +88,10 @@ public class JSONLDFormatter {
     }
 
     public static enum DocType {
-        CORPORATION,
-        LINEAGE,
-        ETEXT,
-        ETEXTCONTENT,
-        ROLE,
-        PERSON,
-        VOLUME,
-        PLACE,
-        TOPIC,
-        ITEM,
-        WORK,
-        PRODUCT,
-        TEST,
-        ANN,
-        ANC,
-        ANP,
-        OA
-        ;
+        CORPORATION, LINEAGE, ETEXT, ETEXTCONTENT, ROLE, PERSON, VOLUME, PLACE, TOPIC, ITEM, WORK, PRODUCT, TEST, ANN, ANC, ANP, OA;
     }
 
-    public final static Map<DocType,Object> docTypeToSimpleContext = new HashMap<>();
+    public final static Map<DocType, Object> docTypeToSimpleContext = new HashMap<>();
     static {
         // these are what will appear in the @context property of the output,
         // just URIs replacing the whole context
@@ -129,9 +113,10 @@ public class JSONLDFormatter {
         docTypeToSimpleContext.put(DocType.OA, Arrays.asList(simpleContext, oaContext));
     }
 
-    public final static Map<DocType,Object> docTypeToContextObject = new HashMap<>();
+    public final static Map<DocType, Object> docTypeToContextObject = new HashMap<>();
     static {
-        // these are what will be passed to the json-ld api, the complete context objects
+        // these are what will be passed to the json-ld api, the complete context
+        // objects
         docTypeToContextObject.put(null, bdoContextObject);
         docTypeToContextObject.put(DocType.PERSON, bdoContextObject);
         docTypeToContextObject.put(DocType.VOLUME, bdoContextObject);
@@ -149,7 +134,7 @@ public class JSONLDFormatter {
         docTypeToContextObject.put(DocType.OA, oaContextObject);
     }
 
-    public static final Map<String,DocType> typeToDocType = new HashMap<>();
+    public static final Map<String, DocType> typeToDocType = new HashMap<>();
     static {
         typeToDocType.put("Person", DocType.PERSON);
         typeToDocType.put("Volume", DocType.VOLUME);
@@ -166,8 +151,7 @@ public class JSONLDFormatter {
         typeToDocType.put("OrderedCollectionPage", DocType.ANP);
     }
 
-
-    public static final Map<DocType,Object> typeToRootShortUri = new EnumMap<>(DocType.class);
+    public static final Map<DocType, Object> typeToRootShortUri = new EnumMap<>(DocType.class);
     static {
         typeToRootShortUri.put(DocType.PERSON, "Person");
         typeToRootShortUri.put(DocType.VOLUME, Arrays.asList("Volume", "VolumeImageAsset", "VolumePhysicalAsset"));
@@ -185,13 +169,14 @@ public class JSONLDFormatter {
         typeToRootShortUri.put(DocType.ANP, "AnnotationPage");
     }
 
-    public static Map<String,Object> getBDOContext() {
-        Map<String, Map<String,Object>> map = null;
+    public static Map<String, Object> getBDOContext() {
+        Map<String, Map<String, Object>> map = null;
         try {
             URL url = new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld");
-            map = mapper.readValue(url, new TypeReference<Map<String, Map<String,Object>>>(){});
+            map = mapper.readValue(url, new TypeReference<Map<String, Map<String, Object>>>() {
+            });
         } catch (Exception e) {
-            log.error("Error reading context file :"+ e);
+            log.error("Error reading context file :" + e);
             e.printStackTrace();
             return null;
         }
@@ -201,16 +186,18 @@ public class JSONLDFormatter {
     // return the object corresponding to the context that needs to
     // be associated with an annotation type for framing. It's a merge
     // of the json file in src/main/resources/context/ and the BDO context
-    public static Map<String,Object> getAnnMergedContext() {
-        final Map<String,Object> res = new HashMap<>();
+    public static Map<String, Object> getAnnMergedContext() {
+        final Map<String, Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
-        Map<String, Map<String,Object>> map = null;
+        Map<String, Map<String, Object>> map = null;
         try {
             InputStream is = Helpers.getResourceOrFile("contexts/ldp.jsonld");
-            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String, Object>>>() {
+            });
             res.putAll(map.get("@context"));
             is = Helpers.getResourceOrFile("contexts/anno.jsonld");
-            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String, Object>>>() {
+            });
             res.putAll(map.get("@context"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -222,13 +209,14 @@ public class JSONLDFormatter {
         return res;
     }
 
-    public static Map<String,Object> getOaMergedContext() {
-        final Map<String,Object> res = new HashMap<>();
+    public static Map<String, Object> getOaMergedContext() {
+        final Map<String, Object> res = new HashMap<>();
         res.putAll(bdoContextObject);
-        Map<String, Map<String,Object>> map = null;
+        Map<String, Map<String, Object>> map = null;
         try {
             InputStream is = Helpers.getResourceOrFile("contexts/oa.jsonld");
-            map = mapper.readValue(is, new TypeReference<Map<String, Map<String,Object>>>(){});
+            map = mapper.readValue(is, new TypeReference<Map<String, Map<String, Object>>>() {
+            });
             res.putAll(map.get("@context"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -239,19 +227,22 @@ public class JSONLDFormatter {
     }
 
     private static void initializeAnnFrameObjects() {
-        Map<String,Object> res = null;
+        Map<String, Object> res = null;
         try {
             InputStream is = Helpers.getResourceOrFile("contexts/annotation_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res = mapper.readValue(is, new TypeReference<Map<String, Object>>() {
+            });
             res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANN, res);
             typeToFrameObject.put(DocType.OA, res);
             is = Helpers.getResourceOrFile("contexts/collection_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res = mapper.readValue(is, new TypeReference<Map<String, Object>>() {
+            });
             res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANC, res);
             is = Helpers.getResourceOrFile("contexts/page_frame.jsonld");
-            res = mapper.readValue(is, new TypeReference<Map<String,Object>>(){});
+            res = mapper.readValue(is, new TypeReference<Map<String, Object>>() {
+            });
             res.put("@context", annContextObject);
             typeToFrameObject.put(DocType.ANP, res);
         } catch (IOException e) {
@@ -264,7 +255,7 @@ public class JSONLDFormatter {
         boolean needsId = (type == DocType.WORK || type == DocType.TEST);
         if (!needsId && typeToFrameObject.containsKey(type))
             return typeToFrameObject.get(type);
-        Map<String,Object> jsonObject = new HashMap<>();
+        Map<String, Object> jsonObject = new HashMap<>();
         if (needsId) {
             jsonObject.put("@id", mainResourceUri);
         } else {
@@ -275,43 +266,52 @@ public class JSONLDFormatter {
         return jsonObject;
     }
 
-    static class JsonLDComparator implements Comparator<String>
-    {
+    static class JsonLDComparator implements Comparator<String> {
         @Override
-        public int compare(String s1, String s2)
-        {
-            if(s1.equals("adm:logEntry")) return 1;
-            if(s2.equals("adm:logEntry")) return -1;
-            if(s1.startsWith("adm:")) return 1;
-            if(s1.startsWith("tbr:")) return 1;
-            if(s2.startsWith("adm:")) return -1;
-            if(s2.startsWith("tbr:")) return -1;
-            if(s1.equals("@context")) return 1;
-            if(s1.equals("@graph")) return -1;
-            if(s1.equals("rdfs:label")) return -1;
-            if(s1.equals("skos:prefLabel")) return -1;
-            if(s1.equals("skos:altLabel")) return -1;
+        public int compare(String s1, String s2) {
+            if (s1.equals("adm:logEntry"))
+                return 1;
+            if (s2.equals("adm:logEntry"))
+                return -1;
+            if (s1.startsWith("adm:"))
+                return 1;
+            if (s1.startsWith("tbr:"))
+                return 1;
+            if (s2.startsWith("adm:"))
+                return -1;
+            if (s2.startsWith("tbr:"))
+                return -1;
+            if (s1.equals("@context"))
+                return 1;
+            if (s1.equals("@graph"))
+                return -1;
+            if (s1.equals("rdfs:label"))
+                return -1;
+            if (s1.equals("skos:prefLabel"))
+                return -1;
+            if (s1.equals("skos:altLabel"))
+                return -1;
             return s1.compareTo(s2);
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected static void insertRec(String k, Object v, SortedMap<String,Object> tm) throws IllegalArgumentException {
+    protected static void insertRec(String k, Object v, SortedMap<String, Object> tm) throws IllegalArgumentException {
         if (k.equals("@graph")) {
             if (v instanceof ArrayList) {
                 if (((ArrayList<Object>) v).size() == 0) {
-                    tm.put(k,v);
-                    //throw new IllegalArgumentException("empty graph, shouldn't happen!");
+                    tm.put(k, v);
+                    // throw new IllegalArgumentException("empty graph, shouldn't happen!");
                     return;
                 }
                 Object o = ((ArrayList<Object>) v).get(0);
                 if (o instanceof Map) {
-                    Map<String,Object> orderedo = orderEntries((Map<String,Object>) o);
+                    Map<String, Object> orderedo = orderEntries((Map<String, Object>) o);
                     ((ArrayList<Object>) v).set(0, orderedo);
                 }
                 tm.put(k, v);
             } else {// supposing v instance of Map
-                tm.put(k, orderEntries( (Map<String,Object>) v));
+                tm.put(k, orderEntries((Map<String, Object>) v));
             }
         } else {
             tm.put(k, v);
@@ -319,11 +319,10 @@ public class JSONLDFormatter {
     }
 
     // reorder list
-    protected static Map<String,Object> orderEntries(Map<String,Object> input) throws IllegalArgumentException
-    {
-        SortedMap<String,Object> res = new TreeMap<>(new JsonLDComparator());
+    protected static Map<String, Object> orderEntries(Map<String, Object> input) throws IllegalArgumentException {
+        SortedMap<String, Object> res = new TreeMap<>(new JsonLDComparator());
         // TODO: maybe it should be recursive? at least for outlines...
-        input.forEach( (k,v) ->  insertRec(k, v, res) );
+        input.forEach((k, v) -> insertRec(k, v, res));
         return res;
     }
 
@@ -340,9 +339,9 @@ public class JSONLDFormatter {
         return res;
     }
 
-    public static Map<String,Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {
+    public static Map<String, Object> modelToJsonObject(final Model m, final String mainResourceUri, DocType type) {
         if (type == null) {
-            type  = getDocType(m, mainResourceUri);
+            type = getDocType(m, mainResourceUri);
             if (type == null) {
                 log.info("not able to determine type of resource {} for frame output, outputting compact", mainResourceUri);
                 return modelToJsonObject(m, null, mainResourceUri, RDFFormat.JSONLD_COMPACT_PRETTY, false);
@@ -352,7 +351,7 @@ public class JSONLDFormatter {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String,Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, RDFFormat format, final boolean reorder) {
+    public static Map<String, Object> modelToJsonObject(final Model m, final DocType type, final String mainResourceUri, RDFFormat format, final boolean reorder) {
         final JsonLDWriteContext ctx = new JsonLDWriteContext();
         if (format.equals(RDFFormat.JSONLD_FRAME_PRETTY) || format.equals(RDFFormat.JSONLD_FRAME_FLAT)) {
             final Object frameObj = getFrameObject(type, mainResourceUri);
@@ -363,9 +362,9 @@ public class JSONLDFormatter {
         ctx.setOptions(jsonLdOptions);
         final DatasetGraph g = DatasetFactory.create(m).asDatasetGraph();
         final PrefixMap pm = Prefixes.getPrefixMap();
-        Map<String,Object> tm;
+        Map<String, Object> tm;
         try {
-            tm = (Map<String,Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
+            tm = (Map<String, Object>) JsonLDWriter.toJsonLDJavaAPI(variant, g, pm, null, ctx);
             // replacing context with URI
             tm.replace("@context", docTypeToSimpleContext.get(type));
             if (reorder)
@@ -378,10 +377,10 @@ public class JSONLDFormatter {
     }
 
     public static void jsonObjectToOutputStream(Object jsonObject, OutputStream out) {
-        Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8) ;
+        Writer wr = new OutputStreamWriter(out, Chars.charsetUTF8);
         try {
             if (prettyPrint) {
-                JsonUtils.writePrettyPrint(wr, jsonObject) ;
+                JsonUtils.writePrettyPrint(wr, jsonObject);
                 wr.write("\n");
             } else {
                 JsonUtils.write(wr, jsonObject);
@@ -389,7 +388,7 @@ public class JSONLDFormatter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        IO.flush(wr) ;
+        IO.flush(wr);
     }
 
     public static void writeModelAsCompact(Model m, OutputStream out) {
@@ -398,4 +397,3 @@ public class JSONLDFormatter {
     }
 
 }
-

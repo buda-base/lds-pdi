@@ -42,7 +42,6 @@ import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class ResServiceTest extends JerseyTest {
 
@@ -72,7 +71,7 @@ public class ResServiceTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(PublicDataResource.class).register(RestExceptionMapper.class);
+        return new ResourceConfig(PublicDataResource.class);
     }
 
     @Test

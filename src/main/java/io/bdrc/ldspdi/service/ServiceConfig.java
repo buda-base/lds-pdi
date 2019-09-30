@@ -35,58 +35,59 @@ import io.bdrc.ldspdi.results.ResultsCache;
 
 public class ServiceConfig {
 
-	static Properties prop = new Properties();
-	public final static String FUSEKI_URL = "fusekiUrl";
-	public static String LOCAL_QUERIES_DIR;
-	public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
+    static Properties prop = new Properties();
+    public final static String FUSEKI_URL = "fusekiUrl";
+    public static String LOCAL_QUERIES_DIR;
+    public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
 
-	// getting the default properties from ldspdi.properties that is packaged with
-	// the jar
-	public static void init() throws JsonParseException, JsonMappingException, IOException {
-		try {
-			LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
-			log.info("getting properties from packaged ldspdi.properties");
-			InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
-			prop.load(input);
-			input.close();
-		} catch (IOException ex) {
-			log.error("ServiceConfig init error", ex);
-		}
-		OntPolicies.init();
-	}
+    // getting the default properties from ldspdi.properties that is packaged with
+    // the jar
+    public static void init() throws JsonParseException, JsonMappingException, IOException {
+        try {
+            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            log.info("getting properties from packaged ldspdi.properties");
+            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            prop.load(input);
+            input.close();
+        } catch (IOException ex) {
+            log.error("ServiceConfig init error", ex);
+        }
+        OntPolicies.init();
+    }
 
-	public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
-		try {
-			InputStream input = new FileInputStream(new File("src/test/resources/ldspdiTest.properties"));
-			// load a properties file
-			prop.load(input);
-			input.close();
-			ResultsCache.init();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		prop.setProperty(FUSEKI_URL, fusekiUrl);
-		OntPolicies.init();
-	}
+    public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
+        try {
+            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            InputStream input = new FileInputStream(new File("src/test/resources/ldspdiTest.properties"));
+            // load a properties file
+            prop.load(input);
+            input.close();
+            ResultsCache.init();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        prop.setProperty(FUSEKI_URL, fusekiUrl);
+        OntPolicies.init();
+    }
 
-	public static boolean useAuth() {
-		return Boolean.parseBoolean(prop.getProperty("useAuth"));
-	}
+    public static boolean useAuth() {
+        return Boolean.parseBoolean(prop.getProperty("useAuth"));
+    }
 
-	public static boolean isBRDCBrand() {
-		return prop.getProperty("brand").equals("BDRC");
-	}
+    public static boolean isBRDCBrand() {
+        return prop.getProperty("brand").equals("BDRC");
+    }
 
-	public static String getProperty(String key) {
-		return prop.getProperty(key);
-	}
+    public static String getProperty(String key) {
+        return prop.getProperty(key);
+    }
 
-	public static Properties getProperties() {
-		return prop;
-	}
+    public static Properties getProperties() {
+        return prop;
+    }
 
-	public static String getRobots() {
-		return "User-agent: *" + System.lineSeparator() + "Disallow: /";
-	}
+    public static String getRobots() {
+        return "User-agent: *" + System.lineSeparator() + "Disallow: /";
+    }
 
 }

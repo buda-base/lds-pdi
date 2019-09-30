@@ -11,15 +11,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
-
 public class OntServiceTest extends JerseyTest {
 
     public final static Logger log = LoggerFactory.getLogger(OntServiceTest.class.getName());
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(TestResource.class).register(RestExceptionMapper.class);
+        return new ResourceConfig(TestResource.class);
     }
 
     @Test

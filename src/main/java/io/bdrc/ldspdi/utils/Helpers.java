@@ -52,177 +52,183 @@ import io.bdrc.formatters.TTLRDFWriter;
 
 public class Helpers {
 
-	public static final ObjectMapper om = new ObjectMapper();
-	public static boolean prettyPrint = false;
+    public static final ObjectMapper om = new ObjectMapper();
+    public static boolean prettyPrint = false;
 
-	public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
 
-	public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
+    public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
 
-	public static InputStream getResourceOrFile(final String baseName) {
-		InputStream stream = null;
-		stream = Helpers.class.getClassLoader().getResourceAsStream("/" + baseName);
-		if (stream != null) {
-			return stream;
-		}
-		stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + baseName);
-		if (stream != null) {
-			return stream;
-		}
-		final String fileBaseName = "src/main/resources/" + baseName;
-		try {
-			stream = new FileInputStream(fileBaseName);
-			return stream;
-		} catch (FileNotFoundException e) {
-			log.debug("FileNotFound: " + baseName);
-			return null;
-		}
-	}
+    public static InputStream getResourceOrFile(final String baseName) {
+        InputStream stream = null;
+        stream = Helpers.class.getClassLoader().getResourceAsStream("/" + baseName);
+        if (stream != null) {
+            return stream;
+        }
+        stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + baseName);
+        if (stream != null) {
+            return stream;
+        }
+        final String fileBaseName = "src/main/resources/" + baseName;
+        try {
+            stream = new FileInputStream(fileBaseName);
+            return stream;
+        } catch (FileNotFoundException e) {
+            log.debug("FileNotFound: " + baseName);
+            return null;
+        }
+    }
 
-	public static String bdrcEncode(String url) {
-		String encoded = url.replace("\"", "%22");
-		encoded = encoded.replace(' ', '+');
-		encoded = encoded.replace("\'", "%27");
-		return encoded;
-	}
+    public static String bdrcEncode(String url) {
+        String encoded = url.replace("\"", "%22");
+        encoded = encoded.replace(' ', '+');
+        encoded = encoded.replace("\'", "%27");
+        return encoded;
+    }
 
-	public static boolean isValidURI(String uri) {
-		String[] schemes = { "http", "https" };
-		UrlValidator urlValidator = new UrlValidator(schemes);
-		return urlValidator.isValid(uri);
-	}
+    public static boolean isValidURI(String uri) {
+        String[] schemes = { "http", "https" };
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        return urlValidator.isValid(uri);
+    }
 
-	public static HashMap<String, String> convertMulti(MultivaluedMap<String, String> map) {
-		HashMap<String, String> copy = new HashMap<>();
-		Set<String> set = map.keySet();
-		for (String key : set) {
-			copy.put(key, map.getFirst(key));
-		}
-		return copy;
-	}
+    public static HashMap<String, String> convertMulti(MultivaluedMap<String, String> map) {
+        HashMap<String, String> copy = new HashMap<>();
+        Set<String> set = map.keySet();
+        for (String key : set) {
+            copy.put(key, map.getFirst(key));
+        }
+        return copy;
+    }
 
-	public static HashMap<String, String> convertMulti(Map<String, String[]> map) {
-		HashMap<String, String> copy = new HashMap<>();
-		Set<String> set = map.keySet();
-		for (String key : set) {
-			copy.put(key, map.get(key)[0]);
-		}
-		return copy;
-	}
+    public static HashMap<String, String> convertMulti(Map<String, String[]> map) {
+        HashMap<String, String> copy = new HashMap<>();
+        Set<String> set = map.keySet();
+        for (String key : set) {
+            copy.put(key, map.get(key)[0]);
+        }
+        return copy;
+    }
 
-	public static StringBuffer getTemplateStr(String tlpPath) {
-		final InputStream stream = getResourceOrFile(tlpPath);
-		final BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
-		final StringBuffer sb = new StringBuffer();
-		try {
-			String line = buffer.readLine();
-			while (line != null) {
-				sb.append(line + System.lineSeparator());
-				line = buffer.readLine();
+    public static StringBuffer getTemplateStr(String tlpPath) {
+        final InputStream stream = getResourceOrFile(tlpPath);
+        final BufferedReader buffer = new BufferedReader(new InputStreamReader(stream));
+        final StringBuffer sb = new StringBuffer();
+        try {
+            String line = buffer.readLine();
+            while (line != null) {
+                sb.append(line + System.lineSeparator());
+                line = buffer.readLine();
 
-			}
-		} catch (IOException e) {
-			log.error("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml()");
-		}
-		return sb;
-	}
+            }
+        } catch (IOException e) {
+            log.error("Unable to parse the html multi Choices template in Helpers.getMultiChoicesHtml()");
+        }
+        return sb;
+    }
 
-	public static String getMultiChoicesHtml(final String path, final boolean resource) {
-		final StringBuilder sb = new StringBuilder();
-		for (final Entry<String, MediaType> e : BudaMediaTypes.getResExtensionMimeMap().entrySet()) {
-			final String ext = e.getKey();
-			final String mimeDesc = e.getValue().toString();
-			if (resource) {
-				sb.append("<tr><td><a href=\"" + path + "." + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
-			} else {
-				sb.append("<tr><td><a href=\"" + path + "&format=" + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
-			}
-		}
-		final HashMap<String, String> map = new HashMap<>();
-		map.put("path", path);
-		map.put("rows", sb.toString());
-		StringSubstitutor s = new StringSubstitutor(map);
-		return s.replace(multiChoiceTpl);
-	}
+    public static String getMultiChoicesHtml(final String path, final boolean resource) {
+        final StringBuilder sb = new StringBuilder();
+        for (final Entry<String, MediaType> e : BudaMediaTypes.getResExtensionMimeMap().entrySet()) {
+            final String ext = e.getKey();
+            final String mimeDesc = e.getValue().toString();
+            if (resource) {
+                sb.append("<tr><td><a href=\"" + path + "." + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
+            } else {
+                sb.append("<tr><td><a href=\"" + path + "&format=" + ext + "\">" + path + "." + ext + "</a><td>" + mimeDesc + "</td></tr>\n");
+            }
+        }
+        final HashMap<String, String> map = new HashMap<>();
+        map.put("path", path);
+        map.put("rows", sb.toString());
+        StringSubstitutor s = new StringSubstitutor(map);
+        return s.replace(multiChoiceTpl);
+    }
 
-	public static StreamingResponseBody getStream(String obj) {
-		final StreamingResponseBody stream = new StreamingResponseBody() {
-			@Override
-			public void writeTo(final OutputStream os) throws IOException {
-				os.write(obj.getBytes());
-			}
-		};
-		return stream;
-	}
+    public static StreamingResponseBody getStream(String obj) {
+        final StreamingResponseBody stream = new StreamingResponseBody() {
+            @Override
+            public void writeTo(final OutputStream os) throws IOException {
+                os.write(obj.getBytes());
+            }
+        };
+        return stream;
+    }
 
-	public static StreamingResponseBody getJsonObjectStream(Object obj) {
-		try {
-			om.writer().writeValue(System.out, obj);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		final StreamingResponseBody stream = new StreamingResponseBody() {
-			@Override
-			public void writeTo(OutputStream os) throws IOException, WebApplicationException {
-				if (prettyPrint)
-					om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
-				else
-					om.writeValue(os, obj);
-			}
-		};
-		return stream;
-	}
+    public static StreamingResponseBody getJsonObjectStream(Object obj) {
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+                if (prettyPrint)
+                    om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
+                else
+                    om.writeValue(os, obj);
+            }
+        };
+    }
 
-	public static byte[] getJsonStream(Object obj) {
-		try {
-			return om.writeValueAsBytes(obj);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new byte[0];
-	}
+    public static byte[] getJsonStream(Object obj) {
+        try {
+            return om.writeValueAsBytes(obj);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new byte[0];
+    }
 
-	public static StreamingResponseBody getModelStream(final Model model, final String format, final String res, DocType docType) {
-		final StreamingResponseBody stream = new StreamingResponseBody() {
-			@Override
-			public void writeTo(OutputStream os) {
-				if (format.equals("jsonld")) {
-					final Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
-					JSONLDFormatter.jsonObjectToOutputStream(json, os);
-					return;
-				}
-				final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
-				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-					writer.output(os);
-					return;
-				}
-				model.write(os, JenaFormat);
-			}
-		};
-		return stream;
-	}
+    public static StreamingResponseBody getModelStream(final Model model, final String format, final String res, DocType docType) {
 
-	public static StreamingResponseBody getModelStream(final Model model, final String format) {
-		StreamingResponseBody stream = new StreamingResponseBody() {
-			@Override
-			public void writeTo(OutputStream os) {
-				if (format.equals("jsonld")) {
-					JSONLDFormatter.writeModelAsCompact(model, os);
-					return;
-				}
-				final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
-				if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-					final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-					writer.output(os);
-					return;
-				}
-				model.write(os, JenaFormat);
-			}
-		};
-		return stream;
-	}
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) {
+                if (format.equals("jsonld")) {
+                    Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
+                    JSONLDFormatter.jsonObjectToOutputStream(json, os);
+
+                } else {
+                    String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
+                    if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+                        writer.output(os);
+                    }
+                    model.write(os, JenaFormat);
+                }
+            }
+        };
+    }
+
+    public static StreamingResponseBody getModelStream(final Model model, final String format) {
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) {
+                if (format.equals("jsonld")) {
+                    JSONLDFormatter.writeModelAsCompact(model, os);
+                    return;
+                }
+                final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
+                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+                    writer.output(os);
+                    return;
+                }
+                model.write(os, JenaFormat);
+            }
+        };
+    }
+
+    public static StreamingResponseBody getModelStream(final Model model) {
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) {
+                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+                writer.output(os);
+            }
+        };
+    }
+
+    public static boolean equals(MediaType mt, MediaType mt1) {
+        return (mt.getType().equals(mt1.getType()) && mt.getSubtype().equals(mt1.getSubtype()));
+    }
 
 }

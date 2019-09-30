@@ -1,35 +1,46 @@
 package io.bdrc.ldspdi.test.annotations;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
-
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
+import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.test.Utils;
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
-public class AnnotationTest extends JerseyTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { AnnotationEndpoint.class, PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@EnableAutoConfiguration
+public class AnnotationTest {
+
+    @Autowired
+    Environment environment;
 
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
@@ -37,6 +48,7 @@ public class AnnotationTest extends JerseyTest {
     public static String fusekiUrl;
     public final static Logger log = LoggerFactory.getLogger(AnnotationTest.class.getName());
     public final static String JsonLdCTWithAnnoProfile = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"";
+
     public final static String JsonLdCTWithOaProfile = "application/ld+json;profile=\"http://www.w3.org/ns/oa.jsonld\"";
 
     @BeforeClass
@@ -56,22 +68,39 @@ public class AnnotationTest extends JerseyTest {
         server.join();
     }
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(AnnotationEndpoint.class).register(RestExceptionMapper.class);
-    }
-
     @Test
     public void basicContentType() throws JsonProcessingException, IOException {
-        final Response res = target("/annotation/AN123")
-                .request()
-                .header("Accept", JsonLdCTWithAnnoProfile)
-                .get();
-        System.out.println(res.readEntity(String.class));
-        System.out.println(res.getHeaders());
-        assertTrue(res.getStatus() == 200);
-        System.out.println(res.getHeaderString("Content-Type"));
-        //assertTrue(res.getHeaderString("Content-Type").equals(JsonLdCTWithAnnoProfile));
+
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/annotations/AN1234");
+        get.addHeader("Accept", JsonLdCTWithAnnoProfile);
+        HttpResponse response = client.execute(get);
+        System.out.println("result:");
+        System.out.println(response.getStatusLine().getStatusCode());
+        HttpEntity ent = response.getEntity();
+        // ent.writeTo(System.out);
+        System.out.println(EntityUtils.toString(ent, "UTF-8"));
+        assert (response.getStatusLine().getStatusCode() == 200);
+
+        // assertTrue(response.getFirstHeader("Content-Type").getValue().equals(JsonLdCTWithAnnoProfile));
+    }
+
+    // @Test
+    public void basicType() throws JsonProcessingException, IOException {
+
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/P1AG29");
+        get.addHeader("Accept", "application/ld+json");
+        HttpResponse response = client.execute(get);
+
+        System.out.println("result:");
+        System.out.println(response.getStatusLine().getStatusCode());
+        HttpEntity ent = response.getEntity();
+        // ent.writeTo(System.out);
+        System.out.println(EntityUtils.toString(ent, "UTF-8"));
+        assert (response.getStatusLine().getStatusCode() == 200);
+
+        // assertTrue(response.getFirstHeader("Content-Type").getValue().equals(JsonLdCTWithAnnoProfile));
     }
 
 }

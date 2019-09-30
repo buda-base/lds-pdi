@@ -27,8 +27,8 @@ import io.bdrc.restapi.exceptions.RestException;
 public class CollectionUtils {
 
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
-    public static final Map<Prefer,String> preferToPagePref = new HashMap<>();
-    public static final Map<Character,Prefer> pageUrlCharToPrefer = new HashMap<>();
+    public static final Map<Prefer, String> preferToPagePref = new HashMap<>();
+    public static final Map<Character, Prefer> pageUrlCharToPrefer = new HashMap<>();
 
     // in a minimal representation, the server can choose between links to
     // IRI or description pages. This option is set here:
@@ -43,21 +43,19 @@ public class CollectionUtils {
     public static final Property annToColl = ResourceFactory.createProperty(BDO, "annInLayer");
 
     public static enum SubsetType {
-        VOLUMEPAGES,
-        ETEXTCHARS,
-        NONE
-        ;
+        VOLUMEPAGES, ETEXTCHARS, NONE;
     }
 
-    public static final Map<String,SubsetType> subsetUrlEltToSubsetType = new HashMap<>();
-    public static final Map<SubsetType,String> subsetToURI = new HashMap<>();
+    public static final Map<String, SubsetType> subsetUrlEltToSubsetType = new HashMap<>();
+    public static final Map<SubsetType, String> subsetToURI = new HashMap<>();
 
     static {
         preferToPagePref.put(Prefer.MINIMAL, "pm");
         preferToPagePref.put(Prefer.IRI, "pi");
         preferToPagePref.put(Prefer.DESCRIPTION, "pd");
 
-        //pageUrlCharToPrefer.put('m', Prefer.MINIMAL); // pages in minimal mode don't make sense
+        // pageUrlCharToPrefer.put('m', Prefer.MINIMAL); // pages in minimal mode don't
+        // make sense
         pageUrlCharToPrefer.put('i', Prefer.IRI);
         pageUrlCharToPrefer.put('d', Prefer.DESCRIPTION);
 
@@ -69,8 +67,6 @@ public class CollectionUtils {
         subsetToURI.put(SubsetType.NONE, "http://purl.bdrc.io/resource/SubsettingNone");
     }
 
-
-
     public static Resource getPageResource(final int pagenum, final String collectionFullUri, final Prefer prefer) {
         final StringBuilder sb = new StringBuilder(collectionFullUri);
         sb.append('/');
@@ -80,11 +76,9 @@ public class CollectionUtils {
         return ResourceFactory.createResource(sb.toString());
     }
 
-    static class SimpleUriResourceComparator implements Comparator<Resource>
-    {
+    static class SimpleUriResourceComparator implements Comparator<Resource> {
         @Override
-        public int compare(Resource s1, Resource s2)
-        {
+        public int compare(Resource s1, Resource s2) {
             return s1.getURI().compareTo(s2.getURI());
         }
     }
@@ -104,7 +98,7 @@ public class CollectionUtils {
         int total = 0;
         final Set<Resource> items = new TreeSet<Resource>(new SimpleUriResourceComparator());
         final Selector sel = new SimpleSelector(null, annToColl, main);
-        final StmtIterator it =  model.listStatements(sel);
+        final StmtIterator it = model.listStatements(sel);
         while (it.hasNext()) {
             final Statement currentS = it.next();
             final Resource ann = currentS.getSubject();
@@ -135,25 +129,24 @@ public class CollectionUtils {
             rangebegin = Integer.parseInt(subcoordinates);
             if (rangebegin < 0)
                 throw new NumberFormatException();
-            return new Integer[] {rangebegin, rangebegin};
+            return new Integer[] { rangebegin, rangebegin };
         }
         if (dashidx == 0) {
             rangeend = Integer.parseInt(subcoordinates.substring(1));
             if (rangeend < 1)
                 throw new NumberFormatException();
-            return new Integer[] {0, rangeend};
+            return new Integer[] { 0, rangeend };
         }
-        if (dashidx == strlen-1) {
+        if (dashidx == strlen - 1) {
             rangebegin = Integer.parseInt(subcoordinates.substring(0, dashidx));
-            return new Integer[] {rangebegin, rangeIdxInfinit};
+            return new Integer[] { rangebegin, rangeIdxInfinit };
         }
         rangebegin = Integer.parseInt(subcoordinates.substring(0, dashidx));
-        rangeend = Integer.parseInt(subcoordinates.substring(dashidx+1));
-        return new Integer[] {rangebegin, rangeend};
+        rangeend = Integer.parseInt(subcoordinates.substring(dashidx + 1));
+        return new Integer[] { rangebegin, rangeend };
     }
 
-    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl,
-            final String subtypeUrlElt, final String subcoordinates, final String collectionAlias) throws RestException {
+    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl, final String subtypeUrlElt, final String subcoordinates, final String collectionAlias) throws RestException {
         final SubsetType subType = subsetUrlEltToSubsetType.get(subtypeUrlElt);
         if (subType == null) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
@@ -167,11 +160,10 @@ public class CollectionUtils {
         return getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subType, range, collectionAlias);
     }
 
-    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl,
-            final SubsetType subType, final Integer[] range, final String collectionAlias) throws RestException {
+    public static Model getSubsetGraph(final String prefixedCollectionRes, final Prefer prefer, final String fusekiUrl, final SubsetType subType, final Integer[] range, final String collectionAlias) throws RestException {
         final String queryFileName = AnnotationCollectionEndpoint.preferToQueryFile.get(prefer);
-        final LdsQuery qfp = LdsQueryService.get(queryFileName,"library");
-        final Map<String,String> args = new HashMap<>();
+        final LdsQuery qfp = LdsQueryService.get(queryFileName, "library");
+        final Map<String, String> args = new HashMap<>();
         args.put("R_SUBMETHOD", subsetToURI.get(subType));
         args.put("R_RES", prefixedCollectionRes);
         args.put("R_RESALIAS", collectionAlias);
@@ -180,6 +172,5 @@ public class CollectionUtils {
         final String query = qfp.getParametizedQuery(args, false);
         return QueryProcessor.getGraph(query, fusekiUrl, null);
     }
-
 
 }

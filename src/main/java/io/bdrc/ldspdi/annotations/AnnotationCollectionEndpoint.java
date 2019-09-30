@@ -3,54 +3,54 @@ package io.bdrc.ldspdi.annotations;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriInfo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
-import io.bdrc.ldspdi.utils.ResponseOutputStream;
+import io.bdrc.ldspdi.utils.BudaMediaTypes;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
-@Path("/anncollection/")
+@RestController
+@RequestMapping("/anncollection/*")
 public class AnnotationCollectionEndpoint {
+
     public final static Logger log = LoggerFactory.getLogger(AnnotationCollectionEndpoint.class.getName());
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
-    // we need to transform collections into sc:AnnotationLists, we do so when we receive the profile:
+    // we need to transform collections into sc:AnnotationLists, we do so when we
+    // receive the profile:
 
-    static final Integer[] defaultRange = new Integer[]{0,0};
+    static final Integer[] defaultRange = new Integer[] { 0, 0 };
 
     public static enum Prefer {
-        MINIMAL,
-        IRI,
-        DESCRIPTION
-        ;
+        MINIMAL, IRI, DESCRIPTION;
     }
 
     public final static String PREFER_LDP_PMC = "return=representation;include=\"http://www.w3.org/ns/ldp#PreferMinimalContainer\"";
     public final static String PREFER_OA_PCI = "return=representation;include=\"http://www.w3.org/ns/oa#PreferContainedIRIs\"";
     public final static String PREFER_OA_PCD = "return=representation;include=\"http://www.w3.org/ns/oa#PreferContainedDescriptions\"";
 
-    static final Map<Prefer,String> preferToQueryFile = new HashMap<>();
+    static final Map<Prefer, String> preferToQueryFile = new HashMap<>();
     static {
-        preferToQueryFile.put(Prefer.MINIMAL,     "AnnCollection-minimal.arq");
-        preferToQueryFile.put(Prefer.IRI,         "AnnCollection-iri.arq");
+        preferToQueryFile.put(Prefer.MINIMAL, "AnnCollection-minimal.arq");
+        preferToQueryFile.put(Prefer.IRI, "AnnCollection-iri.arq");
         preferToQueryFile.put(Prefer.DESCRIPTION, "AnnCollection-description.arq");
     }
 
@@ -69,71 +69,53 @@ public class AnnotationCollectionEndpoint {
         }
     }
 
-    @GET
-    @Path("/{res}")
+    @GetMapping("/{res}")
     @SpringCacheControl()
     // whole collections (no subset)
-    public Response getWholeCollection(@PathParam("res") final String res,
-            @HeaderParam("Accept") final String accept,
-            @HeaderParam("Prefer") final String preferHeader,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getWholeCollection() with URL: {}, accept: {}", info.getPath(), accept);
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+    public ResponseEntity<StreamingResponseBody> getWholeCollection(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept,
+            @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
+        log.info("Call to getWholeCollection() with URL: {}, accept: {}", request.getServletPath(), accept);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (accept == null) {
-            mediaType = MediaTypeUtils.MT_JSONLD;
+            mediaType = BudaMediaTypes.MT_JSONLD;
         } else {
-            mediaType = MediaTypeUtils.getMediaType(request, accept, MediaTypeUtils.resVariants);
+            mediaType = BudaMediaTypes.selectVariant(accept, BudaMediaTypes.resVariants);
             if (mediaType == null)
-                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+                return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
-        if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
-            return AnnotationEndpoint.htmlResponse(info, prefixedCollectionRes);
+        if (mediaType.equals(MediaType.TEXT_HTML))
+            AnnotationUtils.htmlResponse(request, response, prefixedCollectionRes);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), "Choice");
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    @GET
-    @Path("/{res}.{ext}")
+    @GetMapping("/{res}.{ext}")
     @SpringCacheControl()
-    public Response getWholeCollectionSuffix(@PathParam("res") final String res,
-            @PathParam("ext") final String ext,
-            @HeaderParam("Prefer") final String preferHeader,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getWholeCollectionSuffix() with URL: {}", info.getPath());
-        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
+            HttpServletRequest request) throws RestException {
+        log.info("Call to getWholeCollectionSuffix() with URL: {}", request.getServletPath());
+        final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationEndpoint.mediaTypeChoiceResponse(info);
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+            return AnnotationUtils.mediaTypeChoiceResponse(request);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), null);
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), null);
     }
 
-    @GET
-    @Path("/{res}/p{ptype}/{pnum}")
+    @GetMapping("/{res}/p{ptype}/{pnum}")
     @SpringCacheControl()
     // Pages of whole collections
-    // this is almost identical as the getWholeCollection because collections currently
+    // this is almost identical as the getWholeCollection because collections
+    // currently
     // have only one page. The only difference is the json serialization.
-    public Response getWholeCollectionPage(@PathParam("res") final String res,
-            @HeaderParam("Accept") final String accept,
-            @PathParam("ptype") final char ptype,
-            @PathParam("pnum") final int pnum,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", info.getPath(), accept);
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("ptype") final char ptype,
+            @PathVariable("pnum") final int pnum, HttpServletRequest request) throws RestException {
+        log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
         if (prefer == null || pnum != 1) { // all collections currently have 1 page
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
@@ -141,165 +123,128 @@ public class AnnotationCollectionEndpoint {
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (accept == null) {
-            mediaType = MediaTypeUtils.MT_JSONLD;
+            mediaType = BudaMediaTypes.MT_JSONLD;
         } else {
-            mediaType = MediaTypeUtils.getMediaType(request, accept, MediaTypeUtils.resVariantsNoHtml);
+            mediaType = BudaMediaTypes.selectVariant(accept, BudaMediaTypes.resVariantsNoHtml);
             if (mediaType == null)
-                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+                return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), "Choice");
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    @GET
-    @Path("/{res}/p{ptype}/{pnum}.{ext}")
+    @GetMapping("/{res}/p{ptype}/{pnum}.{ext}")
     @SpringCacheControl()
-    public Response getWholeCollectionPageSuffix(@PathParam("res") final String res,
-            @PathParam("ext") final String ext,
-            @PathParam("ptype") final char ptype,
-            @PathParam("pnum") final int pnum,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getWholeCollectionPageSuffix() with URL: {}", info.getPath());
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final int pnum,
+            HttpServletRequest request) throws RestException {
+        log.info("Call to getWholeCollectionPageSuffix() with URL: {}", request.getServletPath());
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
         if (prefer == null || pnum != 1) { // all collections currently have 1 page
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
-        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+        final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+            return AnnotationUtils.mediaTypeChoiceResponse(request);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
-        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX+res, mediaType, prefer, info.getPath(), null);
+        return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), null);
     }
 
-    @GET
-    @Path("/{res}/sub/{subtype}/{subcoordinates}")
+    @GetMapping("/{res}/sub/{subtype}/{subcoordinates}")
     @SpringCacheControl()
     // Collection subset
     // a subcollection corresponding to a page or character range
-    public Response getCollectionSubset(@PathParam("res") final String res,
-            @HeaderParam("Accept") final String accept,
-            @PathParam("subtype") final String subtype,
-            @PathParam("subcoordinates") final String subcoordinates,
-            @HeaderParam("Prefer") final String preferHeader,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", info.getPath(), accept);
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
-        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
+    public ResponseEntity<StreamingResponseBody> getCollectionSubset(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request) throws RestException {
+        log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (accept == null) {
-            mediaType = MediaTypeUtils.MT_JSONLD;
+            mediaType = BudaMediaTypes.MT_JSONLD;
         } else {
-            mediaType = MediaTypeUtils.getMediaType(request, accept, MediaTypeUtils.resVariantsNoHtml);
+            mediaType = BudaMediaTypes.selectVariant(accept, BudaMediaTypes.resVariantsNoHtml);
             if (mediaType == null)
-                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+                return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath(), "Choice");
+        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    @GET
-    @Path("/{res}/sub/{subtype}/{subcoordinates}.{ext}")
+    @GetMapping("/{res}/sub/{subtype}/{subcoordinates}.{ext}")
     @SpringCacheControl()
-    public Response getCollectionSubsetSuffix(@PathParam("res") final String res,
-            @PathParam("ext") final String ext,
-            @PathParam("subtype") final String subtype,
-            @PathParam("subcoordinates") final String subcoordinates,
-            @HeaderParam("Prefer") final String preferHeader,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getCollectionSubsetSuffix() with URL: {}", info.getPath());
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
-        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
-        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader("Prefer") final String preferHeader, HttpServletRequest request) throws RestException {
+        log.info("Call to getCollectionSubsetSuffix() with URL: {}", request.getServletPath());
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
+        final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+            return AnnotationUtils.mediaTypeChoiceResponse(request);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, info.getPath(), null);
+        return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
     }
 
-    @GET
-    @Path("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
+    @GetMapping("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
     @SpringCacheControl()
     // Collection subset page
-    public Response getCollectionSubsetPage(@PathParam("res") final String res,
-            @HeaderParam("Accept") final String accept,
-            @PathParam("subtype") final String subtype,
-            @PathParam("subcoordinates") final String subcoordinates,
-            @PathParam("ptype") final char ptype,
-            @PathParam("pnum") final int pnum,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getCollectionSubsetPage() with URL: {}, accept: {}", info.getPath(), accept);
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
+        if (pnum.contains(".")) {
+            String[] parts = pnum.split("\\.");
+            return getCollectionSubsetPageSuffix(res, parts[1], subtype, subcoordinates, ptype, parts[0], request);
+
+        }
+        log.info("Call to getCollectionSubsetPage() with URL: {}, accept: {}", request.getServletPath(), accept);
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
-        if (prefer == null || pnum != 1) { // all collections currently have 1 page
+        if (prefer == null || Integer.parseInt(pnum) != 1) { // all collections currently have 1 page
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
-        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
         if (accept == null) {
-            mediaType = MediaTypeUtils.MT_JSONLD;
+            mediaType = BudaMediaTypes.MT_JSONLD;
         } else {
-            mediaType = MediaTypeUtils.getMediaType(request, accept, MediaTypeUtils.resVariantsNoHtml);
+            mediaType = BudaMediaTypes.selectVariant(accept, BudaMediaTypes.resVariantsNoHtml);
             if (mediaType == null)
-                return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+                return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath(), "Choice");
+        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    @GET
-    @Path("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}.{ext}")
+    // @GetMapping("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}.{ext}")
     @SpringCacheControl()
-    public Response getCollectionSubsetPageSuffix(@PathParam("res") final String res,
-            @PathParam("ext") final String ext,
-            @PathParam("subtype") final String subtype,
-            @PathParam("subcoordinates") final String subcoordinates,
-            @PathParam("ptype") final char ptype,
-            @PathParam("pnum") final int pnum,
-            @Context final UriInfo info,
-            @Context final Request request,
-            @Context final HttpHeaders headers
-            ) throws RestException {
-        log.info("Call to getCollectionSubsetPage() with URL: {}", info.getPath());
-        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT+':'+res;
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
+
+        log.info("Call to getCollectionSubsetPage() with URL: {}", request.getServletPath());
+        final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
-        if (prefer == null || pnum != 1) { // all collections currently have 1 page
+        if (prefer == null || Integer.parseInt(pnum) != 1) { // all collections currently have 1 page
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedCollectionRes));
         }
-        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX+res+"/sub/"+subtype+"/"+subcoordinates;
-        final MediaType mediaType = MediaTypeUtils.getMimeFromExtension(ext);
+        final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
+        final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationEndpoint.mediaTypeChoiceResponse(info);
+            return AnnotationUtils.mediaTypeChoiceResponse(request);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
-        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, info.getPath(), null);
+        return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
     }
 
-    private Response getResponse(final Model model, final DocType docType,
-            final String collectionAliasUri, final MediaType mediaType, final Prefer prefer,
-            final String path, final String tcn) throws RestException {
+    private ResponseEntity<StreamingResponseBody> getResponse(final Model model, final DocType docType, final String collectionAliasUri, final MediaType mediaType, final Prefer prefer, final String path, final String tcn) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
-        final String ext = MediaTypeUtils.getExtFromMime(mediaType);
+        final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
-        final ResponseBuilder builder = Response.ok(ResponseOutputStream.getModelStream(model, ext, collectionAliasUri, docType));
-        return AnnotationEndpoint.setHeaders(builder,path, ext, tcn, null, mediaType, true)
-                .build();
+        BodyBuilder bb = ResponseEntity.ok();
+        bb = AnnotationUtils.setRespHeaders(bb, path, ext, tcn, null, mediaType, true);
+        return bb.body(Helpers.getModelStream(model, ext, collectionAliasUri, docType));
 
     }
 

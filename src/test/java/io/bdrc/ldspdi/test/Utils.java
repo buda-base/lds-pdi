@@ -38,39 +38,26 @@ public class Utils {
     final static String TESTDIR = "src/test/resources/ttl/";
     final static String TmpDIR = "/tmp";
 
-    public static String prefixes=
-            "PREFIX : <http://purl.bdrc.io/ontology/core/> "
-                    +" PREFIX adm: <http://purl.bdrc.io/ontology/admin/> "
-                    +" PREFIX bdr: <http://purl.bdrc.io/resource/> "
-                    +" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                    +" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
-                    +" PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-                    +" PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>"
-                    +" PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
+    public static String prefixes = "PREFIX : <http://purl.bdrc.io/ontology/core/> " + " PREFIX adm: <http://purl.bdrc.io/ontology/admin/> " + " PREFIX bdr: <http://purl.bdrc.io/resource/> "
+            + " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + " PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + " PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>" + " PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
 
-    public static String placePrefixes=
-            "PREFIX : <http://purl.bdrc.io/ontology/core/> "
-                    +" PREFIX adm: <http://purl.bdrc.io/ontology/admin/> "
-                    +" PREFIX bdr: <http://purl.bdrc.io/resource/> "
-                    +" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                    +" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
-                    +" PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-                    +" PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>"
-                    +" PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>"
-                    +" PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
+    public static String placePrefixes = "PREFIX : <http://purl.bdrc.io/ontology/core/> " + " PREFIX adm: <http://purl.bdrc.io/ontology/admin/> " + " PREFIX bdr: <http://purl.bdrc.io/resource/> "
+            + " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + " PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + " PREFIX tbr: <http://purl.bdrc.io/ontology/toberemoved/>" + " PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>" + " PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
 
-    public static String convertToString(Map<String,String> prefixMap){
-        String pref="";
-        Set<String> keys=prefixMap.keySet();
-        for (String key : keys){
-            String tmp=" PREFIX "+key+ ": <"+prefixMap.get(key)+"> ";//+System.lineSeparator();
-            pref=pref+tmp;
+    public static String convertToString(Map<String, String> prefixMap) {
+        String pref = "";
+        Set<String> keys = prefixMap.keySet();
+        for (String key : keys) {
+            String tmp = " PREFIX " + key + ": <" + prefixMap.get(key) + "> ";// +System.lineSeparator();
+            pref = pref + tmp;
         }
         return pref;
     }
 
-    static HashMap<String,String> getContentTypes(){
-        HashMap<String,String> map=new HashMap<>();
+    static HashMap<String, String> getContentTypes() {
+        HashMap<String, String> map = new HashMap<>();
         map.put("ttl", "text/turtle");
         map.put("nt", "application/n-triples");
         map.put("nq", "application/n-quads");
@@ -87,8 +74,8 @@ public class Utils {
         return map;
     }
 
-    static ArrayList<String> getResourcesList(){
-        ArrayList<String> res=new ArrayList<>();
+    static ArrayList<String> getResourcesList() {
+        ArrayList<String> res = new ArrayList<>();
         res.add("R8LS12819");
         res.add("C68");
         res.add("I00KG01506_I001");
@@ -107,22 +94,21 @@ public class Utils {
         return res;
     }
 
-    public static void loadDataInModel(Model model){
-        //Loads the test dataset
+    public static void loadDataInModel(Model model) {
+        // Loads the test dataset
         ArrayList<String> list = getResourcesList();
-        for(String res : list){
-            final Model m = getModelFromFileName(Utils.TESTDIR+res+".ttl", Lang.TURTLE);
+        for (String res : list) {
+            final Model m = getModelFromFileName(Utils.TESTDIR + res + ".ttl", Lang.TURTLE);
             model.add(m);
         }
+        model.write(System.out, "TURTLE");
     }
 
     public static Model getModelFromFileName(String fname, Lang lang) {
         final Model m = ModelFactory.createDefaultModel();
         final Graph g = m.getGraph();
         try {
-            RDFParserBuilder pb = RDFParser.create()
-                    .source(fname)
-                    .lang(lang);
+            RDFParserBuilder pb = RDFParser.create().source(fname).lang(lang);
             pb.parse(StreamRDFLib.graph(g));
         } catch (RiotException e) {
             e.printStackTrace();

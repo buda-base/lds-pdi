@@ -35,7 +35,6 @@ import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestExceptionMapper;
 
 public class TemplatesTest extends JerseyTest {
 
@@ -65,7 +64,7 @@ public class TemplatesTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(PublicTemplatesResource.class).register(OntData.class).register(RestExceptionMapper.class);
+        return new ResourceConfig(PublicTemplatesResource.class).register(OntData.class);
     }
 
     @Test
