@@ -2,21 +2,27 @@ package io.bdrc.ldspdi.test;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -24,7 +30,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
-public class MarcExportTest extends JerseyTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@EnableAutoConfiguration
+public class MarcExportTest {
+
+    @Autowired
+    Environment environment;
 
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
@@ -54,16 +66,14 @@ public class MarcExportTest extends JerseyTest {
         server.join();
     }
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(PublicDataResource.class);
-    }
-
     @Test
-    public void testSimpleRequestSimple() {
-        final Response res = target("/resource/I23819.mrcx").request().get();
+    public void testSimpleRequestSimple() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/I23819.mrcx");
+        HttpResponse response = client.execute(get);
+        System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
-        System.out.println(res.readEntity(String.class));
+        response.getEntity().writeTo(System.out);
     }
 
 }

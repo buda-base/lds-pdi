@@ -95,9 +95,7 @@ public class AnnotationTest {
 
         System.out.println("result:");
         System.out.println(response.getStatusLine().getStatusCode());
-        HttpEntity ent = response.getEntity();
-        // ent.writeTo(System.out);
-        System.out.println(EntityUtils.toString(ent, "UTF-8"));
+        response.getEntity().writeTo(System.out);
         assert (response.getStatusLine().getStatusCode() == 200);
 
         // assertTrue(response.getFirstHeader("Content-Type").getValue().equals(JsonLdCTWithAnnoProfile));
