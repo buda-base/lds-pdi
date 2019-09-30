@@ -294,13 +294,13 @@ public class PublicDataResource {
     public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable final String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader(value = "Accept", required = false) String format,
             HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") Integer startChar, @RequestParam(value = "endChar", defaultValue = "999999999") Integer endChar)
             throws RestException, IOException {
+        MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
             return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, response, request);
         }
         final String prefixedRes = RES_PREFIX_SHORT + res;
         log.info("Call to getResourceGraphGET() with URL: {}, accept: {}, res {}", request.getServletPath(), format, res);
-        MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (format == null) {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
@@ -313,7 +313,7 @@ public class PublicDataResource {
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
             return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
         }
-        if (mediaType.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             String type = getDilaResourceType(res);
             if (!type.equals("")) {
                 type = type + "/?fromInner=";

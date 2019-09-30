@@ -9,10 +9,16 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -26,14 +32,17 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -43,14 +52,19 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.ldspdi.utils.MediaTypeUtils;
 
-public class ResServiceTest extends JerseyTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@EnableAutoConfiguration
+public class ResServiceTest {
+
+    @Autowired
+    Environment environment;
 
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
     public final static Logger log = LoggerFactory.getLogger(ResServiceTest.class.getName());
-    public final static String[] methods = { "GET" /* , "POST" */ };
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
@@ -69,79 +83,78 @@ public class ResServiceTest extends JerseyTest {
         server.join();
     }
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(PublicDataResource.class);
+    @Test
+    public void AllOk() throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/C68.ttl");
+        HttpResponse resp = client.execute(get);
+        assertTrue(resp.getStatusLine().getStatusCode() == 200);
+        resp.getEntity().writeTo(System.out);
     }
 
     @Test
-    public void AllOk() {
-        Response res = target("/resource/C68.ttl").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
-        assertTrue(res.getStatus() == 200);
-        System.out.println(res.readEntity(String.class));
-        // assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68",true)));
+    public void html() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().disableRedirectHandling().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/P1AG29");
+        get.setHeader("Accept", "text/html");
+        HttpResponse resp = client.execute(get);
+        resp.getEntity().writeTo(System.out);
+        System.out.println("STATUS >> " + resp.getStatusLine().getStatusCode());
+        assertTrue(resp.getStatusLine().getStatusCode() == 302);
+        assertTrue(resp.getFirstHeader("TCN").getValue().equals("Choice"));
+        assertTrue(checkAlternates("/resource/P1AG29", resp.getFirstHeader("Alternates").getValue()));
     }
 
     @Test
-    public void html() {
-        for (String method : methods) {
-            Response res = target("/resource/P1AG29").request().accept("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
-            assertTrue(res.getStatus() == 303);
-            assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
-            assertTrue(res.getHeaderString("TCN").equals("Choice"));
-            assertTrue(checkAlternates("resource/P1AG29", res.getHeaderString("Alternates")));
-            // assertTrue(res.getHeaderString("Location").endsWith("show/bdr:P1AG29"));
-        }
+    public void wrongAccept() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().disableRedirectHandling().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/test");
+        get.setHeader("Accept", "image/jpeg");
+        HttpResponse resp = client.execute(get);
+        assertTrue(resp.getStatusLine().getStatusCode() == 406);
+        assertTrue(resp.getFirstHeader("TCN").getValue().equals("List"));
+
     }
 
     @Test
-    public void wrongAccept() {
-        for (String method : methods) {
-            Response res = target("/resource/test").request().accept("application/xhtml+xml").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
-            if (method.equals("GET")) {
-                assertTrue(res.getStatus() == 406);
-                assertTrue(res.getHeaderString("TCN").equals("List"));
-            }
-            if (method.equals("POST")) {
-                assertTrue(res.getStatus() == 406);
-            }
-        }
-    }
-
-    @Test
-    public void GetResourceByExtension() {
+    public void GetResourceByExtension() throws ClientProtocolException, IOException {
         Set<String> map = MediaTypeUtils.getResExtensionMimeMap().keySet();
         for (String ent : map) {
             if (ent.equals("html"))
                 continue;
-            Response res = target("/resource/P1AG29." + ent).request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
-            System.out.println("GetResourceByExtension() status :" + res.getStatus());
-            assertTrue(res.getStatus() == 200);
-            assertTrue(res.getHeaderString("Content-Type").equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
-            assertTrue(res.getHeaderString("Vary").equals("Negotiate, Accept"));
-            assertTrue(checkAlternates("resource/P1AG29", res.getHeaderString("Alternates")));
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/P1AG29." + ent);
+            HttpResponse resp = client.execute(get);
+            assertTrue(resp.getFirstHeader("Content-Type").getValue().equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
+            assertTrue(checkAlternates("/resource/P1AG29", resp.getFirstHeader("Alternates").getValue()));
         }
     }
 
     @Test
-    public void WrongResource() {
-        Response res = target("/resource/wrong.ttl").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
-        assertTrue(res.getStatus() == 404);
+    public void WrongResource() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/wrong.ttl");
+        HttpResponse resp = client.execute(get);
+        assertTrue(resp.getStatusLine().getStatusCode() == 404);
     }
 
     @Test
-    public void WrongExt() {
-        Response res = target("/resource/C68.wrong").request().property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).get();
-        assertTrue(res.getStatus() == 300);
-        assertTrue(res.readEntity(String.class).equals(Helpers.getMultiChoicesHtml("/resource/C68", true)));
+    public void WrongExt() throws ParseException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/C68.wrong");
+        HttpResponse resp = client.execute(get);
+        assertTrue(resp.getStatusLine().getStatusCode() == 300);
+        assertTrue(EntityUtils.toString(resp.getEntity()).equals(Helpers.getMultiChoicesHtml("/resource/C68", true)));
     }
 
     @Test
-    public void nores() {
-        for (String method : methods) {
-            Response res = target("/resource/nonexistant").request().accept("text/turtle").property(ClientProperties.FOLLOW_REDIRECTS, Boolean.FALSE).method(method);
-            assertTrue(res.getStatus() == 404);
-        }
+    public void nores() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/nonexistant");
+        get.setHeader("Accept", "text/turtle");
+        HttpResponse resp = client.execute(get);
+        assertTrue(resp.getStatusLine().getStatusCode() == 404);
+
     }
 
     @Test
@@ -220,6 +233,7 @@ public class ResServiceTest extends JerseyTest {
         for (String test : alt2) {
             if (!alt1.contains(test)) {
                 log.error("Alternates check failed >>> " + test + alt1.contains(test));
+                System.out.println("Alternates check failed >>> " + test + alt1.contains(test));
                 return false;
             }
         }
