@@ -179,8 +179,9 @@ public class Helpers {
                     if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                         writer.output(os);
+                    } else {
+                        model.write(os, JenaFormat);
                     }
-                    model.write(os, JenaFormat);
                 }
             }
         };
