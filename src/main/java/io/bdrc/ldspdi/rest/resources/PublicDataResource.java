@@ -103,9 +103,9 @@ public class PublicDataResource {
     @SpringCacheControl()
     public ModelAndView getIndexPage() throws RestException, IOException {
         log.info("Call to getIndexPage()");
-        DocFileModel dfm = new DocFileModel();
+        // DocFileModel dfm = new DocFileModel();
         ModelAndView model = new ModelAndView();
-        model.addObject("model", dfm);
+        model.addObject("model", DocFileModel.getInstance());
         model.setViewName("index");
         return model;
     }
@@ -537,7 +537,7 @@ public class PublicDataResource {
         log.info("updating Ontology models() >>");
         Thread t = new Thread(new OntData());
         t.start();
-        return ResponseEntity.ok().body("Ontologies were updated");
+        return ResponseEntity.ok().body("Ontologies are being updated");
     }
 
     private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {

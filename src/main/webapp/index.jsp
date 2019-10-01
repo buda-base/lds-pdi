@@ -47,14 +47,14 @@ function browse(){
 </head>
 <body>
 <h1>${ServiceConfig.getProperty("brandName")} Public Data Interface</h1>
-        <p>This resource provides direct data access to the BDRC Library</p>        
+        <p>This resource provides direct data access to the ${ServiceConfig.getProperty("ontName")} Library</p>        
     
 <h2>Navigate through ${ServiceConfig.getProperty("ontName")}</h2>
 <p>You can use this service to access the current ${ServiceConfig.getProperty("ontName")} and discover the data model:</p>
 <p>ONTOLOGY SERVICE</p>
 <div> Browse an ontology : 
 <select id="uri">
-<c:forEach items="${model.ontos}" var="k">
+<c:forEach items="${model.getOntos()}" var="k">
   <option value="${k}">${k}</option>  
 </c:forEach>
 </select>
@@ -64,7 +64,7 @@ function browse(){
 </br>
 <div> View/download ontology files: 
 <select id="uri1">
-<c:forEach items="${model.ontos}" var="k">
+<c:forEach items="${model.getOntos()}" var="k">
   <option value="${k}">${k}</option>  
 </c:forEach>
 </select>
@@ -89,7 +89,7 @@ using this general url format:</p>
 <div align="center"><h2>Url specifications by query types</h2></div>
 <div align="center">
 
-<c:forEach items="${model.keys}" var="k">
+<c:forEach items="${model.getKeys()}" var="k">
     <c:set var="val" value="${k}"/>
     <div align="center">
        <h2>${k}</h2>

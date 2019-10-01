@@ -58,6 +58,7 @@ import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
+import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
@@ -218,6 +219,7 @@ public class PublicTemplatesResource {
         Thread t = new Thread(new GitService());
         t.start();
         Prefixes.loadPrefixes();
+        DocFileModel.clearCache();
         LdsQueryService.clearCache();
         ResultsCache.clearCache();
         return ResponseEntity.ok().body("Lds-queries have been updated");
