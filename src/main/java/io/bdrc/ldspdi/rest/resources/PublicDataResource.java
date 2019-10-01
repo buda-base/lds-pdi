@@ -383,6 +383,11 @@ public class PublicDataResource {
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
+        if (other.contains(".")) {
+            String[] parts = other.split("\\.");
+            log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
+            return getOntologyResourceAsFile(request, base, parts[0], parts[1]);
+        }
         log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
         boolean isBase = false;
         String baseUri = "";
