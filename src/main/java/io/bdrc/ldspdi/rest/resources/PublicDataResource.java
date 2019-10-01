@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.rest.resources;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -477,42 +478,41 @@ public class PublicDataResource {
                 return (ModelAndView) model;
             }
         }
-
         return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
     }
 
-    @GetMapping(value = "/{base : .*}/{other}.{ext}", produces = MediaType.TEXT_HTML_VALUE)
-    @SpringCacheControl()
-    public Object getOntologyResourceAsFile(HttpServletRequest request, @PathVariable String base, @PathVariable String other, @PathVariable String ext) throws RestException {
+    public Object getOntologyResourceAsFile(HttpServletRequest request, String base, String other, String ext) throws RestException {
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
-        log.info("In getOntologyResourceAsFile(), RES = {}", res);
+        log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
             OntModel model = OntData.getOntModelByBase(params.getBaseUri());
-            final StreamingResponseBody stream = new StreamingResponseBody() {
-                @Override
-                public void writeTo(OutputStream os) throws IOException {
-                    if (JenaLangStr == "STTL") {
-                        model.write(os, "TURTLE");
-                    } else {
-                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
-                        if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                            wr.setProperty("xmlbase", params.getBaseUri());
-                        }
-                        model.write(os, JenaLangStr);
-                    }
+            String t = null;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            if (JenaLangStr == "STTL") {
+                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
+                writer.output(baos);
+            }
+            if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                model.write(baos, "TURTLE");
+            } else {
+                org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                    wr.setProperty("xmlbase", params.getBaseUri());
                 }
-            };
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(stream);
+                wr.write(model, baos, params.getBaseUri());
+                t = baos.toString();
+            }
+            return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(t);
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
     }
 
