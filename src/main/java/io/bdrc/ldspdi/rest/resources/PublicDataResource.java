@@ -377,11 +377,12 @@ public class PublicDataResource {
 
     }
 
-    // @GetMapping(value = "/{base : .*}/{other}")
-    @GetMapping(value = "/{base:[a-z]+}/{other}")
+    @GetMapping(value = "/{base:[a-z]+}/**")
     @SpringCacheControl()
-    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base, @PathVariable String other) throws RestException, IOException {
+    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base/* , @PathVariable String other */) throws RestException, IOException {
         String path = request.getRequestURI();
+        log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
+        String other = request.getServletPath().substring(base.length() + 2);
         log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
         boolean isBase = false;
         String baseUri = "";
@@ -392,7 +393,7 @@ public class PublicDataResource {
             baseUri = parseBaseUri(tmp);
             isBase = true;
         }
-        log.info("getExtOntologyHomePage absolute path >> {}{}", request.getRequestURL().toString(), other);
+        log.info("getExtOntologyHomePage absolute path >> {} and other = {}", request.getRequestURL().toString(), other);
         if (OntPolicies.isBaseUri(parseBaseUri(tmp + other))) {
             baseUri = parseBaseUri(tmp + other);
             isBase = true;
