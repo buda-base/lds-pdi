@@ -35,7 +35,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.test.Utils;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { AnnotationEndpoint.class, PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = { AnnotationEndpoint.class, PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class AnnotationTest {
 
