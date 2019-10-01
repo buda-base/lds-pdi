@@ -1,7 +1,17 @@
 package io.bdrc.ldspdi.test;
 
-import java.io.IOException;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -11,35 +21,31 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.service.SpringBootLdspdi;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@AutoConfigureWebTestClient
-@SpringBootTest(classes = SpringBootLdspdi.class)
-@ActiveProfiles("local")
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableAutoConfiguration
+
 public class TxtExportTest {
+
+    @Autowired
+    Environment environment;
+
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
-    public final static Logger log = LoggerFactory.getLogger(TxtExportTest.class.getName());
-    
-    @Autowired
-	private WebTestClient webClient;
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
@@ -59,14 +65,14 @@ public class TxtExportTest {
     }
 
     @Test
-    public void testSimpleRequestSimple() {
-        final ResponseSpec res = this.webClient.get().uri(uriBuilder -> uriBuilder
-        	    .path("/resource/UT11577_004_0000.txt")
-                .queryParam("startChar", 1234)
-                .queryParam("endChar", 2444)
-    	    .build())
-            .exchange();
-        res.expectStatus().isOk();
-        System.out.println(res.toString());
+    public void testSimpleRequestSimple() throws NumberFormatException, URISyntaxException, ClientProtocolException, IOException {
+        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port"))).setPath("/resource/UT11577_004_0000.txt").setParameter("startChar", Integer.toString(1234))
+                .setParameter("endChar", Integer.toString(2444)).build();
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(uri);
+        HttpResponse resp = client.execute(get);
+        System.out.println(resp.getStatusLine());
+        resp.getEntity().writeTo(System.out);
+        assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 }

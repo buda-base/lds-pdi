@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -41,7 +40,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
-import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
@@ -58,9 +56,6 @@ public class JsonAPIResource {
     private List<String> fileList;
 
     public JsonAPIResource() throws RestException {
-        super();
-        ResourceConfig config = new ResourceConfig(JsonAPIResource.class);
-        config.register(CorsFilter.class);
         fileList = getQueryTemplates();
     }
 

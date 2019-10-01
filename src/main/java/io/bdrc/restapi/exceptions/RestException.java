@@ -1,23 +1,20 @@
 package io.bdrc.restapi.exceptions;
 
+public class RestException extends Exception {
 
-public class RestException extends Exception 
-{
-    
-    public static final int GENERIC_APP_ERROR_CODE=5001;
-    
+    public static final int GENERIC_APP_ERROR_CODE = 5001;
+
     private static final long serialVersionUID = -5379981810772284216L;
     int status;
     int code;
     String link;
     String developerMessage;
-    String message; 
+    String message;
 
     public RestException() {
     }
 
-    public RestException(int status, int code, String message,
-            String developerMessage, String link) {
+    public RestException(int status, int code, String message, String developerMessage, String link) {
         super(message);
         this.status = status;
         this.code = code;
@@ -34,7 +31,7 @@ public class RestException extends Exception
         this.developerMessage = null;
         this.link = null;
     }
-    
+
     public RestException(int status, LdsError err) {
         super(err.getMsg());
         this.status = status;
@@ -42,6 +39,26 @@ public class RestException extends Exception
         this.message = err.getMsg();
         this.developerMessage = null;
         this.link = null;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public String getDeveloperMessage() {
+        return developerMessage;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public void setStatus(int status) {

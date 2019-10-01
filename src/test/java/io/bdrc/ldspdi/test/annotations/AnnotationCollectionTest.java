@@ -34,7 +34,7 @@ import io.bdrc.ldspdi.test.Utils;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = (AnnotationCollectionEndpoint.class), webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = { AnnotationCollectionEndpoint.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class AnnotationCollectionTest {
 

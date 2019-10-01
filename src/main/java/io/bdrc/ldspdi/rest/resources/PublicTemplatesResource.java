@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HeaderParam;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -72,7 +71,7 @@ public class PublicTemplatesResource {
 
     @GetMapping(value = "/query/table/{file}")
     @SpringCacheControl()
-    public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @HeaderParam("fusekiUrl") final String fusekiUrl, @PathVariable("file") String file) throws RestException {
+    public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
 
@@ -97,7 +96,7 @@ public class PublicTemplatesResource {
         String fmt = hm.get(QueryConstants.FORMAT);
         if ("json".equals(fmt)) {
             Results r = new Results(res, hm);
-            byte[] buff = Helpers.getJsonStream(r);
+            byte[] buff = Helpers.getJsonBytesStream(r);
             return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
                     .body(new InputStreamResource(new ByteArrayInputStream(buff)));
         }
@@ -123,12 +122,13 @@ public class PublicTemplatesResource {
 
     @PostMapping(value = "/query/table/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SpringCacheControl()
-    public Object getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map, HttpServletRequest request)
-            throws RestException {
+    public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map,
+            HttpServletRequest request) throws RestException {
         log.info("Call to getQueryTemplateResultsJsonPost()");
+        System.out.println("MAP >> " + map);
         if (map == null || map.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
 
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
@@ -141,8 +141,8 @@ public class PublicTemplatesResource {
             map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
             map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
             Results r = new Results(res, map);
-            byte[] buff = Helpers.getJsonStream(r);
-            return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().body(new InputStreamResource(new ByteArrayInputStream(buff)));
+            String json = new String(Helpers.getJsonBytesStream(r));
+            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().body(Helpers.getStream(json));
         }
     }
 
@@ -153,6 +153,7 @@ public class PublicTemplatesResource {
         String path = request.getServletPath();
         MediaType variant = BudaMediaTypes.selectVariant(request.getHeader("Accept"), BudaMediaTypes.graphVariants);
         log.info("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}", path, format, variant);
+        System.out.println("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}" + path + "," + format + "," + variant);
         if (format == null && variant == null) {
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getGraphResourceHeaders(path, null, "List"));

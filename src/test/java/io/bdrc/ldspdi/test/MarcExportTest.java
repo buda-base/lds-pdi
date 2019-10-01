@@ -31,7 +31,7 @@ import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class MarcExportTest {
 

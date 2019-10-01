@@ -3,26 +3,35 @@ package io.bdrc.ldspdi.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,10 +42,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.LdsError;
+import io.bdrc.restapi.exceptions.LdsPdiExceptionHandler;
 
-public class TemplatesTest extends JerseyTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { PublicTemplatesResource.class, OntData.class, LdsPdiExceptionHandler.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableAutoConfiguration
+public class TemplatesTest {
+
+    @Autowired
+    Environment environment;
 
     private static FusekiServer server;
     private static Dataset srvds = DatasetFactory.createTxnMem();
@@ -62,30 +77,33 @@ public class TemplatesTest extends JerseyTest {
         server.join();
     }
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(PublicTemplatesResource.class).register(OntData.class);
-    }
-
     @Test
-    public void simpleGet() throws JsonProcessingException, IOException {
+    public void simplePost() throws JsonProcessingException, IOException {
+        ObjectMapper om = new ObjectMapper();
         Map<String, String> args = new HashMap<>();
         args.put("R_RES", "bdr:R8LS12819");
-        Response res = target("/query/graph/graph").request().accept(MediaTypeUtils.MT_JSONLD).post(Entity.json(args));
-        assertTrue(res.getStatus() == 200);
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/graph/graph");
+        post.addHeader("Accept", "application/ld+json");
+        post.addHeader("Content-Type", "application/json");
+        post.setEntity(new StringEntity(om.writeValueAsString(args)));
+        HttpResponse resp = client.execute(post);
+        assertTrue(resp.getStatusLine().getStatusCode() == 200);
+        String entity = EntityUtils.toString(resp.getEntity());
         final String expected = "{\n" + "  \"@id\" : \"bdr:R8LS12819\",\n" + "  \"adm:status\" : \"bdr:StatusReleased\",\n" + "  \"@context\" : \"http://purl.bdrc.io/context.jsonld\"\n" + "}\n";
         assertTrue(entity.equals(expected));
     }
 
     @Test
     public void wrongTemplateNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/table/wrongTemplateName").request().get();
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/wrongTemplateName");
+        HttpResponse resp = client.execute(get);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
         assertTrue(code == LdsError.PARSE_ERR);
     }
 
@@ -93,86 +111,127 @@ public class TemplatesTest extends JerseyTest {
     public void wrongTemplateNamePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
         map.put("L_NAME", "dgon gsar");
-        Response res = target("/query/table/wrongTemplateName").request().post(Entity.json(map));
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/wrongTemplateName");
+        post.addHeader("Content-Type", "application/json");
+        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(map)));
+        HttpResponse resp = client.execute(post);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
         assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
-    public void TemplateGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/table/missingArg").queryParam("L_NAME", "rgyal").request().get();
-        System.out.println("STATUS >>" + res.getStatus());
-        assertTrue(res.getStatus() == 200);
+    public void TemplateGet() throws JsonProcessingException, IOException, NumberFormatException, URISyntaxException {
+        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port"))).setPath("/query/table/missingArg").setParameter("L_NAME", "rgyal").build();
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(uri);
+        HttpResponse resp = client.execute(get);
+        System.out.println("STATUS >>" + resp.getStatusLine());
+        assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 
     @Test
     public void TemplatePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
         map.put("L_NAME", "rgyal");
-        Response res = target("/query/table/missingArg").request().post(Entity.json(map));
-        assertTrue(res.getStatus() == 200);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/missingArg");
+        post.addHeader("Content-Type", "application/json");
+        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(map)));
+        HttpResponse resp = client.execute(post);
+        assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 
     @Test
     public void missingParameter() throws JsonProcessingException, IOException {
-        for (String method : methods) {
-            Response res = target("/query/table/missingArg").request().method(method);
-            String entity = res.readEntity(String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(entity);
-            int code = Integer.parseInt(node.findValue("code").asText());
-            assertTrue(res.getStatus() == 500);
-            assertTrue(code == LdsError.MISSING_PARAM_ERR);
-        }
-    }
 
-    @Test
-    public void WrongParamNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/table/missingArg)").queryParam("WRONG", "rgyal").request().get();
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/missingArg");
+        HttpResponse resp = client.execute(get);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
-        assertTrue(code == LdsError.PARSE_ERR);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
+        assertTrue(code == LdsError.MISSING_PARAM_ERR);
+
+        Map<String, String> map = new HashMap<>();
+        HttpClient client1 = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/missingArg");
+        post.addHeader("Content-Type", "application/json");
+        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(map)));
+        HttpResponse resp1 = client1.execute(post);
+        String entity1 = EntityUtils.toString(resp1.getEntity());
+        ObjectMapper mapper1 = new ObjectMapper();
+        JsonNode node1 = mapper1.readTree(entity1);
+        int code1 = Integer.parseInt(node1.findValue("code").asText());
+        assertTrue(resp1.getStatusLine().getStatusCode() == 500);
+        assertTrue(code1 == LdsError.MISSING_PARAM_ERR);
+
+    }
+
+    @Test
+    public void WrongParamNameGet() throws JsonProcessingException, IOException, NumberFormatException, URISyntaxException {
+        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port"))).setPath("/query/table/missingArg").setParameter("WRONG", "rgyal").build();
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(uri);
+        HttpResponse resp = client.execute(get);
+        String entity = EntityUtils.toString(resp.getEntity());
+        System.out.println("ENTITY >>" + entity);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(entity);
+        int code = Integer.parseInt(node.findValue("code").asText());
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
+        assertTrue(code == LdsError.MISSING_PARAM_ERR);
     }
 
     @Test
     public void WrongParamNamePost() throws JsonProcessingException, IOException {
         Map<String, String> map = new HashMap<>();
         map.put("WRONG", "rgyal");
-        Response res = target("/query/table/missingArg").request().post(Entity.json(map));
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/table/missingArg");
+        post.addHeader("Content-Type", "application/json");
+        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(map)));
+        HttpResponse resp = client.execute(post);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
         assertTrue(code == LdsError.MISSING_PARAM_ERR);
     }
 
     @Test
     public void wrongGraphTemplateNameGet() throws JsonProcessingException, IOException {
-        Response res = target("/query/graph/wrongTemplateName").request().get();
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/query/graph/wrongTemplateName");
+        HttpResponse resp = client.execute(get);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
         assertTrue(code == LdsError.PARSE_ERR);
     }
 
     @Test
     public void wrongGraphTemplateNamePost() throws JsonProcessingException, IOException {
-        Response res = target("/query/graph/wrongTemplateName").request().accept(MediaType.APPLICATION_JSON).header("Content-Type", "application/json").post(Entity.entity("{\"ddd\":\"\"}", MediaType.APPLICATION_JSON));
-        String entity = res.readEntity(String.class);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + environment.getProperty("local.server.port") + "/query/graph/wrongTemplateName");
+        post.setHeader("Content-Type", "application/json");
+        post.setHeader("Accept", "application/json");
+        post.setEntity(new StringEntity("{\"ddd\":\"\"}"));
+        HttpResponse resp = client.execute(post);
+        String entity = EntityUtils.toString(resp.getEntity());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(entity);
         int code = Integer.parseInt(node.findValue("code").asText());
-        assertTrue(res.getStatus() == 500);
+        assertTrue(resp.getStatusLine().getStatusCode() == 500);
         assertTrue(code == LdsError.PARSE_ERR);
     }
 

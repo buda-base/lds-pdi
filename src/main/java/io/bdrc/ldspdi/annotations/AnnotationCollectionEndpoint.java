@@ -85,7 +85,7 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
-        if (mediaType.equals(MediaType.TEXT_HTML))
+        if (Helpers.equals(mediaType, MediaType.TEXT_HTML))
             AnnotationUtils.htmlResponse(request, response, prefixedCollectionRes);
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);

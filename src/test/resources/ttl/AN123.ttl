@@ -9,6 +9,7 @@
 @prefix bdan:   <http://purl.bdrc.io/annotation/> .
 @prefix bdac:   <http://purl.bdrc.io/anncollection/> .
 @prefix oa:	   <http://www.w3.org/ns/oa#> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
 
 bdr:AS6265 a adm:Assertion ;
 	rdfs:comment "On the basis of a large set of diverse stylistic markers, bla"@en .
@@ -27,3 +28,17 @@ bdan:AN123 a oa:Annotation ;
 		] ;
 		adm:statementScore 1 ;
 	] .
+
+bdan:AN1234 a oa:Annotation ;
+        bdo:annInLayer  bdac:ANCWCBC2237_C001 ;
+        oa:hasBody      [ adm:statementScore  -1 ;
+                          adm:supportedBy     [ a                     bdo:WorkLocation ;
+                                                bdo:workLocationWork  bdr:WCBCST
+                                              ]
+                        ] ;
+        oa:hasTarget    [ a              rdf:Statement ;
+                          rdf:object     bdr:PCBC47 ;
+                          rdf:predicate  bdo:creatorTranslator ;
+                          rdf:subject    bdr:WCBC2237
+                        ] ;
+        oa:motivatedBy  oa:assessing .

@@ -57,7 +57,7 @@ public class ServiceConfig {
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
         try {
-            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/src/test/resources/arq/";
             InputStream input = new FileInputStream(new File("src/test/resources/ldspdiTest.properties"));
             // load a properties file
             prop.load(input);

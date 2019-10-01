@@ -34,9 +34,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.websocket.server.PathParam;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.OntDocumentManager;
@@ -80,7 +78,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
 import io.bdrc.restapi.exceptions.ErrorMessage;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
@@ -160,7 +157,7 @@ public class PublicDataResource {
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
             return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
         }
-        if (mediaType.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
             Set<Entry<String, String>> set = map.entrySet();
             for (Entry<String, String> e : set) {
@@ -193,7 +190,7 @@ public class PublicDataResource {
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
             return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
         }
-        if (media.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
@@ -218,7 +215,7 @@ public class PublicDataResource {
             return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
 
         }
-        if (media.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
@@ -256,7 +253,7 @@ public class PublicDataResource {
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
             return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
         }
-        if (mediaType.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
             Set<Entry<String, String>> set = map.entrySet();
             for (Entry<String, String> e : set) {
@@ -282,7 +279,7 @@ public class PublicDataResource {
         model.setNsPrefixes(Prefixes.getMap());
         StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
-            public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+            public void writeTo(OutputStream os) throws IOException {
                 model.write(os, "TURTLE");
             }
         };
@@ -292,7 +289,7 @@ public class PublicDataResource {
     @GetMapping(value = "/resource/{res:.+}")
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable final String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader(value = "Accept", required = false) String format,
-            HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") Integer startChar, @RequestParam(value = "endChar", defaultValue = "999999999") Integer endChar)
+            HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") String startChar, @RequestParam(value = "endChar", defaultValue = "999999999") String endChar)
             throws RestException, IOException {
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
@@ -338,8 +335,8 @@ public class PublicDataResource {
         return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext, RES_PREFIX + res, null));
     }
 
-    public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") Integer startChar,
-            @RequestParam(value = "endChar", defaultValue = "999999999") Integer endChar, @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response, HttpServletRequest request)
+    public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
+            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar, @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
         final String prefixedRes = RES_PREFIX_SHORT + res;
@@ -349,7 +346,7 @@ public class PublicDataResource {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
             return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
         }
-        if (media.equals(MediaType.TEXT_HTML)) {
+        if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             String type = getDilaResourceType(res);
             if (!type.equals("")) {
                 type = type + "/?fromInner=";
@@ -367,7 +364,7 @@ public class PublicDataResource {
             return MarcExport.getResponse(media, RES_PREFIX + res);
         }
         if (ext.equals("txt")) {
-            return TxtEtextExport.getResponse(RES_PREFIX + res, startChar, endChar);
+            return TxtEtextExport.getResponse(RES_PREFIX + res, Integer.parseInt(startChar), Integer.parseInt(endChar));
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
@@ -384,7 +381,6 @@ public class PublicDataResource {
     @GetMapping(value = "/{base:[a-z]+}/{other}")
     @SpringCacheControl()
     public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base, @PathVariable String other) throws RestException, IOException {
-        ResponseBuilder builder = null;
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
         boolean isBase = false;
@@ -429,7 +425,7 @@ public class PublicDataResource {
                 OntData.setOntModel(om);
                 om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                 // browser request : serving html page
-                if (mediaType.equals(MediaType.TEXT_HTML)) {
+                if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                     ModelAndView model = new ModelAndView();
                     model.addObject("path", path);
                     model.setViewName("ontologyHome");
@@ -438,7 +434,7 @@ public class PublicDataResource {
                     final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(BudaMediaTypes.getExtFromMime(mediaType));
                     final StreamingResponseBody stream = new StreamingResponseBody() {
                         @Override
-                        public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+                        public void writeTo(OutputStream os) throws IOException {
                             if (JenaLangStr == "STTL") {
                                 final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(om, pr.getBaseUri());
                                 writer.output(os);
@@ -459,23 +455,23 @@ public class PublicDataResource {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
                 return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
-            if (builder == null) {
-                if (OntData.isClass(tmp, true)) {
-                    log.info("CLASS>>" + tmp);
-                    ModelAndView model = new ModelAndView();
-                    model.addObject("model", new OntClassModel(tmp, true));
-                    model.setViewName("ontClassView");
-                    return (ModelAndView) model;
 
-                } else {
-                    log.info("PROP>>" + tmp);
-                    ModelAndView model = new ModelAndView();
-                    model.addObject("model", new OntPropModel(tmp, true));
-                    model.setViewName("ontPropView");
-                    return (ModelAndView) model;
-                }
+            if (OntData.isClass(tmp, true)) {
+                log.info("CLASS>>" + tmp);
+                ModelAndView model = new ModelAndView();
+                model.addObject("model", new OntClassModel(tmp, true));
+                model.setViewName("ontClassView");
+                return (ModelAndView) model;
+
+            } else {
+                log.info("PROP>>" + tmp);
+                ModelAndView model = new ModelAndView();
+                model.addObject("model", new OntPropModel(tmp, true));
+                model.setViewName("ontPropView");
+                return (ModelAndView) model;
             }
         }
+
         return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
     }
 
@@ -485,7 +481,7 @@ public class PublicDataResource {
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
         log.info("In getOntologyResourceAsFile(), RES = {}", res);
-        final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
+        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
             return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
@@ -495,7 +491,7 @@ public class PublicDataResource {
             OntModel model = OntData.getOntModelByBase(params.getBaseUri());
             final StreamingResponseBody stream = new StreamingResponseBody() {
                 @Override
-                public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+                public void writeTo(OutputStream os) throws IOException {
                     if (JenaLangStr == "STTL") {
                         model.write(os, "TURTLE");
                     } else {
@@ -517,7 +513,7 @@ public class PublicDataResource {
     @GetMapping(value = "/ontology/data/{ext}", produces = MediaType.TEXT_HTML_VALUE)
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletRequest request, @PathParam("ext") String ext) throws RestException {
-        final String JenaLangStr = MediaTypeUtils.getJenaFromExtension(ext);
+        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
@@ -525,7 +521,7 @@ public class PublicDataResource {
         OntModel model = OntData.ontAllMod;
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
-            public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+            public void writeTo(OutputStream os) throws IOException {
                 if (JenaLangStr == "STTL") {
                     model.write(os, "TURTLE");
                 } else {

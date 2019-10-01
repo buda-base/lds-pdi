@@ -8,8 +8,7 @@
   <name>lds-pdi Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jersey.version>2.29</jersey.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    
     <jena.version>3.12.0</jena.version>
     <springboot.version>2.1.8.RELEASE</springboot.version>
     <jcs.version>2.2.1</jcs.version>
@@ -35,12 +34,7 @@
     <version>2.1.8.RELEASE</version>
     <relativePath></relativePath>    
     </parent>  
-  <dependencies>
-  <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jersey -->
-	<dependency>
-	    <groupId>org.springframework.boot</groupId>
-	    <artifactId>spring-boot-starter-jersey</artifactId>	    
-	</dependency>	
+  <dependencies>  
 	<dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>        
@@ -57,28 +51,7 @@
 	<dependency>
 	    <groupId>org.apache.tomcat.embed</groupId>
 	    <artifactId>tomcat-embed-jasper</artifactId>	    
-	</dependency>    
-    <dependency>
-      <groupId>org.glassfish.jersey.ext</groupId>
-      <artifactId>jersey-mvc-jsp</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.test-framework</groupId>
-      <artifactId>jersey-test-framework-core</artifactId>
-      <scope>test</scope>
-      <exclusions>
-      <exclusion>
-        <groupId>jakarta.servlet</groupId>
-        <artifactId>jakarta.servlet-api</artifactId>
-      </exclusion>
-      </exclusions>
-    </dependency> 
+	</dependency> 
     <dependency>
     	<groupId>com.github.jsonld-java</groupId>
     	<artifactId>jsonld-java</artifactId>

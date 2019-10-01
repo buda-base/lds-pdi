@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -42,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -49,11 +47,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.rest.resources.PublicDataResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.ldspdi.utils.MediaTypeUtils;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class ResServiceTest {
 
@@ -118,14 +116,14 @@ public class ResServiceTest {
 
     @Test
     public void GetResourceByExtension() throws ClientProtocolException, IOException {
-        Set<String> map = MediaTypeUtils.getResExtensionMimeMap().keySet();
+        Set<String> map = BudaMediaTypes.getResExtensionMimeMap().keySet();
         for (String ent : map) {
             if (ent.equals("html"))
                 continue;
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/P1AG29." + ent);
             HttpResponse resp = client.execute(get);
-            assertTrue(resp.getFirstHeader("Content-Type").getValue().equals(MediaTypeUtils.getMimeFromExtension(ent).toString()));
+            assertTrue(resp.getFirstHeader("Content-Type").getValue().equals(BudaMediaTypes.getMimeFromExtension(ent).toString()));
             assertTrue(checkAlternates("/resource/P1AG29", resp.getFirstHeader("Alternates").getValue()));
         }
     }
@@ -211,18 +209,8 @@ public class ResServiceTest {
 
     }
 
-    static void logResponse(Response res) {
-        log.info(" Status >> " + res.getStatus());
-        log.info(" Vary >> " + res.getHeaderString("Vary"));
-        log.info(" TCN >> " + res.getHeaderString("TCN"));
-        log.info(" Alternates >> " + res.getHeaderString("Alternates"));
-        log.info(" Content-Type >> " + res.getHeaderString("Content-type"));
-        log.info(" Content-Location >> " + res.getHeaderString("Content-Location"));
-        log.info(" Entity >> " + res.getEntity());
-    }
-
     public boolean checkAlternates(String url, String alternates) {
-        HashMap<String, MediaType> map = MediaTypeUtils.getResExtensionMimeMap();
+        HashMap<String, MediaType> map = BudaMediaTypes.getResExtensionMimeMap();
         StringBuilder sb = new StringBuilder("");
         for (Entry<String, MediaType> e : map.entrySet()) {
             sb.append("{\"" + url + "." + e.getKey() + "\" 1.000 {type " + e.getValue().toString() + "}},");

@@ -90,6 +90,7 @@ public class Utils {
         res.add("literal1");
         res.add("layers");
         res.add("etext");
+        res.add("UT11577_004_0000");
         res.add("MarcExportTest");
         return res;
     }
@@ -101,7 +102,6 @@ public class Utils {
             final Model m = getModelFromFileName(Utils.TESTDIR + res + ".ttl", Lang.TURTLE);
             model.add(m);
         }
-        model.write(System.out, "TURTLE");
     }
 
     public static Model getModelFromFileName(String fname, Lang lang) {

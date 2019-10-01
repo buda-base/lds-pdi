@@ -25,6 +25,7 @@ public class RdfAuthTestFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("USE AUTH ? =" + ServiceConfig.useAuth());
         if (ServiceConfig.useAuth()) {
             HttpServletRequest req = (HttpServletRequest) request;
             boolean isSecuredEndpoint = true;
@@ -32,9 +33,11 @@ public class RdfAuthTestFilter implements Filter {
             String token = getToken(req.getHeader("Authorization"));
             TokenValidation validation = null;
             String path = req.getServletPath();
+            System.out.println("PATH ? =" + path);
             Endpoint end;
             try {
                 end = RdfAuthModel.getEndpoint(path);
+                System.out.println("END ? =" + end);
             } catch (Exception e) {
                 e.printStackTrace();
                 end = null;
@@ -48,9 +51,11 @@ public class RdfAuthTestFilter implements Filter {
             if (token != null) {
                 // User is logged on
                 // Getting his profile
+                System.out.println("TOKEN ? =" + token);
                 validation = new TokenValidation(token);
                 prof = validation.getUser();
             }
+            System.out.println("SECURE ENDPOINT ? =" + isSecuredEndpoint);
             if (isSecuredEndpoint) {
                 // Endpoint is secure
                 if (validation == null) {

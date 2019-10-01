@@ -31,9 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
@@ -90,15 +87,6 @@ public class Helpers {
         String[] schemes = { "http", "https" };
         UrlValidator urlValidator = new UrlValidator(schemes);
         return urlValidator.isValid(uri);
-    }
-
-    public static HashMap<String, String> convertMulti(MultivaluedMap<String, String> map) {
-        HashMap<String, String> copy = new HashMap<>();
-        Set<String> set = map.keySet();
-        for (String key : set) {
-            copy.put(key, map.getFirst(key));
-        }
-        return copy;
     }
 
     public static HashMap<String, String> convertMulti(Map<String, String[]> map) {
@@ -158,7 +146,7 @@ public class Helpers {
     public static StreamingResponseBody getJsonObjectStream(Object obj) {
         return new StreamingResponseBody() {
             @Override
-            public void writeTo(OutputStream os) throws IOException, WebApplicationException {
+            public void writeTo(OutputStream os) throws IOException {
                 if (prettyPrint)
                     om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
                 else
@@ -167,7 +155,7 @@ public class Helpers {
         };
     }
 
-    public static byte[] getJsonStream(Object obj) {
+    public static byte[] getJsonBytesStream(Object obj) {
         try {
             return om.writeValueAsBytes(obj);
         } catch (IOException e) {
