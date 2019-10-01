@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.OntDocumentManager;
@@ -380,7 +379,7 @@ public class PublicDataResource {
 
     @GetMapping(value = "/{base:[a-z]+}/**")
     @SpringCacheControl()
-    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base/* , @PathVariable String other */) throws RestException, IOException {
+    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base) throws RestException, IOException {
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
@@ -518,7 +517,8 @@ public class PublicDataResource {
 
     @GetMapping(value = "/ontology/data/{ext}", produces = MediaType.TEXT_HTML_VALUE)
     @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletRequest request, @PathParam("ext") String ext) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
+        log.info("Call to getAllOntologyData(); with ext {}", ext);
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
