@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class RdfAuthTestFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("USE AUTH ? =" + ServiceConfig.useAuth());
+        // System.out.println("USE AUTH ? =" + ServiceConfig.useAuth());
         if (ServiceConfig.useAuth()) {
             HttpServletRequest req = (HttpServletRequest) request;
             boolean isSecuredEndpoint = true;
@@ -33,11 +34,11 @@ public class RdfAuthTestFilter implements Filter {
             String token = getToken(req.getHeader("Authorization"));
             TokenValidation validation = null;
             String path = req.getServletPath();
-            System.out.println("PATH ? =" + path);
+            // System.out.println("PATH ? =" + path);
             Endpoint end;
             try {
                 end = RdfAuthModel.getEndpoint(path);
-                System.out.println("END ? =" + end);
+                // System.out.println("END ? =" + end);
             } catch (Exception e) {
                 e.printStackTrace();
                 end = null;
@@ -51,11 +52,17 @@ public class RdfAuthTestFilter implements Filter {
             if (token != null) {
                 // User is logged on
                 // Getting his profile
-                System.out.println("TOKEN ? =" + token);
-                validation = new TokenValidation(token);
-                prof = validation.getUser();
+                // System.out.println("TOKEN ? =" + token);
+                try {
+                    validation = new TokenValidation(token);
+                    prof = validation.getUser();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    ((HttpServletResponse) response).setStatus(403);
+                    return;
+                }
             }
-            System.out.println("SECURE ENDPOINT ? =" + isSecuredEndpoint);
+            // System.out.println("SECURE ENDPOINT ? =" + isSecuredEndpoint);
             if (isSecuredEndpoint) {
                 // Endpoint is secure
                 if (validation == null) {
@@ -63,10 +70,12 @@ public class RdfAuthTestFilter implements Filter {
                     return;
                 } else {
                     Access access = new Access(prof, end);
-                    // System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
-                    // System.out.println("FILTER Access matchRole >> "+access.matchRole());
-                    // System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());
+                    // System.out.println("FILTER Access matchGroup >> " + access.matchGroup());
+                    // System.out.println("FILTER Access matchRole >> " + access.matchRole());
+                    // System.out.println("FILTER Access matchPerm >> " +
+                    // access.matchPermissions());
                     if (!access.hasEndpointAccess()) {
+                        ((HttpServletResponse) response).setStatus(403);
                         return;
                     }
                     request.setAttribute("access", access);
@@ -80,6 +89,7 @@ public class RdfAuthTestFilter implements Filter {
                 }
             }
         }
+
         chain.doFilter(request, response);
     }
 

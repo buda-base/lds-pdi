@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultsCache;
 
 public class ServiceConfig {
@@ -63,6 +64,17 @@ public class ServiceConfig {
             prop.load(input);
             input.close();
             ResultsCache.init();
+            if (ServiceConfig.useAuth()) {
+                try {
+                    InputStream is = new FileInputStream("/etc/buda/share/shared-private.properties");
+                    prop.load(is);
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    log.warn("No custom properties file could be found: using default props");
+                }
+                AuthProps.init(prop);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
