@@ -38,7 +38,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestResource.class, RdfAuthTestFilter.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
-public class EndpointAccessTest {
+public class EndpointCheck {
 
     @Autowired
     Environment environment;
