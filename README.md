@@ -19,13 +19,13 @@ The API and routes provided by the server are described in a separate document: 
 You can run the server locally with a maven command:
 
 ```
-mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/
+mvn spring-boot:run -Dldspdi.configpath=/my/configfile/dir/ -Dspring.profiles.active=local
 ```
 
 See below for an example for an explanation of the configpath argument). This will make the server accessible on
 
 ```
-http://localhost:8080/index.jsp
+http://localhost:8080
 ```
 
 ### Building a jar
@@ -49,7 +49,7 @@ The configuration of the server must be recorded in a property file named `ldspd
 The path of the directory containing `ldspdi.properties` must be passed to the server through a system property called `ldspdi.configpath`. You can pass this value when starting your server from the command line, here's an example setting it when running locally:
 
 ```
-mvn jetty:run -Dldspdi.configpath=/my/configfile/dir/
+mvn spring-boot:run -Dldspdi.configpath=/my/configfile/dir/ -Dspring.profiles.active=local
 ```
 
 Note that the [buda-base](https://github.com/buda-base/buda-base) environment sets the config path to `/etc/buda/ldspdi/`, so the only thing you need to do is to copy your configuration file to `/etc/buda/ldspdi/ldspdi.properties`.
