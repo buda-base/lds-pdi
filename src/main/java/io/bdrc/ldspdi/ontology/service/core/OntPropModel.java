@@ -23,7 +23,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class OntPropModel {
 
-    final static Logger log = LoggerFactory.getLogger(OntPropModel.class.getName());
+    final static Logger log = LoggerFactory.getLogger("default");
 
     public static final String DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain";
     public static final String RANGE = "http://www.w3.org/2000/01/rdf-schema#range";

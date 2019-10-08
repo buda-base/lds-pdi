@@ -54,7 +54,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class QueryProcessor {
 
-    public final static Logger log = LoggerFactory.getLogger(QueryProcessor.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public static Model getCoreResourceGraph(final String URI, String fusekiUrl, String prefixes, String type) throws RestException {
         switch (type) {

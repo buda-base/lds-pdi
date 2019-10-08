@@ -26,7 +26,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 @Order(4)
 public class RdfAuthFilter implements Filter {
 
-    public final static Logger log = LoggerFactory.getLogger(RdfAuthFilter.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

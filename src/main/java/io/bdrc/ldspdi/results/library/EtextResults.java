@@ -18,54 +18,53 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class EtextResults {
 
-    public final static Logger log=LoggerFactory.getLogger(EtextResults.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
-    public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
-        HashMap<String,Object> res=new HashMap<>();
-        HashMap<String,ArrayList<Field>> etexts=new HashMap<>();
-        HashMap<String,ArrayList<Field>> chunks=new HashMap<>();
-        HashMap<String,Integer> topics=new HashMap<>();
-        HashMap<String,HashSet<String>> Wtopics=new HashMap<>();
-        HashMap<String,HashSet<String>> WorkBranch=new HashMap<>();
-        HashSet<String> tops=new HashSet<>();
-        HashSet<String> authors=new HashSet<>();
-        StmtIterator iter=mod.listStatements();
-        while(iter.hasNext()) {
-            Statement st=iter.next();
-            String type=mod.getProperty(st.getSubject(), RDF.type).getObject().asResource().getURI();
+    public static HashMap<String, Object> getResultsMap(Model mod) throws RestException {
+        HashMap<String, Object> res = new HashMap<>();
+        HashMap<String, ArrayList<Field>> etexts = new HashMap<>();
+        HashMap<String, ArrayList<Field>> chunks = new HashMap<>();
+        HashMap<String, Integer> topics = new HashMap<>();
+        HashMap<String, HashSet<String>> Wtopics = new HashMap<>();
+        HashMap<String, HashSet<String>> WorkBranch = new HashMap<>();
+        HashSet<String> tops = new HashSet<>();
+        HashSet<String> authors = new HashSet<>();
+        StmtIterator iter = mod.listStatements();
+        while (iter.hasNext()) {
+            Statement st = iter.next();
+            String type = mod.getProperty(st.getSubject(), RDF.type).getObject().asResource().getURI();
             switch (type) {
             case Taxonomy.ETEXT:
-                ArrayList<Field> etextl=etexts.get(st.getSubject().getURI());
-                if(etextl==null) {
-                    etextl=new ArrayList<Field>();
+                ArrayList<Field> etextl = etexts.get(st.getSubject().getURI());
+                if (etextl == null) {
+                    etextl = new ArrayList<Field>();
                 }
-                String pred_uri=st.getPredicate().getURI();
-                if(pred_uri.equals(Taxonomy.WORK_GENRE) || pred_uri.equals(Taxonomy.WORK_IS_ABOUT)) {
+                String pred_uri = st.getPredicate().getURI();
+                if (pred_uri.equals(Taxonomy.WORK_GENRE) || pred_uri.equals(Taxonomy.WORK_IS_ABOUT)) {
                     Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
                 }
-                if(pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {
+                if (pred_uri.equals(Taxonomy.WORK_MAIN_AUTHOR)) {
                     authors.add(st.getObject().asResource().getURI());
                 }
                 etextl.add(Field.getField(st));
-                etexts.put(st.getSubject().getURI(),etextl);
+                etexts.put(st.getSubject().getURI(), etextl);
                 break;
             case Taxonomy.ETEXT_CHUNK:
-                ArrayList<Field> chunksl=chunks.get(st.getSubject().toString());
-                if(chunksl==null) {
-                    chunksl=new ArrayList<Field>();
+                ArrayList<Field> chunksl = chunks.get(st.getSubject().toString());
+                if (chunksl == null) {
+                    chunksl = new ArrayList<Field>();
                 }
                 chunksl.add(Field.getField(st));
-                chunks.put(st.getSubject().toString(),chunksl);
+                chunks.put(st.getSubject().toString(), chunksl);
                 break;
             default:
-                throw new RestException(500,new LdsError(LdsError.UNKNOWN_ERR).
-                        setContext("unknown type in WorkAllResults.getResultsMap(Model mod) >> "+type));
+                throw new RestException(500, new LdsError(LdsError.UNKNOWN_ERR).setContext("unknown type in WorkAllResults.getResultsMap(Model mod) >> " + type));
             }
         }
-        res.put(Taxonomy.ETEXT_CHUNK,chunks);
-        res.put(Taxonomy.WORK_MAIN_AUTHOR,authors);
-        res.put(Taxonomy.ETEXT,etexts);
-        res.put("tree",Taxonomy.buildFacetTree(tops, topics));
+        res.put(Taxonomy.ETEXT_CHUNK, chunks);
+        res.put(Taxonomy.WORK_MAIN_AUTHOR, authors);
+        res.put(Taxonomy.ETEXT, etexts);
+        res.put("tree", Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
 

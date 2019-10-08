@@ -52,7 +52,7 @@ public class Helpers {
     public static final ObjectMapper om = new ObjectMapper();
     public static boolean prettyPrint = false;
 
-    public final static Logger log = LoggerFactory.getLogger(Helpers.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
 

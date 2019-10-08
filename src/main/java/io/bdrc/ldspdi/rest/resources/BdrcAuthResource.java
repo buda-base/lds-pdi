@@ -30,7 +30,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/")
 public class BdrcAuthResource {
 
-    public final static Logger log = LoggerFactory.getLogger(BdrcAuthResource.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 

@@ -36,7 +36,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPage {
 
-    public final static Logger log = LoggerFactory.getLogger(ResultPage.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public int pageNumber, numberOfPages, pageSize, numResults, hash;
     public long execTime;

@@ -25,7 +25,7 @@ import io.bdrc.restapi.exceptions.RestException;
 public class DocFileModel {
 
     static List<String> files;
-    public final static Logger log = LoggerFactory.getLogger(DocFileModel.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
     public static Set<String> keys;
     public static ArrayList<String> ontos;
     public static String brandName = ServiceConfig.getProperty("brandName");

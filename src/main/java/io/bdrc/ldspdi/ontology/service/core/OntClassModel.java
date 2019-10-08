@@ -49,146 +49,146 @@ import io.bdrc.ldspdi.service.ServiceConfig;
  */
 public class OntClassModel {
 
-	final static Logger log = LoggerFactory.getLogger(OntClassModel.class.getName());
+    final static Logger log = LoggerFactory.getLogger("default");
 
-	protected String uri;
-	protected OntClass clazz;
+    protected String uri;
+    protected OntClass clazz;
 
-	public OntClassModel(String uri, boolean global) {
-		this.uri = uri;
-		if (global) {
-			clazz = OntData.ontAllMod.getOntClass(uri);
-		} else {
-			clazz = OntData.ontMod.getOntClass(uri);
-		}
-	}
+    public OntClassModel(String uri, boolean global) {
+        this.uri = uri;
+        if (global) {
+            clazz = OntData.ontAllMod.getOntClass(uri);
+        } else {
+            clazz = OntData.ontMod.getOntClass(uri);
+        }
+    }
 
-	public OntClassModel(OntClass c) {
+    public OntClassModel(OntClass c) {
 
-		this.uri = c.getURI();
-		clazz = c;
-	}
+        this.uri = c.getURI();
+        clazz = c;
+    }
 
-	public boolean isPresent() {
-		return clazz != null;
-	}
+    public boolean isPresent() {
+        return clazz != null;
+    }
 
-	public boolean isRootClassModel() {
-		return OntData.getOntRootClasses().contains(this);
-	}
+    public boolean isRootClassModel() {
+        return OntData.getOntRootClasses().contains(this);
+    }
 
-	public String getUri() {
-		return uri;
-	}
+    public String getUri() {
+        return uri;
+    }
 
-	public String getId() {
-		return OntData.ontAllMod.shortForm(uri);
-	}
+    public String getId() {
+        return OntData.ontAllMod.shortForm(uri);
+    }
 
-	public boolean hasParent() {
-		return clazz.getSuperClass() != null;
-	}
+    public boolean hasParent() {
+        return clazz.getSuperClass() != null;
+    }
 
-	public String getShortName() {
-		return clazz.getLocalName();
-	}
+    public String getShortName() {
+        return clazz.getLocalName();
+    }
 
-	public ArrayList<OntClassModel> getParent(boolean global) {
-		if (clazz.getSuperClass() != null) {
-			return new OntClassParent(uri, global).getParents();
-		}
-		return null;
-	}
+    public ArrayList<OntClassModel> getParent(boolean global) {
+        if (clazz.getSuperClass() != null) {
+            return new OntClassParent(uri, global).getParents();
+        }
+        return null;
+    }
 
-	public List<OntClassModel> getSubclasses() {
-		List<OntClass> subs = clazz.listSubClasses(true).toList();
-		List<OntClassModel> models = new ArrayList<>();
+    public List<OntClassModel> getSubclasses() {
+        List<OntClass> subs = clazz.listSubClasses(true).toList();
+        List<OntClassModel> models = new ArrayList<>();
 
-		for (OntClass c : subs) {
-			if (!c.isAnon()) {
-				models.add(new OntClassModel(c));
-			}
-		}
-		Collections.sort(models, OntData.ontClassModelComparator);
-		return models;
-	}
+        for (OntClass c : subs) {
+            if (!c.isAnon()) {
+                models.add(new OntClassModel(c));
+            }
+        }
+        Collections.sort(models, OntData.ontClassModelComparator);
+        return models;
+    }
 
-	public List<OntClassModel> getSuperClasses() {
-		List<OntClass> sups = clazz.listSuperClasses(true).toList();
-		List<OntClassModel> models = new ArrayList<>();
-		for (OntClass c : sups) {
-			if (!c.isAnon()) {
-				models.add(new OntClassModel(c));
-			}
-		}
-		Collections.sort(models, OntData.ontClassModelComparator);
-		return models;
-	}
+    public List<OntClassModel> getSuperClasses() {
+        List<OntClass> sups = clazz.listSuperClasses(true).toList();
+        List<OntClassModel> models = new ArrayList<>();
+        for (OntClass c : sups) {
+            if (!c.isAnon()) {
+                models.add(new OntClassModel(c));
+            }
+        }
+        Collections.sort(models, OntData.ontClassModelComparator);
+        return models;
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<Individual> getIndividuals() {
-		ExtendedIterator<Individual> it = (ExtendedIterator<Individual>) clazz.listInstances(true);
+    @SuppressWarnings("unchecked")
+    public List<Individual> getIndividuals() {
+        ExtendedIterator<Individual> it = (ExtendedIterator<Individual>) clazz.listInstances(true);
 
-		List<Individual> inds = it.toList();
-		Collections.sort(inds, OntData.individualComparator);
-		return inds;
-	}
+        List<Individual> inds = it.toList();
+        Collections.sort(inds, OntData.individualComparator);
+        return inds;
+    }
 
-	public List<String> getLabels() {
-		List<String> labels = new ArrayList<>();
+    public List<String> getLabels() {
+        List<String> labels = new ArrayList<>();
 
-		for (RDFNode node : clazz.listLabels(null).toList()) {
-			labels.add(node.toString());
-		}
+        for (RDFNode node : clazz.listLabels(null).toList()) {
+            labels.add(node.toString());
+        }
 
-		return labels;
-	}
+        return labels;
+    }
 
-	public List<String[]> getLangLabels() {
-		List<String[]> labels = new ArrayList<>();
+    public List<String[]> getLangLabels() {
+        List<String[]> labels = new ArrayList<>();
 
-		for (RDFNode node : clazz.listLabels(null).toList()) {
-			labels.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
-		}
-		return labels;
-	}
+        for (RDFNode node : clazz.listLabels(null).toList()) {
+            labels.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
+        }
+        return labels;
+    }
 
-	public List<String> getComments() {
-		List<String> comments = new ArrayList<>();
+    public List<String> getComments() {
+        List<String> comments = new ArrayList<>();
 
-		for (RDFNode node : clazz.listComments(null).toList()) {
-			comments.add(node.toString());
-		}
+        for (RDFNode node : clazz.listComments(null).toList()) {
+            comments.add(node.toString());
+        }
 
-		return comments;
-	}
+        return comments;
+    }
 
-	public List<String[]> getLangComments() {
-		List<String[]> comments = new ArrayList<>();
-		for (RDFNode node : clazz.listComments(null).toList()) {
-			comments.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
-		}
-		return comments;
-	}
+    public List<String[]> getLangComments() {
+        List<String[]> comments = new ArrayList<>();
+        for (RDFNode node : clazz.listComments(null).toList()) {
+            comments.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
+        }
+        return comments;
+    }
 
-	public List<OntProperty> getAllClassProperties() {
-		ArrayList<OntProperty> list = new ArrayList<>();
-		Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(), ResourceFactory.createResource(uri).asNode());
-		ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
-		while (ext.hasNext()) {
-			Triple tpp = ext.next();
-			String st = tpp.getSubject().getURI();
-			OntProperty prop = OntData.ontMod.getOntProperty(st);
-			list.add(prop);
-		}
-		return list;
-	}
+    public List<OntProperty> getAllClassProperties() {
+        ArrayList<OntProperty> list = new ArrayList<>();
+        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(), ResourceFactory.createResource(uri).asNode());
+        ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
+        while (ext.hasNext()) {
+            Triple tpp = ext.next();
+            String st = tpp.getSubject().getURI();
+            OntProperty prop = OntData.ontMod.getOntProperty(st);
+            list.add(prop);
+        }
+        return list;
+    }
 
-	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
-		ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
-		OntData.init();
-		OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextSlice", true);
-		System.out.println(mod.hasParent());
-	}
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        OntData.init();
+        OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextSlice", true);
+        System.out.println(mod.hasParent());
+    }
 
 }

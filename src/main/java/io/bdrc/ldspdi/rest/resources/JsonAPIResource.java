@@ -52,7 +52,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/")
 public class JsonAPIResource {
 
-    public final static Logger log = LoggerFactory.getLogger(JsonAPIResource.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
     private List<String> fileList;
 
     public JsonAPIResource() throws RestException {

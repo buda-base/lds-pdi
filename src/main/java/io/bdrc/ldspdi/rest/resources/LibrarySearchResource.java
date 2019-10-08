@@ -44,7 +44,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/")
 public class LibrarySearchResource {
 
-    public final static Logger log = LoggerFactory.getLogger(LibrarySearchResource.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     @PostMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)

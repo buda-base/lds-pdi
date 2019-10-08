@@ -31,7 +31,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class Results {
 
-    public final static Logger log=LoggerFactory.getLogger(Results.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public int pageNumber;
     public int numberOfPages;
@@ -42,52 +42,50 @@ public class Results {
     public boolean lastPage;
     public boolean firstPage;
     public ResultPageLinks pLinks;
-    public HashMap<String,List<String>> head;
-    //public Head head;
-    public HashMap<String,ArrayList<Row>> results;
+    public HashMap<String, List<String>> head;
+    // public Head head;
+    public HashMap<String, ArrayList<Row>> results;
 
-    public Results(ResultSetWrapper res,HashMap<String,String> hm)
-            throws RestException{
-        String pageNum=hm.get(QueryConstants.PAGE_NUMBER);
-        if (pageNum!=null) {
-            this.pageNumber=Integer.parseInt(pageNum);
+    public Results(ResultSetWrapper res, HashMap<String, String> hm) throws RestException {
+        String pageNum = hm.get(QueryConstants.PAGE_NUMBER);
+        if (pageNum != null) {
+            this.pageNumber = Integer.parseInt(pageNum);
         } else {
-            this.pageNumber=1;
+            this.pageNumber = 1;
         }
-        pageSize=res.getPageSize();
-        numResults=res.getNumResults();
-        execTime=res.getExecTime();
-        hash=res.getHash();
-        head=res.getHead();
-        numberOfPages=res.getNumberOfPages();
-        int offset=(pageNumber-1)*pageSize;
-        results=new HashMap<>();
-        ArrayList<Row> rows=res.getRows();
-        ArrayList<Row> bindings=new ArrayList<>();;
-        if(pageNumber<=numberOfPages) {
-            for (int x=(offset); x<(offset+pageSize);x++) {
+        pageSize = res.getPageSize();
+        numResults = res.getNumResults();
+        execTime = res.getExecTime();
+        hash = res.getHash();
+        head = res.getHead();
+        numberOfPages = res.getNumberOfPages();
+        int offset = (pageNumber - 1) * pageSize;
+        results = new HashMap<>();
+        ArrayList<Row> rows = res.getRows();
+        ArrayList<Row> bindings = new ArrayList<>();
+        ;
+        if (pageNumber <= numberOfPages) {
+            for (int x = (offset); x < (offset + pageSize); x++) {
                 try {
                     bindings.add(rows.get(x));
-                }
-                catch(Exception ex) {
+                } catch (Exception ex) {
                     break;
                 }
             }
         }
         results.put("bindings", bindings);
-        if(pageNumber==1) {
-            firstPage=true;
+        if (pageNumber == 1) {
+            firstPage = true;
+        } else {
+            firstPage = false;
         }
-        else {
-            firstPage=false;
+        if (pageNumber == res.numberOfPages) {
+            lastPage = true;
+        } else {
+            lastPage = false;
         }
-        if(pageNumber==res.numberOfPages) {
-            lastPage=true;
-        }else {
-            lastPage=false;
-        }
-        pLinks=new ResultPageLinks(this,hm);
-        res=null;
+        pLinks = new ResultPageLinks(this, hm);
+        res = null;
     }
 
     public int getPageNumber() {
@@ -126,7 +124,7 @@ public class Results {
         return pLinks;
     }
 
-    public HashMap<String,List<String>> getHead() {
+    public HashMap<String, List<String>> getHead() {
         return head;
     }
 
@@ -136,12 +134,8 @@ public class Results {
 
     @Override
     public String toString() {
-        return "Results [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize
-                + ", numResults=" + numResults + ", execTime=" + execTime + ", hash=" + hash + ", lastPage=" + lastPage
-                + ", firstPage=" + firstPage + ", pLinks=" + pLinks + ", head=" + head + ", results=" + results + "]";
+        return "Results [pageNumber=" + pageNumber + ", numberOfPages=" + numberOfPages + ", pageSize=" + pageSize + ", numResults=" + numResults + ", execTime=" + execTime + ", hash=" + hash + ", lastPage=" + lastPage + ", firstPage=" + firstPage
+                + ", pLinks=" + pLinks + ", head=" + head + ", results=" + results + "]";
     }
-
-
-
 
 }

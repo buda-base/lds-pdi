@@ -28,7 +28,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/annotations/")
 public class AnnotationEndpoint {
 
-    public final static Logger log = LoggerFactory.getLogger(AnnotationEndpoint.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     public final static String ANN_PROFILE = "http://www.w3.org/ns/anno.jsonld";

@@ -86,7 +86,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/")
 public class PublicDataResource {
 
-    public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public static final String RES_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.resource.shortprefix");
     public static final String RES_PREFIX = ServiceConfig.getProperty("endpoints.resource.fullprefix");

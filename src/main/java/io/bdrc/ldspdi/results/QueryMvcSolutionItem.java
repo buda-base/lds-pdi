@@ -15,47 +15,44 @@ import io.bdrc.ldspdi.sparql.Prefixes;
 
 public class QueryMvcSolutionItem {
 
-    public final static Logger log=LoggerFactory.getLogger(QueryMvcSolutionItem.class.getName());
-    public HashMap<String,String> dataRow;
+    public final static Logger log = LoggerFactory.getLogger("default");
+    public HashMap<String, String> dataRow;
 
-    public QueryMvcSolutionItem(QuerySolution qs,List<String> headers) {
-        NodeFormatterTTL nf=new NodeFormatterTTL(null,Prefixes.getPrefixMap());
-        dataRow=new HashMap<>();
-        for(String key:headers) {
-            RDFNode node=qs.get(key);
-            if(node !=null) {
-                if(node.isResource()) {
-                    Resource res=node.asResource();
-                    String Uri=res.getURI();
-                    String tmp="";
-                    if(node.asNode().isBlank()) {
-                        tmp=res.getLocalName();
-                    }
-                    else {
-                        if(Uri.startsWith("http://purl.bdrc.io/resource")) {
-                            tmp="<a href=/resource/"+res.getLocalName()+"> "+res.getLocalName()+"</a>  "+
-                                    "<a href=/resource/"+res.getLocalName()+".ttl> (ttl)</a>";
-                        }else if(Uri.startsWith("http://purl.bdrc.io/ontology/core/")){
-                            tmp="<a href=\""+Uri+"\"> "+res.getLocalName()+"</a>";
-                        }
-                        else {
-                            tmp="<a href=\""+Uri+"\"> "+Uri+"</a>";
+    public QueryMvcSolutionItem(QuerySolution qs, List<String> headers) {
+        NodeFormatterTTL nf = new NodeFormatterTTL(null, Prefixes.getPrefixMap());
+        dataRow = new HashMap<>();
+        for (String key : headers) {
+            RDFNode node = qs.get(key);
+            if (node != null) {
+                if (node.isResource()) {
+                    Resource res = node.asResource();
+                    String Uri = res.getURI();
+                    String tmp = "";
+                    if (node.asNode().isBlank()) {
+                        tmp = res.getLocalName();
+                    } else {
+                        if (Uri.startsWith("http://purl.bdrc.io/resource")) {
+                            tmp = "<a href=/resource/" + res.getLocalName() + "> " + res.getLocalName() + "</a>  " + "<a href=/resource/" + res.getLocalName() + ".ttl> (ttl)</a>";
+                        } else if (Uri.startsWith("http://purl.bdrc.io/ontology/core/")) {
+                            tmp = "<a href=\"" + Uri + "\"> " + res.getLocalName() + "</a>";
+                        } else {
+                            tmp = "<a href=\"" + Uri + "\"> " + Uri + "</a>";
                         }
                     }
                     dataRow.put(key, tmp);
                 }
-                if(node.isLiteral()) {
-                    StringWriterI sw=new StringWriterI();
+                if (node.isLiteral()) {
+                    StringWriterI sw = new StringWriterI();
                     nf.formatLiteral(sw, node.asNode());
                     sw.flush();
                     dataRow.put(key, sw.toString());
                 }
-                if(node.isAnon()) {
-                    StringWriterI sw=new StringWriterI();
+                if (node.isAnon()) {
+                    StringWriterI sw = new StringWriterI();
                     nf.formatBNode(sw, node.asNode());
                     dataRow.put(key, sw.toString());
                 }
-            }else {
+            } else {
                 dataRow.put(key, "");
             }
         }

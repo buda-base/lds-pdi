@@ -39,112 +39,109 @@ public class ResultPageLinks {
     public String prevJsonParams;
     public String nextJsonParams;
 
-    public final static Logger log=LoggerFactory.getLogger(ResultPageLinks.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
-    public ResultPageLinks(ResultPage page, HashMap<String,String> hm) throws RestException{
+    public ResultPageLinks(ResultPage page, HashMap<String, String> hm) throws RestException {
         ObjectMapper mapper = new ObjectMapper();
-        String URL=hm.get(QueryConstants.REQ_URI);
-        if( page.numberOfPages>1) {
-            if(page.getPageNumber()==1 ) {
-                if(!URL.contains("&pageNumber=")) {
-                    if(URL.indexOf("?")!=-1) {
-                        nextGet=URL+"&pageNumber=2&hash="+page.getHash();
-                    }else {
-                        nextGet=URL+"?pageNumber=2&hash="+page.getHash();
+        String URL = hm.get(QueryConstants.REQ_URI);
+        if (page.numberOfPages > 1) {
+            if (page.getPageNumber() == 1) {
+                if (!URL.contains("&pageNumber=")) {
+                    if (URL.indexOf("?") != -1) {
+                        nextGet = URL + "&pageNumber=2&hash=" + page.getHash();
+                    } else {
+                        nextGet = URL + "?pageNumber=2&hash=" + page.getHash();
                     }
+                } else {
+                    int next = page.getPageNumber() + 1;
+                    nextGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + next);
                 }
-                else {
-                    int next=page.getPageNumber()+1;
-                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                }
-            }else {
-                int prev=page.getPageNumber()-1;
-                prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
+            } else {
+                int prev = page.getPageNumber() - 1;
+                prevGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + prev);
 
-                if(!page.isLastPage()) {
-                    int next=page.getPageNumber()+1;
-                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                if (!page.isLastPage()) {
+                    int next = page.getPageNumber() + 1;
+                    nextGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + next);
                 }
             }
         }
         try {
-            currJsonParams=mapper.writer().writeValueAsString(hm);
+            currJsonParams = mapper.writer().writeValueAsString(hm);
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-            if(page.getPageNumber()>=1 && (page.getPageNumber()<page.getNumberOfPages())) {
-                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
-                nextJsonParams=mapper.writer().writeValueAsString(hm);
+            if (page.getPageNumber() >= 1 && (page.getPageNumber() < page.getNumberOfPages())) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber() + 1));
+                nextJsonParams = mapper.writer().writeValueAsString(hm);
             }
-            if(page.getPageNumber()!=1) {
-                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
-                prevJsonParams=mapper.writer().writeValueAsString(hm);
+            if (page.getPageNumber() != 1) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber() - 1));
+                prevJsonParams = mapper.writer().writeValueAsString(hm);
             }
-        }
-        catch(JsonProcessingException ex) {
-            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).
-                    setContext(" in ResultPageLinks constructor ",ex));
+        } catch (JsonProcessingException ex) {
+            throw new RestException(5001, new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks constructor ", ex));
         }
     }
 
-    public ResultPageLinks(Results page, HashMap<String,String> hm) throws RestException{
+    public ResultPageLinks(Results page, HashMap<String, String> hm) throws RestException {
         ObjectMapper mapper = new ObjectMapper();
-        String URL=hm.get(QueryConstants.REQ_URI);
-        if( page.numberOfPages>1) {
-            if(page.getPageNumber()==1 ) {
-                if(!URL.contains("&pageNumber=")) {
-                nextGet=URL+"&pageNumber=2&hash="+page.getHash();
+        String URL = hm.get(QueryConstants.REQ_URI);
+        if (page.numberOfPages > 1) {
+            if (page.getPageNumber() == 1) {
+                if (!URL.contains("&pageNumber=")) {
+                    nextGet = URL + "&pageNumber=2&hash=" + page.getHash();
+                } else {
+                    int next = page.getPageNumber() + 1;
+                    nextGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + next);
                 }
-                else {
-                    int next=page.getPageNumber()+1;
-                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
-                }
-            }else {
-                int prev=page.getPageNumber()-1;
-                prevGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+prev);
+            } else {
+                int prev = page.getPageNumber() - 1;
+                prevGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + prev);
 
-                if(page.getPageNumber()!=page.getNumberOfPages()) {
-                    int next=page.getPageNumber()+1;
-                    nextGet=URL.replace("pageNumber="+page.getPageNumber(), "pageNumber="+next);
+                if (page.getPageNumber() != page.getNumberOfPages()) {
+                    int next = page.getPageNumber() + 1;
+                    nextGet = URL.replace("pageNumber=" + page.getPageNumber(), "pageNumber=" + next);
                 }
             }
         }
         try {
-            currJsonParams=mapper.writer().writeValueAsString(hm);
+            currJsonParams = mapper.writer().writeValueAsString(hm);
             hm.put(QueryConstants.RESULT_HASH, Integer.toString(page.getHash()));
-            if(page.getPageNumber()>=1 && (page.getPageNumber()<page.getNumberOfPages())) {
-                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()+1));
-                nextJsonParams=mapper.writer().writeValueAsString(hm);
+            if (page.getPageNumber() >= 1 && (page.getPageNumber() < page.getNumberOfPages())) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber() + 1));
+                nextJsonParams = mapper.writer().writeValueAsString(hm);
             }
-            if(page.getPageNumber()!=1) {
-                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber()-1));
-                prevJsonParams=mapper.writer().writeValueAsString(hm);
+            if (page.getPageNumber() != 1) {
+                hm.put(QueryConstants.PAGE_NUMBER, Integer.toString(page.getPageNumber() - 1));
+                prevJsonParams = mapper.writer().writeValueAsString(hm);
             }
-        }
-        catch(JsonProcessingException ex) {
-            throw new RestException(5001,new LdsError(LdsError.JSON_ERR).
-                    setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor ",ex));
+        } catch (JsonProcessingException ex) {
+            throw new RestException(5001, new LdsError(LdsError.JSON_ERR).setContext(" in ResultPageLinks(Results, HashMap<String,String>) constructor ", ex));
         }
     }
 
     public String getPrevGet() {
         return prevGet;
     }
+
     public String getNextGet() {
         return nextGet;
     }
+
     public String getCurrJsonParams() {
         return currJsonParams;
     }
+
     public String getPrevJsonParams() {
         return prevJsonParams;
     }
+
     public String getNextJsonParams() {
         return nextJsonParams;
     }
 
     @Override
     public String toString() {
-        return "ResultPageLinks [prevGet=" + prevGet + ", nextGet=" + nextGet + ", currJsonParams=" + currJsonParams
-                + ", prevJsonParams=" + prevJsonParams + ", nextJsonParams=" + nextJsonParams + "]";
+        return "ResultPageLinks [prevGet=" + prevGet + ", nextGet=" + nextGet + ", currJsonParams=" + currJsonParams + ", prevJsonParams=" + prevJsonParams + ", nextJsonParams=" + nextJsonParams + "]";
     }
 
 }

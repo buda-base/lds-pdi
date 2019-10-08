@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -38,7 +39,7 @@ public class ServiceConfig {
     static Properties prop = new Properties();
     public final static String FUSEKI_URL = "fusekiUrl";
     public static String LOCAL_QUERIES_DIR;
-    public final static org.slf4j.Logger log = LoggerFactory.getLogger(ServiceConfig.class.getName());
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     // getting the default properties from ldspdi.properties that is packaged with
     // the jar
