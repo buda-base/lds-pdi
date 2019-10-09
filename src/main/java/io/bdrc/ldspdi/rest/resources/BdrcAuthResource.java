@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -45,8 +46,9 @@ public class BdrcAuthResource {
     @GetMapping(value = "/resource-nc/auth/{res}")
     public ResponseEntity<StreamingResponseBody> getAuthResource(@PathVariable("res") final String res) throws RestException {
         log.info("Call getAuthResource()");
-        String query = "describe <http://purl.bdrc.io/resource-auth/" + res + ">";
+        String query = "describe <http://purl.bdrc.io/resource-nc/auth/" + res + ">";
         Model m = QueryProcessor.getGraphFromModel(query, QueryProcessor.getAuthGraph(null, "authDataGraph"));
+        m.setNsPrefixes(Prefixes.getPrefixMapping());
         if (m.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_RES_ERR).setContext(res);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
