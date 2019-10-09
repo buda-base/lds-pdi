@@ -42,7 +42,7 @@ public class BdrcAuthResource {
         return model;
     }
 
-    @GetMapping(value = "/resource-auth/{res}")
+    @GetMapping(value = "/resource-nc/auth/{res}")
     public ResponseEntity<StreamingResponseBody> getAuthResource(@PathVariable("res") final String res) throws RestException {
         log.info("Call getAuthResource()");
         String query = "describe <http://purl.bdrc.io/resource-auth/" + res + ">";
