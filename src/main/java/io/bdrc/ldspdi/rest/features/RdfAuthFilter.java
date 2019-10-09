@@ -87,7 +87,6 @@ public class RdfAuthFilter implements Filter {
 
     public static String getToken(final String header) {
         if (header == null || !header.startsWith("Bearer ")) {
-            log.info("invalid Authorization header: {}", header);
             return null;
         }
         return header.substring(7);
