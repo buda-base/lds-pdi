@@ -68,7 +68,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/")
 public class PublicTemplatesResource {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(PublicTemplatesResource.class);
 
     @GetMapping(value = "/query/table/{file}")
     @SpringCacheControl()

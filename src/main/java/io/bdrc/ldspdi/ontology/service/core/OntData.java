@@ -58,7 +58,7 @@ public class OntData implements Runnable {
     public static OntModel ontAllMod;
     public static OntModel ontAuthMod;
     public static OWLPropsCharacteristics owlCharacteristics;
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(OntData.class);
     public static String JSONLD_CONTEXT;
     // static EntityTag update;
     static String update;

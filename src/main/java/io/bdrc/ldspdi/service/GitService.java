@@ -36,7 +36,7 @@ public class GitService implements Runnable {
     private static String GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
     private static Repository localRepo;
 
-    final static Logger log = LoggerFactory.getLogger("default");
+    final static Logger log = LoggerFactory.getLogger(GitService.class);
 
     public static void update() {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();

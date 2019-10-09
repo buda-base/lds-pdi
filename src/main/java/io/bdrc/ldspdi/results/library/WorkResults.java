@@ -18,7 +18,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class WorkResults {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(WorkResults.class);
     public final static String[] types = { Taxonomy.ACCESS, Taxonomy.LICENSE, Taxonomy.LANG_SCRIPT, Taxonomy.STATUS };
 
     public static HashMap<String, Object> getResultsMap(Model mod) throws RestException {

@@ -39,7 +39,7 @@ public class ServiceConfig {
     static Properties prop = new Properties();
     public final static String FUSEKI_URL = "fusekiUrl";
     public static String LOCAL_QUERIES_DIR;
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged with
     // the jar

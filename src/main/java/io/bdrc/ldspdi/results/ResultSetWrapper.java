@@ -36,7 +36,7 @@ import io.bdrc.ldspdi.sparql.QueryConstants;
 
 public class ResultSetWrapper {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(ResultSetWrapper.class);
 
     public long execTime;
     public int numResults;

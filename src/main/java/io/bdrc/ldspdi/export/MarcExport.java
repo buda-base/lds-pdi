@@ -85,7 +85,7 @@ public class MarcExport {
 
     public static final MarcFactory factory = MarcFactory.newInstance();
 
-    public final static Logger log = LoggerFactory.getLogger(MarcExport.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(MarcExport.class);
 
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
     public static final String BDR = "http://purl.bdrc.io/resource/";

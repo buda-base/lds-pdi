@@ -31,7 +31,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class Results {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(Results.class);
 
     public int pageNumber;
     public int numberOfPages;

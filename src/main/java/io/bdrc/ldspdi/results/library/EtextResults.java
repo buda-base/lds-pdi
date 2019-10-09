@@ -18,7 +18,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class EtextResults {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(EtextResults.class);
 
     public static HashMap<String, Object> getResultsMap(Model mod) throws RestException {
         HashMap<String, Object> res = new HashMap<>();

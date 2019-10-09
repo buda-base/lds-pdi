@@ -31,7 +31,7 @@ import io.bdrc.restapi.exceptions.RestException;
 @RequestMapping("/anncollection/*")
 public class AnnotationCollectionEndpoint {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(AnnotationCollectionEndpoint.class);
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     // we need to transform collections into sc:AnnotationLists, we do so when we

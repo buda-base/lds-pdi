@@ -69,7 +69,7 @@ public class JSONLDFormatter {
     public static final Map<String, Object> annContextObject = getAnnMergedContext();
     public static final Map<String, Object> oaContextObject = getOaMergedContext();
     public static final String BDR = "http://purl.bdrc.io/resource/";
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(JSONLDFormatter.class);
     public final static String simpleContext = "http://purl.bdrc.io/context.jsonld";
     public final static String annoContext = "http://www.w3.org/ns/anno.jsonld";
     public final static String oaContext = "http://www.w3.org/ns/oa.jsonld";

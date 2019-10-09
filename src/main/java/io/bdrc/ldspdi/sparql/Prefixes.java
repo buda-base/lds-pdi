@@ -18,7 +18,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class Prefixes {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(Prefixes.class);
     private final static PrefixMap pMap = new PrefixMapStd();
     private final static HashMap<String, String> map = new HashMap<>();
     private static String prefixesString;

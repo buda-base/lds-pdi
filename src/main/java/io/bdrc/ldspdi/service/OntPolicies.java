@@ -29,7 +29,7 @@ public class OntPolicies {
     public static HashMap<String, OntPolicy> map;
     private static Model mod;
     private static String defaultGraph;
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(OntPolicies.class);
 
     private static OntPolicy loadPolicy(Resource r, FileManager fm) {
         Statement st = r.getProperty(ResourceFactory.createProperty("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#publicURI"));

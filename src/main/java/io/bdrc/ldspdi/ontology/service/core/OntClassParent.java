@@ -20,7 +20,7 @@ public class OntClassParent {
     String uri;
     boolean global;
 
-    final static Logger log = LoggerFactory.getLogger("default");
+    final static Logger log = LoggerFactory.getLogger(OntClassParent.class);
 
     public OntClassParent(String uri, boolean global) {
         this.uri = uri;

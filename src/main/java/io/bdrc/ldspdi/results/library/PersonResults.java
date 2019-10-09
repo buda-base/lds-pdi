@@ -14,7 +14,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class PersonResults {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(PersonResults.class);
 
     public static HashMap<String, Object> getResultsMap(Model mod) {
         HashMap<String, Object> res = new HashMap<>();

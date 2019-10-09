@@ -15,7 +15,7 @@ import io.bdrc.restapi.exceptions.RestException;
 
 public class RootResults {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(RootResults.class);
 
     public static HashMap<String, Object> getResultsMap(Model mod, int etext_count) throws RestException {
         final HashMap<String, Object> res = new HashMap<>();

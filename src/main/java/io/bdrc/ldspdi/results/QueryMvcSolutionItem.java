@@ -15,7 +15,7 @@ import io.bdrc.ldspdi.sparql.Prefixes;
 
 public class QueryMvcSolutionItem {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(QueryMvcSolutionItem.class);
     public HashMap<String, String> dataRow;
 
     public QueryMvcSolutionItem(QuerySolution qs, List<String> headers) {

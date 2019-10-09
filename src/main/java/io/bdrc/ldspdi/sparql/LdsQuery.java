@@ -60,7 +60,7 @@ public class LdsQuery {
     private ArrayList<Output> outputs;
     private String prefixedQuery;
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(LdsQuery.class);
 
     public LdsQuery(String filePath) throws RestException {
         metaInf = new HashMap<>();

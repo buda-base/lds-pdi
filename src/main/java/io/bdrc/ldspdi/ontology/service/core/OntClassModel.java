@@ -49,7 +49,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
  */
 public class OntClassModel {
 
-    final static Logger log = LoggerFactory.getLogger("default");
+    final static Logger log = LoggerFactory.getLogger(OntClassModel.class);
 
     protected String uri;
     protected OntClass clazz;

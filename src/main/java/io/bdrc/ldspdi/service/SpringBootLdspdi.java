@@ -34,7 +34,7 @@ import io.bdrc.taxonomy.TaxModel;
 
 public class SpringBootLdspdi extends SpringBootServletInitializer {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class);
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, RestException {
         final String configPath = System.getProperty("ldspdi.configpath");

@@ -39,7 +39,7 @@ public class ResultPageLinks {
     public String prevJsonParams;
     public String nextJsonParams;
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(ResultPageLinks.class);
 
     public ResultPageLinks(ResultPage page, HashMap<String, String> hm) throws RestException {
         ObjectMapper mapper = new ObjectMapper();
