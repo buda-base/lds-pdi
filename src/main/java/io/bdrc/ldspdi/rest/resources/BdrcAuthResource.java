@@ -1,9 +1,13 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -17,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.bdrc.auth.Access;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.users.BudaUser;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.ErrorMessage;
@@ -41,6 +47,24 @@ public class BdrcAuthResource {
         ModelAndView model = new ModelAndView();
         model.setViewName("authDetails");
         return model;
+    }
+
+    @GetMapping(value = "/resource-nc/user/me")
+    public ResponseEntity<StreamingResponseBody> meUser(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        String token = getToken(request.getHeader("Authorization"));
+        log.info("TOKEN >> {}", token);
+        if (token == null) {
+            return ResponseEntity.status(401).body(Helpers.getStream("No token available"));
+        } else {
+            Access acc = (Access) request.getAttribute("access");
+            String auth0Id = acc.getUser().getAuthId();
+            auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
+            log.info("Access >> {}", auth0Id);
+            // log.info("Has RDF data ? >> {}", BudaUser.getRdfProfile(auth0Id));
+            // log.info("Is Admin ? >> {}", BudaUser.isAdmin(acc.getUser()));
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(auth0Id)), "jsonld"));
+        }
+        // return ResponseEntity.ok().body(Helpers.getStream("DONE"));
     }
 
     @GetMapping(value = "/resource-nc/auth/{res}")
@@ -94,6 +118,13 @@ public class BdrcAuthResource {
         return ResponseEntity.ok("Auth Model was updated");
         // }
         // return Response.ok("Auth usage is disabled").build();
+    }
+
+    public static String getToken(final String header) {
+        if (header == null || !header.startsWith("Bearer ")) {
+            return null;
+        }
+        return header.substring(7);
     }
 
 }

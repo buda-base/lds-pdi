@@ -1,0 +1,34 @@
+@prefix bdgup: <http://purl.bdrc.io/graph-nc/user-private/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix bdu: <http://purl.bdrc.io/resource-nc/user/> .
+@prefix bdou: <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix bdgu: <http://purl.bdrc.io/graph-nc/user/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix viaf:  <http://viaf.org/viaf/> .
+
+
+bdu:U123 a foaf:Person, bdo:Person, bdu:User ;
+        bdou:hasUserProfile adr:5b5f01c877737b5f5c561635 ;
+        foaf:homepage "foo"^^xsd:anyURI ;
+        foaf:img "bar"^^xsd:anyURI ;
+        bdo:gender bdr:GenderMale ;
+        skos:prefLabel "public user" , "my name in Tibetan"@bo-x-ewts ;
+        skos:altLabel "public@bdrc.com user name" ;
+        bdou:mainResidenceCountry "China" ; # must be a standard name first, then we should create identifiers
+        bdou:mainResidenceArea "Khams" ; # same
+        owl:sameAsVIAF viaf:U4433 ;
+        rdfs:seeAlso "academia profile"^^xsd:anyURI ;
+        foaf:interest bdr:T13 , bdr:P6161 ;
+        rdfs:comment "I am this and this person"@en ;
+        bdou:interest bdou:InterestResearch ;
+        bdou:accountCreation "somedate"^^xsd:datetime ;
+        bdou:lastVisit "somedate"^^xsd:datetime ;
+        bdou:preferredLangTags "bo" ;
+        bdou:publicProps skos:prefLabel ;
+        bdou:affiliation bdr:G123 .

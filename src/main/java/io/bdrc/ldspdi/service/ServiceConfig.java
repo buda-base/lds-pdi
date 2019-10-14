@@ -74,7 +74,9 @@ public class ServiceConfig {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        prop.setProperty(FUSEKI_URL, fusekiUrl);
+        if (fusekiUrl != null) {
+            prop.setProperty(FUSEKI_URL, fusekiUrl);
+        }
         OntPolicies.init();
     }
 

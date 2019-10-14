@@ -1,0 +1,16 @@
+@prefix bdgup: <http://purl.bdrc.io/graph-nc/user-private/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix bdu: <http://purl.bdrc.io/resource-nc/user/> .
+@prefix bdou: <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix bdgu: <http://purl.bdrc.io/graph-nc/user/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix viaf:  <http://viaf.org/viaf/> .
+
+   bdu:U123 a foaf:Person, bdo:Person, bdou:User ;
+        skos:prefLabel "public user" .

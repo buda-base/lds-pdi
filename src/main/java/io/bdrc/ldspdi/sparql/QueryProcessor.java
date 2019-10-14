@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.query.DatasetFactory;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -39,6 +41,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,6 +212,31 @@ public class QueryProcessor {
                     + "prefix vcard: <http://www.w3.org/2006/vcard/ns#>\n" + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + "prefix text:  <http://jena.apache.org/text#>\n" + "prefix oa:    <http://www.w3.org/ns/oa#>\n"
                     + "prefix as:    <http://www.w3.org/ns/activitystreams#>\n" + "prefix ldp:   <http://www.w3.org/ns/ldp#>\n" + "prefix sh: <http://www.w3.org/ns/shacl#>\n" + "prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>";
         }
+    }
+
+    public static Dataset buildRdfUserDataset() throws IOException, RestException {
+        Dataset ds = DatasetFactory.create();
+        InputStream stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123.ttl");
+        Model mod = ModelFactory.createDefaultModel();
+        mod.read(stream, "", "TURTLE");
+        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U123", mod);
+        mod.write(System.out, Lang.TURTLE.getName());
+        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123p.ttl");
+        mod = ModelFactory.createDefaultModel();
+        mod.read(stream, "", "TURTLE");
+        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U123", mod);
+        mod.write(System.out, Lang.TURTLE.getName());
+        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456.ttl");
+        mod = ModelFactory.createDefaultModel();
+        mod.read(stream, "", "TURTLE");
+        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U456", mod);
+        mod.write(System.out, Lang.TURTLE.getName());
+        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456p.ttl");
+        mod = ModelFactory.createDefaultModel();
+        mod.read(stream, "", "TURTLE");
+        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U456", mod);
+        mod.write(System.out, Lang.TURTLE.getName());
+        return ds;
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
