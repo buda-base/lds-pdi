@@ -51,20 +51,37 @@ public class BdrcAuthResource {
 
     @GetMapping(value = "/resource-nc/user/me")
     public ResponseEntity<StreamingResponseBody> meUser(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        log.info("Call meUser()");
         String token = getToken(request.getHeader("Authorization"));
-        log.info("TOKEN >> {}", token);
         if (token == null) {
             return ResponseEntity.status(401).body(Helpers.getStream("No token available"));
         } else {
             Access acc = (Access) request.getAttribute("access");
+            log.info("Access >> {}", acc);
             String auth0Id = acc.getUser().getAuthId();
             auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
-            log.info("Access >> {}", auth0Id);
-            // log.info("Has RDF data ? >> {}", BudaUser.getRdfProfile(auth0Id));
-            // log.info("Is Admin ? >> {}", BudaUser.isAdmin(acc.getUser()));
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(auth0Id)), "jsonld"));
         }
-        // return ResponseEntity.ok().body(Helpers.getStream("DONE"));
+    }
+
+    @GetMapping(value = "/resource-nc/user/{res}")
+    public ResponseEntity<StreamingResponseBody> userResource(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        log.info("Call userResource()");
+        String token = getToken(request.getHeader("Authorization"));
+        if (token == null) {
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModelFromUserId(false, res), "jsonld"));
+        } else {
+            Access acc = (Access) request.getAttribute("access");
+            // auth0Id corresponding to the logged on user - from the token
+            String auth0Id = acc.getUser().getAuthId();
+            // auth0Id corresponding to the requested userId - from the path variable
+            String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
+            n = n.substring(n.lastIndexOf("/") + 1);
+            if (BudaUser.isAdmin(acc.getUser()) || auth0Id.equals(n)) {
+                return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
+            }
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));
+        }
     }
 
     @GetMapping(value = "/resource-nc/auth/{res}")

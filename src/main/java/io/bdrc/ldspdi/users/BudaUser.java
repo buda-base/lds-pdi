@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -35,6 +37,18 @@ public class BudaUser {
         return null;
     }
 
+    public static RDFNode getAuth0IdFromUserId(String userId) throws IOException, RestException {
+        Dataset ds = QueryProcessor.buildRdfUserDataset();
+        Model m = ds.getUnionModel();
+        NodeIterator ni = m.listObjectsOfProperty(ResourceFactory.createResource("http://purl.bdrc.io/resource-nc/user/" + userId), ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/user/hasUserProfile"));
+        if (ni.hasNext()) {
+            RDFNode n = ni.next();
+            log.info("NODE >> {} and rdfId= {} ", n);
+            return n;
+        }
+        return null;
+    }
+
     public static boolean isAdmin(User usr) throws IOException, RestException {
         ArrayList<String> gp = usr.getGroups();
         log.info("user groups {}", gp);
@@ -52,9 +66,24 @@ public class BudaUser {
         if (full) {
             mod.add(ds.getNamedModel(PRIVATE_PFX + rdfId));
         }
-        // log.info("USER MODEL for {} and full={}", r, full);
-        // mod.write(System.out, "JSONLD");
         return mod;
+    }
+
+    public static Model getUserModelFromUserId(boolean full, String resId) throws IOException, RestException {
+        if (resId == null) {
+            return null;
+        }
+        Model mod = ModelFactory.createDefaultModel();
+        Dataset ds = QueryProcessor.buildRdfUserDataset();
+        mod.add(ds.getNamedModel(PUBLIC_PFX + resId));
+        if (full) {
+            mod.add(ds.getNamedModel(PRIVATE_PFX + resId));
+        }
+        return mod;
+    }
+
+    public static void main(String[] args) throws IOException, RestException {
+        System.out.println("Auth0Id >> " + BudaUser.getAuth0IdFromUserId("U456"));
     }
 
 }

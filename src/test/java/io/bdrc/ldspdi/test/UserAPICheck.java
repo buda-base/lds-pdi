@@ -126,4 +126,21 @@ public class UserAPICheck {
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
+    @Test
+    public void userForUser() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/U456");
+        get.addHeader("Authorization", "Bearer " + publicToken);
+        HttpResponse resp = client.execute(get);
+        log.info("RESP STATUS userForNonAdminUser public >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        log.info("RESULT userForNonAdminUser public >> {}", EntityUtils.toString(resp.getEntity()));
+        get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/U456");
+        get.addHeader("Authorization", "Bearer " + adminToken);
+        resp = client.execute(get);
+        log.info("RESP STATUS userForNonAdminUser admin >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        log.info("RESULT userForNonAdminUser admin >> {}", EntityUtils.toString(resp.getEntity()));
+    }
+
 }

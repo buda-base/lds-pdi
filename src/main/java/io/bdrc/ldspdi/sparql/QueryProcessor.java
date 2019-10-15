@@ -41,7 +41,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,22 +219,22 @@ public class QueryProcessor {
         Model mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U123", mod);
-        mod.write(System.out, Lang.TURTLE.getName());
+        // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U123", mod);
-        mod.write(System.out, Lang.TURTLE.getName());
+        // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U456", mod);
-        mod.write(System.out, Lang.TURTLE.getName());
+        // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U456", mod);
-        mod.write(System.out, Lang.TURTLE.getName());
+        // mod.write(System.out, Lang.TURTLE.getName());
         return ds;
     }
 
