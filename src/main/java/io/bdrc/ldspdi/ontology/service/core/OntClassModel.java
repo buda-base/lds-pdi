@@ -30,8 +30,11 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,11 +187,29 @@ public class OntClassModel {
         return list;
     }
 
+    public List<Property> getAdminAnnotProps() {
+        ArrayList<Property> list = new ArrayList<>();
+        StmtIterator it = clazz.listProperties();
+        while (it.hasNext()) {
+            Statement stmt = it.next();
+            Property p = stmt.getPredicate();
+            if (OntData.isAdminAnnotProp(p)) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
+    public String getPropertyValue(Property p) {
+        return clazz.getPropertyValue(p).asLiteral().getString();
+    }
+
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
         ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
         OntData.init();
-        OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextSlice", true);
-        System.out.println(mod.hasParent());
+        OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextChunk", true);
+        System.out.println("ADMIN ANNOT PROPS >> " + OntData.adminAnnotProps);
+        System.out.println(mod.getAdminAnnotProps());
     }
 
 }

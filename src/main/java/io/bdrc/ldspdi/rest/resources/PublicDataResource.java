@@ -394,7 +394,7 @@ public class PublicDataResource {
         String tmp = request.getRequestURL().toString().replace("https", "http");
         // DO not Remove below : this is useful for local testing
         // String tmp = "http://purl.bdrc.io/ontology/admin";
-        // String tmp = "http://purl.bdrc.io/ontology/core/Etext";
+        // String tmp = "http://purl.bdrc.io/ontology/core/isRoot";
         log.info("getExtOntologyHomePage tmp is >> {}", tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = parseBaseUri(tmp);

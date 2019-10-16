@@ -78,6 +78,16 @@
             <div style="white-space: pre-wrap;">${comm[0]}<span class="lang">${comm[1]}</span></div><hr/>
         </c:forEach> 
 </c:if>
+
+<!-- ADMIN ANNOTS -->
+    <c:if test = "${model.getAdminAnnotProps().size()>0}">
+        <h4>Annotations:</h4>
+        <c:forEach items="${model.getAdminAnnotProps()}" var="prop">
+            <div style="white-space: pre-wrap;"><b>adm:${prop.getLocalName()}</b><span>&nbsp;:&nbsp;${model.getPropertyValue(prop)}</span></div><hr/>
+        </c:forEach>
+    </c:if>
+    
+    
 <c:if test = "${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics: </b>
 <c:forEach items="${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri())}" var="owlprop"> 

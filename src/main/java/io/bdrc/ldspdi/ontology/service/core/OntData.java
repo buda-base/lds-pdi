@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.ontology.AnnotationProperty;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -32,6 +33,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -65,6 +67,7 @@ public class OntData implements Runnable {
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
     final static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    static List<AnnotationProperty> adminAnnotProps;
 
     public static void init() {
         try {
@@ -84,6 +87,7 @@ public class OntData implements Runnable {
             }
             updateFusekiDataset();
             readGithubJsonLDContext();
+            adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -455,6 +459,16 @@ public class OntData implements Runnable {
 
     };
 
+    public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
+        OntModel om = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/admin");
+        om.write(System.out, "TURTLE");
+        return om.listAnnotationProperties().toList();
+    }
+
+    public static boolean isAdminAnnotProp(Property op) {
+        return OntData.adminAnnotProps.contains(op);
+    }
+
     public static void rdf10tordf11(OntModel o) {
         final ExtendedIterator<DatatypeProperty> it = o.listDatatypeProperties();
         while (it.hasNext()) {
@@ -483,12 +497,13 @@ public class OntData implements Runnable {
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
         OntData.init();
-        OntModel m = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth");
-        OntData.setOntModel(m);
-        m.write(System.out, "TURTLE");
-        System.out.println(m.size());
+        // OntModel m =
+        // OntData.getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth");
+        // OntData.setOntModel(m);
+        // m.write(System.out, "TURTLE");
+        // System.out.println(m.size());
     }
 
 }

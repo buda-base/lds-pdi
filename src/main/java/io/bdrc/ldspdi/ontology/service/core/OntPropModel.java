@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,10 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.restapi.exceptions.RestException;
 
 public class OntPropModel {
@@ -228,6 +233,31 @@ public class OntPropModel {
     @Override
     public String toString() {
         return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range=" + range + ", domain=" + domain + "]";
+    }
+
+    public List<Property> getAdminAnnotProps() {
+        ArrayList<Property> list = new ArrayList<>();
+        StmtIterator it = prop.listProperties();
+        while (it.hasNext()) {
+            Statement stmt = it.next();
+            Property p = stmt.getPredicate();
+            if (OntData.isAdminAnnotProp(p)) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
+    public String getPropertyValue(Property p) {
+        return prop.getPropertyValue(p).asLiteral().getString();
+    }
+
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        OntData.init();
+        OntPropModel mod = new OntPropModel("http://purl.bdrc.io/ontology/core/isRoot", true);
+        System.out.println("ADMIN ANNOT PROPS >> " + OntData.adminAnnotProps);
+        System.out.println(mod.getAdminAnnotProps());
     }
 
 }
