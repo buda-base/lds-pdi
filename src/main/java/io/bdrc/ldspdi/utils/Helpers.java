@@ -196,6 +196,7 @@ public class Helpers {
                     return;
                 }
                 final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
+                log.info("JENA FORMAT >> {}", JenaFormat);
                 if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                     final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);

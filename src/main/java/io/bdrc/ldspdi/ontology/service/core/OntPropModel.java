@@ -43,10 +43,10 @@ public class OntPropModel {
     public String domainUri;
     public List<String> comments;
     public List<String[]> commentsLang;
+    public OntProperty prop;
 
     public OntPropModel(String uri, boolean global) {
         this.uri = uri;
-        OntProperty prop = null;
         if (global) {
             this.name = OntData.ontAllMod.shortForm(uri);
             prop = OntData.ontAllMod.getOntProperty(uri);

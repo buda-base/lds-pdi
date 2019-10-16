@@ -60,7 +60,6 @@ public class OntData implements Runnable {
     public static OWLPropsCharacteristics owlCharacteristics;
     public final static Logger log = LoggerFactory.getLogger(OntData.class);
     public static String JSONLD_CONTEXT;
-    // static EntityTag update;
     static String update;
     static Date lastUpdated;
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();

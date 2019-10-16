@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.query.DatasetFactory;
@@ -39,9 +38,11 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +106,7 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         Query q = QueryFactory.create(prefixes + " describe " + URI);
+        log.debug("getDescribeModel() query : {}", q.toString());
         RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
         Model model = conn.queryDescribe(q);
         return model;
@@ -213,29 +215,29 @@ public class QueryProcessor {
         }
     }
 
-    public static Dataset buildRdfUserDataset() throws IOException, RestException {
-        Dataset ds = DatasetFactory.create();
+    public static DatasetGraph buildRdfUserDataset() throws IOException, RestException {
+        DatasetGraph dgs = DatasetFactory.create().asDatasetGraph();
         InputStream stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123.ttl");
         Model mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
-        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U123", mod);
+        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U123").asNode(), mod.getGraph());
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
-        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U123", mod);
+        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U123").asNode(), mod.getGraph());
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
-        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user-private/U456", mod);
+        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U456").asNode(), mod.getGraph());
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
-        ds.addNamedModel("http://purl.bdrc.io/graph-nc/user/U456", mod);
+        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U456").asNode(), mod.getGraph());
         // mod.write(System.out, Lang.TURTLE.getName());
-        return ds;
+        return dgs;
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {

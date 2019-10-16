@@ -392,7 +392,9 @@ public class PublicDataResource {
         boolean isBase = false;
         String baseUri = "";
         String tmp = request.getRequestURL().toString().replace("https", "http");
+        // DO not Remove below : this is useful for local testing
         // String tmp = "http://purl.bdrc.io/ontology/admin";
+        // String tmp = "http://purl.bdrc.io/ontology/core/Etext";
         log.info("getExtOntologyHomePage tmp is >> {}", tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = parseBaseUri(tmp);
@@ -409,7 +411,9 @@ public class PublicDataResource {
             OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
             // if accept header is present
             if (format != null) {
+                log.info("getExtOntologyHomePage IS BASE and Format is >> {}", format);
                 MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
+                log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
                 if (mediaType == null) {
                     return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                 }
@@ -438,22 +442,8 @@ public class PublicDataResource {
                     return (ModelAndView) model;
                 } else {
                     final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(BudaMediaTypes.getExtFromMime(mediaType));
-                    final StreamingResponseBody stream = new StreamingResponseBody() {
-                        @Override
-                        public void writeTo(OutputStream os) throws IOException {
-                            if (JenaLangStr == "STTL") {
-                                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(om, pr.getBaseUri());
-                                writer.output(os);
-                            } else {
-                                org.apache.jena.rdf.model.RDFWriter wr = om.getWriter(JenaLangStr);
-                                if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                                    wr.setProperty("xmlbase", pr.getBaseUri());
-                                }
-                                wr.write(om, os, pr.getBaseUri());
-                            }
-                        }
-                    };
-                    return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(mediaType).body(stream);
+                    log.debug("getExtOntologyHomePage JenaLangStr is >> {}", JenaLangStr);
+                    return (String) writeStream(om, JenaLangStr).toString();
                 }
             }
         } else {
@@ -461,20 +451,34 @@ public class PublicDataResource {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
                 return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
+            if (format != null) {
+                MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
+                log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
+                if (mediaType == null) {
+                    return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
+                }
+                if (OntData.isClass(tmp, true)) {
+                    log.info("CLASS>>" + tmp);
+                    OntClassModel ocm = new OntClassModel(tmp, true);
+                    if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+                        ModelAndView model = new ModelAndView();
+                        model.addObject("model", ocm);
+                        model.setViewName("ontClassView");
+                        return (ModelAndView) model;
+                    }
 
-            if (OntData.isClass(tmp, true)) {
-                log.info("CLASS>>" + tmp);
-                ModelAndView model = new ModelAndView();
-                model.addObject("model", new OntClassModel(tmp, true));
-                model.setViewName("ontClassView");
-                return (ModelAndView) model;
-
+                } else {
+                    log.info("PROP>>" + tmp);
+                    OntPropModel opm = new OntPropModel(tmp, true);
+                    if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+                        ModelAndView model = new ModelAndView();
+                        model.addObject("model", opm);
+                        model.setViewName("ontPropView");
+                        return (ModelAndView) model;
+                    }
+                }
             } else {
-                log.info("PROP>>" + tmp);
-                ModelAndView model = new ModelAndView();
-                model.addObject("model", new OntPropModel(tmp, true));
-                model.setViewName("ontPropView");
-                return (ModelAndView) model;
+                return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
             }
         }
         return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
@@ -570,11 +574,20 @@ public class PublicDataResource {
         return headers;
     }
 
-    /*
-     * private static ResponseBuilder setHeaders(ResponseBuilder builder,
-     * HashMap<String, String> headers) { for (String key : headers.keySet()) {
-     * builder.header(key, headers.get(key)); } return builder; }
-     */
+    private ByteArrayOutputStream writeStream(Model m, String lang) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        if (lang == "STTL") {
+            final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
+            writer.output(os);
+        } else {
+            org.apache.jena.rdf.model.RDFWriter wr = m.getWriter(lang);
+            if (lang.equals(RDFLanguages.strLangRDFXML)) {
+                wr.setProperty("xmlbase", "");
+            }
+            m.write(os, "");
+        }
+        return os;
+    }
 
     private static String getEtag(Model model, String res) {
         Statement smt = model.getProperty(ResourceFactory.createResource(RES_PREFIX + res), ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/gitRevision"));
