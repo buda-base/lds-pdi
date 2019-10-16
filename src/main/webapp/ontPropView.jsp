@@ -83,7 +83,7 @@
     <c:if test = "${model.getAdminAnnotProps().size()>0}">
         <h4>Annotations:</h4>
         <c:forEach items="${model.getAdminAnnotProps()}" var="prop">
-            <div style="white-space: pre-wrap;"><b>adm:${prop.getLocalName()}</b><span>&nbsp;:&nbsp;${model.getPropertyValue(prop)}</span></div><hr/>
+            <div style="white-space: pre-wrap;"><b>adm:${prop.getLocalName()}</b><span>&nbsp;:&nbsp;${model.getPropertyValue(prop).asLiteral().getString()}</span><span class="lang">${model.getPropertyValue(prop).asLiteral().getLanguage()}</span></div><hr/>
         </c:forEach>
     </c:if>
     

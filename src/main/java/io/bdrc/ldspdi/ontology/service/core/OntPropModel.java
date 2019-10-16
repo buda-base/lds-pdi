@@ -248,8 +248,8 @@ public class OntPropModel {
         return list;
     }
 
-    public String getPropertyValue(Property p) {
-        return prop.getPropertyValue(p).asLiteral().getString();
+    public RDFNode getPropertyValue(Property p) {
+        return prop.getPropertyValue(p);
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {

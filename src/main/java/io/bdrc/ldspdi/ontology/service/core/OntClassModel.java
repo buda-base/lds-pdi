@@ -200,8 +200,8 @@ public class OntClassModel {
         return list;
     }
 
-    public String getPropertyValue(Property p) {
-        return clazz.getPropertyValue(p).asLiteral().getString();
+    public RDFNode getPropertyValue(Property p) {
+        return clazz.getPropertyValue(p);
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
