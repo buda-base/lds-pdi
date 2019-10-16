@@ -391,10 +391,10 @@ public class PublicDataResource {
         log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
         boolean isBase = false;
         String baseUri = "";
-        // String tmp = request.getRequestURL().toString().replace("https", "http");
+        String tmp = request.getRequestURL().toString().replace("https", "http");
         // DO not Remove below : this is useful for local testing
         // String tmp = "http://purl.bdrc.io/ontology/admin";
-        String tmp = "http://purl.bdrc.io/ontology/core/Etext";
+        // String tmp = "http://purl.bdrc.io/ontology/core/Etext";
         log.info("getExtOntologyHomePage tmp is >> {}", tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = parseBaseUri(tmp);
