@@ -72,6 +72,9 @@ public class BdrcAuthResource {
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModelFromUserId(false, res), "jsonld"));
         } else {
             Access acc = (Access) request.getAttribute("access");
+
+            BudaUser.createBudaUserModels(acc.getUser());
+
             // auth0Id corresponding to the logged on user - from the token
             String auth0Id = acc.getUser().getAuthId();
             // auth0Id corresponding to the requested userId - from the path variable
