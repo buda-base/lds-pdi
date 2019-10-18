@@ -215,7 +215,12 @@
         </exclusion>
       </exclusions>
       <version>1.4.0</version>
-    </dependency>    
+    </dependency> 
+    <dependency>
+      <groupId>io.bdrc.libraries</groupId>
+      <artifactId>bdrc-libraries</artifactId>
+      <version>0.4.6</version>
+    </dependency>   
 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 	<dependency>
 	    <groupId>org.yaml</groupId>

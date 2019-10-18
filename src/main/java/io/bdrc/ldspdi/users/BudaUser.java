@@ -115,7 +115,9 @@ public class BudaUser {
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(FOAF + "Person"));
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDOU_PFX + "User"));
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
-        privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + usr.getAuthId().substring(usr.getAuthId().lastIndexOf("/") + 1)));
+        String auth0Id = usr.getAuthId().substring(usr.getAuthId().lastIndexOf("/") + 1);
+        auth0Id = auth0Id.substring(auth0Id.lastIndexOf("|") + 1);
+        privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
         privateModel.write(System.out, "TURTLE");
         mods[0] = publicModel;
         mods[1] = privateModel;
