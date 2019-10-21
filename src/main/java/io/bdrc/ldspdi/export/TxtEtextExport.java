@@ -29,7 +29,6 @@ public class TxtEtextExport {
         // process
         final LdsQuery qfp = LdsQueryService.get("ChunksByRange.arq", "library");
         final String query = qfp.getParametizedQuery(args, false);
-        System.out.println("QUERY >>" + query);
         ResultSetWrapper res = QueryProcessor.getResults(query, null, null, "100000");
         return res;
     }

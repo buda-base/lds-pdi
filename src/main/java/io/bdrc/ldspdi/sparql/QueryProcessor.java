@@ -35,12 +35,15 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.slf4j.Logger;
@@ -52,6 +55,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.users.BudaUser;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -215,29 +219,43 @@ public class QueryProcessor {
         }
     }
 
-    public static DatasetGraph buildRdfUserDataset() throws IOException, RestException {
+    public static DatasetGraph buildRdfUserDataset() throws Exception {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         DatasetGraph dgs = DatasetFactory.create().asDatasetGraph();
         InputStream stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123.ttl");
         Model mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U123").asNode(), mod.getGraph());
+        putModel(fusConn, BudaUser.PRIVATE_PFX + "U123", mod);
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U123").asNode(), mod.getGraph());
+        putModel(fusConn, BudaUser.PUBLIC_PFX + "U123", mod);
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U456").asNode(), mod.getGraph());
+        putModel(fusConn, BudaUser.PRIVATE_PFX + "U456", mod);
         // mod.write(System.out, Lang.TURTLE.getName());
         stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456p.ttl");
         mod = ModelFactory.createDefaultModel();
         mod.read(stream, "", "TURTLE");
         dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U456").asNode(), mod.getGraph());
+        putModel(fusConn, BudaUser.PUBLIC_PFX + "U456", mod);
         // mod.write(System.out, Lang.TURTLE.getName());
+        fusConn.close();
         return dgs;
+    }
+
+    public static void putModel(RDFConnectionFuseki fusConn, String graph, Model m) throws Exception {
+        fusConn.begin(ReadWrite.WRITE);
+        fusConn.put(graph, m);
+        fusConn.commit();
+        fusConn.end();
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {

@@ -126,7 +126,6 @@ public class PublicTemplatesResource {
     public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map,
             HttpServletRequest request) throws RestException {
         log.info("Call to getQueryTemplateResultsJsonPost()");
-        System.out.println("MAP >> " + map);
         if (map == null || map.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
             return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
@@ -154,7 +153,6 @@ public class PublicTemplatesResource {
         String path = request.getServletPath();
         MediaType variant = BudaMediaTypes.selectVariant(request.getHeader("Accept"), BudaMediaTypes.graphVariants);
         log.info("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}", path, format, variant);
-        System.out.println("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}" + path + "," + format + "," + variant);
         if (format == null && variant == null) {
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getGraphResourceHeaders(path, null, "List"));

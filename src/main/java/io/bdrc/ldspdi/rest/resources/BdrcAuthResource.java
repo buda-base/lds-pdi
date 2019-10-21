@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.auth.Access;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.service.UserDataService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.users.BudaUser;
@@ -60,7 +62,13 @@ public class BdrcAuthResource {
             log.info("Access >> {}", acc);
             String auth0Id = acc.getUser().getAuthId();
             auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
-            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(auth0Id)), "jsonld"));
+            Resource usr = BudaUser.getRdfProfile(auth0Id);
+            if (usr == null) {
+                UserDataService.addNewBudaUser(acc.getUser());
+                usr = BudaUser.getRdfProfile(auth0Id);
+                log.info("User Resource >> {}", usr);
+            }
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, usr), "jsonld"));
         }
     }
 
@@ -72,11 +80,16 @@ public class BdrcAuthResource {
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModelFromUserId(false, res), "jsonld"));
         } else {
             Access acc = (Access) request.getAttribute("access");
-
             BudaUser.createBudaUserModels(acc.getUser());
-
             // auth0Id corresponding to the logged on user - from the token
             String auth0Id = acc.getUser().getAuthId();
+            auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
+            Resource usr = BudaUser.getRdfProfile(auth0Id);
+            if (usr == null) {
+                UserDataService.addNewBudaUser(acc.getUser());
+                usr = BudaUser.getRdfProfile(auth0Id);
+                log.info("User Resource >> {}", usr);
+            }
             // auth0Id corresponding to the requested userId - from the path variable
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
             n = n.substring(n.lastIndexOf("/") + 1);
@@ -130,14 +143,10 @@ public class BdrcAuthResource {
 
     @GetMapping(value = "/callbacks/github/bdrc-auth")
     public ResponseEntity<String> updateAuthModel() throws RestException {
-        // if (ServiceConfig.useAuth()) {
-        System.out.println("updating Auth data model() >>");
         log.info("updating Auth data model() >>");
         Thread t = new Thread(new RdfAuthModel());
         t.start();
         return ResponseEntity.ok("Auth Model was updated");
-        // }
-        // return Response.ok("Auth usage is disabled").build();
     }
 
     public static String getToken(final String header) {

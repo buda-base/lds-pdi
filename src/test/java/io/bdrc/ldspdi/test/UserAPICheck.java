@@ -48,6 +48,8 @@ public class UserAPICheck {
     static String token;
     static String publicToken;
     static String adminToken;
+    static String privateToken;
+    static String staffToken;
 
     @Autowired
     Environment environment;
@@ -88,6 +90,8 @@ public class UserAPICheck {
         log.info("USERS >> {}" + RdfAuthModel.getUsers());
         set123Token();
         set456Token();
+        setPrivateToken();
+        setStaffToken();
     }
 
     private static void set123Token() throws IOException {
@@ -104,6 +108,22 @@ public class UserAPICheck {
         req.setAudience("https://bdrc-io.auth0.com/api/v2/");
         adminToken = req.execute().getIdToken();
         log.info("admin Token >> {}", adminToken);
+    }
+
+    private static void setPrivateToken() throws IOException {
+        AuthRequest req = auth.login("privateuser@bdrc.com", AuthProps.getProperty("privateuser@bdrc.com"));
+        req.setScope("openid offline_access");
+        req.setAudience("https://bdrc-io.auth0.com/api/v2/");
+        privateToken = req.execute().getIdToken();
+        log.info("private Token >> {}", privateToken);
+    }
+
+    private static void setStaffToken() throws IOException {
+        AuthRequest req = auth.login("staffuser@bdrc.com", AuthProps.getProperty("staffuser@bdrc.com"));
+        req.setScope("openid offline_access");
+        req.setAudience("https://bdrc-io.auth0.com/api/v2/");
+        staffToken = req.execute().getIdToken();
+        log.info("staff Token >> {}", staffToken);
     }
 
     @Test
@@ -141,6 +161,17 @@ public class UserAPICheck {
         log.info("RESP STATUS userForNonAdminUser admin >> {}", resp.getStatusLine());
         assert (resp.getStatusLine().getStatusCode() == 200);
         log.info("RESULT userForNonAdminUser admin >> {}", EntityUtils.toString(resp.getEntity()));
+    }
+
+    @Test
+    public void tokenOfNonExistingBudaUser() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
+        get.addHeader("Authorization", "Bearer " + privateToken);
+        HttpResponse resp = client.execute(get);
+        log.info("RESP STATUS public resource >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
 }

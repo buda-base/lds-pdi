@@ -64,9 +64,9 @@ public class RdfAuthFilter implements Filter {
                     return;
                 } else {
                     Access access = new Access(prof, end);
-                    // System.out.println("FILTER Access matchGroup >> "+access.matchGroup());
-                    // System.out.println("FILTER Access matchRole >> "+access.matchRole());
-                    // System.out.println("FILTER Access matchPerm >> "+access.matchPermissions());
+                    log.debug("FILTER Access matchGroup >> {}", access.matchGroup());
+                    log.debug("FILTER Access matchRole >> {}", access.matchRole());
+                    log.debug("FILTER Access matchPerm >> {}", access.matchPermissions());
                     if (!access.hasEndpointAccess()) {
                         ((HttpServletResponse) response).setStatus(403);
                         return;

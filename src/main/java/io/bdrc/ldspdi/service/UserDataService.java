@@ -4,7 +4,6 @@ import static io.bdrc.libraries.Models.ADM;
 import static io.bdrc.libraries.Models.BDO;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,12 +15,13 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -34,19 +34,23 @@ import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.jena.sttl.STriGWriter;
 import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.users.BudaUser;
 
-public class UserGitService {
+public class UserDataService {
 
-    public final static Logger log = LoggerFactory.getLogger(UserGitService.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(UserDataService.class.getName());
     public static final String gitignore = "# Ignore everything\n" + "*\n" + "# Don't ignore directories, so we can recurse into them\n" + "!*/\n" + "# Don't ignore .gitignore and *.foo files\n" + "!.gitignore\n" + "!*.trig\n" + "";
 
-    public RevCommit addNewBudaUser(User user) {
+    public static RevCommit addNewBudaUser(User user) {
         RevCommit rev = null;
         Model[] mod = BudaUser.createBudaUserModels(user);
+        log.info("public model for user {} is {}", user, mod[0]);
+        log.info("private model for user {} is {}", user, mod[1]);
         Model pub = mod[0];
+        Model priv = mod[1];
         String userId = null;
-        ResIterator rit = pub.listSubjectsWithProperty(ResourceFactory.createProperty(BudaUser.BDOU_PFX + "hasUserProfile"));
+        ResIterator rit = priv.listSubjectsWithProperty(ResourceFactory.createProperty(BudaUser.BDOU_PFX + "hasUserProfile"));
         if (rit.hasNext()) {
             Resource r = rit.next();
             userId = r.getLocalName();
@@ -54,7 +58,6 @@ public class UserGitService {
             log.error("Invalid user model for {}", user);
             return null;
         }
-        Model priv = mod[1];
         ensureUserGitRepo();
         FileOutputStream fos = null;
         try {
@@ -69,8 +72,14 @@ public class UserGitService {
                 git.add().addFilepattern(".").call();
                 rev = git.commit().setMessage("User " + user.getName() + " was created").call();
             }
+            git.close();
+            RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+            RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
+            QueryProcessor.putModel(fusConn, BudaUser.PUBLIC_PFX + userId, pub);
+            QueryProcessor.putModel(fusConn, BudaUser.PRIVATE_PFX + userId, priv);
+            fusConn.close();
 
-        } catch (FileNotFoundException | GitAPIException e) {
+        } catch (Exception e) {
 
         }
         return rev;
@@ -87,7 +96,7 @@ public class UserGitService {
             repository = builder.setGitDir(gitDir).setWorkTree(wtDir).readEnvironment() // scan environment GIT_* variables
                     .build();
             if (!repository.getObjectDatabase().exists()) {
-                System.out.println("create git repository in " + dirpath);
+                log.info("create git repository in {}", dirpath);
                 repository.create();
                 PrintWriter out = new PrintWriter(dirpath + ".gitignore");
                 out.println(gitignore);
@@ -110,7 +119,7 @@ public class UserGitService {
         }
     }
 
-    private Context createWriterContext() {
+    private static Context createWriterContext() {
         SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
         nsPrio.put(SKOS.getURI(), 1);
         nsPrio.put("http://purl.bdrc.io/ontology/admin/", 5);
