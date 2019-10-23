@@ -75,6 +75,7 @@ public class ResultSetWrapper {
     }
 
     public void update(int pageSize) {
+        this.pageSize = pageSize;
         numberOfPages = numResults / pageSize;
         if (numberOfPages * pageSize < numResults) {
             numberOfPages++;
