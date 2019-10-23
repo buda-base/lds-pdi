@@ -22,4 +22,25 @@ jcs.ldspdi.elementattributes.IdleTime=300
 #Test jcs.ldspdi.elementattributes.MaxLife=180
 #Test jcs.ldspdi.elementattributes.IdleTime=120
 
+# DEFAULT CACHE REGION
+jcs.usr=
+jcs.usr.cacheattributes=org.apache.commons.jcs.engine.CompositeCacheAttributes
+jcs.usr.cacheattributes.MaxObjects=500
+jcs.usr.cacheattributes.UseDisk=false
+jcs.usr.cacheattributes.UseRemote=false
+jcs.usr.cacheattributes.UseLateral=false
+jcs.usr.cacheattributes.MemoryCacheName=org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
+jcs.usr.cacheattributes.UseMemoryShrinker=true
+jcs.usr.cacheattributes.MaxMemoryIdleTimeSeconds=3600
+jcs.usr.cacheattributes.ShrinkerIntervalSeconds=30
+jcs.usr.cacheattributes.MaxSpoolPerRun=250
+jcs.usr.elementattributes=org.apache.commons.jcs.engine.ElementAttributes
+jcs.usr.elementattributes.IsEternal=false
+jcs.usr.elementattributes.IsSpool=false
+jcs.usr.elementattributes.IsRemote=false
+jcs.usr.elementattributes.IsLateral=false
+jcs.usr.elementattributes.MaxLife=900
+jcs.usr.elementattributes.IdleTime=300
+
+
 
