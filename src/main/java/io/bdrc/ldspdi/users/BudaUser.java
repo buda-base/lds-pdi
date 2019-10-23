@@ -3,7 +3,6 @@ package io.bdrc.ldspdi.users;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
@@ -41,7 +40,6 @@ public class BudaUser {
 
     public final static Logger log = LoggerFactory.getLogger(BudaUser.class);
     // TODO this should come from the auth library
-    private static String adminGroupId = "f0f95a54-56cf-4bce-bf9d-8d2df6779b60";
     public static final String PRIVATE_PFX = "http://purl.bdrc.io/graph-nc/user-private/";
     public static final String PUBLIC_PFX = "http://purl.bdrc.io/graph-nc/user/";
     public static final String BDOU_PFX = "http://purl.bdrc.io/ontology/ext/user/";
@@ -53,26 +51,29 @@ public class BudaUser {
     // TODO give an explicit name
     public static Dataset ds;
 
+    // This part will go away very soon, once the dataset is actually properly set
+    // in fuseki authrw
     static {
         try {
             ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
         } catch (Exception e) {
-            // TODO log the error instead of writing to stdout
-            e.printStackTrace();
+            log.error("Could not instantiate User Dataset", e);
         }
     }
 
     public static Resource getRdfProfile(String auth0Id) throws IOException, RestException {
+        Resource r = (Resource) UsersCache.getObjectFromCache(auth0Id.hashCode());
+        if (r != null) {
+            return r;
+        }
         String query = "select distinct ?s where  {  ?s <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> <http://purl.bdrc.io/resource-nc/auth/" + auth0Id + "> }";
         log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
-        // TODO this should be cached (like the other sparql queries)
-        // perhaps in a special cache that gets cleared when there's a change in auth0
-        // model
         QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
         ResultSet rs = qe.execSelect();
         if (rs.hasNext()) {
-            Resource r = rs.next().getResource("?s");
+            r = rs.next().getResource("?s");
             log.info("RESOURCE >> {} and rdfId= {} ", r);
+            UsersCache.addToCache(r, auth0Id.hashCode());
             return r;
         }
         qe.close();
@@ -90,12 +91,6 @@ public class BudaUser {
             return r;
         }
         return null;
-    }
-
-    public static boolean isAdmin(User usr) throws IOException, RestException {
-        ArrayList<String> gp = usr.getGroups();
-        log.info("user groups {}", gp);
-        return gp.contains(BudaUser.adminGroupId);
     }
 
     public static boolean isActive(String userId) throws IOException, RestException {
@@ -170,8 +165,9 @@ public class BudaUser {
         publicModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
         // TODO there should be some language detection based on the first character:
         // if Chinese, then @zh-hani, if Tibetan then @bo, else no lang tag
-        publicModel.add(bUser, SKOS_PREF_LABEL, usr.getName());
+        publicModel.add(bUser, SKOS_PREF_LABEL, ResourceFactory.createPlainLiteral(usr.getName()));
         // TODO don't write on System.out
+        // for development purpose only
         publicModel.write(System.out, "TURTLE");
         mods[0] = publicModel;
 
@@ -184,10 +180,11 @@ public class BudaUser {
         String auth0Id = usr.getUserId();
 
         privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
+        privateModel.add(bUser, ResourceFactory.createProperty(FOAF + "mbox"), ResourceFactory.createPlainLiteral(usr.getEmail()));
+        privateModel.add(bUser, SKOS_PREF_LABEL, ResourceFactory.createPlainLiteral(usr.getName()));
         // TODO don't write on system.out
+        // for development purpose only
         privateModel.write(System.out, "TURTLE");
-        // TODO also include email from auth profile in private model
-        // TODO include name
 
         mods[0] = publicModel;
         mods[1] = privateModel;

@@ -26,11 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
@@ -221,4 +225,10 @@ public class Helpers {
         return (mt.getType().equals(mt1.getType()) && mt.getSubtype().equals(mt1.getSubtype()));
     }
 
+    public static String getTwoLettersBucket(String st) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.reset();
+        md.update(st.getBytes(Charset.forName("UTF8")));
+        return new String(Hex.encodeHex(md.digest())).substring(0, 2);
+    }
 }

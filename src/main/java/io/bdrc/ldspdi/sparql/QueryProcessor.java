@@ -220,7 +220,6 @@ public class QueryProcessor {
     }
 
     public static DatasetGraph buildRdfUserDataset() throws Exception {
-        // TODO what's that?
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
         RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         DatasetGraph dgs = DatasetFactory.create().asDatasetGraph();

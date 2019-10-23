@@ -36,6 +36,7 @@ import io.bdrc.jena.sttl.STriGWriter;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.users.BudaUser;
+import io.bdrc.ldspdi.utils.Helpers;
 
 public class UserDataService {
 
@@ -58,18 +59,24 @@ public class UserDataService {
             log.error("Invalid user model for {}", user);
             return null;
         }
-        // TODO the ensureUsreGitRepo should only be called at initialization, not at every call
-        // (it's a lot of IO)
-        ensureUserGitRepo();
+        String dirpath = System.getProperty("user.dir") + "/users/";
+        File theDir = new File(dirpath);
+        Repository r = null;
+        if (!theDir.exists()) {
+            r = ensureUserGitRepo();
+        }
         FileOutputStream fos = null;
         try {
-            // TODO there should be a bucket system with 2 letters, like on other repositories
-            fos = new FileOutputStream(System.getProperty("user.dir") + "/users/" + userId + ".trig");
+            String bucket = Helpers.getTwoLettersBucket(userId);
+            createDirIfNotExists(dirpath + bucket + "/");
+            fos = new FileOutputStream(dirpath + bucket + "/" + userId + ".trig");
             DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
             dsg.addGraph(ResourceFactory.createResource(BudaUser.PUBLIC_PFX + userId).asNode(), pub.getGraph());
             dsg.addGraph(ResourceFactory.createResource(BudaUser.PRIVATE_PFX + userId).asNode(), priv.getGraph());
             new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
-            Repository r = ensureUserGitRepo();
+            if (r == null) {
+                r = ensureUserGitRepo();
+            }
             Git git = new Git(r);
             if (!git.status().call().isClean()) {
                 git.add().addFilepattern(".").call();
@@ -86,9 +93,8 @@ public class UserDataService {
             fusConn = ((RDFConnectionFuseki) builder.build());
             QueryProcessor.putModel(fusConn, BudaUser.PUBLIC_PFX + userId, pub);
             fusConn.close();
-
         } catch (Exception e) {
-            // TODO: there should be an error log
+            log.error("Failed to add new Buda user :" + user.getName(), e);
         }
         return rev;
     }
@@ -111,8 +117,7 @@ public class UserDataService {
                 out.close();
             }
         } catch (IOException e) {
-            // TODO do not write to system.out, write proper logs
-            e.printStackTrace();
+            log.error("Could not get git repository: ", e);
         }
         return repository;
     }
@@ -123,8 +128,7 @@ public class UserDataService {
             try {
                 theDir.mkdir();
             } catch (SecurityException se) {
-                // TODO do not write to system.err, write proper logs
-                System.err.println("could not create directory, please fasten your seat belt");
+                log.error("Could not create " + dir, se);
             }
         }
     }

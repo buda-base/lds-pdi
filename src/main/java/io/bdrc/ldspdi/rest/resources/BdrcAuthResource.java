@@ -98,7 +98,7 @@ public class BdrcAuthResource {
             // auth0Id corresponding to the requested userId - from the path variable
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
             n = n.substring(n.lastIndexOf("/") + 1);
-            if (BudaUser.isAdmin(acc.getUser()) || auth0Id.equals(n)) {
+            if (acc.getUser().isAdmin() || auth0Id.equals(n)) {
                 return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
             }
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));
@@ -113,7 +113,7 @@ public class BdrcAuthResource {
             return ResponseEntity.status(403).body(Helpers.getStream("You must be authenticated in order to disable this user"));
         } else {
             Access acc = (Access) request.getAttribute("access");
-            if (BudaUser.isAdmin(acc.getUser())) {
+            if (acc.getUser().isAdmin()) {
                 String auth0Id = BudaUser.getAuth0IdFromUserId(res).asNode().getURI();
                 User usr = RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1));
                 String auth0FullId = usr.getAuthId();
@@ -124,8 +124,7 @@ public class BdrcAuthResource {
             }
             BudaUser.createBudaUserModels(acc.getUser());
             // auth0Id corresponding to the logged on user - from the token
-            String auth0Id = acc.getUser().getAuthId();
-            auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
+            String auth0Id = acc.getUser().getUserId();
             Resource usr = BudaUser.getRdfProfile(auth0Id);
             if (usr == null) {
                 UserDataService.addNewBudaUser(acc.getUser());
@@ -135,7 +134,7 @@ public class BdrcAuthResource {
             // auth0Id corresponding to the requested userId - from the path variable
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
             n = n.substring(n.lastIndexOf("/") + 1);
-            if (BudaUser.isAdmin(acc.getUser())) {
+            if (acc.getUser().isAdmin()) {
                 return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
             }
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));
