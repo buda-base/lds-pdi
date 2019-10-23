@@ -15,6 +15,7 @@
 
 bdu:U123 a foaf:Person, bdo:Person, bdu:User ;
         bdou:hasUserProfile adr:5b5f01c877737b5f5c561635 ;
+        bdou:isActive "true"^^xsd:boolean  ;
         foaf:homepage "foo"^^xsd:anyURI ;
         foaf:img "bar"^^xsd:anyURI ;
         bdo:gender bdr:GenderMale ;

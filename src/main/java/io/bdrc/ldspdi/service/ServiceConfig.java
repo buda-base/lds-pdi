@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultsCache;
 
 public class ServiceConfig {
@@ -71,6 +72,7 @@ public class ServiceConfig {
              * log.warn("No custom properties file could be found: using default props"); }
              * AuthProps.init(prop); }
              */
+            AuthProps.init(prop);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

@@ -75,7 +75,7 @@ public class PublicTemplatesResource {
     public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
-
+        log.info("Call to getQueryTemplateResults() parameters hashmap ={}", hm);
         String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
         if (pageNumber == null) {
             pageNumber = "1";

@@ -78,6 +78,11 @@ public class UserDataService {
             QueryProcessor.putModel(fusConn, BudaUser.PUBLIC_PFX + userId, pub);
             QueryProcessor.putModel(fusConn, BudaUser.PRIVATE_PFX + userId, priv);
             fusConn.close();
+            // Public graph is pushed to bdrcrw
+            builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiUrl").replace("query", ""));
+            fusConn = ((RDFConnectionFuseki) builder.build());
+            QueryProcessor.putModel(fusConn, BudaUser.PUBLIC_PFX + userId, pub);
+            fusConn.close();
 
         } catch (Exception e) {
 

@@ -1,26 +1,35 @@
 package io.bdrc.ldspdi.users;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
+import org.seaborne.patch.changes.RDFChangesApply;
+import org.seaborne.patch.text.RDFPatchReaderText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.model.User;
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -66,13 +75,14 @@ public class BudaUser {
     }
 
     public static RDFNode getAuth0IdFromUserId(String userId) throws IOException, RestException {
-        // Dataset ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
-        Model m = ds.getUnionModel();
-        NodeIterator ni = m.listObjectsOfProperty(ResourceFactory.createResource("http://purl.bdrc.io/resource-nc/user/" + userId), ResourceFactory.createProperty("http://purl.bdrc.io/ontology/ext/user/hasUserProfile"));
-        if (ni.hasNext()) {
-            RDFNode n = ni.next();
-            log.info("NODE >> {} and rdfId= {} ", n);
-            return n;
+        String query = "select distinct ?o where  {  <" + BDU_PFX + userId + "> <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> ?o }";
+        log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+        QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+        ResultSet rs = qe.execSelect();
+        if (rs.hasNext()) {
+            Resource r = rs.next().getResource("?o");
+            log.info("RESOURCE >> {} and rdfId= {} ", r);
+            return r;
         }
         return null;
     }
@@ -81,6 +91,33 @@ public class BudaUser {
         ArrayList<String> gp = usr.getGroups();
         log.info("user groups {}", gp);
         return gp.contains(BudaUser.adminGroupId);
+    }
+
+    public static boolean isActive(String userId) throws IOException, RestException {
+        String query = "select distinct ?o where  {  <" + BDU_PFX + userId + "> <http://purl.bdrc.io/ontology/ext/user/isActive> ?o }";
+        log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+        QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+        ResultSet rs = qe.execSelect();
+        if (rs.hasNext()) {
+            Literal r = rs.next().getLiteral("?o");
+            log.info("RESOURCE >> {} and rdfId= {} ", r);
+            return r.getBoolean();
+        }
+        return false;
+    }
+
+    public static void update(String userId, String patch) throws Exception {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
+        InputStream ptc = new ByteArrayInputStream(patch.getBytes());
+        RDFPatchReaderText rdf = new RDFPatchReaderText(ptc);
+        Model m = fusConn.fetch("<" + PRIVATE_PFX + userId + ">");
+        DatasetGraph dsg = DatasetFactory.wrap(m).asDatasetGraph();
+        RDFChangesApply apply = new RDFChangesApply(dsg);
+        rdf.apply(apply);
+        Model m1 = ModelFactory.createModelForGraph(dsg.getGraph(NodeFactory.createURI("<" + PRIVATE_PFX + userId + ">")));
+        QueryProcessor.putModel(fusConn, "<" + PRIVATE_PFX + userId + ">", m1);
+        fusConn.close();
     }
 
     public static Model getUserModel(boolean full, Resource r) throws IOException, RestException {
@@ -113,6 +150,7 @@ public class BudaUser {
     }
 
     public static Model[] createBudaUserModels(User usr) {
+        log.info("createBudaUserModels for user {}", usr);
         Model[] mods = new Model[2];
         Model publicModel = ModelFactory.createDefaultModel();
         String userId = "U" + Integer.toString(Math.abs(usr.getName().hashCode()));
@@ -131,8 +169,8 @@ public class BudaUser {
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(FOAF + "Person"));
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDOU_PFX + "User"));
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
-        String auth0Id = usr.getAuthId().substring(usr.getAuthId().lastIndexOf("/") + 1);
-        auth0Id = auth0Id.substring(auth0Id.lastIndexOf("|") + 1);
+        log.info("hasUserProfile in createBudaUserModels = {}", usr.getUserId());
+        String auth0Id = usr.getUserId();
         privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
         privateModel.write(System.out, "TURTLE");
 
@@ -144,8 +182,14 @@ public class BudaUser {
     }
 
     public static void main(String[] args) throws IOException, RestException {
-        System.out.println("Auth0Id >> " + BudaUser.getAuth0IdFromUserId("U456"));
-        BudaUser.createBudaUserModels(null);
+        ServiceConfig.initForTests(null);
+        RdfAuthModel.initForTest(false, true);
+        String auth0Id = BudaUser.getAuth0IdFromUserId("U456").asNode().getURI();
+        System.out.println("Is active  >> " + BudaUser.isActive("U456"));
+        // System.out.println("Auth0Id >> " + auth0Id);
+        // System.out.println("USERS >> " + RdfAuthModel.getUsers());
+        // System.out.println("USER >> " +
+        // RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1)));
     }
 
 }

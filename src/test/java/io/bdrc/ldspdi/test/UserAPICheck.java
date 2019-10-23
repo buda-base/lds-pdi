@@ -126,7 +126,32 @@ public class UserAPICheck {
         log.info("staff Token >> {}", staffToken);
     }
 
-    @Test
+    private static String getAPIToken() throws ClientProtocolException, IOException {
+        String webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
+        String auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = null;
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
+        HashMap<String, String> json = new HashMap<>();
+        json.put("grant_type", "client_credentials");
+        json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
+        json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
+        json.put("audience", "urn:auth0-authz-api");
+        String post_data = new ObjectMapper().writer().writeValueAsString(json);
+        StringEntity se = new StringEntity(post_data);
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        post.setEntity(se);
+        HttpResponse response = client.execute(post);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        response.getEntity().writeTo(baos);
+        String json_resp = baos.toString();
+        baos.close();
+        JsonNode node = new ObjectMapper().readTree(json_resp);
+        String token = node.findValue("access_token").asText();
+        return token;
+    }
+
+    // @Test
     public void noToken() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
@@ -135,7 +160,7 @@ public class UserAPICheck {
         assert (resp.getStatusLine().getStatusCode() == 401);
     }
 
-    @Test
+    // @Test
     public void tokenOfExistingUser() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
@@ -146,7 +171,7 @@ public class UserAPICheck {
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
-    @Test
+    // @Test
     public void userForUser() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/U456");
@@ -172,6 +197,24 @@ public class UserAPICheck {
         log.info("RESP STATUS public resource >> {}", resp.getStatusLine());
         assert (resp.getStatusLine().getStatusCode() == 200);
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
+    }
+
+    // @Test
+    public void viewAuth0Users() throws ClientProtocolException, IOException {
+        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpGet get = new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/users");
+        get.addHeader("Authorization", "Bearer " + getAPIToken());
+        final HttpResponse resp = client.execute(get);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resp.getEntity().writeTo(baos);
+        final JsonNode node1 = new ObjectMapper().readTree(baos.toString());
+        System.out.println("Users JSON >> " + node1);
+        baos.close();
+        final java.util.Iterator<JsonNode> it = node1.at("/users").elements();
+        while (it.hasNext()) {
+            final JsonNode tmp = it.next();
+            System.out.println("User json >> " + tmp);
+        }
     }
 
 }

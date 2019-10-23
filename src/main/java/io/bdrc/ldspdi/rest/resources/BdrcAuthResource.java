@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,15 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.auth.Access;
+import io.bdrc.auth.model.AuthDataModelBuilder;
+import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.UserDataService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.users.BudaUser;
+import io.bdrc.ldspdi.users.UserPatches;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.restapi.exceptions.ErrorMessage;
@@ -94,6 +98,43 @@ public class BdrcAuthResource {
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
             n = n.substring(n.lastIndexOf("/") + 1);
             if (BudaUser.isAdmin(acc.getUser()) || auth0Id.equals(n)) {
+                return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
+            }
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));
+        }
+    }
+
+    @DeleteMapping(value = "/resource-nc/user/{res}")
+    public ResponseEntity<StreamingResponseBody> userDelete(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws Exception {
+        log.info("Call userResource()");
+        String token = getToken(request.getHeader("Authorization"));
+        if (token == null) {
+            return ResponseEntity.status(403).body(Helpers.getStream("You must be authenticated in order to disable this user"));
+        } else {
+            Access acc = (Access) request.getAttribute("access");
+            if (BudaUser.isAdmin(acc.getUser())) {
+                String auth0Id = BudaUser.getAuth0IdFromUserId(res).asNode().getURI();
+                User usr = RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1));
+                String auth0FullId = usr.getAuthId();
+                // first update the Buda User rdf profile
+                BudaUser.update(res, UserPatches.getSetActivePatch(res, false));
+                // next, mark (patch) the corresponding Auth0 user as "blocked'
+                AuthDataModelBuilder.patchUser(auth0FullId, "{\"blocked\"=true}");
+            }
+            BudaUser.createBudaUserModels(acc.getUser());
+            // auth0Id corresponding to the logged on user - from the token
+            String auth0Id = acc.getUser().getAuthId();
+            auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
+            Resource usr = BudaUser.getRdfProfile(auth0Id);
+            if (usr == null) {
+                UserDataService.addNewBudaUser(acc.getUser());
+                usr = BudaUser.getRdfProfile(auth0Id);
+                log.info("User Resource >> {}", usr);
+            }
+            // auth0Id corresponding to the requested userId - from the path variable
+            String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
+            n = n.substring(n.lastIndexOf("/") + 1);
+            if (BudaUser.isAdmin(acc.getUser())) {
                 return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
             }
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));

@@ -214,7 +214,7 @@
           <artifactId>slf4j-simple</artifactId>
         </exclusion>
       </exclusions>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
     </dependency> 
     <dependency>
       <groupId>io.bdrc.libraries</groupId>
@@ -226,6 +226,18 @@
 	    <groupId>org.yaml</groupId>
 	    <artifactId>snakeyaml</artifactId>	    
 	</dependency>
+    <!-- https://mvnrepository.com/artifact/org.seaborne.rdf-delta/rdf-patch -->
+    <dependency>
+        <groupId>org.seaborne.rdf-delta</groupId>
+        <artifactId>rdf-patch</artifactId>
+        <version>0.7.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.seaborne.rdf-delta/rdf-delta-server-local -->
+    <dependency>
+        <groupId>org.seaborne.rdf-delta</groupId>
+        <artifactId>rdf-delta-server-local</artifactId>
+        <version>0.7.0</version>
+    </dependency>
   </dependencies> 
   <build>
     <finalName>lds-pdi</finalName>
