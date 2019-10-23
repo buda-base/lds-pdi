@@ -64,6 +64,7 @@ public class BdrcAuthResource {
         } else {
             Access acc = (Access) request.getAttribute("access");
             log.info("Access >> {}", acc);
+            // TODO there should be a function in bdrc-auth-lib that does this
             String auth0Id = acc.getUser().getAuthId();
             auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
             Resource usr = BudaUser.getRdfProfile(auth0Id);

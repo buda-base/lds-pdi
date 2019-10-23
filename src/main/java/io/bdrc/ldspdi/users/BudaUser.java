@@ -40,6 +40,7 @@ public class BudaUser {
     public final static Property SKOS_PREF_LABEL = ResourceFactory.createProperty("http://www.w3.org/2004/02/skos/core#prefLabel");
 
     public final static Logger log = LoggerFactory.getLogger(BudaUser.class);
+    // TODO this should come from the auth library
     private static String adminGroupId = "f0f95a54-56cf-4bce-bf9d-8d2df6779b60";
     public static final String PRIVATE_PFX = "http://purl.bdrc.io/graph-nc/user-private/";
     public static final String PUBLIC_PFX = "http://purl.bdrc.io/graph-nc/user/";
@@ -49,13 +50,14 @@ public class BudaUser {
     public static final String FOAF = "http://xmlns.com/foaf/0.1/";
     public static final String ADR_PFX = "http://purl.bdrc.io/resource-nc/auth/";
 
+    // TODO give an explicit name
     public static Dataset ds;
 
     static {
         try {
             ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            // TODO log the error instead of writing to stdout
             e.printStackTrace();
         }
     }
@@ -63,6 +65,9 @@ public class BudaUser {
     public static Resource getRdfProfile(String auth0Id) throws IOException, RestException {
         String query = "select distinct ?s where  {  ?s <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> <http://purl.bdrc.io/resource-nc/auth/" + auth0Id + "> }";
         log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+        // TODO this should be cached (like the other sparql queries)
+        // perhaps in a special cache that gets cleared when there's a change in auth0
+        // model
         QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
         ResultSet rs = qe.execSelect();
         if (rs.hasNext()) {
@@ -140,6 +145,9 @@ public class BudaUser {
         if (resId == null) {
             return null;
         }
+        // TODO I'm not sure I understand: do we keep all rdf data about users in memory
+        // all the time?
+        // why not do what we usually do and cache sparql query results for some time?
         Model mod = ModelFactory.createDefaultModel();
         // Dataset ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
         mod.add(ds.getNamedModel(PUBLIC_PFX + resId));
@@ -160,7 +168,10 @@ public class BudaUser {
         publicModel.add(bUser, RDF.type, ResourceFactory.createResource(FOAF + "Person"));
         publicModel.add(bUser, RDF.type, ResourceFactory.createResource(BDOU_PFX + "User"));
         publicModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
+        // TODO there should be some language detection based on the first character:
+        // if Chinese, then @zh-hani, if Tibetan then @bo, else no lang tag
         publicModel.add(bUser, SKOS_PREF_LABEL, usr.getName());
+        // TODO don't write on System.out
         publicModel.write(System.out, "TURTLE");
         mods[0] = publicModel;
 
@@ -171,8 +182,12 @@ public class BudaUser {
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
         log.info("hasUserProfile in createBudaUserModels = {}", usr.getUserId());
         String auth0Id = usr.getUserId();
+
         privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
+        // TODO don't write on system.out
         privateModel.write(System.out, "TURTLE");
+        // TODO also include email from auth profile in private model
+        // TODO include name
 
         mods[0] = publicModel;
         mods[1] = privateModel;

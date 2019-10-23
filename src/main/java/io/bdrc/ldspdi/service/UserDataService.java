@@ -58,9 +58,12 @@ public class UserDataService {
             log.error("Invalid user model for {}", user);
             return null;
         }
+        // TODO the ensureUsreGitRepo should only be called at initialization, not at every call
+        // (it's a lot of IO)
         ensureUserGitRepo();
         FileOutputStream fos = null;
         try {
+            // TODO there should be a bucket system with 2 letters, like on other repositories
             fos = new FileOutputStream(System.getProperty("user.dir") + "/users/" + userId + ".trig");
             DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
             dsg.addGraph(ResourceFactory.createResource(BudaUser.PUBLIC_PFX + userId).asNode(), pub.getGraph());
@@ -85,7 +88,7 @@ public class UserDataService {
             fusConn.close();
 
         } catch (Exception e) {
-
+            // TODO: there should be an error log
         }
         return rev;
     }
@@ -108,6 +111,7 @@ public class UserDataService {
                 out.close();
             }
         } catch (IOException e) {
+            // TODO do not write to system.out, write proper logs
             e.printStackTrace();
         }
         return repository;
@@ -119,6 +123,7 @@ public class UserDataService {
             try {
                 theDir.mkdir();
             } catch (SecurityException se) {
+                // TODO do not write to system.err, write proper logs
                 System.err.println("could not create directory, please fasten your seat belt");
             }
         }

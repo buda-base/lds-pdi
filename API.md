@@ -236,7 +236,7 @@ You can pass query parameters to control the output format:
 Example:
 
 ```
-/query/table/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1&profile=simple
+/query/table/volumesForWork?R_RES=bdr:W23703&format=csv&pageSize=50&pageNumber=1
 ```
 
 #### Using JSON POST with curl

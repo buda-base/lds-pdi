@@ -52,6 +52,7 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
@@ -75,7 +76,16 @@ public class PublicTemplatesResource {
     public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
-        log.info("Call to getQueryTemplateResults() parameters hashmap ={}", hm);
+        String pageSize = hm.get(QueryConstants.PAGE_SIZE);
+        if (pageSize != null) {
+            try {
+                if (Integer.parseInt(pageSize) > Integer.parseInt(ServiceConfig.getProperty("limit"))) {
+                    return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + ServiceConfig.getProperty("limit") + ")");
+                }
+            } catch (Exception e) {
+                throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
+            }
+        }
         String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
         if (pageNumber == null) {
             pageNumber = "1";
