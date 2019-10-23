@@ -53,8 +53,7 @@ public class ResultPage {
         if (pageNum != null) {
             this.pageNumber = Integer.parseInt(pageNum);
         } else {
-            // this.pageNumber = 1;
-            this.pageNumber = res.getNumberOfPages();
+            this.pageNumber = 1;
         }
         this.hm = hm;
         pageSize = res.getPageSize();

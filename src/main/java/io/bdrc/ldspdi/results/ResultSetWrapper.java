@@ -74,6 +74,13 @@ public class ResultSetWrapper {
         }
     }
 
+    public void update(int pageSize) {
+        numberOfPages = numResults / pageSize;
+        if (numberOfPages * pageSize < numResults) {
+            numberOfPages++;
+        }
+    }
+
     public HashMap<String, List<String>> getHead() {
         return head;
     }

@@ -169,6 +169,10 @@ public class QueryProcessor {
         if (hash != null) {
             return (ResultSetWrapper) ResultsCache.getObjectFromCache(Integer.parseInt(hash));
         }
+        int psz = Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
+        if (pageSize != null) {
+            psz = Integer.parseInt(pageSize);
+        }
         int new_hash = Objects.hashCode(query);
         ResultSetWrapper res = (ResultSetWrapper) ResultsCache.getObjectFromCache(new_hash);
         if (res == null) {
@@ -176,14 +180,13 @@ public class QueryProcessor {
             final QueryExecution qe = getResultSet(query, fusekiUrl);
             final ResultSet jrs = qe.execSelect();
             long elapsed = System.currentTimeMillis() - start;
-            int psz = Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
-            if (pageSize != null) {
-                psz = Integer.parseInt(pageSize);
-            }
             res = new ResultSetWrapper(jrs, elapsed, psz);
             qe.close();
             res.setHash(new_hash);
             ResultsCache.addToCache(res, new_hash);
+        } else {
+            // Given cached results, set new pageSize parameter
+            res.update(psz);
         }
         return res;
     }
