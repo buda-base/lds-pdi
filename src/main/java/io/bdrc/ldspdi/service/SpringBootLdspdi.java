@@ -22,6 +22,7 @@ import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.users.UsersCache;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 import io.bdrc.taxonomy.TaxModel;
@@ -66,6 +67,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             RdfAuthModel.readAuthModel();
         }
         ResultsCache.init();
+        UsersCache.init();
         GitService.update();
         OntData.init();
         TaxModel.fetchModel();

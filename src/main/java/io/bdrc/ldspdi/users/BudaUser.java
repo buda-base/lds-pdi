@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
@@ -18,8 +17,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
 import org.seaborne.patch.changes.RDFChangesApply;
@@ -47,19 +44,6 @@ public class BudaUser {
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
     public static final String FOAF = "http://xmlns.com/foaf/0.1/";
     public static final String ADR_PFX = "http://purl.bdrc.io/resource-nc/auth/";
-
-    // TODO give an explicit name
-    public static Dataset ds;
-
-    // This part will go away very soon, once the dataset is actually properly set
-    // in fuseki authrw
-    static {
-        try {
-            ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
-        } catch (Exception e) {
-            log.error("Could not instantiate User Dataset", e);
-        }
-    }
 
     public static Resource getRdfProfile(String auth0Id) throws IOException, RestException {
         Resource r = (Resource) UsersCache.getObjectFromCache(auth0Id.hashCode());
@@ -124,15 +108,15 @@ public class BudaUser {
         if (r == null) {
             return null;
         }
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         Model mod = ModelFactory.createDefaultModel();
         String rdfId = r.getURI().substring(r.getURI().lastIndexOf("/") + 1);
-        // Dataset ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
-        log.info("DATASET as TRIG >>");
-        RDFDataMgr.write(System.out, ds, Lang.TRIG);
-        mod.add(ds.getNamedModel(PUBLIC_PFX + rdfId));
+        mod.add(fusConn.fetch(PUBLIC_PFX + rdfId));
         if (full) {
-            mod.add(ds.getNamedModel(PRIVATE_PFX + rdfId));
+            mod.add(fusConn.fetch(PRIVATE_PFX + rdfId));
         }
+        fusConn.close();
         return mod;
     }
 
@@ -140,19 +124,24 @@ public class BudaUser {
         if (resId == null) {
             return null;
         }
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         // TODO I'm not sure I understand: do we keep all rdf data about users in memory
         // all the time?
         // why not do what we usually do and cache sparql query results for some time?
         Model mod = ModelFactory.createDefaultModel();
         // Dataset ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
-        mod.add(ds.getNamedModel(PUBLIC_PFX + resId));
+        mod.add(fusConn.fetch(PUBLIC_PFX + resId));
         if (full) {
-            mod.add(ds.getNamedModel(PRIVATE_PFX + resId));
+            mod.add(fusConn.fetch(PRIVATE_PFX + resId));
         }
+        fusConn.close();
         return mod;
     }
 
     public static Model[] createBudaUserModels(User usr) {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         log.info("createBudaUserModels for user {}", usr);
         Model[] mods = new Model[2];
         Model publicModel = ModelFactory.createDefaultModel();
@@ -188,8 +177,9 @@ public class BudaUser {
 
         mods[0] = publicModel;
         mods[1] = privateModel;
-        ds.addNamedModel(PUBLIC_PFX + userId, publicModel);
-        ds.addNamedModel(PRIVATE_PFX + userId, publicModel);
+        fusConn.put(PUBLIC_PFX + userId, publicModel);
+        fusConn.put(PRIVATE_PFX + userId, publicModel);
+        fusConn.close();
         return mods;
     }
 

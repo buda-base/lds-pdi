@@ -10,7 +10,6 @@ import java.util.Objects;
 
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.query.DatasetFactory;
 
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
@@ -39,13 +38,10 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
-import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.RDFLanguages;
-import org.apache.jena.sparql.core.DatasetGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +51,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.users.BudaUser;
 import io.bdrc.restapi.exceptions.LdsError;
 import io.bdrc.restapi.exceptions.RestException;
 
@@ -217,38 +212,6 @@ public class QueryProcessor {
                     + "prefix vcard: <http://www.w3.org/2006/vcard/ns#>\n" + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + "prefix text:  <http://jena.apache.org/text#>\n" + "prefix oa:    <http://www.w3.org/ns/oa#>\n"
                     + "prefix as:    <http://www.w3.org/ns/activitystreams#>\n" + "prefix ldp:   <http://www.w3.org/ns/ldp#>\n" + "prefix sh: <http://www.w3.org/ns/shacl#>\n" + "prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>";
         }
-    }
-
-    public static DatasetGraph buildRdfUserDataset() throws Exception {
-        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
-        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
-        DatasetGraph dgs = DatasetFactory.create().asDatasetGraph();
-        InputStream stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123.ttl");
-        Model mod = ModelFactory.createDefaultModel();
-        mod.read(stream, "", "TURTLE");
-        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U123").asNode(), mod.getGraph());
-        putModel(fusConn, BudaUser.PRIVATE_PFX + "U123", mod);
-        // mod.write(System.out, Lang.TURTLE.getName());
-        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U123p.ttl");
-        mod = ModelFactory.createDefaultModel();
-        mod.read(stream, "", "TURTLE");
-        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U123").asNode(), mod.getGraph());
-        putModel(fusConn, BudaUser.PUBLIC_PFX + "U123", mod);
-        // mod.write(System.out, Lang.TURTLE.getName());
-        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456.ttl");
-        mod = ModelFactory.createDefaultModel();
-        mod.read(stream, "", "TURTLE");
-        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user-private/U456").asNode(), mod.getGraph());
-        putModel(fusConn, BudaUser.PRIVATE_PFX + "U456", mod);
-        // mod.write(System.out, Lang.TURTLE.getName());
-        stream = QueryProcessor.class.getClassLoader().getResourceAsStream("U456p.ttl");
-        mod = ModelFactory.createDefaultModel();
-        mod.read(stream, "", "TURTLE");
-        dgs.addGraph(ResourceFactory.createResource("http://purl.bdrc.io/graph-nc/user/U456").asNode(), mod.getGraph());
-        putModel(fusConn, BudaUser.PUBLIC_PFX + "U456", mod);
-        // mod.write(System.out, Lang.TURTLE.getName());
-        fusConn.close();
-        return dgs;
     }
 
     public static void putModel(RDFConnectionFuseki fusConn, String graph, Model m) throws Exception {

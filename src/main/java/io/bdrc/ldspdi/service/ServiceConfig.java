@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.users.UsersCache;
 
 public class ServiceConfig {
 
@@ -65,6 +66,7 @@ public class ServiceConfig {
             prop.load(input);
             input.close();
             ResultsCache.init();
+            UsersCache.init();
             /*
              * if (ServiceConfig.useAuth()) { try { InputStream is = new
              * FileInputStream("/etc/buda/share/shared-private.properties"); prop.load(is);
