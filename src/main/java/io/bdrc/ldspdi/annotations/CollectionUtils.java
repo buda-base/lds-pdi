@@ -169,7 +169,7 @@ public class CollectionUtils {
         args.put("R_RESALIAS", collectionAlias);
         args.put("I_SUBRANGEFIRST", range[0].toString());
         args.put("I_SUBRANGELAST", range[1].toString());
-        final String query = qfp.getParametizedQuery(args, false);
+        final String query = qfp.getParametizedQuery(args);
         return QueryProcessor.getGraph(query, fusekiUrl, null);
     }
 

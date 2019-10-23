@@ -88,7 +88,7 @@ public class QueryProcessor {
             LdsQuery qfp = LdsQueryService.get(queryName, "library");
             final Map<String, String> map = new HashMap<>();
             map.put("R_RES", URI);
-            String query = qfp.getParametizedQuery(map, false);
+            String query = qfp.getParametizedQuery(map);
             Query q = QueryFactory.create(query);
             RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
             model = conn.queryDescribe(q);

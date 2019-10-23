@@ -52,7 +52,6 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
-import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.Prefixes;
@@ -77,15 +76,7 @@ public class PublicTemplatesResource {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
         String pageSize = hm.get(QueryConstants.PAGE_SIZE);
-        if (pageSize != null) {
-            try {
-                if (Integer.parseInt(pageSize) > Integer.parseInt(ServiceConfig.getProperty("limit"))) {
-                    return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + ServiceConfig.getProperty("limit") + ")");
-                }
-            } catch (Exception e) {
-                throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
-            }
-        }
+
         String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
         if (pageNumber == null) {
             pageNumber = "1";
@@ -98,7 +89,16 @@ public class PublicTemplatesResource {
         }
         // process
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-        final String query = qfp.getParametizedQuery(hm, true);
+        if (pageSize != null) {
+            try {
+                if (Long.parseLong(pageSize) > qfp.getLimit_max()) {
+                    return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
+                }
+            } catch (Exception e) {
+                throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
+            }
+        }
+        final String query = qfp.getParametizedQuery(hm);
         log.info("Parametized Query >> : {}", query);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
@@ -142,7 +142,7 @@ public class PublicTemplatesResource {
 
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-        final String query = qfp.getParametizedQuery(map, true);
+        final String query = qfp.getParametizedQuery(map);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getStream(query));
         } else {
@@ -173,7 +173,7 @@ public class PublicTemplatesResource {
         HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
         // process
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-        final String query = qfp.getParametizedQuery(hm, false);
+        final String query = qfp.getParametizedQuery(hm);
         // format is prevalent
         MediaType mediaType = BudaMediaTypes.getMimeFromExtension(format);
         if (mediaType == null) {
@@ -207,7 +207,7 @@ public class PublicTemplatesResource {
         }
         // process
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-        final String query = qfp.getParametizedQuery(map, false);
+        final String query = qfp.getParametizedQuery(map);
         // format is prevalent
         MediaType mediaType = BudaMediaTypes.getMimeFromExtension(accept);
         if (mediaType == null) {

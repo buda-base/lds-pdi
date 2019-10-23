@@ -59,6 +59,7 @@ public class LdsQuery {
     private ArrayList<Param> params;
     private ArrayList<Output> outputs;
     private String prefixedQuery;
+    private long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
 
     public final static Logger log = LoggerFactory.getLogger(LdsQuery.class);
 
@@ -91,6 +92,7 @@ public class LdsQuery {
                 boolean processed = false;
                 if (readLine.startsWith("#")) {
                     readLine = readLine.substring(1);
+
                     int index = readLine.indexOf("=");
                     if (index != -1) {
                         String info0 = readLine.substring(0, index);
@@ -137,6 +139,10 @@ public class LdsQuery {
             params = buildParams(p_map);
             outputs = buildOutputs(o_map);
             prefixedQuery = Prefixes.getPrefixesString() + " " + query;
+            String customLimit = getMetaInf().get(QueryConstants.QUERY_LIMIT);
+            if (customLimit != null) {
+                this.limit_max = Long.parseLong(customLimit);
+            }
         } catch (Exception ex) {
             log.error("QueryFile parsing error", ex);
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: " + file.getName()));
@@ -146,6 +152,18 @@ public class LdsQuery {
             } catch (Exception e) {
             }
         }
+    }
+
+    public long getLimit_max() {
+        return limit_max;
+    }
+
+    public HashMap<String, String> getMetaInf() {
+        return metaInf;
+    }
+
+    public void setParams(ArrayList<Param> params) {
+        this.params = params;
     }
 
     public String getPrefixedQuery() {
@@ -232,7 +250,7 @@ public class LdsQuery {
         return query;
     }
 
-    public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
+    public String getParametizedQuery(Map<String, String> converted/* , boolean limit */) throws RestException {
 
         if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
@@ -294,16 +312,14 @@ public class LdsQuery {
             }
         }
         Query q = queryStr.asQuery();
-        if (limit) {
-            long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
-            if (q.hasLimit()) {
-                if (q.getLimit() > limit_max) {
-                    q.setLimit(limit_max);
-                }
-            } else {
+        if (q.hasLimit()) {
+            if (q.getLimit() > limit_max) {
                 q.setLimit(limit_max);
             }
+        } else {
+            q.setLimit(limit_max);
         }
+
         if (q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in LdsQuery.getParametizedQuery() template ->" + getTemplateName() + ".arq" + "; ERROR: " + query));
         }
