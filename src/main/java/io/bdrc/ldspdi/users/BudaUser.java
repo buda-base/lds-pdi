@@ -126,11 +126,7 @@ public class BudaUser {
         }
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
         RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
-        // TODO I'm not sure I understand: do we keep all rdf data about users in memory
-        // all the time?
-        // why not do what we usually do and cache sparql query results for some time?
         Model mod = ModelFactory.createDefaultModel();
-        // Dataset ds = DatasetFactory.wrap(QueryProcessor.buildRdfUserDataset());
         mod.add(fusConn.fetch(PUBLIC_PFX + resId));
         if (full) {
             mod.add(fusConn.fetch(PRIVATE_PFX + resId));

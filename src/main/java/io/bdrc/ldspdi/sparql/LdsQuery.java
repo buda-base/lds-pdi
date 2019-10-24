@@ -177,7 +177,6 @@ public class LdsQuery {
     }
 
     private ArrayList<Param> buildParams(HashMap<String, HashMap<String, String>> p_map) throws RestException {
-        // log.info("Build query params >> {}", p_map);
         ArrayList<Param> p = new ArrayList<>();
         Set<String> names = p_map.keySet();
         for (String name : names) {
@@ -250,7 +249,7 @@ public class LdsQuery {
         return query;
     }
 
-    public String getParametizedQuery(Map<String, String> converted/* , boolean limit */) throws RestException {
+    public String getParametizedQuery(Map<String, String> converted) throws RestException {
 
         if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));

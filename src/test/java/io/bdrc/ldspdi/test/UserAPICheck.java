@@ -1,9 +1,11 @@
 package io.bdrc.ldspdi.test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -17,6 +19,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.rdf.model.Resource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,10 +36,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.auth.AuthProps;
+import io.bdrc.auth.TokenValidation;
+import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.rest.resources.BdrcAuthResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.SpringBootLdspdi;
+import io.bdrc.ldspdi.users.BudaUser;
+import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.restapi.exceptions.RestException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { BdrcAuthResource.class, SpringBootLdspdi.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -171,7 +179,7 @@ public class UserAPICheck {
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
-    @Test
+    // @Test
     public void userForUser() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/U456");
@@ -215,6 +223,28 @@ public class UserAPICheck {
             final JsonNode tmp = it.next();
             System.out.println("User json >> " + tmp);
         }
+    }
+
+    @Test
+    public void createBudauserFromToken() throws ClientProtocolException, IOException, RestException, NoSuchAlgorithmException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
+        get.addHeader("Authorization", "Bearer " + privateToken);
+        HttpResponse resp = client.execute(get);
+        log.info("RESP STATUS public resource >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
+        // Looking for the created Buda User resource in the authrw dataset
+        TokenValidation tv = new TokenValidation(privateToken);
+        UserProfile up = tv.getUser();
+        Resource r = BudaUser.getRdfProfile(up.getUser().getUserId());
+        log.info("RESOURCE >> {}", r);
+        assert (r != null);
+        // Looking for the created Buda User Trig serialization in the users git repo
+        String bucket = Helpers.getTwoLettersBucket(r.getLocalName());
+        String filepath = System.getProperty("user.dir") + "/users/" + bucket + "/";
+        log.info("TRIG FILE DIRECTORY >> {}", filepath);
+        assert (new File(filepath + r.getLocalName() + ".trig").exists());
     }
 
 }
