@@ -253,13 +253,13 @@ public class UserAPICheck {
         // First, make sure we have a user
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
-        get.addHeader("Authorization", "Bearer " + publicToken);
+        get.addHeader("Authorization", "Bearer " + staffToken);
         HttpResponse resp = client.execute(get);
         log.info("RESP STATUS disableBudaUser 1 >> {}", resp.getStatusLine());
         assert (resp.getStatusLine().getStatusCode() == 200);
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
         // gets the buda user id from token
-        TokenValidation tv = new TokenValidation(publicToken);
+        TokenValidation tv = new TokenValidation(staffToken);
         UserProfile up = tv.getUser();
         String userId = BudaUser.getRdfProfile(up.getUser().getUserId()).getLocalName();
         HttpDelete hd = new HttpDelete("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/" + userId);
