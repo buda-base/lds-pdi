@@ -113,23 +113,15 @@ public class BdrcAuthResource {
             return ResponseEntity.status(403).body(Helpers.getStream("You must be authenticated in order to disable this user"));
         } else {
             Access acc = (Access) request.getAttribute("access");
+            log.info("userDelete() Token User {}", acc.getUser());
             if (acc.getUser().isAdmin()) {
                 String auth0Id = BudaUser.getAuth0IdFromUserId(res).asNode().getURI();
                 User usr = RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1));
-                String auth0FullId = usr.getAuthId();
+                // String auth0FullId = usr.getUserId();
                 // first update the Buda User rdf profile
                 BudaUser.update(res, UserPatches.getSetActivePatch(res, false));
                 // next, mark (patch) the corresponding Auth0 user as "blocked'
-                AuthDataModelBuilder.patchUser(auth0FullId, "{\"blocked\"=true}");
-            }
-            BudaUser.createBudaUserModels(acc.getUser());
-            // auth0Id corresponding to the logged on user - from the token
-            String auth0Id = acc.getUser().getUserId();
-            Resource usr = BudaUser.getRdfProfile(auth0Id);
-            if (usr == null) {
-                UserDataService.addNewBudaUser(acc.getUser());
-                usr = BudaUser.getRdfProfile(auth0Id);
-                log.info("User Resource >> {}", usr);
+                AuthDataModelBuilder.patchUser(auth0Id, "{\"blocked\"=true}");
             }
             // auth0Id corresponding to the requested userId - from the path variable
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();

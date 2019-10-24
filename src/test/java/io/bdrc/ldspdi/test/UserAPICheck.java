@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -225,7 +226,7 @@ public class UserAPICheck {
         }
     }
 
-    @Test
+    // @Test
     public void createBudauserFromToken() throws ClientProtocolException, IOException, RestException, NoSuchAlgorithmException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
@@ -245,6 +246,29 @@ public class UserAPICheck {
         String filepath = System.getProperty("user.dir") + "/users/" + bucket + "/";
         log.info("TRIG FILE DIRECTORY >> {}", filepath);
         assert (new File(filepath + r.getLocalName() + ".trig").exists());
+    }
+
+    @Test
+    public void disableBudaUser() throws ClientProtocolException, IOException, RestException {
+        // First, make sure we have a user
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
+        get.addHeader("Authorization", "Bearer " + publicToken);
+        HttpResponse resp = client.execute(get);
+        log.info("RESP STATUS disableBudaUser 1 >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
+        // gets the buda user id from token
+        TokenValidation tv = new TokenValidation(publicToken);
+        UserProfile up = tv.getUser();
+        String userId = BudaUser.getRdfProfile(up.getUser().getUserId()).getLocalName();
+        HttpDelete hd = new HttpDelete("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/" + userId);
+        hd.addHeader("Authorization", "Bearer " + adminToken);
+        resp = client.execute(hd);
+        log.info("RESP STATUS disableBudaUser 2 >> {}", resp.getStatusLine());
+        assert (resp.getStatusLine().getStatusCode() == 200);
+        assert (!BudaUser.isActive(userId));
+        // assert (up.getUser().isBlocked());
     }
 
 }

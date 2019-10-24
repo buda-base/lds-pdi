@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
@@ -95,12 +96,15 @@ public class BudaUser {
         RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
         InputStream ptc = new ByteArrayInputStream(patch.getBytes());
         RDFPatchReaderText rdf = new RDFPatchReaderText(ptc);
-        Model m = fusConn.fetch("<" + PRIVATE_PFX + userId + ">");
-        DatasetGraph dsg = DatasetFactory.wrap(m).asDatasetGraph();
+        Dataset ds = DatasetFactory.create();
+        DatasetGraph dsg = ds.asDatasetGraph();
+        Model m = fusConn.fetch(PRIVATE_PFX + userId);
+        dsg.addGraph(NodeFactory.createURI(PRIVATE_PFX + userId), m.getGraph());
         RDFChangesApply apply = new RDFChangesApply(dsg);
         rdf.apply(apply);
-        Model m1 = ModelFactory.createModelForGraph(dsg.getGraph(NodeFactory.createURI("<" + PRIVATE_PFX + userId + ">")));
-        QueryProcessor.putModel(fusConn, "<" + PRIVATE_PFX + userId + ">", m1);
+        Model m1 = ModelFactory.createModelForGraph(dsg.getGraph(NodeFactory.createURI(PRIVATE_PFX + userId)));
+        QueryProcessor.putModel(fusConn, PRIVATE_PFX + userId, m1);
+        ptc.close();
         fusConn.close();
     }
 
@@ -163,7 +167,7 @@ public class BudaUser {
         privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
         log.info("hasUserProfile in createBudaUserModels = {}", usr.getUserId());
         String auth0Id = usr.getUserId();
-
+        privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "isActive"), ResourceFactory.createPlainLiteral("true"));
         privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
         privateModel.add(bUser, ResourceFactory.createProperty(FOAF + "mbox"), ResourceFactory.createPlainLiteral(usr.getEmail()));
         privateModel.add(bUser, SKOS_PREF_LABEL, ResourceFactory.createPlainLiteral(usr.getName()));
