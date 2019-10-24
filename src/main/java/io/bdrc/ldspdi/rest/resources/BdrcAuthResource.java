@@ -121,7 +121,10 @@ public class BdrcAuthResource {
                 // first update the Buda User rdf profile
                 BudaUser.update(res, UserPatches.getSetActivePatch(res, false));
                 // next, mark (patch) the corresponding Auth0 user as "blocked'
-                AuthDataModelBuilder.patchUser(usr.getAuthId(), "{\"blocked\":true}", token);
+                AuthDataModelBuilder.patchUser(usr.getAuthId(), "{\"blocked\":true}");
+                // next, update RdfAuthModel (auth0 users)
+                Thread t = new Thread(new RdfAuthModel());
+                t.start();
             }
             String n = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
             if (acc.getUser().isAdmin()) {
