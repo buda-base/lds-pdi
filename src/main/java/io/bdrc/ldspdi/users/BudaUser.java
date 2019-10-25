@@ -183,15 +183,62 @@ public class BudaUser {
         return mods;
     }
 
+    // for admin or testing purpose only
+    public static Model[] createBudaUserModels(String userName, String usrId, String userEmail) {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty("fusekiAuthData"));
+        RDFConnectionFuseki fusConn = ((RDFConnectionFuseki) builder.build());
+        log.info("createBudaUserModels for user {}", userName);
+        Model[] mods = new Model[2];
+        Model publicModel = ModelFactory.createDefaultModel();
+        String userId = "U" + Integer.toString(Math.abs(userName.hashCode()));
+        log.debug("createBudaUserModel for >> {}", userId);
+        Resource bUser = ResourceFactory.createResource(BDU_PFX + userId);
+        publicModel.setNsPrefixes(Prefixes.getPrefixMapping());
+        publicModel.add(bUser, RDF.type, ResourceFactory.createResource(FOAF + "Person"));
+        publicModel.add(bUser, RDF.type, ResourceFactory.createResource(BDOU_PFX + "User"));
+        publicModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
+        // TODO there should be some language detection based on the first character:
+        // if Chinese, then @zh-hani, if Tibetan then @bo, else no lang tag
+        publicModel.add(bUser, SKOS_PREF_LABEL, ResourceFactory.createPlainLiteral(userName));
+        // TODO don't write on System.out
+        // for development purpose only
+        publicModel.write(System.out, "TURTLE");
+        mods[0] = publicModel;
+
+        Model privateModel = ModelFactory.createDefaultModel();
+        privateModel.setNsPrefixes(Prefixes.getPrefixMapping());
+        privateModel.add(bUser, RDF.type, ResourceFactory.createResource(FOAF + "Person"));
+        privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDOU_PFX + "User"));
+        privateModel.add(bUser, RDF.type, ResourceFactory.createResource(BDO + "Person"));
+        log.info("hasUserProfile in createBudaUserModels = {}", userId);
+        String auth0Id = usrId;
+        privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "isActive"), ResourceFactory.createPlainLiteral("true"));
+        privateModel.add(bUser, ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile"), ResourceFactory.createResource(ADR_PFX + auth0Id));
+        privateModel.add(bUser, ResourceFactory.createProperty(FOAF + "mbox"), ResourceFactory.createPlainLiteral(userEmail));
+        privateModel.add(bUser, SKOS_PREF_LABEL, ResourceFactory.createPlainLiteral(userName));
+        // TODO don't write on system.out
+        // for development purpose only
+        privateModel.write(System.out, "TURTLE");
+
+        mods[0] = publicModel;
+        mods[1] = privateModel;
+        fusConn.put(PUBLIC_PFX + userId, publicModel);
+        fusConn.put(PRIVATE_PFX + userId, publicModel);
+        fusConn.close();
+        return mods;
+    }
+
     public static void main(String[] args) throws IOException, RestException {
         ServiceConfig.initForTests(null);
         RdfAuthModel.initForTest(false, true);
-        String auth0Id = BudaUser.getAuth0IdFromUserId("U456").asNode().getURI();
-        System.out.println("Is active  >> " + BudaUser.isActive("U456"));
+        // String auth0Id = BudaUser.getAuth0IdFromUserId("U456").asNode().getURI();
+        // System.out.println("Is active >> " + BudaUser.isActive("U456"));
         // System.out.println("Auth0Id >> " + auth0Id);
         // System.out.println("USERS >> " + RdfAuthModel.getUsers());
         // System.out.println("USER >> " +
         // RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1)));
+        System.out.println(BudaUser.createBudaUserModels("Nicolas Berger", "103776618189565648628", "quai.ledrurollin@gmail.com")[0]);
+        System.out.println(BudaUser.createBudaUserModels("Nicolas Berger", "103776618189565648628", "quai.ledrurollin@gmail.com")[1]);
     }
 
 }

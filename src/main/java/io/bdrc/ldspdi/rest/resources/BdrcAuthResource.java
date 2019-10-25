@@ -17,8 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -63,7 +66,7 @@ public class BdrcAuthResource {
             return ResponseEntity.status(401).body(Helpers.getStream("No token available"));
         } else {
             Access acc = (Access) request.getAttribute("access");
-            log.info("Access >> {}", acc);
+            log.info("meUser() Access >> {}", acc);
             // TODO there should be a function in bdrc-auth-lib that does this
             String auth0Id = acc.getUser().getAuthId();
             auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
@@ -71,9 +74,9 @@ public class BdrcAuthResource {
             if (usr == null) {
                 UserDataService.addNewBudaUser(acc.getUser());
                 usr = BudaUser.getRdfProfile(auth0Id);
-                log.info("User Resource >> {}", usr);
+                log.info("meUser() User Resource >> {}", usr);
             }
-            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, usr), "jsonld"));
+            return ResponseEntity.status(200).header("Location", "/resource-nc/user/" + usr.getLocalName()).body(Helpers.getModelStream(BudaUser.getUserModel(true, usr), "jsonld"));
         }
     }
 
@@ -85,15 +88,15 @@ public class BdrcAuthResource {
             return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModelFromUserId(false, res), "jsonld"));
         } else {
             Access acc = (Access) request.getAttribute("access");
-            BudaUser.createBudaUserModels(acc.getUser());
             // auth0Id corresponding to the logged on user - from the token
             String auth0Id = acc.getUser().getAuthId();
-            auth0Id = auth0Id.substring(auth0Id.indexOf("|") + 1);
+            log.info("User in userResource() >> {}", acc.getUser());
+            auth0Id = acc.getUser().getUserId();
             Resource usr = BudaUser.getRdfProfile(auth0Id);
             if (usr == null) {
                 UserDataService.addNewBudaUser(acc.getUser());
                 usr = BudaUser.getRdfProfile(auth0Id);
-                log.info("User Resource >> {}", usr);
+                log.info("RDF User created Resource >> {}", usr);
             }
             // auth0Id corresponding to the requested userId - from the path variable
             String n = BudaUser.getAuth0IdFromUserId(res).asResource().getURI();
@@ -107,7 +110,7 @@ public class BdrcAuthResource {
 
     @DeleteMapping(value = "/resource-nc/user/{res}")
     public ResponseEntity<StreamingResponseBody> userDelete(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws Exception {
-        log.info("Call userResource()");
+        log.info("Call userDelete()");
         String token = getToken(request.getHeader("Authorization"));
         if (token == null) {
             return ResponseEntity.status(403).body(Helpers.getStream("You must be authenticated in order to disable this user"));
@@ -127,6 +130,42 @@ public class BdrcAuthResource {
                 t.start();
             }
             String n = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
+            if (acc.getUser().isAdmin()) {
+                return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
+            }
+            return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(false, BudaUser.getRdfProfile(n)), "jsonld"));
+        }
+    }
+
+    @PatchMapping(value = "/resource-nc/user/{res}")
+    public ResponseEntity<StreamingResponseBody> userPatch(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "type", defaultValue = "NONE") final String type,
+            @RequestBody String patch) throws Exception {
+        log.info("Call userPatch()");
+        String token = getToken(request.getHeader("Authorization"));
+        if (token == null) {
+            return ResponseEntity.status(403).body(Helpers.getStream("You must be authenticated in order to disable this user"));
+        } else {
+            String auth0Id = BudaUser.getAuth0IdFromUserId(res).asNode().getURI();
+            User usr = RdfAuthModel.getUser(auth0Id.substring(auth0Id.lastIndexOf("/") + 1));
+            String n = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
+            Access acc = (Access) request.getAttribute("access");
+            log.info("userPatch() Token User {}", acc.getUser());
+            if (acc.getUser().isAdmin()) {
+                // case user unlock
+                if (type.equals("unblock")) {
+                    // first update the Buda User rdf profile
+                    BudaUser.update(res, UserPatches.getSetActivePatch(res, true));
+                    // next, mark (patch) the corresponding Auth0 user as "unblocked'
+                    AuthDataModelBuilder.patchUser(usr.getAuthId(), "{\"blocked\":false}");
+                    // next, update RdfAuthModel (auth0 users)
+                    Thread t = new Thread(new RdfAuthModel());
+                    t.start();
+                } else {
+                    // specialized or generic patching here
+                }
+                return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
+
+            }
             if (acc.getUser().isAdmin()) {
                 return ResponseEntity.status(200).body(Helpers.getModelStream(BudaUser.getUserModel(true, BudaUser.getRdfProfile(n)), "jsonld"));
             }

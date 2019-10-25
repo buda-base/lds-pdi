@@ -197,11 +197,11 @@ public class UserAPICheck {
         log.info("RESULT user for AdminUser admin >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
-    // @Test
+    @Test
     public void tokenOfNonExistingBudaUser() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
-        get.addHeader("Authorization", "Bearer " + privateToken);
+        get.addHeader("Authorization", "Bearer " + adminToken);
         HttpResponse resp = client.execute(get);
         log.info("RESP STATUS public resource >> {}", resp.getStatusLine());
         assert (resp.getStatusLine().getStatusCode() == 200);
@@ -230,13 +230,13 @@ public class UserAPICheck {
     public void createBudauserFromToken() throws ClientProtocolException, IOException, RestException, NoSuchAlgorithmException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
-        get.addHeader("Authorization", "Bearer " + privateToken);
+        get.addHeader("Authorization", "Bearer " + adminToken);
         HttpResponse resp = client.execute(get);
         log.info("RESP STATUS public resource >> {}", resp.getStatusLine());
         assert (resp.getStatusLine().getStatusCode() == 200);
         log.info("RESULT >> {}", EntityUtils.toString(resp.getEntity()));
         // Looking for the created Buda User resource in the authrw dataset
-        TokenValidation tv = new TokenValidation(privateToken);
+        TokenValidation tv = new TokenValidation(adminToken);
         UserProfile up = tv.getUser();
         Resource r = BudaUser.getRdfProfile(up.getUser().getUserId());
         log.info("RESOURCE >> {}", r);
@@ -248,7 +248,7 @@ public class UserAPICheck {
         assert (new File(filepath + r.getLocalName() + ".trig").exists());
     }
 
-    @Test
+    // @Test
     public void disableBudaUser() throws ClientProtocolException, IOException, RestException {
         // First, make sure we have a user
         HttpClient client = HttpClientBuilder.create().build();
