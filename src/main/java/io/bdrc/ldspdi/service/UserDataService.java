@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -22,6 +23,13 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.AbortedByHookException;
+import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NoMessageException;
+import org.eclipse.jgit.api.errors.UnmergedPathsException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -96,6 +104,30 @@ public class UserDataService {
         } catch (Exception e) {
             log.error("Failed to add new Buda user :" + user.getName(), e);
         }
+        return rev;
+    }
+
+    public static RevCommit update(String userId, Model pub, Model priv)
+            throws IOException, NoSuchAlgorithmException, NoHeadException, NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException, WrongRepositoryStateException, AbortedByHookException, GitAPIException {
+        RevCommit rev = null;
+        String dirpath = System.getProperty("user.dir") + "/users/";
+        String bucket = Helpers.getTwoLettersBucket(userId);
+        createDirIfNotExists(dirpath + bucket + "/");
+        FileOutputStream fos = new FileOutputStream(dirpath + bucket + "/" + userId + ".trig");
+        DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
+        dsg.addGraph(ResourceFactory.createResource(BudaUser.PUBLIC_PFX + userId).asNode(), pub.getGraph());
+        dsg.addGraph(ResourceFactory.createResource(BudaUser.PRIVATE_PFX + userId).asNode(), priv.getGraph());
+        new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
+        Repository r = null;
+        if (r == null) {
+            r = ensureUserGitRepo();
+        }
+        Git git = new Git(r);
+        if (!git.status().call().isClean()) {
+            git.add().addFilepattern(".").call();
+            rev = git.commit().setMessage("User " + userId + " was updated").call();
+        }
+        git.close();
         return rev;
     }
 

@@ -197,7 +197,7 @@ public class UserAPICheck {
         log.info("RESULT user for AdminUser admin >> {}", EntityUtils.toString(resp.getEntity()));
     }
 
-    @Test
+    // @Test
     public void tokenOfNonExistingBudaUser() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource-nc/user/me");
@@ -248,7 +248,7 @@ public class UserAPICheck {
         assert (new File(filepath + r.getLocalName() + ".trig").exists());
     }
 
-    // @Test
+    @Test
     public void disableBudaUser() throws ClientProtocolException, IOException, RestException {
         // First, make sure we have a user
         HttpClient client = HttpClientBuilder.create().build();

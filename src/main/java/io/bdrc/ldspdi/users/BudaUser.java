@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.service.UserDataService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.restapi.exceptions.RestException;
@@ -99,6 +100,7 @@ public class BudaUser {
         Dataset ds = DatasetFactory.create();
         DatasetGraph dsg = ds.asDatasetGraph();
         Model m = fusConn.fetch(PRIVATE_PFX + userId);
+        Model pub = fusConn.fetch(PUBLIC_PFX + userId);
         dsg.addGraph(NodeFactory.createURI(PRIVATE_PFX + userId), m.getGraph());
         RDFChangesApply apply = new RDFChangesApply(dsg);
         rdf.apply(apply);
@@ -106,6 +108,7 @@ public class BudaUser {
         QueryProcessor.putModel(fusConn, PRIVATE_PFX + userId, m1);
         ptc.close();
         fusConn.close();
+        UserDataService.update(userId, pub, m1);
     }
 
     public static Model getUserModel(boolean full, Resource r) throws IOException, RestException {
