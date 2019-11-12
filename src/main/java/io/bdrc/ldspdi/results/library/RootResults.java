@@ -47,20 +47,8 @@ public class RootResults {
                 wl.add(Field.getField(st));
                 map.put(st.getSubject().getURI(), wl);
                 res.put(type, map);
-
-                // Keeping the code below in case I am missing something about Person type
-                // as I don't understand why I initially set a condition regarding predicate and
-                // object !
-
-                /*
-                 * case Taxonomy.PERSON:
-                 * if(!st.getPredicate().getURI().equals(st.getObject().toString())) {
-                 * ArrayList<Field> pl=people.get(st.getSubject().getURI()); if(pl==null) {
-                 * pl=new ArrayList<Field>(); } pl.add(Field.getField(st));
-                 * people.put(st.getSubject().getURI(),pl); } break;
-                 */
-                processed.add(st.getSubject().getURI());
             }
+            processed.add(st.getSubject().getURI());
         }
         res.put("metadata", count);
         return res;

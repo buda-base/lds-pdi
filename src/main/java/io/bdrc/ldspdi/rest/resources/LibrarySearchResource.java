@@ -50,7 +50,6 @@ public class LibrarySearchResource {
     @PostMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getLibGraphPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") final String file, @RequestBody HashMap<String, String> map) throws RestException {
-
         log.info("Call to getLibGraphPost() with template name >> " + file);
         Thread t = null;
         AsyncSparql async = null;
@@ -140,7 +139,6 @@ public class LibrarySearchResource {
                     throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphGet()", e));
                 }
             }
-
             res = RootResults.getResultsMap(model, etext_count);
             break;
         case "personFacetGraph":
