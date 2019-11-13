@@ -221,7 +221,7 @@ or using curl:
 curl --data "L_NAME=(\"mkhan chen\" AND (\"'od zer\" OR \"ye shes\"))&LG_NAME=bo-x-ewts&I_LIM=100" http://purl.bdrc.io/query/table/Res_byName
 ```
 
-When called in `POST`, the endpoint only accepts and produces JSON.
+When called in `POST`, the endpoint only accepts JSON and produces `JSON or XML` (*when the format parameter is set to xml in the Request JSON body*).
 
 #### Controling the output
 
@@ -229,9 +229,11 @@ You can pass query parameters to control the output format:
 
 | Parameter name | Possible values | Default |
 | ----- | ----- | ----- |
-| `format` | `csv` (simple), `csv_f` (full) or `json` | `json` |
+| `format` | `csv` (simple), `csv_f` (full), `json` or `xml` | `json` |
 | `pageSize` | integer | 50 |
 | `pageNumber` | integer | 1 |
+
+**Note:** page information does not apply to `xml` format: the whole resultSet is returned in such a case.
 
 Example:
 
