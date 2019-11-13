@@ -31,7 +31,7 @@ import io.bdrc.taxonomy.TaxModel;
 @Configuration
 @EnableAutoConfiguration
 @Primary
-@ComponentScan(basePackages = { "io.bdrc.ldspdi" })
+@ComponentScan(basePackages = { "io.bdrc.ldspdi", "io.bdrc.restapi" })
 
 public class SpringBootLdspdi extends SpringBootServletInitializer {
 

@@ -153,7 +153,7 @@ public class ResultSetWrapper {
         final int pageNumber = Integer.parseInt(pageNum);
         final int offset = (pageNumber - 1) * pageSize;
         if (pageNumber > numberOfPages || pageNumber < 0) {
-            return null;
+            return new byte[0];
         }
         StringWriter sw = new StringWriter();
         final int maxIdx = Math.min(offset + pageSize, numResults);

@@ -57,7 +57,7 @@ public class RestException extends Exception {
         return developerMessage;
     }
 
-    public String getMessage() {
+    public String getRestMessage() {
         return message;
     }
 
@@ -80,4 +80,10 @@ public class RestException extends Exception {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "RestException [status=" + status + ", code=" + code + ", link=" + link + ", developerMessage=" + developerMessage + ", message=" + message + "]";
+    }
+
 }
