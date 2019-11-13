@@ -48,7 +48,7 @@ import io.bdrc.restapi.exceptions.LdsPdiExceptionHandler;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { PublicTemplatesResource.class, OntData.class, LdsPdiExceptionHandler.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
-public class TemplatesTest {
+public class TemplatesTest1 {
 
     @Autowired
     Environment environment;
