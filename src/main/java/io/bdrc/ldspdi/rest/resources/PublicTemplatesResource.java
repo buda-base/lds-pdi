@@ -28,6 +28,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,8 +106,13 @@ public class PublicTemplatesResource {
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
         }
-        ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
         String fmt = hm.get(QueryConstants.FORMAT);
+        if ("xml".equals(fmt)) {
+            ResultSet rs = QueryProcessor.getResults(query, fusekiUrl);
+            response.setContentType("text/html");
+            return ResultSetFormatter.asXMLString(rs);
+        }
+        ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
         if ("json".equals(fmt)) {
             Results r = new Results(res, hm);
             byte[] buff = Helpers.getJsonBytesStream(r);
@@ -136,7 +143,7 @@ public class PublicTemplatesResource {
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map,
             HttpServletRequest request) throws RestException {
-        log.info("Call to getQueryTemplateResultsJsonPost()");
+        log.info("Call to getQueryTemplateResultsJsonPost() with params : {}", map);
         if (map == null || map.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
             return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
@@ -145,7 +152,12 @@ public class PublicTemplatesResource {
         final LdsQuery qfp = LdsQueryService.get(file + ".arq");
         final String query = qfp.getParametizedQuery(map);
         if (query.startsWith(QueryConstants.QUERY_ERROR)) {
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getStream(query));
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getStream(query));
+        }
+        String fmt = map.get(QueryConstants.FORMAT);
+        if ("xml".equals(fmt)) {
+            ResultSet res = QueryProcessor.getResults(query, fuseki);
+            return ResponseEntity.ok().contentType(MediaType.TEXT_XML).body(Helpers.getResultSetAsXml(res));
         } else {
             ResultSetWrapper res = QueryProcessor.getResults(query, fuseki, map.get(QueryConstants.RESULT_HASH), map.get(QueryConstants.PAGE_SIZE));
             map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
@@ -153,7 +165,7 @@ public class PublicTemplatesResource {
             map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
             Results r = new Results(res, map);
             String json = new String(Helpers.getJsonBytesStream(r));
-            return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().body(Helpers.getStream(json));
+            return ResponseEntity.ok().body(Helpers.getStream(json));
         }
     }
 

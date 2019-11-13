@@ -37,6 +37,8 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
@@ -155,6 +157,15 @@ public class Helpers {
                     om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
                 else
                     om.writeValue(os, obj);
+            }
+        };
+    }
+
+    public static StreamingResponseBody getResultSetAsXml(ResultSet rs) {
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) throws IOException {
+                ResultSetFormatter.outputAsXML(os, rs);
             }
         };
     }

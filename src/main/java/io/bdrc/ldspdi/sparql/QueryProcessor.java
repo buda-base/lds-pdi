@@ -191,6 +191,21 @@ public class QueryProcessor {
         return res;
     }
 
+    public static ResultSet getResults(final String query, String fusekiUrl) {
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        int new_hash = Objects.hashCode(query + "RES");
+        // ResultSet res = (ResultSet) ResultsCache.getObjectFromCache(new_hash);
+        ResultSet res = null;
+        if (res == null) {
+            final QueryExecution qe = getResultSet(query, fusekiUrl);
+            res = qe.execSelect();
+            ResultsCache.addToCache(res, new_hash);
+        }
+        return res;
+    }
+
     public static Model getGraphFromModel(String query, Model model) throws RestException {
         try {
             QueryExecution qexec = QueryExecutionFactory.create(query, model);
