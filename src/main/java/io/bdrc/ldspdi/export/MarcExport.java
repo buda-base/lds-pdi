@@ -225,7 +225,7 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
         f542_PD.addSubfield(factory.newSubfield('l', "Public domain"));
-        f542_PD.addSubfield(factory.newSubfield('u', "https://creativecommons.org/publicdomain/mark/1.0/"));
+        f542_PD.addSubfield(factory.newSubfield('u', "http://creativecommons.org/publicdomain/mark/1.0/"));
     }
 
     public static boolean indent = true;
