@@ -37,11 +37,17 @@
   <dependencies>  
 	<dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>        
+        <artifactId>spring-boot-starter-web</artifactId>            
     </dependency>
 	<dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-actuator</artifactId>        
+        <artifactId>spring-boot-starter-actuator</artifactId>
+        <exclusions>      
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>        
     </dependency>
     <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-core -->
       <dependency>
@@ -219,6 +225,12 @@
     <dependency>
       <groupId>io.bdrc.libraries</groupId>
       <artifactId>bdrc-libraries</artifactId>
+      <exclusions>      
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
       <version>0.4.6</version>
     </dependency>   
 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
