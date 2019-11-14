@@ -25,6 +25,7 @@ public class WorkAllResults {
         HashMap<String, ArrayList<Field>> unspec_works = new HashMap<>();
         HashMap<String, ArrayList<Field>> virtual_works = new HashMap<>();
         HashMap<String, ArrayList<Field>> lineages = new HashMap<>();
+        HashMap<String, ArrayList<Field>> persons = new HashMap<>();
         HashMap<String, Integer> topics = new HashMap<>();
         HashMap<String, HashSet<String>> Wtopics = new HashMap<>();
         HashMap<String, HashSet<String>> WorkBranch = new HashMap<>();
@@ -108,6 +109,17 @@ public class WorkAllResults {
                 pli.add(Field.getField(st));
                 lineages.put(st.getSubject().getURI(), pli);
                 break;
+            case Taxonomy.PERSON:
+                ArrayList<Field> perl = persons.get(st.getSubject().getURI());
+                if (perl == null) {
+                    perl = new ArrayList<Field>();
+                }
+                if (st.getPredicate().getURI().equals(Taxonomy.WORK_GENRE) || st.getPredicate().getURI().equals(Taxonomy.WORK_IS_ABOUT)) {
+                    Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
+                }
+                perl.add(Field.getField(st));
+                persons.put(st.getSubject().getURI(), perl);
+                break;
             default:
                 throw new RestException(500, new LdsError(LdsError.UNKNOWN_ERR).setContext(" type in WorkAllResults.getResultsMap(Model mod) >> " + type));
             }
@@ -119,6 +131,7 @@ public class WorkAllResults {
         res.put(Taxonomy.ABSTRACT_WORK, abstract_works);
         res.put(Taxonomy.UNSPEC_WORK, unspec_works);
         res.put(Taxonomy.VIRTUAL_WORK, virtual_works);
+        res.put(Taxonomy.PERSON, persons);
         res.put("tree", Taxonomy.buildFacetTree(tops, topics));
         return res;
     }
