@@ -17,9 +17,9 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class OWLPropsCharacteristics {
 

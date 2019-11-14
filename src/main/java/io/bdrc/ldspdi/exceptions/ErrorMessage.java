@@ -1,4 +1,4 @@
-package io.bdrc.restapi.exceptions;
+package io.bdrc.ldspdi.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

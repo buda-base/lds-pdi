@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPageLinks {
 

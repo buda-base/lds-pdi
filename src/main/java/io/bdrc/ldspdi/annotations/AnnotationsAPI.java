@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.bdrc.formatters.JSONLDFormatter.DocType;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.RestException;
 
 @RestController
 @RequestMapping("/annotations/")

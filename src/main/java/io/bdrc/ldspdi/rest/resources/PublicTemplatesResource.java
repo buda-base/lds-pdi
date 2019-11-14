@@ -51,6 +51,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.bdrc.ldspdi.exceptions.ErrorMessage;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
@@ -65,9 +68,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.ErrorMessage;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 @RestController
 @RequestMapping("/")

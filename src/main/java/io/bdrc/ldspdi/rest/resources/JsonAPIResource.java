@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.objects.json.QueryListItem;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
@@ -45,8 +47,6 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 @RestController
 @RequestMapping("/")

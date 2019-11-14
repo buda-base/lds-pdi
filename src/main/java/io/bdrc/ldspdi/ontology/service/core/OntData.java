@@ -47,11 +47,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class OntData implements Runnable {
 

@@ -7,8 +7,8 @@ import org.apache.jena.query.ResultSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class AsyncSparql implements Runnable {
 

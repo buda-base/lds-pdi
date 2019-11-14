@@ -33,11 +33,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class JsonOutputTest {
 

@@ -16,8 +16,8 @@ import org.apache.commons.jcs.engine.behavior.ICompositeCacheAttributes;
 import org.apache.commons.jcs.engine.behavior.IElementAttributes;
 import org.apache.commons.jcs.engine.control.CompositeCache;
 
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 
 public class CacheAccessModel {
 

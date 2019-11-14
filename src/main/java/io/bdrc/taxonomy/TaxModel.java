@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.apache.jena.rdf.model.Model;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class TaxModel {
 

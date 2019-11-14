@@ -14,13 +14,13 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class DocFileModel {
 

@@ -28,11 +28,11 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.objects.json.Output;
 import io.bdrc.ldspdi.objects.json.Param;
 import io.bdrc.ldspdi.objects.json.QueryTemplate;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class ResultPage {
 

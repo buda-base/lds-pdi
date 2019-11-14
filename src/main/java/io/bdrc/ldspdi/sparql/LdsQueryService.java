@@ -2,8 +2,8 @@ package io.bdrc.ldspdi.sparql;
 
 import java.util.HashMap;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class LdsQueryService {
     private static final HashMap<String, LdsQuery> instances = new HashMap<>();

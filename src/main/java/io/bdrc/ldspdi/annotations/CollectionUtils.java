@@ -18,11 +18,11 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.annotations.AnnotationCollectionEndpoint.Prefer;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class CollectionUtils {
 

@@ -26,8 +26,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.sparql.QueryConstants;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class Results {
 

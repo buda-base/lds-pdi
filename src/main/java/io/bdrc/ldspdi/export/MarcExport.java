@@ -60,10 +60,10 @@ import com.opencsv.CSVReaderBuilder;
 import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 /*
  * Here's some knowledge that can be useful when dealing with libraries:

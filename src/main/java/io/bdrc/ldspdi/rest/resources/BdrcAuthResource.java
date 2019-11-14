@@ -30,6 +30,9 @@ import io.bdrc.auth.Access;
 import io.bdrc.auth.model.AuthDataModelBuilder;
 import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
+import io.bdrc.ldspdi.exceptions.ErrorMessage;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.UserDataService;
 import io.bdrc.ldspdi.sparql.Prefixes;
@@ -38,9 +41,6 @@ import io.bdrc.ldspdi.users.BudaUser;
 import io.bdrc.ldspdi.users.UserPatches;
 import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.ErrorMessage;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.RestException;
 
 @RestController
 @RequestMapping("/")

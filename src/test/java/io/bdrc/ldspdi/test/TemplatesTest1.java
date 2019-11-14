@@ -39,11 +39,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.LdsPdiExceptionHandler;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.restapi.exceptions.LdsError;
-import io.bdrc.restapi.exceptions.LdsPdiExceptionHandler;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { PublicTemplatesResource.class, OntData.class, LdsPdiExceptionHandler.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

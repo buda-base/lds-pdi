@@ -40,12 +40,12 @@ import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.rdf.RdfAuthModel;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.resources.BdrcAuthResource;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.SpringBootLdspdi;
 import io.bdrc.ldspdi.users.BudaUser;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.restapi.exceptions.RestException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { BdrcAuthResource.class, SpringBootLdspdi.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

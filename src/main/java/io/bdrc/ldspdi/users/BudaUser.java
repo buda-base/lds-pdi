@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.UserDataService;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.restapi.exceptions.RestException;
 
 public class BudaUser {
 
