@@ -1,5 +1,8 @@
 package io.bdrc.ldspdi.utils;
 
+import static io.bdrc.libraries.Models.ADM;
+import static io.bdrc.libraries.Models.BDO;
+
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  *
@@ -30,18 +33,26 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -52,6 +63,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bdrc.formatters.JSONLDFormatter;
 import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.formatters.TTLRDFWriter;
+import io.bdrc.jena.sttl.CompareComplex;
+import io.bdrc.jena.sttl.ComparePredicates;
+import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.jena.sttl.STriGWriter;
+import io.bdrc.ldspdi.sparql.Prefixes;
 
 public class Helpers {
 
@@ -191,12 +207,18 @@ public class Helpers {
 
                 } else {
                     String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
-                    if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                    if (JenaFormat == null || JenaFormat.equals("STTL")) {
                         final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                         writer.output(os);
-                    } else {
-                        model.write(os, JenaFormat);
+                        return;
                     }
+                    if (JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                        DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
+                        dsg.addGraph(ResourceFactory.createResource(res).asNode(), model.getGraph());
+                        new STriGWriter().write(os, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
+                        return;
+                    }
+                    model.write(os, JenaFormat);
                 }
             }
         };
@@ -214,6 +236,11 @@ public class Helpers {
                 log.info("JENA FORMAT >> {}", JenaFormat);
                 if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                     final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
+                    writer.output(os);
+                    return;
+                }
+                if (JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                    final RDFWriter writer = TTLRDFWriter.getTrigRDFWriter(model, "");
                     writer.output(os);
                     return;
                 }
@@ -242,4 +269,31 @@ public class Helpers {
         md.update(st.getBytes(Charset.forName("UTF8")));
         return new String(Hex.encodeHex(md.digest())).substring(0, 2);
     }
+
+    public static Context createWriterContext() {
+        SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
+        nsPrio.put(SKOS.getURI(), 1);
+        nsPrio.put("http://purl.bdrc.io/ontology/admin/", 5);
+        nsPrio.put("http://purl.bdrc.io/ontology/toberemoved/", 6);
+        List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
+        predicatesPrio.add(ADM + "logDate");
+        predicatesPrio.add(BDO + "seqNum");
+        predicatesPrio.add(BDO + "onYear");
+        predicatesPrio.add(BDO + "notBefore");
+        predicatesPrio.add(BDO + "notAfter");
+        predicatesPrio.add(BDO + "noteText");
+        predicatesPrio.add(BDO + "noteWork");
+        predicatesPrio.add(BDO + "noteLocationStatement");
+        predicatesPrio.add(BDO + "volumeNumber");
+        predicatesPrio.add(BDO + "eventWho");
+        predicatesPrio.add(BDO + "eventWhere");
+        Context ctx = new Context();
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsPriorities"), nsPrio);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsDefaultPriority"), 2);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "complexPredicatesPriorities"), predicatesPrio);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "indentBase"), 4);
+        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 18);
+        return ctx;
+    }
+
 }

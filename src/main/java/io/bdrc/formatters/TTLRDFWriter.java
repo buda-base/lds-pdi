@@ -64,8 +64,12 @@ public class TTLRDFWriter {
         ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 12);
     }
 
-    public static RDFWriter getSTTLRDFWriter(Model m,String baseURI) {    	
+    public static RDFWriter getSTTLRDFWriter(Model m, String baseURI) {
         return RDFWriter.create().source(m.getGraph()).base(baseURI).context(ctx).lang(sttl).build();
+    }
+
+    public static RDFWriter getTrigRDFWriter(Model m, String baseURI) {
+        return RDFWriter.create().source(m.getGraph()).base(baseURI).context(ctx).lang(Lang.TRIG).build();
     }
 
 }

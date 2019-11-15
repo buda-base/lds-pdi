@@ -92,6 +92,7 @@ public class PublicDataResource {
     public static final String RES_PREFIX = ServiceConfig.getProperty("endpoints.resource.fullprefix");
     public static final String ADM_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.admindata.shortprefix");
     public static final String GRAPH_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.graph.shortprefix");
+    public static final String GRAPH_PREFIX_FULL = ServiceConfig.getProperty("endpoints.graph.fullprefix");
 
     @GetMapping("/")
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
@@ -180,8 +181,8 @@ public class PublicDataResource {
     // admindata/res with extension
     public ResponseEntity<StreamingResponseBody> getAdResourceGraphExt(@PathVariable String res, @PathVariable String ext, @RequestHeader("fusekiUrl") final String fusekiUrl, @RequestHeader("Accept") String format, HttpServletRequest request)
             throws RestException {
-
         final String prefixedRes = ADM_PREFIX_SHORT + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         final String graphType = "describe";
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         if (media == null) {
@@ -194,6 +195,7 @@ public class PublicDataResource {
             throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
+
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
@@ -201,13 +203,14 @@ public class PublicDataResource {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().contentType(media).headers(hh).body(Helpers.getModelStream(model, ext, prefixedRes, null));
+        return ResponseEntity.ok().contentType(media).headers(hh).body(Helpers.getModelStream(model, ext, fullResURI, null));
 
     }
 
     // graph/res with extension
     public ResponseEntity<StreamingResponseBody> getGrResourceGraphExt(String res, String ext, String fusekiUrl, String format, HttpServletRequest request) throws RestException {
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         final String graphType = "graph";
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         if (media == null) {
@@ -225,7 +228,7 @@ public class PublicDataResource {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, prefixedRes, null));
+        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, fullResURI, null));
 
     }
 
@@ -238,6 +241,7 @@ public class PublicDataResource {
             return getGrResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
         }
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         final String graphType = "graph";
         final MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (format == null) {
@@ -269,7 +273,7 @@ public class PublicDataResource {
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(mediaType).body(Helpers.getModelStream(model, ext, RES_PREFIX + res, null));
+        return ResponseEntity.ok().headers(hh).contentType(mediaType).body(Helpers.getModelStream(model, ext, fullResURI, null));
     }
 
     @GetMapping(value = "/prefixes")
@@ -297,6 +301,7 @@ public class PublicDataResource {
             return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, response, request);
         }
         final String prefixedRes = RES_PREFIX_SHORT + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         log.info("Call to getResourceGraphGET() with URL: {}, accept: {}, res {}", request.getServletPath(), format, res);
         if (format == null) {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
@@ -332,7 +337,7 @@ public class PublicDataResource {
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext, RES_PREFIX + res, null));
+        return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext, fullResURI, null));
     }
 
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
@@ -340,6 +345,7 @@ public class PublicDataResource {
             throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
         final String prefixedRes = RES_PREFIX_SHORT + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         log.info("Call to getFormattedResourceGraph() path is {}", request.getServletPath());
         if (media == null) {
@@ -373,7 +379,7 @@ public class PublicDataResource {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, RES_PREFIX + res, null));
+        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, fullResURI, null));
 
     }
 

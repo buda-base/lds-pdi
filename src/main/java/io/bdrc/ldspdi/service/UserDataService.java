@@ -1,15 +1,10 @@
 package io.bdrc.ldspdi.service;
 
-import static io.bdrc.libraries.Models.ADM;
-import static io.bdrc.libraries.Models.BDO;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.SortedMap;
 
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -19,9 +14,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.util.Context;
-import org.apache.jena.sparql.util.Symbol;
-import org.apache.jena.vocabulary.SKOS;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.AbortedByHookException;
 import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
@@ -37,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.model.User;
-import io.bdrc.jena.sttl.CompareComplex;
-import io.bdrc.jena.sttl.ComparePredicates;
-import io.bdrc.jena.sttl.STTLWriter;
 import io.bdrc.jena.sttl.STriGWriter;
 import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -81,7 +70,7 @@ public class UserDataService {
             DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
             dsg.addGraph(ResourceFactory.createResource(BudaUser.PUBLIC_PFX + userId).asNode(), pub.getGraph());
             dsg.addGraph(ResourceFactory.createResource(BudaUser.PRIVATE_PFX + userId).asNode(), priv.getGraph());
-            new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
+            new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", Helpers.createWriterContext());
             if (r == null) {
                 r = ensureUserGitRepo();
             }
@@ -117,7 +106,7 @@ public class UserDataService {
         DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
         dsg.addGraph(ResourceFactory.createResource(BudaUser.PUBLIC_PFX + userId).asNode(), pub.getGraph());
         dsg.addGraph(ResourceFactory.createResource(BudaUser.PRIVATE_PFX + userId).asNode(), priv.getGraph());
-        new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
+        new STriGWriter().write(fos, dsg, Prefixes.getPrefixMap(), "", Helpers.createWriterContext());
         Repository r = null;
         if (r == null) {
             r = ensureUserGitRepo();
@@ -163,32 +152,6 @@ public class UserDataService {
                 log.error("Could not create " + dir, se);
             }
         }
-    }
-
-    private static Context createWriterContext() {
-        SortedMap<String, Integer> nsPrio = ComparePredicates.getDefaultNSPriorities();
-        nsPrio.put(SKOS.getURI(), 1);
-        nsPrio.put("http://purl.bdrc.io/ontology/admin/", 5);
-        nsPrio.put("http://purl.bdrc.io/ontology/toberemoved/", 6);
-        List<String> predicatesPrio = CompareComplex.getDefaultPropUris();
-        predicatesPrio.add(ADM + "logDate");
-        predicatesPrio.add(BDO + "seqNum");
-        predicatesPrio.add(BDO + "onYear");
-        predicatesPrio.add(BDO + "notBefore");
-        predicatesPrio.add(BDO + "notAfter");
-        predicatesPrio.add(BDO + "noteText");
-        predicatesPrio.add(BDO + "noteWork");
-        predicatesPrio.add(BDO + "noteLocationStatement");
-        predicatesPrio.add(BDO + "volumeNumber");
-        predicatesPrio.add(BDO + "eventWho");
-        predicatesPrio.add(BDO + "eventWhere");
-        Context ctx = new Context();
-        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsPriorities"), nsPrio);
-        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "nsDefaultPriority"), 2);
-        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "complexPredicatesPriorities"), predicatesPrio);
-        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "indentBase"), 4);
-        ctx.set(Symbol.create(STTLWriter.SYMBOLS_NS + "predicateBaseWidth"), 18);
-        return ctx;
     }
 
 }
