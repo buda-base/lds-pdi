@@ -311,12 +311,14 @@ public class LdsQuery {
             }
         }
         Query q = queryStr.asQuery();
-        if (q.hasLimit()) {
-            if (q.getLimit() > limit_max) {
+        if (!metaInf.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
+            if (q.hasLimit()) {
+                if (q.getLimit() > limit_max) {
+                    q.setLimit(limit_max);
+                }
+            } else {
                 q.setLimit(limit_max);
             }
-        } else {
-            q.setLimit(limit_max);
         }
 
         if (q.toString().startsWith(QueryConstants.QUERY_ERROR)) {

@@ -48,7 +48,6 @@ public class BdrcAuthResource {
 
     public final static Logger log = LoggerFactory.getLogger(BdrcAuthResource.class);
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
-    public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     @GetMapping(value = "/auth/details", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView getUsers() {
@@ -201,7 +200,7 @@ public class BdrcAuthResource {
         }
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(Helpers.getModelStream(QueryProcessor.getAuthGraph(fusekiUrl, "authDataGraph"), null));
+        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(Helpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null));
     }
 
     @GetMapping(value = "/authmodel/updated")
@@ -222,7 +221,7 @@ public class BdrcAuthResource {
         return ResponseEntity.ok("Auth Model was updated");
     }
 
-    public static String getToken(final String header) {
+    private static String getToken(final String header) {
         if (header == null || !header.startsWith("Bearer ")) {
             return null;
         }
