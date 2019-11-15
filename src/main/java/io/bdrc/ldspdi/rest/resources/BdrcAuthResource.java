@@ -201,7 +201,7 @@ public class BdrcAuthResource {
         }
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(Helpers.getModelStream(QueryProcessor.getAuthGraph(fusekiUrl, "authDataGraph")));
+        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(Helpers.getModelStream(QueryProcessor.getAuthGraph(fusekiUrl, "authDataGraph"), null));
     }
 
     @GetMapping(value = "/authmodel/updated")

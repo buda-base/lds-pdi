@@ -155,6 +155,10 @@ public class Helpers {
         return s.replace(multiChoiceTpl);
     }
 
+    public static void test() {
+
+    }
+
     public static StreamingResponseBody getStream(String obj) {
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
@@ -228,33 +232,23 @@ public class Helpers {
         return new StreamingResponseBody() {
             @Override
             public void writeTo(OutputStream os) {
-                if (format.equals("jsonld")) {
-                    JSONLDFormatter.writeModelAsCompact(model, os);
-                    return;
+                String JenaFormat = null;
+                if (format == null) {
+                    JenaFormat = "STTL";
+                } else {
+                    if (format.equals("jsonld")) {
+                        JSONLDFormatter.writeModelAsCompact(model, os);
+                        return;
+                    }
+                    JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
                 }
-                final String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
                 log.info("JENA FORMAT >> {}", JenaFormat);
                 if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
                     final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
                     writer.output(os);
                     return;
                 }
-                if (JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-                    final RDFWriter writer = TTLRDFWriter.getTrigRDFWriter(model, "");
-                    writer.output(os);
-                    return;
-                }
                 model.write(os, JenaFormat);
-            }
-        };
-    }
-
-    public static StreamingResponseBody getModelStream(final Model model) {
-        return new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) {
-                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                writer.output(os);
             }
         };
     }

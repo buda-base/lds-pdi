@@ -68,8 +68,4 @@ public class TTLRDFWriter {
         return RDFWriter.create().source(m.getGraph()).base(baseURI).context(ctx).lang(sttl).build();
     }
 
-    public static RDFWriter getTrigRDFWriter(Model m, String baseURI) {
-        return RDFWriter.create().source(m.getGraph()).base(baseURI).context(ctx).lang(Lang.TRIG).build();
-    }
-
 }
