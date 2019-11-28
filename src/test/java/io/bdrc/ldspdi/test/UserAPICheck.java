@@ -136,7 +136,6 @@ public class UserAPICheck {
     }
 
     private static String getAPIToken() throws ClientProtocolException, IOException {
-        String webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
         String auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = null;

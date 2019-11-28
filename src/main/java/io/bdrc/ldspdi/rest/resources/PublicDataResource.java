@@ -392,7 +392,7 @@ public class PublicDataResource {
         if (other.contains(".")) {
             String[] parts = other.split("\\.");
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
-            return getOntologyResourceAsFile(request, base, parts[0], parts[1]);
+            return getOntologyResourceAsFile(request, parts[1]);
         }
         log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
         boolean isBase = false;
@@ -414,7 +414,6 @@ public class PublicDataResource {
         log.info("getExtOntologyHomePage baseUri is >> {}", baseUri);
         // Is the full request uri a baseuri?
         if (isBase) {
-            OntPolicy pr = OntPolicies.getOntologyByBase(baseUri);
             // if accept header is present
             if (format != null) {
                 log.info("getExtOntologyHomePage IS BASE and Format is >> {}", format);
@@ -488,9 +487,10 @@ public class PublicDataResource {
             }
         }
         return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
+
     }
 
-    public Object getOntologyResourceAsFile(HttpServletRequest request, String base, String other, String ext) throws RestException {
+    public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
         log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
@@ -502,23 +502,22 @@ public class PublicDataResource {
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
             OntModel model = OntData.getOntModelByBase(params.getBaseUri());
-            String t = null;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (JenaLangStr == "STTL") {
-                final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
+                final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
                 writer.output(baos);
-            }
-            if (JenaLangStr == RDFLanguages.strLangTurtle) {
-                model.write(baos, "TURTLE");
             } else {
-                org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
-                if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                    wr.setProperty("xmlbase", params.getBaseUri());
+                if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                    model.write(baos, "TURTLE");
+                } else {
+                    org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                    if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                        wr.setProperty("xmlbase", params.getBaseUri());
+                    }
+                    wr.write(model, baos, params.getBaseUri());
                 }
-                wr.write(model, baos, params.getBaseUri());
-                t = baos.toString();
             }
-            return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(t);
+            return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
