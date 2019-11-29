@@ -203,6 +203,12 @@ public class BdrcAuthResource {
         return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(Helpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null));
     }
 
+    @GetMapping(value = "/userEditPolicies")
+    public ResponseEntity<StreamingResponseBody> getUserEditPolicies() throws RestException {
+        log.info("Call to getUserEditPolicies()");
+        return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension("json")).body(Helpers.getJsonObjectStream(BudaUser.getUserPropsEditPolicies()));
+    }
+
     @GetMapping(value = "/authmodel/updated")
     public long getAuthModelUpdated() {
         log.info("Call to getAuthModelUpdated()");

@@ -3,6 +3,9 @@ package io.bdrc.ldspdi.users;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
@@ -46,6 +49,12 @@ public class BudaUser {
     public static final String BDO = "http://purl.bdrc.io/ontology/core/";
     public static final String FOAF = "http://xmlns.com/foaf/0.1/";
     public static final String ADR_PFX = "http://purl.bdrc.io/resource-nc/auth/";
+
+    public static final String PUBLIC_PROPS_KEY = "publicProps";
+    public static final String ADMIN_PROPS_KEY = "adminEditProps";
+    public static final String USER_PROPS_KEY = "userEditProps";
+
+    public static HashMap<String, List<String>> propsPolicies;
 
     public static Resource getRdfProfile(String auth0Id) throws IOException, RestException {
         Resource r = (Resource) UsersCache.getObjectFromCache(auth0Id.hashCode());
@@ -229,6 +238,16 @@ public class BudaUser {
         fusConn.put(PRIVATE_PFX + userId, publicModel);
         fusConn.close();
         return mods;
+    }
+
+    public static HashMap<String, List<String>> getUserPropsEditPolicies() {
+        if (propsPolicies == null) {
+            propsPolicies = new HashMap<>();
+            propsPolicies.put(BudaUser.PUBLIC_PROPS_KEY, Arrays.asList(ServiceConfig.getProperty(BudaUser.PUBLIC_PROPS_KEY).split(",")));
+            propsPolicies.put(BudaUser.ADMIN_PROPS_KEY, Arrays.asList(ServiceConfig.getProperty(BudaUser.ADMIN_PROPS_KEY).split(",")));
+            propsPolicies.put(BudaUser.USER_PROPS_KEY, Arrays.asList(ServiceConfig.getProperty(BudaUser.USER_PROPS_KEY).split(",")));
+        }
+        return propsPolicies;
     }
 
     public static void main(String[] args) throws IOException, RestException {

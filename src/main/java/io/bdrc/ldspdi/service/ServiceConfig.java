@@ -52,6 +52,9 @@ public class ServiceConfig {
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             prop.load(input);
             input.close();
+            input = ServiceConfig.class.getClassLoader().getResourceAsStream("edit.properties");
+            prop.load(input);
+            input.close();
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }
