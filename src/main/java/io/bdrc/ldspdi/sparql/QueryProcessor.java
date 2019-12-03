@@ -34,12 +34,10 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
@@ -53,6 +51,7 @@ import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.libraries.Prefixes;
 
 public class QueryProcessor {
 
@@ -230,13 +229,6 @@ public class QueryProcessor {
                     + "prefix vcard: <http://www.w3.org/2006/vcard/ns#>\n" + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + "prefix text:  <http://jena.apache.org/text#>\n" + "prefix oa:    <http://www.w3.org/ns/oa#>\n"
                     + "prefix as:    <http://www.w3.org/ns/activitystreams#>\n" + "prefix ldp:   <http://www.w3.org/ns/ldp#>\n" + "prefix sh: <http://www.w3.org/ns/shacl#>\n" + "prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>";
         }
-    }
-
-    public static void putModel(RDFConnectionFuseki fusConn, String graph, Model m) throws Exception {
-        fusConn.begin(ReadWrite.WRITE);
-        fusConn.put(graph, m);
-        fusConn.commit();
-        fusConn.end();
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {

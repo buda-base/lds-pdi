@@ -62,12 +62,14 @@ import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.GlobalHelpers;
+import io.bdrc.libraries.Prefixes;
+import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
@@ -119,7 +121,7 @@ public class PublicTemplatesResource {
             ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
-                byte[] buff = Helpers.getJsonBytesStream(r);
+                byte[] buff = GlobalHelpers.getJsonBytes(r);
                 return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
@@ -161,13 +163,13 @@ public class PublicTemplatesResource {
             log.info("Call to getQueryTemplateResultsJsonPost() with params : {}", map);
             if (map == null || map.size() == 0) {
                 LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
-                return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
+                return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
 
             }
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
             final String query = qfp.getParametizedQuery(map);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
-                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getStream(query));
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }
             String fmt = map.get(QueryConstants.FORMAT);
             if ("xml".equals(fmt)) {
@@ -179,8 +181,8 @@ public class PublicTemplatesResource {
                 map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
                 map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
                 Results r = new Results(res, map);
-                String json = new String(Helpers.getJsonBytesStream(r));
-                return ResponseEntity.ok().body(Helpers.getStream(json));
+                String json = new String(GlobalHelpers.getJsonBytes(r));
+                return ResponseEntity.ok().body(StreamingHelpers.getStream(json));
             }
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -209,7 +211,7 @@ public class PublicTemplatesResource {
             if (format == null && variant == null) {
                 HttpHeaders hh = new HttpHeaders();
                 hh.setAll(getGraphResourceHeaders(path, null, "List"));
-                return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + path).body(Helpers.getStream(Helpers.getMultiChoicesHtml(path, false)));
+                return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + path).body(StreamingHelpers.getStream(Helpers.getMultiChoicesHtml(path, false)));
 
             }
             // Settings
@@ -226,7 +228,7 @@ public class PublicTemplatesResource {
             model = QueryProcessor.getGraph(query, fuseki, null);
             if (model.size() == 0) {
                 LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + hm.toString());
-                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
             }
             ext = BudaMediaTypes.getExtFromMime(mediaType);
@@ -243,7 +245,7 @@ public class PublicTemplatesResource {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext));
+        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext));
 
     }
 
@@ -261,7 +263,7 @@ public class PublicTemplatesResource {
             log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
             if (variant == null) {
                 LdsError lds = new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()");
-                return ResponseEntity.status(406).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(406, lds)));
+                return ResponseEntity.status(406).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(406, lds)));
             }
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
@@ -274,7 +276,7 @@ public class PublicTemplatesResource {
             model = QueryProcessor.getGraph(query, fuseki, null);
             if (model.size() == 0) {
                 LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + map.toString());
-                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -287,7 +289,7 @@ public class PublicTemplatesResource {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType)));
+        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType)));
     }
 
     @PostMapping(value = "/callbacks/github/lds-queries", consumes = MediaType.APPLICATION_JSON_VALUE)

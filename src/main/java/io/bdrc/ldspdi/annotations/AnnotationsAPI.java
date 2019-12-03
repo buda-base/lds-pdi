@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.StreamingHelpers;
+import io.bdrc.libraries.formatters.JSONLDFormatter.DocType;
 
 @RestController
 @RequestMapping("/annotations/")
@@ -47,7 +48,7 @@ public class AnnotationsAPI {
         COLL_SERV.write(System.out, "JSON-LD");
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return bb.body(Helpers.getModelStream(COLL_SERV, ext, "http://api.bdrc.io/annotations/collectionService", null));
+        return bb.body(StreamingHelpers.getModelStream(COLL_SERV, ext, "http://api.bdrc.io/annotations/collectionService", null));
 
     }
 
@@ -78,7 +79,7 @@ public class AnnotationsAPI {
         Model model = QueryProcessor.getGraph(query, ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL), null);
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return bb.body(Helpers.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", dct));
+        return bb.body(StreamingHelpers.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", dct));
     }
 
 }

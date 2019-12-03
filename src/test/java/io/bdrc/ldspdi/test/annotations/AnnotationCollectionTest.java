@@ -31,7 +31,7 @@ import io.bdrc.ldspdi.annotations.AnnotationCollectionEndpoint;
 import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.test.Utils;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
+import io.bdrc.libraries.BudaMediaTypes;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { AnnotationCollectionEndpoint.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

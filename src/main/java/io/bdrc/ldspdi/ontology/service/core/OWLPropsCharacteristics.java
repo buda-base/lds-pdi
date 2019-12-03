@@ -19,20 +19,20 @@ import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.libraries.Prefixes;
 
 public class OWLPropsCharacteristics {
 
     Model propsModel;
-    public static final String OWL_FUNCTIONAL="http://www.w3.org/2002/07/owl#FunctionalProperty";
-    public static final String OWL_SYMMETRIC="http://www.w3.org/2002/07/owl#SymmetricProperty";
-    public static final String OWL_IRREFLEXIVE="http://www.w3.org/2002/07/owl#IrreflexiveProperty";
-    public static final String OWL_INVERSE_FUNCTIONAL="http://www.w3.org/2002/07/owl#InverseFunctionalProperty";
-    public static final String OWL_TRANSITIVE="http://www.w3.org/2002/07/owl#TransitiveProperty";
-    public static final String OWL_ASYMMETRIC="http://www.w3.org/2002/07/owl#AsymmetricProperty";
-    public static final String OWL_REFLEXIVE="http://www.w3.org/2002/07/owl#ReflexiveProperty";
-    public static final String OWL_INVERSEOF="http://www.w3.org/2002/07/owl#inverseOf";
-    public static final String OWL_ANNOTATION_PROP="http://www.w3.org/2002/07/owl#AnnotationProperty";
+    public static final String OWL_FUNCTIONAL = "http://www.w3.org/2002/07/owl#FunctionalProperty";
+    public static final String OWL_SYMMETRIC = "http://www.w3.org/2002/07/owl#SymmetricProperty";
+    public static final String OWL_IRREFLEXIVE = "http://www.w3.org/2002/07/owl#IrreflexiveProperty";
+    public static final String OWL_INVERSE_FUNCTIONAL = "http://www.w3.org/2002/07/owl#InverseFunctionalProperty";
+    public static final String OWL_TRANSITIVE = "http://www.w3.org/2002/07/owl#TransitiveProperty";
+    public static final String OWL_ASYMMETRIC = "http://www.w3.org/2002/07/owl#AsymmetricProperty";
+    public static final String OWL_REFLEXIVE = "http://www.w3.org/2002/07/owl#ReflexiveProperty";
+    public static final String OWL_INVERSEOF = "http://www.w3.org/2002/07/owl#inverseOf";
+    public static final String OWL_ANNOTATION_PROP = "http://www.w3.org/2002/07/owl#AnnotationProperty";
 
     ArrayList<String> functionalProps;
     ArrayList<String> symmetricProps;
@@ -41,107 +41,106 @@ public class OWLPropsCharacteristics {
     ArrayList<String> transitiveProps;
     ArrayList<String> asymmetricProps;
     ArrayList<String> reflexiveProps;
-    HashMap<String,String> inverseOfProps;
+    HashMap<String, String> inverseOfProps;
 
     public OWLPropsCharacteristics(Model m) throws IOException, RestException {
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(ServiceConfig.class.getClassLoader().getResourceAsStream("arq/OwlProps.arq")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(ServiceConfig.class.getClassLoader().getResourceAsStream("arq/OwlProps.arq")));
         StringBuilder out = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             out.append(line);
         }
-        String query=Prefixes.getPrefixesString()+" "+out.toString();
+        String query = Prefixes.getPrefixesString() + " " + out.toString();
         QueryExecution qexec = QueryExecutionFactory.create(query, m);
-        propsModel=qexec.execConstruct();
+        propsModel = qexec.execConstruct();
         getInverseOfProps();
     }
 
-    public ArrayList<String> getFunctionalProps(){
-        if(functionalProps==null) {
-            ResIterator it = propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_FUNCTIONAL));
-            functionalProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getFunctionalProps() {
+        if (functionalProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_FUNCTIONAL));
+            functionalProps = new ArrayList<>();
+            while (it.hasNext()) {
                 functionalProps.add(it.next().getURI());
             }
         }
         return functionalProps;
     }
 
-    public ArrayList<String> getSymmetricProps(){
-        if(symmetricProps==null) {
-            ResIterator it = propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_SYMMETRIC));
-            symmetricProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getSymmetricProps() {
+        if (symmetricProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_SYMMETRIC));
+            symmetricProps = new ArrayList<>();
+            while (it.hasNext()) {
                 symmetricProps.add(it.next().getURI());
             }
         }
         return symmetricProps;
     }
 
-    public ArrayList<String> getIrreflexiveProps(){
-        if(irreflexiveProps==null) {
-            ResIterator it = propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_IRREFLEXIVE));
-            irreflexiveProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getIrreflexiveProps() {
+        if (irreflexiveProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_IRREFLEXIVE));
+            irreflexiveProps = new ArrayList<>();
+            while (it.hasNext()) {
                 irreflexiveProps.add(it.next().getURI());
             }
         }
         return irreflexiveProps;
     }
 
-    public ArrayList<String> getInverseFunctionalProps(){
-        if(inverseFunctionalProps==null) {
-            ResIterator it = propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_INVERSE_FUNCTIONAL));
-            inverseFunctionalProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getInverseFunctionalProps() {
+        if (inverseFunctionalProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_INVERSE_FUNCTIONAL));
+            inverseFunctionalProps = new ArrayList<>();
+            while (it.hasNext()) {
                 inverseFunctionalProps.add(it.next().getURI());
             }
         }
         return inverseFunctionalProps;
     }
 
-    public ArrayList<String> getTransitiveProps(){
-        if(transitiveProps==null) {
-            ResIterator it= propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_TRANSITIVE));
-            transitiveProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getTransitiveProps() {
+        if (transitiveProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_TRANSITIVE));
+            transitiveProps = new ArrayList<>();
+            while (it.hasNext()) {
                 transitiveProps.add(it.next().getURI());
             }
         }
         return transitiveProps;
     }
 
-    public ArrayList<String> getAsymmetricProps(){
-        if(asymmetricProps==null) {
-            ResIterator it= propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_ASYMMETRIC));
-            asymmetricProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getAsymmetricProps() {
+        if (asymmetricProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_ASYMMETRIC));
+            asymmetricProps = new ArrayList<>();
+            while (it.hasNext()) {
                 asymmetricProps.add(it.next().getURI());
             }
         }
         return asymmetricProps;
     }
 
-    public ArrayList<String> getReflexiveProps(){
-        if(reflexiveProps==null) {
-            ResIterator it=propsModel.listResourcesWithProperty(RDF.type,ResourceFactory.createProperty(OWL_REFLEXIVE));
-            reflexiveProps=new ArrayList<>();
-            while(it.hasNext()) {
+    public ArrayList<String> getReflexiveProps() {
+        if (reflexiveProps == null) {
+            ResIterator it = propsModel.listResourcesWithProperty(RDF.type, ResourceFactory.createProperty(OWL_REFLEXIVE));
+            reflexiveProps = new ArrayList<>();
+            while (it.hasNext()) {
                 reflexiveProps.add(it.next().getURI());
             }
         }
         return reflexiveProps;
     }
 
-    public HashMap<String,String> getInverseOfProps(){
-        if(inverseOfProps==null) {
-            StmtIterator it=propsModel.listStatements((Resource)null,ResourceFactory.createProperty(OWL_INVERSEOF),(RDFNode)null);
+    public HashMap<String, String> getInverseOfProps() {
+        if (inverseOfProps == null) {
+            StmtIterator it = propsModel.listStatements((Resource) null, ResourceFactory.createProperty(OWL_INVERSEOF), (RDFNode) null);
             inverseOfProps = new HashMap<>();
-            while(it.hasNext()) {
-                Statement s=it.next();
-                inverseOfProps.put(s.getSubject().getURI(),s.getObject().asNode().getURI());
-                inverseOfProps.put(s.getObject().asNode().getURI(),s.getSubject().getURI());
+            while (it.hasNext()) {
+                Statement s = it.next();
+                inverseOfProps.put(s.getSubject().getURI(), s.getObject().asNode().getURI());
+                inverseOfProps.put(s.getObject().asNode().getURI(), s.getSubject().getURI());
             }
         }
         return inverseOfProps;
@@ -183,42 +182,42 @@ public class OWLPropsCharacteristics {
         return getReflexiveProps().contains(uri);
     }
 
-    public ArrayList<String> getOwlProps(String uri) throws RestException{
-        ArrayList<String> owlProps=new ArrayList<>();
-        if(isFunctionalProp(uri)) {
+    public ArrayList<String> getOwlProps(String uri) throws RestException {
+        ArrayList<String> owlProps = new ArrayList<>();
+        if (isFunctionalProp(uri)) {
             owlProps.add(OWL_FUNCTIONAL);
         }
-        if(isSymmetricProp(uri)) {
+        if (isSymmetricProp(uri)) {
             owlProps.add(OWL_SYMMETRIC);
         }
-        if(isIrreflexiveProp(uri)) {
+        if (isIrreflexiveProp(uri)) {
             owlProps.add(OWL_IRREFLEXIVE);
         }
-        if(isInverseFunctionalProp(uri)) {
+        if (isInverseFunctionalProp(uri)) {
             owlProps.add(OWL_INVERSE_FUNCTIONAL);
         }
-        if(isTransitiveProp(uri)) {
+        if (isTransitiveProp(uri)) {
             owlProps.add(OWL_TRANSITIVE);
         }
-        if(isAsymmetricProp(uri)) {
+        if (isAsymmetricProp(uri)) {
             owlProps.add(OWL_ASYMMETRIC);
         }
-        if(isReflexiveProp(uri)) {
+        if (isReflexiveProp(uri)) {
             owlProps.add(OWL_REFLEXIVE);
         }
         return owlProps;
     }
 
     public String getPrefixed(String uri) {
-        if(uri !=null) {
-            return "owl:"+uri.substring(uri.lastIndexOf("#")+1);
+        if (uri != null) {
+            return "owl:" + uri.substring(uri.lastIndexOf("#") + 1);
         }
         return uri;
     }
 
     public String getShortInverse(String uri) {
-        if(uri !=null) {
-            return ":"+uri.substring(uri.lastIndexOf("/")+1);
+        if (uri != null) {
+            return ":" + uri.substring(uri.lastIndexOf("/") + 1);
         }
         return uri;
     }

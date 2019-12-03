@@ -11,7 +11,7 @@ import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.libraries.Prefixes;
 
 public class QueryMvcSolutionItem {
 

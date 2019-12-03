@@ -61,7 +61,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -76,11 +75,13 @@ import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.Prefixes;
+import io.bdrc.libraries.StreamingHelpers;
+import io.bdrc.libraries.formatters.TTLRDFWriter;
 
 @RestController
 @RequestMapping("/")
@@ -149,14 +150,14 @@ public class PublicDataResource {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
 
         }
         if (mediaType == null) {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
@@ -170,12 +171,12 @@ public class PublicDataResource {
         Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().contentType(mediaType).headers(hh).body(Helpers.getModelStream(model, ext, RES_PREFIX + res, null));
+        return ResponseEntity.ok().contentType(mediaType).headers(hh).body(StreamingHelpers.getModelStream(model, ext, RES_PREFIX + res, null));
     }
 
     // admindata/res with extension
@@ -189,7 +190,7 @@ public class PublicDataResource {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
@@ -198,12 +199,12 @@ public class PublicDataResource {
 
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().contentType(media).headers(hh).body(Helpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().contentType(media).headers(hh).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
 
     }
 
@@ -215,7 +216,7 @@ public class PublicDataResource {
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
-            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
 
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
@@ -224,11 +225,11 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(media).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
 
     }
 
@@ -248,14 +249,14 @@ public class PublicDataResource {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
 
         }
         if (mediaType == null) {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
@@ -268,12 +269,12 @@ public class PublicDataResource {
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(mediaType).body(Helpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
     }
 
     @GetMapping(value = "/prefixes")
@@ -307,13 +308,13 @@ public class PublicDataResource {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (mediaType == null) {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             String type = getDilaResourceType(res);
@@ -332,12 +333,12 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
     }
 
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
@@ -350,7 +351,7 @@ public class PublicDataResource {
         log.info("Call to getFormattedResourceGraph() path is {}", request.getServletPath());
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
-            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             String type = getDilaResourceType(res);
@@ -375,11 +376,11 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(Helpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(media).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
 
     }
 
@@ -454,7 +455,7 @@ public class PublicDataResource {
         } else {
             if (OntData.ontAllMod.getOntResource(tmp) == null) {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
-                return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
             if (format != null) {
                 MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
@@ -497,7 +498,7 @@ public class PublicDataResource {
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
@@ -520,7 +521,7 @@ public class PublicDataResource {
             return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
     }
 
@@ -531,7 +532,7 @@ public class PublicDataResource {
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         OntModel model = OntData.ontAllMod;
         final StreamingResponseBody stream = new StreamingResponseBody() {

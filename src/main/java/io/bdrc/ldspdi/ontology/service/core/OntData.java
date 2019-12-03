@@ -50,8 +50,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.sparql.Prefixes;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.libraries.Prefixes;
 
 public class OntData implements Runnable {
 

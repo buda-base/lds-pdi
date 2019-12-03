@@ -15,8 +15,9 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.StreamingHelpers;
 
 public class AnnotationUtils {
 
@@ -24,7 +25,7 @@ public class AnnotationUtils {
         final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
         BodyBuilder bb = ResponseEntity.status(300);
         bb = setRespHeaders(bb, request.getServletPath(), null, "List", null, MediaType.TEXT_HTML, false);
-        return bb.header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(Helpers.getStream(html));
+        return bb.header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
     }
 
     public static void htmlResponse(HttpServletRequest request, HttpServletResponse response, final String res) throws RestException {

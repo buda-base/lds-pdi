@@ -42,14 +42,8 @@ import java.util.SortedMap;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.riot.RDFLanguages;
-import org.apache.jena.riot.RDFWriter;
-import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.SKOS;
@@ -58,21 +52,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.bdrc.formatters.JSONLDFormatter;
-import io.bdrc.formatters.JSONLDFormatter.DocType;
-import io.bdrc.formatters.TTLRDFWriter;
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
-import io.bdrc.jena.sttl.STriGWriter;
-import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.libraries.BudaMediaTypes;
 
 public class Helpers {
-
-    public static final ObjectMapper om = new ObjectMapper();
-    public static boolean prettyPrint = false;
 
     public final static Logger log = LoggerFactory.getLogger(Helpers.class);
 
@@ -159,96 +144,11 @@ public class Helpers {
 
     }
 
-    public static StreamingResponseBody getStream(String obj) {
-        final StreamingResponseBody stream = new StreamingResponseBody() {
-            @Override
-            public void writeTo(final OutputStream os) throws IOException {
-                os.write(obj.getBytes());
-            }
-        };
-        return stream;
-    }
-
-    public static StreamingResponseBody getJsonObjectStream(Object obj) {
-        return new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) throws IOException {
-                if (prettyPrint)
-                    om.writerWithDefaultPrettyPrinter().writeValue(os, obj);
-                else
-                    om.writeValue(os, obj);
-            }
-        };
-    }
-
     public static StreamingResponseBody getResultSetAsXml(ResultSet rs) {
         return new StreamingResponseBody() {
             @Override
             public void writeTo(OutputStream os) throws IOException {
                 ResultSetFormatter.outputAsXML(os, rs);
-            }
-        };
-    }
-
-    public static byte[] getJsonBytesStream(Object obj) {
-        try {
-            return om.writeValueAsBytes(obj);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return new byte[0];
-    }
-
-    public static StreamingResponseBody getModelStream(final Model model, final String format, final String res, DocType docType) {
-
-        return new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) {
-                if (format.equals("jsonld")) {
-                    Object json = JSONLDFormatter.modelToJsonObject(model, res, docType);
-                    JSONLDFormatter.jsonObjectToOutputStream(json, os);
-
-                } else {
-                    String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
-                    if (JenaFormat == null || JenaFormat.equals("STTL")) {
-                        final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                        writer.output(os);
-                        return;
-                    }
-                    if (JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-                        DatasetGraph dsg = DatasetFactory.create().asDatasetGraph();
-                        dsg.addGraph(ResourceFactory.createResource(res).asNode(), model.getGraph());
-                        new STriGWriter().write(os, dsg, Prefixes.getPrefixMap(), "", createWriterContext());
-                        return;
-                    }
-                    model.write(os, JenaFormat);
-                }
-            }
-        };
-    }
-
-    public static StreamingResponseBody getModelStream(final Model model, final String format) {
-        return new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) {
-                String JenaFormat = null;
-                if (format == null) {
-                    JenaFormat = "STTL";
-                } else {
-                    if (format.equals("jsonld")) {
-                        JSONLDFormatter.writeModelAsCompact(model, os);
-                        return;
-                    }
-                    JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
-                }
-                log.info("JENA FORMAT >> {}", JenaFormat);
-                if (JenaFormat == null || JenaFormat.equals("STTL") || JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
-                    final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(model, "");
-                    writer.output(os);
-                    return;
-                }
-                model.write(os, JenaFormat);
             }
         };
     }

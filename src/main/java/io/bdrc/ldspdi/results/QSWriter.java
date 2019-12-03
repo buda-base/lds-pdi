@@ -8,7 +8,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 import com.opencsv.CSVWriter;
 
-import io.bdrc.ldspdi.sparql.Prefixes;
+import io.bdrc.libraries.Prefixes;
 
 public class QSWriter {
 
@@ -16,16 +16,16 @@ public class QSWriter {
         final int nbVars = vars.size();
         String[] csvrow = new String[nbVars];
         int varIdx = 0;
-        for(String key: vars) {
-            RDFNode node=qs.get(key);
+        for (String key : vars) {
+            RDFNode node = qs.get(key);
             if (node == null) {
                 csvrow[varIdx] = "";
-            } else if(node.isURIResource()) {
+            } else if (node.isURIResource()) {
                 csvrow[varIdx] = Prefixes.getPrefixedIRI(node.asResource().getURI());
-            } else if(node.isLiteral()) {
+            } else if (node.isLiteral()) {
                 csvrow[varIdx] = node.asLiteral().getValue().toString();
-            } else if(node.isAnon()) {
-                csvrow[varIdx] = "_:"+node.toString();
+            } else if (node.isAnon()) {
+                csvrow[varIdx] = "_:" + node.toString();
             }
             varIdx += 1;
         }
@@ -34,29 +34,29 @@ public class QSWriter {
 
     public static void writeCsvFull(final QuerySolution qs, final List<String> vars, final CSVWriter writer) {
         final int nbVars = vars.size();
-        String[] csvrow = new String[3*nbVars];
+        String[] csvrow = new String[3 * nbVars];
         int varIdx = 0;
-        for(String key: vars) {
-            RDFNode node=qs.get(key);
+        for (String key : vars) {
+            RDFNode node = qs.get(key);
             if (node == null) {
-                csvrow[3*varIdx] = "";
-                csvrow[3*varIdx+1] = "";
-                csvrow[3*varIdx+2] = "";
-            } else if(node.isURIResource()) {
-                csvrow[3*varIdx] = node.asResource().getURI();
-                csvrow[3*varIdx+1] = "@id";
-                csvrow[3*varIdx+2] = "";
-            } else if(node.isLiteral()) {
+                csvrow[3 * varIdx] = "";
+                csvrow[3 * varIdx + 1] = "";
+                csvrow[3 * varIdx + 2] = "";
+            } else if (node.isURIResource()) {
+                csvrow[3 * varIdx] = node.asResource().getURI();
+                csvrow[3 * varIdx + 1] = "@id";
+                csvrow[3 * varIdx + 2] = "";
+            } else if (node.isLiteral()) {
                 final Literal l = node.asLiteral();
-                csvrow[3*varIdx] = l.getValue().toString();
+                csvrow[3 * varIdx] = l.getValue().toString();
                 final String type = l.getDatatypeURI();
-                csvrow[3*varIdx+1] = (type == null) ? "" : type;
+                csvrow[3 * varIdx + 1] = (type == null) ? "" : type;
                 final String lang = l.getLanguage();
-                csvrow[3*varIdx+2] = (lang == null) ? "" : lang;
-            } else if(node.isAnon()) {
-                csvrow[3*varIdx] = "_:"+node.toString();
-                csvrow[3*varIdx+1] = "@id";
-                csvrow[3*varIdx+2] = "";
+                csvrow[3 * varIdx + 2] = (lang == null) ? "" : lang;
+            } else if (node.isAnon()) {
+                csvrow[3 * varIdx] = "_:" + node.toString();
+                csvrow[3 * varIdx + 1] = "@id";
+                csvrow[3 * varIdx + 2] = "";
             }
             varIdx += 1;
         }

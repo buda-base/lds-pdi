@@ -19,13 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.StreamingHelpers;
+import io.bdrc.libraries.formatters.JSONLDFormatter.DocType;
 
 @RestController
 @RequestMapping("/anncollection/*")
@@ -237,14 +238,14 @@ public class AnnotationCollectionEndpoint {
         return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
     }
 
-    private ResponseEntity<StreamingResponseBody> getResponse(final Model model, final DocType docType, final String collectionAliasUri, final MediaType mediaType, final Prefer prefer, final String path, final String tcn) throws RestException {
+    private ResponseEntity<StreamingResponseBody> getResponse(final Model model, DocType docType, final String collectionAliasUri, final MediaType mediaType, final Prefer prefer, final String path, final String tcn) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, path, ext, tcn, null, mediaType, true);
-        return bb.body(Helpers.getModelStream(model, ext, collectionAliasUri, docType));
+        return bb.body(StreamingHelpers.getModelStream(model, ext, collectionAliasUri, docType));
 
     }
 

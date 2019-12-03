@@ -46,7 +46,7 @@ import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
@@ -63,14 +63,14 @@ public class JsonAPIResource {
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> queriesListGet() throws RestException {
         log.info("Call to queriesListGet()");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(getQueryListItems(fileList)));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(getQueryListItems(fileList)));
     }
 
     @PostMapping(value = "/queries", produces = MediaType.APPLICATION_JSON_VALUE)
     @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> queriesListPost() throws RestException {
         log.info("Call to queriesListPost()");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(getQueryListItems(fileList)));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(getQueryListItems(fileList)));
     }
 
     @GetMapping(value = "/queries/{template}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -78,7 +78,7 @@ public class JsonAPIResource {
     public ResponseEntity<StreamingResponseBody> queryDescGet(@PathVariable("template") String name) throws RestException {
         log.info("Call to queryDescGet()");
         final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(qfp.getTemplate()));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(qfp.getTemplate()));
     }
 
     @PostMapping(value = "/queries/{template}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +86,7 @@ public class JsonAPIResource {
     public ResponseEntity<StreamingResponseBody> queryDescPost(@PathVariable("template") String name) throws RestException {
         log.info("Call to queryDescPost()");
         final LdsQuery qfp = LdsQueryService.get(name + ".arq");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(qfp.getTemplate()));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(qfp.getTemplate()));
     }
 
     private ArrayList<QueryListItem> getQueryListItems(List<String> filesList) throws RestException {

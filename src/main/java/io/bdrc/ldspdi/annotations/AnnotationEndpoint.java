@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.formatters.JSONLDFormatter.DocType;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.BudaMediaTypes;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.StreamingHelpers;
+import io.bdrc.libraries.formatters.JSONLDFormatter.DocType;
 
 @RestController
 @RequestMapping("/annotations/")
@@ -96,7 +97,7 @@ public class AnnotationEndpoint {
         // return ResponseEntity.ok().body(Helpers.getModelStream(model, ext, ANN_PREFIX
         // + res, docType));
         response = AnnotationUtils.setRespHeaders(response, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(mediaType).body(Helpers.getModelStream(model, ext, ANN_PREFIX + res, docType));
+        return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, docType));
     }
 
     @GetMapping(value = "/{res}.{ext}")
@@ -117,7 +118,7 @@ public class AnnotationEndpoint {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return (ResponseEntity<StreamingResponseBody>) bb.body(Helpers.getModelStream(model, ext, ANN_PREFIX + res, DocType.ANN));
+        return (ResponseEntity<StreamingResponseBody>) bb.body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, DocType.ANN));
     }
 
     static int getJsonLdMode(final MediaType mediaType) {

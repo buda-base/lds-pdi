@@ -17,7 +17,7 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.StreamingHelpers;
 
 public class TxtEtextExport {
 
@@ -69,7 +69,7 @@ public class TxtEtextExport {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
         }
         final String resStr = getStringForTxt(res, startChar, endChar);
-        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").body(Helpers.getStream(resStr));
+        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").body(StreamingHelpers.getStream(resStr));
     }
 
 }

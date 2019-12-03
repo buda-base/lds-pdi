@@ -39,6 +39,7 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
@@ -104,9 +105,9 @@ public class LibrarySearchResource {
             break;
         default:
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(res));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
     }
 
     @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -176,10 +177,10 @@ public class LibrarySearchResource {
             break;
         default:
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
         }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Helpers.getJsonObjectStream(res));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
     }
 
 }

@@ -231,7 +231,7 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.4.6</version>
+      <version>0.6.4</version>
     </dependency>   
 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 	<dependency>
