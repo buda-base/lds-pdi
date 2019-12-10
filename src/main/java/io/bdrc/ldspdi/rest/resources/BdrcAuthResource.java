@@ -33,7 +33,6 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.libraries.BudaMediaTypes;
@@ -134,10 +133,7 @@ public class BdrcAuthResource {
     }
 
     private Resource getRdfProfile(String auth0Id) throws IOException {
-        Resource r = (Resource) ResultsCache.getObjectFromCache(auth0Id.hashCode());
-        if (r != null) {
-            return r;
-        }
+        Resource r = null;
         String query = "select distinct ?s where  {  ?s <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> <http://purl.bdrc.io/resource-nc/auth/" + auth0Id + "> }";
         log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
         QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
@@ -145,7 +141,6 @@ public class BdrcAuthResource {
         if (rs.hasNext()) {
             r = rs.next().getResource("?s");
             log.info("RESOURCE >> {} and rdfId= {} ", r);
-            ResultsCache.addToCache(r, auth0Id.hashCode());
             return r;
         }
         qe.close();
