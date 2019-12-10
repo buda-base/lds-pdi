@@ -60,26 +60,31 @@ public class BdrcAuthResource {
     @GetMapping(value = "/resource-nc/user/{res}")
     public ResponseEntity<StreamingResponseBody> userResource(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
         log.info("Call userResource()");
-        String token = getToken(request.getHeader("Authorization"));
-        if (token == null) {
-            return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModelFromUserId(false, res), "jsonld"));
-        } else {
-            Access acc = (Access) request.getAttribute("access");
-            // auth0Id corresponding to the logged on user - from the token
-            String auth0Id = acc.getUser().getAuthId();
-            log.info("User in userResource() >> {}", acc.getUser());
-            auth0Id = acc.getUser().getUserId();
-            Resource usr = getRdfProfile(auth0Id);
-            if (usr == null) {
-                return ResponseEntity.status(404).body(StreamingHelpers.getStream("No user was found with resource Id=" + res));
+        try {
+            String token = getToken(request.getHeader("Authorization"));
+            if (token == null) {
+                return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModelFromUserId(false, res), "jsonld"));
+            } else {
+                Access acc = (Access) request.getAttribute("access");
+                // auth0Id corresponding to the logged on user - from the token
+                String auth0Id = acc.getUser().getAuthId();
+                log.info("User in userResource() >> {}", acc.getUser());
+                auth0Id = acc.getUser().getUserId();
+                Resource usr = getRdfProfile(auth0Id);
+                if (usr == null) {
+                    return ResponseEntity.status(404).body(StreamingHelpers.getStream("No user was found with resource Id=" + res));
+                }
+                // auth0Id corresponding to the requested userId - from the path variable
+                String n = getAuth0IdFromUserId(res).asResource().getURI();
+                n = n.substring(n.lastIndexOf("/") + 1);
+                if (acc.getUser().isAdmin() || auth0Id.equals(n)) {
+                    return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(true, getRdfProfile(n)), "jsonld"));
+                }
+                return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(false, getRdfProfile(n)), "jsonld"));
             }
-            // auth0Id corresponding to the requested userId - from the path variable
-            String n = getAuth0IdFromUserId(res).asResource().getURI();
-            n = n.substring(n.lastIndexOf("/") + 1);
-            if (acc.getUser().isAdmin() || auth0Id.equals(n)) {
-                return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(true, getRdfProfile(n)), "jsonld"));
-            }
-            return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(false, getRdfProfile(n)), "jsonld"));
+        } catch (Exception e) {
+            log.error("Call userResource() failed", e);
+            return ResponseEntity.status(404).body(StreamingHelpers.getStream("Could not find the requested resource " + res + " Exception is:" + e.getMessage()));
         }
     }
 
