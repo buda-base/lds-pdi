@@ -39,6 +39,7 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
+import io.bdrc.ldspdi.utils.Watcher;
 import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
@@ -61,7 +62,10 @@ public class LibrarySearchResource {
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
         final String query = qfp.getParametizedQuery(map);
+        long deb = System.currentTimeMillis();
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
+        long end = System.currentTimeMillis();
+        new Watcher(end - deb, query, file).run();
         HashMap<String, Object> res = null;
         switch (file) {
         case "rootSearchGraph":

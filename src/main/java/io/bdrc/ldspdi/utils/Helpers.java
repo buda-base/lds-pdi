@@ -23,6 +23,7 @@ import static io.bdrc.libraries.Models.BDO;
  ******************************************************************************/
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -80,6 +81,17 @@ public class Helpers {
         } catch (FileNotFoundException e) {
             log.debug("FileNotFound: " + baseName);
             return null;
+        }
+    }
+
+    public static void createDirIfNotExists(String dir) {
+        File theDir = new File(dir);
+        if (!theDir.exists()) {
+            try {
+                theDir.mkdir();
+            } catch (SecurityException se) {
+                log.error("Could not create " + dir, se);
+            }
         }
     }
 
