@@ -80,7 +80,7 @@ public class OntData implements Runnable {
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
                 String uri = it.next();
-                log.info("OntManagerDoc :" + uri);
+                log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
@@ -461,7 +461,6 @@ public class OntData implements Runnable {
 
     public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
         OntModel om = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/admin");
-        om.write(System.out, "TURTLE");
         return om.listAnnotationProperties().toList();
     }
 
