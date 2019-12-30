@@ -45,17 +45,21 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
         }
         Properties props = ServiceConfig.getProperties();
-        InputStream is;
-        try {
-            is = new FileInputStream(configPath + "ldspdi.properties");
-            props.load(is);
-            is.close();
-        } catch (IOException e) {
-            log.warn("No custom properties file could be found: using default props");
+        if (configPath != null) {
+            log.info("getting properties from {}", configPath + "ldspdi.properties");
+            try {
+                InputStream is = new FileInputStream(configPath + "ldspdi.properties");
+                props.load(is);
+                is.close();
+            } catch (IOException e) {
+                log.warn("No custom properties file could be found: using default props");
+            }
+        } else {
+            log.info("using default properties");
         }
         if (ServiceConfig.useAuth()) {
             try {
-                is = new FileInputStream(configPath + "ldspdi-private.properties");
+                InputStream is = new FileInputStream(configPath + "ldspdi-private.properties");
                 props.load(is);
                 is.close();
             } catch (IOException e) {

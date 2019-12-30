@@ -59,15 +59,10 @@ public class Watcher implements Runnable {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(dir + template + "_" + System.currentTimeMillis() + ".json"));
                 writer.write(s);
                 writer.close();
-            } catch (JsonProcessingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error("error in Watcher: ", e);
             }
         }
-
     }
 
     public static void main(String[] args) {
