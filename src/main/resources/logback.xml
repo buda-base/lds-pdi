@@ -5,7 +5,7 @@
         <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
       </encoder>
     </appender>
-      <root level="WARN">
+      <root level="INFO">
         <appender-ref ref="default" />
     </root>
 </configuration>
