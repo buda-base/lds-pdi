@@ -18,7 +18,7 @@ import io.bdrc.taxonomy.Taxonomy;
 
 public class PlaceAllResults {
 
-    public final static String[] types= {Taxonomy.ACCESS,Taxonomy.LICENSE,Taxonomy.LANG_SCRIPT,Taxonomy.STATUS};
+    public final static String[] types= {Taxonomy.INSTANCEACCESS,Taxonomy.LANGUAGE};
 
     public static HashMap<String,Object> getResultsMap(Model mod) throws RestException{
         HashMap<String,Object> res=new HashMap<>();

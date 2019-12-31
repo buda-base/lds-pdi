@@ -58,10 +58,14 @@ public class Taxonomy {
     public final static String WORK_IS_ABOUT = "http://purl.bdrc.io/ontology/core/workIsAbout";
     public final static String WORK_MAIN_AUTHOR = "http://purl.bdrc.io/ontology/core/creatorMainAuthor";
     public final static String PERSONGENDER = "http://purl.bdrc.io/ontology/core/personGender";
-    public final static String ACCESS = "http://purl.bdrc.io/ontology/admin/access";
+    //public final static String ACCESS = "http://purl.bdrc.io/ontology/admin/access";
+    public final static String INSTANCEACCESS = "http://purl.bdrc.io/ontology/tmp/instanceAccess";
+    public final static String AUTHOR = "http://purl.bdrc.io/ontology/tmp/author";
+    public final static String INSTANCETYPE = "http://purl.bdrc.io/ontology/tmp/instanceType";
     public final static String LICENSE = "http://purl.bdrc.io/ontology/admin/license";
     public final static String STATUS = "http://purl.bdrc.io/ontology/admin/status";
-    public final static String LANG_SCRIPT = "http://purl.bdrc.io/ontology/core/workLangScript";
+    //public final static String LANG_SCRIPT = "http://purl.bdrc.io/ontology/core/workLangScript";
+    public final static String LANGUAGE = "http://purl.bdrc.io/ontology/core/workLangScript";
     public final static String TOPIC = "http://purl.bdrc.io/ontology/core/Topic";
     public final static String ROLE = "http://purl.bdrc.io/ontology/core/Role";
 
@@ -110,7 +114,7 @@ public class Taxonomy {
         return tmp;
     }
 
-    public static Graph getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, HashMap<String, Integer> topics) {
+    public static Graph getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, Map<String, Integer> topics) {
         Model model = TaxModel.getModel();
         Graph modGraph = model.getGraph();
         Model mod = ModelFactory.createDefaultModel();
@@ -140,7 +144,7 @@ public class Taxonomy {
         return partialTree;
     }
 
-    public static JsonNode buildFacetTree(HashSet<String> tops, HashMap<String, Integer> topics) throws RestException {
+    public static JsonNode buildFacetTree(HashSet<String> tops, Map<String, Integer> topics) throws RestException {
         JsonNode nn = null;
         if (tops.size() > 0) {
             try {
@@ -156,7 +160,7 @@ public class Taxonomy {
         return nn;
     }
 
-    public static void processTopicStatement(Statement st, HashSet<String> tops, HashMap<String, HashSet<String>> Wtopics, HashMap<String, HashSet<String>> WorkBranch, HashMap<String, Integer> topics) {
+    public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp = Wtopics.get(st.getObject().asNode().getURI());
         if (tmp == null) {

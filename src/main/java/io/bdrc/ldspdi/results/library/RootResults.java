@@ -2,8 +2,14 @@ package io.bdrc.ldspdi.results.library;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
@@ -17,40 +23,33 @@ public class RootResults {
 
     public final static Logger log = LoggerFactory.getLogger(RootResults.class);
 
-    public static HashMap<String, Object> getResultsMap(Model mod, int etext_count) throws RestException {
-        final HashMap<String, Object> res = new HashMap<>();
-        final HashMap<String, Integer> count = new HashMap<>();
+    public static Map<String, Object> getResultsMap(Model mod, int etext_count) throws RestException {
+        final Map<String, Object> res = new HashMap<>();
+        final Map<String, Integer> count = new HashMap<>();
         final ArrayList<String> processed = new ArrayList<>();
-        count.put("http://purl.bdrc.io/ontology/core/Etext", etext_count);
-        final StmtIterator it = mod.listStatements();
+        //count.put("http://purl.bdrc.io/ontology/core/Etext", etext_count);
+        Selector selector = new SimpleSelector(null, RDF.type, (Node)null);
+        final StmtIterator it = mod.listStatements(selector);
         while (it.hasNext()) {
             final Statement st = it.next();
-            final String type = mod.getProperty(st.getSubject(), RDF.type).getObject().asResource().getURI();
-            Integer ct = count.get(type);
-            if (!processed.contains(st.getSubject().getURI())) {
-                if (ct != null) {
-                    count.put(type, ct.intValue() + 1);
-                } else {
-                    count.put(type, 1);
-                }
+            final String sUri = st.getSubject().getURI();
+            final String oUri = st.getObject().asResource().getURI();
+            Integer ct = count.getOrDefault(oUri, 0);
+            if (!processed.contains(sUri)) {
+                count.put(oUri, ct.intValue() + 1);
             }
             if (!st.getPredicate().getURI().equals(RDF.type.getURI())) {
                 @SuppressWarnings("unchecked")
-                HashMap<String, ArrayList<Field>> map = (HashMap<String, ArrayList<Field>>) res.get(type);
-                if (map == null) {
-                    map = new HashMap<String, ArrayList<Field>>();
-                }
+                Map<String, ArrayList<Field>> map = (Map<String, ArrayList<Field>>) res.computeIfAbsent(oUri, x -> new HashMap<String, ArrayList<Field>>());
                 ArrayList<Field> wl = map.get(st.getSubject().getURI());
                 if (wl == null) {
                     wl = new ArrayList<Field>();
                 }
                 wl.add(Field.getField(st));
                 map.put(st.getSubject().getURI(), wl);
-                res.put(type, map);
             }
             processed.add(st.getSubject().getURI());
         }
-        res.put("metadata", count);
         return res;
     }
 

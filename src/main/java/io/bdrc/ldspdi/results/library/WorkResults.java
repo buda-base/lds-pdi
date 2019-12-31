@@ -5,12 +5,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.Field;
@@ -19,50 +25,58 @@ import io.bdrc.taxonomy.Taxonomy;
 public class WorkResults {
 
     public final static Logger log = LoggerFactory.getLogger(WorkResults.class);
-    public final static String[] types = { Taxonomy.ACCESS, Taxonomy.LICENSE, Taxonomy.LANG_SCRIPT, Taxonomy.STATUS };
+    public final static List<String> sortingProps = Arrays.asList(Taxonomy.INSTANCEACCESS, Taxonomy.LANGUAGE, Taxonomy.INSTANCETYPE, Taxonomy.AUTHOR);
 
-    public static HashMap<String, Object> getResultsMap(Model mod) throws RestException {
-        HashMap<String, Object> res = new HashMap<>();
-        HashMap<String, HashMap<String, Integer>> count = new HashMap<>();
-        HashMap<String, Integer> topics = new HashMap<>();
-        HashMap<String, ArrayList<Field>> works = new HashMap<>();
-        HashMap<String, HashSet<String>> Wtopics = new HashMap<>();
-        HashMap<String, HashSet<String>> WorkBranch = new HashMap<>();
+    public static Map<String, Object> getResultsMap(Model mod) throws RestException {
+        Map<String, Object> res = new HashMap<>();
+        Map<String, Integer> topics = new HashMap<>();
+        Map<Resource, ArrayList<Field>> main = new HashMap<>();
+        Map<Resource, ArrayList<Field>> aux = new HashMap<>();
+        Map<String, HashSet<String>> Wtopics = new HashMap<>();
+        Map<String, HashSet<String>> WorkBranch = new HashMap<>();
+        Map<String, Object> facets = new HashMap<>();
         HashSet<String> tops = new HashSet<>();
-        StmtIterator iter = mod.listStatements();
-        List<String> all_types = Arrays.asList(types);
-        while (iter.hasNext()) {
-            Statement st = iter.next();
-            String uri = st.getSubject().getURI();
-            ArrayList<Field> w = works.get(uri);
+        Map<Resource, Boolean> isWork = new HashMap<>();
+        ResIterator workit = mod.listResourcesWithProperty(RDF.type, mod.getResource("http://purl.bdrc.io/ontology/core/Work"));
+        while (workit.hasNext()) {
+            Resource work = workit.next();
+            isWork.put(work, true);
+        }
 
-            if (w == null) {
-                w = new ArrayList<Field>();
+        StmtIterator allIterator = mod.listStatements();
+        while (allIterator.hasNext()) {
+            Statement st = allIterator.next();
+            
+            final Resource subject = st.getSubject();
+            
+            final Boolean subjectIsWork = isWork.getOrDefault(subject, false);
+            
+            List<Field> stlist;
+            if (subjectIsWork) {
+                stlist = main.computeIfAbsent(subject, x -> new ArrayList<Field>());
+            } else {
+                stlist = aux.computeIfAbsent(subject, x -> new ArrayList<Field>());
             }
-            w.add(Field.getField(st));
-            works.put(uri, w);
-            String type = st.getPredicate().getURI();
-            if (st.getObject().isURIResource() && all_types.contains(type)) {
-                HashMap<String, Integer> map = count.get(type);
-                if (map == null) {
-                    map = new HashMap<String, Integer>();
-                }
-                Integer ct = map.get(st.getObject().asNode().getURI());
-                if (ct != null) {
-                    map.put(st.getObject().asNode().getURI(), ct.intValue() + 1);
-                } else {
-                    map.put(st.getObject().asNode().getURI(), 1);
-                }
-                count.put(type, map);
+            stlist.add(Field.getField(st));
+
+            String prop = st.getPredicate().getURI();
+            if (st.getObject().isURIResource() && sortingProps.contains(prop)) {
+                // we assume that sortingProps is handling resources
+                Resource object = st.getObject().asResource();
+                @SuppressWarnings("unchecked")
+                Map<Resource, List<Resource>> valueList = (Map<Resource, List<Resource>>) facets.computeIfAbsent(prop, x -> new HashMap<Resource, List<Resource>>());
+                List<Resource> list = valueList.computeIfAbsent(object, x -> new ArrayList<Resource>());
+                list.add(subject);
             }
-            if (type.equals(Taxonomy.WORK_GENRE) || type.equals(Taxonomy.WORK_IS_ABOUT)) {
+            if (prop.equals(Taxonomy.WORK_GENRE) || prop.equals(Taxonomy.WORK_IS_ABOUT)) {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
             }
-
         }
-        res.put(Taxonomy.WORK, works);
-        res.put("tree", Taxonomy.buildFacetTree(tops, topics));
-        res.put("metadata", count);
+        res.put("main", main);
+        res.put("aux", aux);
+        JsonNode topicstree = Taxonomy.buildFacetTree(tops, topics);
+        facets.put("topics", topicstree);
+        res.put("facets", facets);
         return res;
     }
 }
