@@ -30,8 +30,8 @@ public class WorkResults {
     public static Map<String, Object> getResultsMap(Model mod) throws RestException {
         Map<String, Object> res = new HashMap<>();
         Map<String, Integer> topics = new HashMap<>();
-        Map<Resource, ArrayList<Field>> main = new HashMap<>();
-        Map<Resource, ArrayList<Field>> aux = new HashMap<>();
+        Map<String, ArrayList<Field>> main = new HashMap<>();
+        Map<String, ArrayList<Field>> aux = new HashMap<>();
         Map<String, HashSet<String>> Wtopics = new HashMap<>();
         Map<String, HashSet<String>> WorkBranch = new HashMap<>();
         Map<String, Object> facets = new HashMap<>();
@@ -53,9 +53,9 @@ public class WorkResults {
             
             List<Field> stlist;
             if (subjectIsWork) {
-                stlist = main.computeIfAbsent(subject, x -> new ArrayList<Field>());
+                stlist = main.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
             } else {
-                stlist = aux.computeIfAbsent(subject, x -> new ArrayList<Field>());
+                stlist = aux.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
             }
             stlist.add(Field.getField(st));
 
@@ -64,9 +64,9 @@ public class WorkResults {
                 // we assume that sortingProps is handling resources
                 Resource object = st.getObject().asResource();
                 @SuppressWarnings("unchecked")
-                Map<Resource, List<Resource>> valueList = (Map<Resource, List<Resource>>) facets.computeIfAbsent(prop, x -> new HashMap<Resource, List<Resource>>());
-                List<Resource> list = valueList.computeIfAbsent(object, x -> new ArrayList<Resource>());
-                list.add(subject);
+                Map<String, List<String>> valueList = (Map<String, List<String>>) facets.computeIfAbsent(prop, x -> new HashMap<Resource, List<String>>());
+                List<String> list = valueList.computeIfAbsent(object.getURI(), x -> new ArrayList<String>());
+                list.add(subject.getURI());
             }
             if (prop.equals(Taxonomy.WORK_GENRE) || prop.equals(Taxonomy.WORK_IS_ABOUT)) {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
