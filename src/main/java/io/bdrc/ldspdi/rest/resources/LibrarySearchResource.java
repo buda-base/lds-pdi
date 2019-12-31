@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.rest.resources;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -66,7 +67,7 @@ public class LibrarySearchResource {
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
         long end = System.currentTimeMillis();
         new Watcher(end - deb, query, file).run();
-        HashMap<String, Object> res = null;
+        Map<String, Object> res = null;
         switch (file) {
         case "rootSearchGraph":
             log.info("MAP >>> " + map);
@@ -131,7 +132,7 @@ public class LibrarySearchResource {
         final String query = qfp.getParametizedQuery(map);
         log.debug("Call to getLibGraphGet() with query >> " + query);
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
-        HashMap<String, Object> res = null;
+        Map<String, Object> res = null;
         switch (file) {
         case "rootSearchGraph":
             int etext_count = 0;
