@@ -147,10 +147,12 @@ public class Taxonomy {
                 final Map<String,Object> nodeMap = res.computeIfAbsent(node, x -> new HashMap<>());
                 if (!node.equals(previous) && !node.equals(ROOTURI)) {
                     nodeMap.put("count", count);
+                    final Map<String,Object> previousNodeMap = res.computeIfAbsent(previous, x -> new HashMap<>());
                     @SuppressWarnings("unchecked")
-                    final Set<String> subclasses = (Set<String>) nodeMap.computeIfAbsent("subclasses", x -> new HashSet<>());
-                    subclasses.add(previous);
+                    final Set<String> previousSubclasses = (Set<String>) previousNodeMap.computeIfAbsent("subclasses", x -> new HashSet<>());
+                    previousSubclasses.add(node);
                 }
+
                 // TODO: the labels should be added in the TaxNodes, this would save time at
                 // each query
                 if (!nodeMap.containsKey("skos:prefLabel")) {

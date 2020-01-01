@@ -70,7 +70,7 @@ public class WorkResults {
                 List<String> list = valueList.computeIfAbsent(object.getURI(), x -> new ArrayList<String>());
                 list.add(subject.getURI());
             }
-            if (prop.equals(Taxonomy.WORK_GENRE) || prop.equals(Taxonomy.WORK_IS_ABOUT)) {
+            if (prop.equals(Taxonomy.WORK_GENRE) || prop.equals(Taxonomy.WORK_IS_ABOUT) && st.getObject().asResource().getLocalName().startsWith("T")) {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
             }
         }
