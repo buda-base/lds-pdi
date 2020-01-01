@@ -28,6 +28,7 @@ public class WorkResults {
     public final static List<String> sortingProps = Arrays.asList(Taxonomy.INSTANCEACCESS, Taxonomy.LANGUAGE, Taxonomy.INSTANCETYPE, Taxonomy.AUTHOR);
 
     public static Map<String, Object> getResultsMap(Model mod) throws RestException {
+        long start = System.nanoTime();
         Map<String, Object> res = new HashMap<>();
         Map<String, Integer> topics = new HashMap<>();
         Map<String, ArrayList<Field>> main = new HashMap<>();
@@ -42,7 +43,8 @@ public class WorkResults {
             Resource work = workit.next();
             isWork.put(work, true);
         }
-
+        //if (log.isDebugEnabled())
+            log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
         StmtIterator allIterator = mod.listStatements();
         while (allIterator.hasNext()) {
             Statement st = allIterator.next();
@@ -72,9 +74,13 @@ public class WorkResults {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
             }
         }
+        //if (log.isDebugEnabled())
+            log.error("WorkResults.getResultMap(), checkpoint2: {}", (System.nanoTime()-start)/1000);
         res.put("main", main);
         res.put("aux", aux);
         JsonNode topicstree = Taxonomy.buildFacetTree(tops, topics);
+        //if (log.isDebugEnabled())
+            log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
         facets.put("topics", topicstree);
         res.put("facets", facets);
         return res;
