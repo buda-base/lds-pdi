@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.TaxNode;
 import io.bdrc.libraries.formatters.JSONLDFormatter;
@@ -148,10 +149,14 @@ public class Taxonomy {
         JsonNode nn = null;
         if (tops.size() > 0) {
             try {
+                long start = System.nanoTime();
                 Graph g = Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops, topics);
+                WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 JSONLDFormatter.writeModelAsCompact(ModelFactory.createModelForGraph(g), baos);
+                WorkResults.log.error("WorkResults.getResultMap(), checkpoint2: {}", (System.nanoTime()-start)/1000);
                 nn = mapper.readTree(baos.toString());
+                WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
                 baos.close();
             } catch (IOException ex) {
                 throw new RestException(500, new LdsError(LdsError.JSON_ERR).setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \"" + ex.getMessage() + "\"", ex));
