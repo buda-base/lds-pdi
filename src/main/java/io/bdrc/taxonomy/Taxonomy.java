@@ -2,17 +2,21 @@ package io.bdrc.taxonomy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.LiteralLabel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -115,12 +119,15 @@ public class Taxonomy {
         Collections.reverse(tmp);
         return tmp;
     }
-
-    public static Model getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, Map<String, Integer> topics) {
-        Model model = TaxModel.getModel();
-        Graph modGraph = model.getGraph();
-        Model mod = ModelFactory.createDefaultModel();
-        Graph partialTree = mod.getGraph();
+    
+    public static Map<String, Map<String, Object>> buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics) throws RestException {
+        if (leafTopics.size() == 0) {
+            return null;
+        }
+        long start = System.nanoTime();
+        WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
+        Map<String,Map<String, Object>> res = new HashMap<>();
+        final Graph modGraph = TaxModel.getModel().getGraph();
         String previous = ROOTURI;
         for (String uri : leafTopics) {
             LinkedList<String> ll = getRootToLeafPath(uri);
@@ -129,31 +136,31 @@ public class Taxonomy {
                 if (count == null) {
                     count = -1;
                 }
+                final Map<String,Object> nodeMap = res.computeIfAbsent(node, x -> new HashMap<>());
                 if (!node.equals(previous) && !node.equals(ROOTURI)) {
-                    final Literal l = mod.createTypedLiteral(count, XSDDatatype.XSDinteger);
-                    partialTree.add(new Triple(NodeFactory.createURI(node), countNode, l.asNode()));
-                    partialTree.add(new Triple(NodeFactory.createURI(previous), hasSubClass, NodeFactory.createURI(node)));
+                    nodeMap.put("count", count);
+                    @SuppressWarnings("unchecked")
+                    final Set<String> subclasses = (Set<String>) nodeMap.computeIfAbsent("subclasses", x -> new HashSet<>());
+                    subclasses.add(previous);
                 }
                 // TODO: the labels should be added in the TaxNodes, this would save time at
                 // each query
-                final ExtendedIterator<Triple> label = modGraph.find(NodeFactory.createURI(node), SKOS.prefLabel.asNode(), Node.ANY);
-                while (label.hasNext()) {
-                    partialTree.add(label.next());
+                if (!nodeMap.containsKey("skos:prefLabel")) {
+                    final List<Map<String,String>> labels = new ArrayList<>();
+                    nodeMap.put("skos:prefLabel", labels);
+                 
+                    final ExtendedIterator<Triple> labelIt = modGraph.find(NodeFactory.createURI(node), SKOS.prefLabel.asNode(), Node.ANY);
+                    while (labelIt.hasNext()) {
+                        LiteralLabel l = labelIt.next().getObject().getLiteral();
+                        final Map<String,String> label = new HashMap<>();
+                        labels.add(label);
+                        label.put("@language", l.language());
+                        label.put("@value", (String) l.getValue());
+                    }
                 }
                 previous = node;
             }
         }
-        return mod;
-    }
-
-    public static Map<String, Object> buildFacetTree(HashSet<String> tops, Map<String, Integer> topics) throws RestException {
-        if (tops.size() == 0) {
-            return new HashMap<>();
-        }
-        long start = System.nanoTime();
-        Model mod = Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops, topics);
-        WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
-        Map<String, Object> res = JSONLDFormatter.modelToJsonObject(mod, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
         WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
         return res;
     }
