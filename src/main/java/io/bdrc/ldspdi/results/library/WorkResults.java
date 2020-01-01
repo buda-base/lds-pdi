@@ -78,7 +78,7 @@ public class WorkResults {
             log.error("WorkResults.getResultMap(), checkpoint2: {}", (System.nanoTime()-start)/1000);
         res.put("main", main);
         res.put("aux", aux);
-        JsonNode topicstree = Taxonomy.buildFacetTree(tops, topics);
+        Map<String,Object> topicstree = Taxonomy.buildFacetTree(tops, topics);
         //if (log.isDebugEnabled())
             log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
         facets.put("topics", topicstree);

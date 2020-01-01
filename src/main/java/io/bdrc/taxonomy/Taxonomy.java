@@ -19,6 +19,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.SKOS;
 
@@ -115,7 +116,7 @@ public class Taxonomy {
         return tmp;
     }
 
-    public static Graph getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, Map<String, Integer> topics) {
+    public static Model getPartialLDTreeTriples(TaxNode root, HashSet<String> leafTopics, Map<String, Integer> topics) {
         Model model = TaxModel.getModel();
         Graph modGraph = model.getGraph();
         Model mod = ModelFactory.createDefaultModel();
@@ -142,27 +143,19 @@ public class Taxonomy {
                 previous = node;
             }
         }
-        return partialTree;
+        return mod;
     }
 
-    public static JsonNode buildFacetTree(HashSet<String> tops, Map<String, Integer> topics) throws RestException {
-        JsonNode nn = null;
-        if (tops.size() > 0) {
-            try {
-                long start = System.nanoTime();
-                Graph g = Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops, topics);
-                WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                JSONLDFormatter.writeModelAsCompact(ModelFactory.createModelForGraph(g), baos);
-                WorkResults.log.error("WorkResults.getResultMap(), checkpoint2: {}", (System.nanoTime()-start)/1000);
-                nn = mapper.readTree(baos.toString());
-                WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
-                baos.close();
-            } catch (IOException ex) {
-                throw new RestException(500, new LdsError(LdsError.JSON_ERR).setContext(" Taxonomy.buildFacetTree() was unable to write Taxonomy Tree : \"" + ex.getMessage() + "\"", ex));
-            }
+    public static Map<String, Object> buildFacetTree(HashSet<String> tops, Map<String, Integer> topics) throws RestException {
+        if (tops.size() == 0) {
+            return new HashMap<>();
         }
-        return nn;
+        long start = System.nanoTime();
+        Model mod = Taxonomy.getPartialLDTreeTriples(Taxonomy.ROOT, tops, topics);
+        WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
+        Map<String, Object> res = JSONLDFormatter.modelToJsonObject(mod, null, null, RDFFormat.JSONLD_COMPACT_PRETTY, false);
+        WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
+        return res;
     }
 
     public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
