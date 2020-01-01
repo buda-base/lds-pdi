@@ -41,8 +41,8 @@ import io.bdrc.libraries.formatters.JSONLDFormatter;
 public class Taxonomy {
 
     public static Map<String, TaxNode> allNodes = new HashMap<>();
-    public static final String ROOTURI = ServiceConfig.getProperty("taxonomyRoot");
-    public static TaxNode ROOT = new TaxNode(ROOTURI);
+    public static String ROOTURI = null;
+    public static TaxNode ROOT = null;
     public final static String HASSUBCLASS = "http://purl.bdrc.io/ontology/core/taxHasSubClass";
     public final static Node hasSubClass = ResourceFactory.createProperty(HASSUBCLASS).asNode();
     public final static String COUNT = "http://purl.bdrc.io/ontology/tmp/count";
@@ -79,8 +79,16 @@ public class Taxonomy {
 
     static {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        String sysProp = ServiceConfig.getProperty("taxonomyRoot");
+        if (sysProp != null)
+            init(ServiceConfig.getProperty("taxonomyRoot"));
+    }
+    
+    public static void init(String rootUri) {
+        ROOTURI = rootUri;
+        ROOT = new TaxNode(rootUri);
         Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
-        Taxonomy.buildTree(t, Taxonomy.ROOT);
+        Taxonomy.buildTree(t, ROOT);
     }
 
     public static TaxNode buildTree(Triple t, TaxNode root) {

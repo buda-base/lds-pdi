@@ -1,0 +1,2174 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+
+bdr:W1KG1795  a             bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts .
+
+bdr:WA1KG3818  bdo:workGenre  bdr:T89 , bdr:T304 ;
+        bdo:workHasInstance  bdr:W1KG3818 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P270 , bdr:P699 ;
+        tmp:labelMatch       "byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long dang ↦spyod↤ '↦jug↤ mchan 'grel mkhan po gzhan dgas mdzad pa/"@bo-x-ewts ;
+        tmp:matchScore       "5.3094683"^^xsd:float ;
+        skos:altLabel        "Byaṅ chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me loṅ bźugs so /[dpal sprul O-rgyan-ʼjigs-med-chos-kyi-dbaṅ-po]. Byaṅ chub sems dpa'i spyod pa la 'jug pa źes bya ba'i mchan 'grel bźugs so / [mkhan po Gźan-phan-chos-kyi-snaṅ-ba]."@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa zhes bya ba'i mchan 'grel/"@bo-x-ewts , "Byaṅ chub sems dpaʼi spyod pa la ʼjug paʼi sa bcad don gsal me loṅ daṅ /[Dpal-sprul ʼJigs-med-chos-kyi-dbaṅ-po]."@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long /"@bo-x-ewts ;
+        skos:prefLabel       "byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long dang spyod 'jug mchan 'grel mkhan po gzhan dgas mdzad pa/"@bo-x-ewts .
+
+bdr:WA3PD988_P1f3c5d71df34
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1PD100944 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ brgyud pa'i gsol 'debs/"@bo-x-ewts ;
+        tmp:matchScore       "10.767674"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug brgyud pa'i gsol 'debs/"@bo-x-ewts .
+
+bdr:WA1AC322  bdo:serialHasInstance  bdr:W1AC322 ;
+        bdo:workHasInstance    bdr:W1AC322 ;
+        tmp:author             bdr:P319 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ rnam bshad theg chen chos kyi rgya mtsho/"@bo-x-ewts ;
+        tmp:matchScore         "8.983218"^^xsd:float ;
+        skos:altLabel          "spyod 'jug rnam bshad theg chen chos kyi rgya mtsho/"@bo-x-ewts ;
+        skos:prefLabel         "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa theg chen chos kyi rgya mtsho zab rgyas mtha' yas pa'i snying po zhes bya ba bzhugs so/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001672  bdo:workHasInstance
+                bdr:W1TLMTGA001672 ;
+        tmp:author           bdr:P5013 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dka' 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i dka' 'grel/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug dka' 'grel/"@bo-x-ewts .
+
+bdr:WA10736_P80d1c8004945
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts .
+
+bdr:W19740  bdo:workGenre    bdr:T233 , bdr:T1777 ;
+        bdo:workHasInstance  bdr:W0GR0353 , bdr:W0GR0356 ;
+        bdo:workIsAbout      bdr:T2064 ;
+        tmp:author           bdr:P6161 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "13.554522"^^xsd:float ;
+        skos:prefLabel       "byang chub sems dpa'i spyod pa la 'jug pa/"@bo-x-ewts , "bodhisattvacaryāvatāra"@sa-x-iast , "spyod 'jug"@bo-x-ewts , "Bodhisattvacaryāvatāra"@sa-x-iast .
+
+bdr:W1TLMTGA001641  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts .
+
+bdr:WA1KG14557_Pd5edc1e91a07
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "byang chub sems dpa'i ↦spyod↤ '↦jug↤ las gsungs pa'i bsngo ba'i le'u smon lam gyi lung thob pa/"@bo-x-ewts ;
+        tmp:matchScore  "6.6598334"^^xsd:float ;
+        skos:prefLabel  "byang chub sems dpa'i spyod 'jug las gsungs pa'i bsngo ba'i le'u smon lam gyi lung thob pa/"@bo-x-ewts .
+
+bdr:W1660  a                bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa gzhung don rab gsal snang ba/"@bo-x-ewts .
+
+bdr:WA3CN57_P23e93969e287
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ don 'grel mu tig phrengg ba/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug don 'grel mu tig phrengg ba/"@bo-x-ewts .
+
+bdr:P2259  skos:prefLabel  "brtson 'grus seng+ge"@bo-x-ewts .
+
+bdr:W0GR0353  a             bdo:EtextInstance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "Santideva: Bodhicaryavatara"@en .
+
+bdr:WA1KG3408  bdo:workGenre  bdr:T132 , bdr:T1491 ;
+        bdo:workHasInstance  bdr:W1KG3408 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P5013 , bdr:P3276 , bdr:P1KG3495 , bdr:P3299 , bdr:P7313 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi rnam par bshad pa sogs 'grel pa khag cig"@bo-x-ewts ;
+        tmp:matchScore       "8.229624"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rtogs par dka' ba'i gnas gtan la dbab pa zhes bya ba'i gzhung /"@bo-x-ewts , "byang chub sems dpa'i spyod pa la 'jug pa'i legs par sbyar ba/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi rnam par bshad pa sogs 'grel pa khag cig"@bo-x-ewts .
+
+bdr:WA7500  bdo:workGenre    bdr:T61 ;
+        bdo:workHasInstance  bdr:W7500 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P319 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa theg chen chos kyi rgya mtsho zab rgyas mtha' yas pa'i snying po/"@bo-x-ewts , "Byaṅ chub sems dpaʼi spyod pa la ʼjug paʼi rnam par bśad pa Theg chen chos kyi rgya mtsho Zab rgyas mthaʼ yas paʼi sñiṅ po :a detailed exegesis of the Bodhicaryāvatāra of Ācārya Śāntideva /by the Second Dpaʼ-bo Sprul-sku of Gnas-naṅ Gtsug-lag-ʼphreṅ-ba."@en-x-mixed , "a detailed exegesis of the bodhicaryavatara of acarya santideva"@en-x-mixed ;
+        skos:prefLabel       "spyod 'jug 'grel pa/"@bo-x-ewts .
+
+bdr:WA3MS261_Pbf4622b2dde7
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sher le'i 'bru 'grel srin chung 'phongs kyi 'od snang /"@bo-x-ewts ;
+        tmp:matchScore  "8.271103"^^xsd:float ;
+        skos:altLabel   "spyod 'jug sher le'i 'bru 'grel srin chung 'phongs kyi 'od snang /"@bo-x-ewts ;
+        skos:prefLabel  "sher le'i 'bru 'grel srin chung 'phongs kyi 'od snang /"@bo-x-ewts .
+
+bdr:WA1KG24645  bdo:serialHasInstance  bdr:W1KG24645 ;
+        bdo:workGenre          bdr:T1KG8787 ;
+        bdo:workHasInstance    bdr:W1KG24645 ;
+        bdo:workIsAbout        bdr:W4CZ16766 , bdr:W19740 , bdr:W22950 , bdr:T2033 ;
+        tmp:author             bdr:P3379 , bdr:P6161 , bdr:P4954 ;
+        tmp:labelMatch         "bshes pa'i springs yig dang ↦spyod↤ '↦jug↤ sogs/"@bo-x-ewts ;
+        tmp:matchScore         "9.763929"^^xsd:float ;
+        skos:prefLabel         "bshes pa'i springs yig dang spyod 'jug sogs/"@bo-x-ewts .
+
+bdr:W1PD86340  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "dge lugs pa'i zhal 'don phyogs bsgrigs/"@bo-x-ewts .
+
+bdr:WA1KG13126_P82f9c249b726
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi rnam par bshad pa/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:altLabel   "bodhisattvacaryavatara"@sa-x-ndia ;
+        skos:prefLabel  "spyod 'jug gi rnam par bshad pa/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001654  bdo:workHasInstance
+                bdr:W1TLMTGA001654 ;
+        tmp:author           bdr:P1TLMTGA001653 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad gzhung don rab gsal/"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa gzhung don rab gsal snang ba/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug rnam bshad gzhung don rab gsal/"@bo-x-ewts .
+
+bdr:WA24829_P9af4e7ad106a
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ par byang sogs tshan pa gnyis/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug par byang sogs tshan pa gnyis/"@bo-x-ewts .
+
+bdr:WA3CN3408_P536f3b033b4e
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P151 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa gzhung don rab gsal/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa gzhung don rab gsal snang ba/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa gzhung don rab gsal/"@bo-x-ewts .
+
+bdr:WA1PD89084_Pcf93d1d8b59b
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P2271 ;
+        tmp:labelMatch  "gro ston bdud rtsi grags pas mdzad pa'i ↦spyod↤ '↦jug↤ gi 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9557686"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa 'jug pa'i tshig gi don zhib tu rnam par 'byed pa dga' ba rgya mtsho/"@bo-x-ewts , "gro ston bdud rtsi grags pas mdzad pa'i spyod 'jug gi 'grel pa/"@bo-x-ewts ;
+        skos:prefLabel  "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa/"@bo-x-ewts .
+
+bdr:P1KG5610  skos:prefLabel  "chab tshang 'jam dpal/"@bo-x-ewts .
+
+bdr:T2397  skos:prefLabel  "word by word commentary"@en , "tshig 'grel/"@bo-x-ewts .
+
+bdr:T1KG8787  skos:prefLabel  "root text"@en , "rtsa ba/"@bo-x-ewts .
+
+bdr:WA21505_P31347d8bf98b
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bshad pa'i zin tho zhal lung bdud rtsi'i zags ma/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi bshad pa'i zin tho zhal lung bdud rtsi'i zags ma/"@bo-x-ewts .
+
+bdr:WA3CN1482  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W3CN1482 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6430 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel chung /"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi 'grel pa nges legs mdzod/"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float , "12.1115055"^^xsd:float ;
+        skos:altLabel        "byang chub sems pa'i spyod pa la 'jug pa'i 'grel pa nges legs mdzod/"@bo-x-ewts , "spyod 'jug 'grel chung /"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa nges legs mdzod/"@bo-x-ewts .
+
+bdr:WA3CN3408_P3f7ce8efaa1f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bcu pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bcu pa/"@bo-x-ewts .
+
+bdr:W1KG22298  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "karma bka' brgyud kyi 'don 'grigs/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001666  bdo:workHasInstance
+                bdr:W1TLMTGA001666 ;
+        tmp:author           bdr:P3183 ;
+        tmp:labelMatch       "kun dga' rnam rgyal ↦spyod↤ '↦jug↤ bsdus don/_sa skya pa'i mkhas pa rnams kyi gsung skor pod bdun pa/"@bo-x-ewts ;
+        tmp:matchScore       "6.261697"^^xsd:float ;
+        skos:altLabel        "kun dga' rnam rgyal gyis mdzad pa'i byang chub sems dpa'i spyod pa 'jug pa'i bsdus don 'jam dbyangs bla ma'i zhal lung /"@bo-x-ewts ;
+        skos:prefLabel       "kun dga' rnam rgyal spyod 'jug bsdus don/_sa skya pa'i mkhas pa rnams kyi gsung skor pod bdun pa/"@bo-x-ewts .
+
+bdr:W23627  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_'jigs med bstan pa'i nyi ma/(bdud 'joms rin po che'i dpe mdzod khang du bzhugs pa'i shing par dang lag bris 'dres ma/)"@bo-x-ewts .
+
+bdr:P1790  skos:prefLabel  "shes rab 'byung gnas blo gros/"@bo-x-ewts .
+
+bdr:T1488  skos:prefLabel  "'bru 'grel/"@bo-x-ewts , "syllable by syllable commentary; the words commented on are usually marked with circles beneath"@en .
+
+bdr:WA4CZ302675  bdo:workGenre  bdr:T238 ;
+        bdo:workHasInstance  bdr:W4CZ302675 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P64 , bdr:P6161 ;
+        tmp:labelMatch       "lam rim chen mo spyod pa spyi bslab dang ↦spyod↤ '↦jug↤ rtsa ba/"@bo-x-ewts ;
+        tmp:matchScore       "7.9185443"^^xsd:float ;
+        skos:altLabel        "byang chub lam gyi rim pa chen mo/"@bo-x-ewts , "byang chub sems dpa'i spyod pa la 'jug pa/"@bo-x-ewts ;
+        skos:prefLabel       "lam rim chen mo spyod pa spyi bslab dang spyod 'jug rtsa ba/"@bo-x-ewts .
+
+bdr:WA3CN3408_P4e51c9f122bd
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bdun pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bdun pa/"@bo-x-ewts .
+
+bdr:WA1PD96085_P8ffd0b4853a1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "byang chub sems pa'i ↦spyod↤ '↦jug↤ las byung ba'i mchod bshags kyi le'u/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "byang chub sems pa'i spyod 'jug las byung ba'i mchod bshags kyi le'u/"@bo-x-ewts .
+
+bdr:WA1KG5465  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W1KG5465 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6161 , bdr:P65 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi rtsa ba dang de'i 'grel pa rnam bshad rgyal sras 'jug ngogs gnyis kyi shan sbyar/"@bo-x-ewts , "↦spyod↤ '↦jug↤ dar Tik shan sbyar/"@bo-x-ewts ;
+        tmp:matchScore       "6.474691"^^xsd:float , "10.767674"^^xsd:float ;
+        skos:altLabel        "ru xing lun ben song yu zhu jie"@zh-latn-pinyin-x-ndia , "spyod 'jug gi rtsa ba dang de'i 'grel pa rnam bshad rgyal sras 'jug ngogs gnyis kyi shan sbyar/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug dar Tik shan sbyar/"@bo-x-ewts .
+
+bdr:P2PD20791  skos:prefLabel  "dbyangs can dga' b'i blo gros/"@bo-x-ewts .
+
+bdr:WA21957_Pd30e14cc9fdb
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ brgyud pa'i gsol 'debs bdud rtsi'i 'khri shing /"@bo-x-ewts ;
+        tmp:matchScore  "8.931362"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug brgyud pa'i gsol 'debs bdud rtsi'i 'khri shing /"@bo-x-ewts .
+
+bdr:W3CN18551  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug smon lam sogs/"@bo-x-ewts .
+
+bdr:WA1AC57  bdo:serialHasInstance  bdr:W1AC57 ;
+        bdo:workHasInstance    bdr:W1AC57 ;
+        bdo:workIsAbout        bdr:W22950 , bdr:W19740 ;
+        tmp:author             bdr:P4954 ;
+        tmp:labelMatch         "bshes pa'i springs yig dang ↦spyod↤ '↦jug↤ sogs/"@bo-x-ewts ;
+        tmp:matchScore         "9.763929"^^xsd:float ;
+        skos:prefLabel         "bshes pa'i springs yig dang spyod 'jug sogs/"@bo-x-ewts .
+
+bdr:WA4PD1207_Pef84b06445d1
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1NLM61 , bdr:W1KG4532 , bdr:W1KG1011 , bdr:W1KG988 , bdr:W19999 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ smon lam/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug smon lam/"@bo-x-ewts .
+
+bdr:WA3CN3014_P1be615630347
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ kyi de kho na nyid gsal byed rin chen snang ba/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug kyi de kho na nyid gsal byed rin chen snang ba/"@bo-x-ewts .
+
+bdr:WA1KG24247  bdo:workGenre  bdr:T2397 ;
+        bdo:workHasInstance  bdr:W1KG24247 , bdr:W25983 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        tmp:matchScore       "7.6301246"^^xsd:float ;
+        skos:altLabel        "बोधिचर्यावतार विभाषा"@sa-Deva , "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug 'grel pa 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:W20510  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_tsong kha pa/ (mtsho sngon mi rigs dpe skrun khang /)"@bo-x-ewts .
+
+bdr:W1CZ1269  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA23891_P8bc2cffd3f89
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "dpal phag mo gru pas mdzad pa'i ↦spyod↤ '↦jug↤"@bo-x-ewts , "↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore  "9.387328"^^xsd:float , "13.554522"^^xsd:float ;
+        skos:altLabel   "dpal phag mo gru pas mdzad pa'i spyod 'jug"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug"@bo-x-ewts .
+
+bdr:P1404  skos:prefLabel  "chos kyi seng+ge"@bo-x-ewts .
+
+bdr:W19999  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "dge lugs pa'i chos spyod phyogs bsgrigs/"@bo-x-ewts .
+
+bdr:T977  skos:prefLabel  "ritual text"@en , "法事"@zh-hans , "vidhi"@sa-x-iast , "cho ga"@bo-x-ewts .
+
+bdr:WA19639  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W19639 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P5957 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ chen mo'i 'grel pa tshig nyung don gsal sman gyi sdong bu/"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi 'grel pa tshig nyung don gsal/"@bo-x-ewts , "↦spyod↤ '↦jug↤ chen mo'i 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "7.663595"^^xsd:float , "10.851836"^^xsd:float , "9.329107"^^xsd:float ;
+        skos:altLabel        "spyod 'jug chen mo'i 'grel pa tshig nyung don gsal sman gyi sdong bu/"@bo-x-ewts , "ju hsing lun chu shih"@zh-latn-wadegile , "spyod 'jug chen mo'i 'grel pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa tshig nyung don gsal/"@bo-x-ewts .
+
+bdr:W1TLMTGA001689  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rtsa 'grel chen mo/"@bo-x-ewts .
+
+bdr:T1078  skos:prefLabel  "bodhisattva"@sa-alalc97 , "byang chub sems dpa'"@bo-x-ewts .
+
+bdr:W1PD159108  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa byang sems gsal byed zla ba'i 'od zer/"@bo-x-ewts .
+
+bdr:P5957  skos:prefLabel  "ngag dbang phun tshogs/"@bo-x-ewts .
+
+bdr:W00EGS1016759  a        bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "kaM tshang chos spyod sogs kha ton gces btus/"@bo-x-ewts .
+
+bdr:W8LS22401  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "bzang spyod 'grel pa/ byams smon gyi 'grel pa/ spyod 'jug smon lam gyi sa bcad/ bka' gdams pha chos rin po che/ blo sbyong tshig brgyad ma/"@bo-x-ewts .
+
+bdr:P65  skos:prefLabel  "dar ma rin chen/"@bo-x-ewts .
+
+bdr:WA20479_P846c97b5fbe1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ rnam bshad rgyal sras 'jug ngogs las rtsa 'grel so sor 'byed pa nag po 'gro shes/"@bo-x-ewts ;
+        tmp:matchScore  "6.454632"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i rnam bshad rgyal sras 'jug ngogs las rtsa 'grel so sor 'byed pa nag po 'gro shes/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug rnam bshad rgyal sras 'jug ngogs las rtsa 'grel so sor 'byed pa nag po 'gro shes/"@bo-x-ewts .
+
+bdr:WA447_P9b37d5aa0c6e
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1KG2144 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi bsdus don mkhas pa'i mgul rgyan"@bo-x-ewts ;
+        tmp:matchScore       "9.329107"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i bsdus don mkhas pa'i mgul rgyan"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi bsdus don mkhas pa'i mgul rgyan"@bo-x-ewts .
+
+bdr:W1KG24645  a            bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "bshes pa'i springs yig dang spyod 'jug sogs/"@bo-x-ewts .
+
+bdr:T1386  skos:prefLabel  "karma bka' brgyud/"@bo-x-ewts .
+
+bdr:W1KG3545  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug shes rab le'u'i tshig don go slar bshad pa/"@bo-x-ewts .
+
+bdr:WA25185_P287421b89ebd
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ smon lam/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug smon lam/"@bo-x-ewts .
+
+bdr:P297  skos:prefLabel  "grags pa rgyal mtshan/"@bo-x-ewts .
+
+bdr:T1441  skos:prefLabel  "dvayasatya, satyadvaya"@sa-alalc97 , "the two truths"@en , "bden gnyis/"@bo-x-ewts .
+
+bdr:P3183  skos:prefLabel  "kun dga' rnam rgyal/"@bo-x-ewts .
+
+bdr:P1TLMTGA001391  skos:prefLabel  "mgon po klu sgrub/"@bo-x-ewts .
+
+bdr:WA3PD982_P095c1b4900ab
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i gzhung 'grel zab mo rten 'byung gi de kho na nyid gsal ba'i sgron me/"@bo-x-ewts ;
+        tmp:matchScore  "6.2798448"^^xsd:float ;
+        skos:altLabel   "spyod 'jug shes rab le'u'i gzhung 'grel zab mo rten 'byung gi de kho na nyid gsal ba'i sgron me/"@bo-x-ewts ;
+        skos:prefLabel  "shes rab le'u'i gzhung 'grel zab mo rten 'byung gi de kho na nyid gsal ba'i sgron me/"@bo-x-ewts .
+
+bdr:W1PD137815  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dar TIka shan sbyar/"@bo-x-ewts .
+
+bdr:WA23786  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W23786 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug 'grel pa/"@bo-x-ewts .
+
+bdr:P4069  skos:prefLabel  "thub bstan chos kyi grags pa/"@bo-x-ewts .
+
+bdr:T200  skos:prefLabel  "instructional manual"@en , "khrid yig"@bo-x-ewts .
+
+bdr:WA19567_P54bc6a3049ff
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P5928 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sher le'i 'bru 'grel srin chung 'phongs kyi 'od snang /"@bo-x-ewts ;
+        tmp:matchScore  "8.229624"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug sher le'i 'bru 'grel srin chung 'phongs kyi 'od snang /"@bo-x-ewts .
+
+bdr:WA15659  bdo:serialHasInstance  bdr:W15659 ;
+        bdo:workGenre          bdr:T132 ;
+        bdo:workHasInstance    bdr:W3CN4807 , bdr:W15659 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P4069 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ gi 'grel bshad rgyal sras yon tan bum bzang /"@bo-x-ewts ;
+        tmp:matchScore         "8.566146"^^xsd:float ;
+        skos:altLabel          "ru pu sa xing zhu shu"@zh-latn-pinyin-x-ndia , "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel bshad rgyal sras rgya mtsho'i yon tan rin po che mi zad 'jo ba'i bum bzang /"@bo-x-ewts , "Spyod ʼjug gi ʼgrel bśad rgyal sras yon tan bum bzaṅ /Thub-bstan-chos-kyi-grags-pa."@en-x-mixed ;
+        skos:prefLabel         "spyod 'jug gi 'grel bshad rgyal sras yon tan bum bzang /"@bo-x-ewts .
+
+bdr:W1TLMTGA001672  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dka' 'grel/"@bo-x-ewts .
+
+bdr:WA22248  bdo:workGenre   bdr:T61 ;
+        bdo:workHasInstance  bdr:W22248 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P151 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad gzhung don rab gsal snang ba/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa gzhung don rab gsal snang ba/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug rnam bshad gzhung don rab gsal snang ba/"@bo-x-ewts .
+
+bdr:P153  skos:prefLabel  "blo gros dpal bzang /"@bo-x-ewts .
+
+bdr:WA10206_P3046c836a386
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi mtshan don/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi mtshan don/"@bo-x-ewts .
+
+bdr:WA19617_P8c02d20874ca
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ chen mo'i 'grel ba tshig nyung don gsal sman gyi sdong bu/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug chen mo'i 'grel ba tshig nyung don gsal sman gyi sdong bu/"@bo-x-ewts .
+
+bdr:WA3834_Pcf09045b80f3
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ zin bris/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:altLabel   "byang chub sems dapa'i spyod pa la 'jug pa'i zab khrid nos skabs kyi zin bris/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug zin bris/"@bo-x-ewts .
+
+bdr:W1KG24247  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:W8LS22437  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts .
+
+bdr:WA3CN3408_P91767858b8b0
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod chen dang po/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod chen dang po/"@bo-x-ewts .
+
+bdr:W1TLMTGA001654  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad gzhung don rab gsal/"@bo-x-ewts .
+
+bdr:WA3CN3408_P2ee7ba12fda5
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod gsum pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod gsum pa/"@bo-x-ewts .
+
+bdr:WA21939_P4731fed9004e
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "sangs rgyas kun gyi dgongs pa 'dus pa'i mdo chen po las/__rnal 'byor ↦spyod↤ '↦jug↤ gi le'u zhes bya ste don gcig pa/"@bo-x-ewts ;
+        tmp:matchScore  "5.5929794"^^xsd:float ;
+        skos:prefLabel  "sangs rgyas kun gyi dgongs pa 'dus pa'i mdo chen po las/__rnal 'byor spyod 'jug gi le'u zhes bya ste don gcig pa/"@bo-x-ewts .
+
+bdr:WA22389_Pd4ecb2128610
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i dka' 'grel lung rigs 'od snang /"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:altLabel   "byang chub sems pa'i spyod pa la 'jug pa shes rab le'u'i dka' 'grel lung rigs 'od snang /"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug shes rab le'u'i dka' 'grel lung rigs 'od snang /"@bo-x-ewts .
+
+bdr:WA3CN552  bdo:serialHasInstance  bdr:W3CN552 ;
+        bdo:workGenre          bdr:T89 ;
+        bdo:workHasInstance    bdr:W3CN552 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P319 , bdr:P6161 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ rtsa ba dang sa bcad sbyar ba/"@bo-x-ewts ;
+        tmp:matchScore         "9.329107"^^xsd:float ;
+        skos:prefLabel         "spyod 'jug rtsa ba dang sa bcad sbyar ba/"@bo-x-ewts .
+
+bdr:WA3CN3408_P915a7129d165
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa legs bshad snang ba/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'grel pa legs bshad snang ba/"@bo-x-ewts .
+
+bdr:WA3CN3408_Paadc7691eab2
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod gnyis pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod gnyis pa/"@bo-x-ewts .
+
+bdr:W21825  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_thub bstan chos kyi glang po/"@bo-x-ewts .
+
+bdr:W1NLM61  a              bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "phyogs bcu'i mun pa rnam par sel ba sogs/"@bo-x-ewts .
+
+bdr:WA14345  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W14345 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P2259 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'grel pa/"@bo-x-ewts , "↦spyod↤ '↦jug↤ yi ge"@bo-x-ewts ;
+        tmp:matchScore       "12.1115055"^^xsd:float , "11.3511305"^^xsd:float ;
+        skos:altLabel        "spyod 'jug yi ge"@bo-x-ewts , "byang chub sems dpa'i spyod pa 'jug pa'i 'grel pa legs par bshad pa bsdus pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA3CN18551  bdo:workGenre  bdr:T225 ;
+        bdo:workHasInstance  bdr:W3CN18551 ;
+        bdo:workIsAbout      bdr:T34 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ smon lam sogs/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug smon lam sogs/"@bo-x-ewts .
+
+bdr:WA22389_P2bbb6ccfef46
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ klad don/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug klad don/"@bo-x-ewts .
+
+bdr:WA4CZ30835_Pe453dc3cca25
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ las gsungs tshul/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug las gsungs tshul/"@bo-x-ewts .
+
+bdr:T2579  skos:prefLabel  "compilation of recitations"@en , "'don 'grigs/"@bo-x-ewts .
+
+bdr:WA11886  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W11886 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1226 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad dgongs pa nges par gsal ba/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa dgongs pa nges par gsal ba/"@bo-x-ewts , "a fourteenth century sa-skya-pa commentary on santideva's bodhisattvacaryavatara"@en , "A fourteenth century Sa-skya-pa commentary on Śāntideva's Bodhisattvacaryāvatāra /by Bla-ma Dam-pa Bsod-nams-rgyal-mtshan ; being the text of Byan chub sems dpaʼi spyod pa la ʼjug pa rnam par bśad pa dgoṅs pa ṅes pa gsal ba."@en-x-mixed ;
+        skos:prefLabel       "spyod 'jug rnam bshad dgongs pa nges par gsal ba/"@bo-x-ewts .
+
+bdr:W1TLMTGA001666  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "kun dga' rnam rgyal spyod 'jug bsdus don/_sa skya pa'i mkhas pa rnams kyi gsung skor pod bdun pa/"@bo-x-ewts .
+
+bdr:WA4CZ1019_Pe049a5879c5c
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bsdus don/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi bsdus don/"@bo-x-ewts .
+
+bdr:WA1KG6257_P51bacb7a9da8
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ la bstod pa/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug la bstod pa/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001667  bdo:workHasInstance
+                bdr:W1TLMTGA001667 ;
+        tmp:author           bdr:P7313 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dka' 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "byang chub kyi spyod pa la 'jug pa'i dka' 'grel/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug dka' 'grel/"@bo-x-ewts .
+
+bdr:WA00KG0545  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W00KG0545 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "kun dpal ↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "kun dpal spyod 'jug"@bo-x-ewts .
+
+bdr:T34  skos:prefLabel  "祈愿"@zh-hans , "prayer"@en , "praṇidhāna"@sa-x-ndia , "smon lam/"@bo-x-ewts .
+
+bdr:T393  skos:prefLabel  "修心"@zh-hans , "mind training"@en , "blo sbyong /"@bo-x-ewts .
+
+bdr:WA3CN7826  bdo:workGenre  bdr:T200 ;
+        bdo:workHasInstance  bdr:W3CN7826 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1649 ;
+        tmp:labelMatch       "rgyal sras chen po zhi ba lhas mdzad pa'i ↦spyod↤ '↦jug↤ bka' khrid zin bris/"@bo-x-ewts , "rgyal sras chen po zhi ba lhas mdzad pa'i ↦spyod↤ '↦jug↤ gi bka' khrid zin bris skal bzang 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore       "7.361978"^^xsd:float , "6.2798448"^^xsd:float ;
+        skos:altLabel        "rgyal sras chen po zhi ba lhas mdzad pa'i spyod 'jug gi bka' khrid zin bris skal bzang 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel       "rgyal sras chen po zhi ba lhas mdzad pa'i spyod 'jug bka' khrid zin bris/"@bo-x-ewts .
+
+bdr:WA1KG12679  bdo:workGenre  bdr:T1488 ;
+        bdo:workHasInstance  bdr:W1KG12679 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P825 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float , "8.612466"^^xsd:float ;
+        skos:altLabel        "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts .
+
+bdr:WA8LS18997  bdo:serialHasInstance  bdr:W8LS18997 ;
+        bdo:workGenre          bdr:T61 , bdr:T4CZ16893 , bdr:T132 ;
+        bdo:workHasInstance    bdr:W8LS18997 ;
+        bdo:workIsAbout        bdr:W19740 , bdr:T74 , bdr:T394 , bdr:T215 ;
+        tmp:author             bdr:P153 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ rnam bshad/"@bo-x-ewts ;
+        tmp:matchScore         "12.001439"^^xsd:float ;
+        skos:altLabel          "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa gzhung don snang ba/ brda sprod pa'i khyad par rtogs byed/ na ro 'grel chen gyi bsdus don/ dus 'khor gyi thig rtsa dang / zhi rgyas so so'i las brgyad zhi rgyas las thams cad la bzhir phye ste/ bcu gnyis kyi dbye ba'i thig rtsa sogs/"@bo-x-ewts ;
+        skos:prefLabel         "spyod 'jug rnam bshad/"@bo-x-ewts .
+
+bdr:WA1KG15822  bdo:serialHasInstance  bdr:W1KG15822 ;
+        bdo:workGenre          bdr:T61 ;
+        bdo:workHasInstance    bdr:W1KG15822 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P65 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ rtsa 'grel chen mo/"@bo-x-ewts ;
+        tmp:matchScore         "10.767674"^^xsd:float ;
+        skos:altLabel          "byang chub sems dpa'i spyod pa la 'jug pa'i rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel         "spyod 'jug rtsa 'grel chen mo/"@bo-x-ewts .
+
+bdr:WA8LS22401  bdo:workGenre  bdr:T34 , bdr:T89 , bdr:T132 ;
+        bdo:workHasInstance  bdr:W8LS22401 ;
+        bdo:workIsAbout      bdr:T393 , bdr:W4CZ16796 , bdr:W4CZ32863 ;
+        tmp:author           bdr:P3445 , bdr:P4796 ;
+        tmp:labelMatch       "bzang spyod 'grel pa/ byams smon gyi 'grel pa/ ↦spyod↤ '↦jug↤ smon lam gyi sa bcad/ bka' gdams pha chos rin po che/ blo sbyong tshig brgyad ma/"@bo-x-ewts , "bzang spyod 'grel pa tshig don ngo 'phrod dang / byams smon gyi 'grel pa/ ↦spyod↤ '↦jug↤ smon lam gyi sa bcad/ bka' gdams pha chos rin po che'i rtsa tshig byang sems nor phreng / blo sbyong tshig brgyad ma/"@bo-x-ewts ;
+        tmp:matchScore       "3.995375"^^xsd:float , "5.053312"^^xsd:float ;
+        skos:altLabel        "bzang spyod 'grel pa tshig don ngo 'phrod dang / byams smon gyi 'grel pa/ spyod 'jug smon lam gyi sa bcad/ bka' gdams pha chos rin po che'i rtsa tshig byang sems nor phreng / blo sbyong tshig brgyad ma/"@bo-x-ewts ;
+        skos:prefLabel       "bzang spyod 'grel pa/ byams smon gyi 'grel pa/ spyod 'jug smon lam gyi sa bcad/ bka' gdams pha chos rin po che/ blo sbyong tshig brgyad ma/"@bo-x-ewts .
+
+bdr:WA1KG10436  bdo:serialHasInstance  bdr:W1KG10436 ;
+        bdo:workGenre          bdr:T132 ;
+        bdo:workHasInstance    bdr:W1KG10436 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P6161 , bdr:P1KG10437 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ rtsa ba dang 'grel pa tshig don kun gsal bar byed pa skal bzang rnams kyi 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore         "6.261697"^^xsd:float ;
+        skos:altLabel          "bodhicaryavatara : 1. pre-cononical mongolian text; 2. tibetan commentary by blo-bzan-dpal-ldan"@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa'i tshig don kun gsal bar byed pa skal bzang rnams kyi 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel         "spyod 'jug rtsa ba dang 'grel pa tshig don kun gsal bar byed pa skal bzang rnams kyi 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA21506_Pc183b21c407f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "phan bde legs bshad gling gi ↦spyod↤ '↦jug↤ tshogs 'don gnang mdzad pa'i mjug ti sbyor rgyu/"@bo-x-ewts ;
+        tmp:matchScore  "6.878512"^^xsd:float ;
+        skos:prefLabel  "phan bde legs bshad gling gi spyod 'jug tshogs 'don gnang mdzad pa'i mjug ti sbyor rgyu/"@bo-x-ewts .
+
+bdr:W4996  a                bdo:Instance ;
+        tmp:author          bdr:P252 ;
+        tmp:instanceIsOpen  false ;
+        tmp:labelMatch      "↦spyod↤ '↦jug↤ shes rab le'u'i tshig don go slar bshad pa/"@bo-x-ewts ;
+        tmp:matchScore      "8.566146"^^xsd:float ;
+        skos:prefLabel      "spyod 'jug shes rab le'u'i tshig don go slar bshad pa/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001679  bdo:workHasInstance
+                bdr:W1TLMTGA001679 ;
+        tmp:author           bdr:P319 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad zab rgyas mtha' yas snying po/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug rnam bshad zab rgyas mtha' yas snying po/"@bo-x-ewts .
+
+bdr:WA3CN7868  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W3CN7868 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P155 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi rtsa 'grel gces btus/"@bo-x-ewts ;
+        tmp:matchScore       "10.241266"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rtsa 'grel gces btus/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi rtsa 'grel gces btus/"@bo-x-ewts .
+
+bdr:P1827  skos:prefLabel  "byang chub skyabs/"@bo-x-ewts .
+
+bdr:WA4998  bdo:workGenre    bdr:T132 ;
+        bdo:workHasInstance  bdr:W4998 ;
+        bdo:workIsAbout      bdr:T102 , bdr:W19740 ;
+        tmp:author           bdr:P252 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sher le brgal lan nyin byed snang ba/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "brgal lan nyin byed snang ba/"@bo-x-ewts , "sher 'grel brgal lan nyin byed snang ba/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug sher le brgal lan nyin byed snang ba/"@bo-x-ewts .
+
+bdr:WA1PD89084_P48301a149422
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1830 ;
+        tmp:labelMatch  "mdo sde rgyan dang rgyud bla ma ↦spyod↤ '↦jug↤ rnams kyi 'grel TIk+ka gi dbu zhabs kyi tshigs bcad/"@bo-x-ewts ;
+        tmp:matchScore  "6.261697"^^xsd:float ;
+        skos:prefLabel  "mdo sde rgyan dang rgyud bla ma spyod 'jug rnams kyi 'grel TIk+ka gi dbu zhabs kyi tshigs bcad/"@bo-x-ewts .
+
+bdr:W4CZ2710  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_rgyal tshab rje/ (bla brang par ma/)"@bo-x-ewts .
+
+bdr:W1AC322  a              bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa theg chen chos kyi rgya mtsho zab rgyas mtha' yas pa'i snying po zhes bya ba bzhugs so/"@bo-x-ewts .
+
+bdr:T58  skos:prefLabel  "zhal gdams/"@bo-x-ewts , "instruction"@en .
+
+bdr:P5928  skos:prefLabel  "blo gros rgya mtsho/"@bo-x-ewts .
+
+bdr:WA25007_P9b5f286732cb
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W23627 , bdr:W23907 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dka' gnas gsal byed baiDUrya dbang po'i me long /"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi dka' gnas gsal byed/"@bo-x-ewts ;
+        tmp:matchScore       "8.612466"^^xsd:float , "10.241266"^^xsd:float ;
+        skos:altLabel        "spyod 'jug dka' gnas gsal byed baiDUrya dbang po'i me long /"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi dka' gnas gsal byed/"@bo-x-ewts .
+
+bdr:P8696  skos:prefLabel  "thub bstan chos kyi grags pa/"@bo-x-ewts .
+
+bdr:W11577  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_kun dga' bzang po/"@bo-x-ewts .
+
+bdr:WA8LS19709  bdo:workHasInstance  bdr:W8LS19709 , bdr:W3PD982 ;
+        bdo:workIsAbout      bdr:W19740 , bdr:T179 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ bshad pa'i sngon 'gro gzhon nu'i rna rgyan/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug bshad pa'i sngon 'gro gzhon nu'i rna rgyan/"@bo-x-ewts .
+
+bdr:WA1PD89084_P626cb5f05f64
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1219 ;
+        tmp:labelMatch  "bslas btus dang ↦spyod↤ '↦jug↤ gi khrid/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "bslas btus dang spyod 'jug gi khrid/"@bo-x-ewts .
+
+bdr:WA1KG14783_P0671439e1665
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "don gcig pa/_rnal 'byor ↦spyod↤ '↦jug↤ gi le'u/"@bo-x-ewts ;
+        tmp:matchScore  "9.329107"^^xsd:float ;
+        skos:prefLabel  "don gcig pa/_rnal 'byor spyod 'jug gi le'u/"@bo-x-ewts .
+
+bdr:W23779  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "'brug lugs chos mdzod chen mo/"@bo-x-ewts .
+
+bdr:WA3CN13006_Pe0fbcc18360c
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ tshig 'grel bdud rtsi'i thig pa/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug tshig 'grel bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:WA1KG14001  bdo:serialHasInstance  bdr:W1KG14001 ;
+        bdo:workGenre          bdr:T1488 ;
+        bdo:workHasInstance    bdr:W1KG14001 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P1KG5610 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ chen mo gleng ba/"@bo-x-ewts ;
+        tmp:matchScore         "10.767674"^^xsd:float ;
+        skos:altLabel          "a discussion on bodhicaryavatara"@en ;
+        skos:prefLabel         "spyod 'jug chen mo gleng ba/"@bo-x-ewts .
+
+bdr:T4CZ71  skos:prefLabel  "珍本、孤本"@zh-hans , "rare texts"@en , "dpe dkon/"@bo-x-ewts .
+
+bdr:W00KG0545  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "kun dpal spyod 'jug"@bo-x-ewts .
+
+bdr:WA1KG23091  bdo:workGenre  bdr:T61 ;
+        bdo:workHasInstance  bdr:W1KG23091 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P319 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad theg chen chos kyi rgya mtsho/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa theg chen chos kyi rgya mtsho zab rgyas mtha' yas pa'i snying po/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug rnam bshad theg chen chos kyi rgya mtsho/"@bo-x-ewts .
+
+bdr:W1PD83960  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/ shes bya kun rig"@bo-x-ewts .
+
+bdr:WA8LS22437  bdo:workGenre  bdr:T1488 ;
+        bdo:workHasInstance  bdr:W8LS22437 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P825 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts ;
+        tmp:matchScore       "8.612466"^^xsd:float ;
+        skos:altLabel        "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts .
+
+bdr:WA1PD181158_P6f4a31bd7725
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W00EGS1016759 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts .
+
+bdr:W7500  a                bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa/"@bo-x-ewts .
+
+bdr:P8763  skos:prefLabel  "blo gros rgya mtsho/"@bo-x-ewts .
+
+bdr:W22272  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_tsong kha pa/ (sku 'bum par ma/)"@bo-x-ewts .
+
+bdr:W4CZ32863  skos:prefLabel  "byams pa'i smon lam/"@bo-x-ewts .
+
+bdr:W1KG12679  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001674  bdo:workHasInstance
+                bdr:W1TLMTGA001674 ;
+        tmp:author           bdr:P4761 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sher le'i rgya cher 'grel chen snying po'i don gsal nyin byed chen po/"@bo-x-ewts ;
+        tmp:matchScore       "7.1392245"^^xsd:float ;
+        skos:altLabel        "spyod 'jug sher le'i rgya cher 'grel chen snying po'i don gsal nyin byed chen po/"@bo-x-ewts ;
+        skos:prefLabel       "sher le'i rgya cher 'grel mchan snying po/"@bo-x-ewts .
+
+bdr:W8LS18997  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad/"@bo-x-ewts .
+
+bdr:W00JW501203  a          bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "'bri gung bka' brgyud chos mdzod chen mo/"@bo-x-ewts .
+
+bdr:WA3CN3408_P6cbfc25415e0
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P155 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bsdus don/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi bsdus don/"@bo-x-ewts .
+
+bdr:W1KG15822  a            bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rtsa 'grel chen mo/ (glog klad par ma/)"@bo-x-ewts .
+
+bdr:W1KG10436  a            bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rtsa ba dang 'grel pa tshig don kun gsal bar byed pa skal bzang rnams kyi 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA10206_Pfbd57931d203
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "zab mo lta ba'i lugs kyi byang chub sems dpa'i sdom pa len tshul ↦spyod↤ '↦jug↤ dang sbyar ba/"@bo-x-ewts ;
+        tmp:matchScore  "6.454632"^^xsd:float ;
+        skos:prefLabel  "zab mo lta ba'i lugs kyi byang chub sems dpa'i sdom pa len tshul spyod 'jug dang sbyar ba/"@bo-x-ewts .
+
+bdr:WA1KG4472  bdo:workGenre  bdr:T61 ;
+        bdo:workHasInstance  bdr:W1KG4472 , bdr:W676 , bdr:W29194 , bdr:W4CZ2710 , bdr:W23692 , bdr:W1NLM519 ;
+        bdo:workIsAbout      bdr:T233 , bdr:W19740 ;
+        tmp:author           bdr:P65 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:altLabel        "Spyod ʼjug rnam bśad Rgyal sras ʼjug ṅogs /Rgyal-tshab Rje."@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa'i rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pe0721b398a39
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bzhi pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bzhi pa/"@bo-x-ewts .
+
+bdr:W1AC57  a               bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "bshes pa'i springs yig dang spyod 'jug sogs/"@bo-x-ewts .
+
+bdr:WA27521  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W27521 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P8763 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ ser le'i rgya cher 'grel mchan snin po'i don gsl ni byed chen po/"@bo-x-ewts , "↦spyod↤ '↦jug↤ sher le'i rgya cher 'grel mchan snying po'i don gsal nyin byed chen po/"@bo-x-ewts ;
+        tmp:matchScore       "7.1392245"^^xsd:float ;
+        skos:altLabel        "an exegesis of the 9th chapter of santideva's bodhicaryavatara"@en-x-mixed , "spyod 'jug sher le'i rgya cher 'grel mchan snying po'i don gsal nyin byed chen po/"@bo-x-ewts , "spyod 'jug ser le'i rgya cher 'grel mchan snin po'i don gsl ni byed chen po/"@bo-x-ewts , "chos kyi dbyins su bstod pa'i 'grel pa nes don zab mo'i gter gyi kha 'byed/"@bo-x-ewts , "a commentary on nagarjunas dharmadhatustava"@bo-alalc97 ;
+        skos:prefLabel       "chos kyi dbyings su bstod pa'i 'grel pa nges don zab mo'i gter gyi kha 'byed/"@bo-x-ewts .
+
+bdr:WA1PD95746_Pce9f8be55968
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi shes rab le'u'i rnam bshad rigs pa'i sgo 'byed/"@bo-x-ewts ;
+        tmp:matchScore  "8.229624"^^xsd:float ;
+        skos:altLabel   "rgyal sras byang chub sems dpa'i spyod pa la 'jug pa'i shes rab le'u'i rnam bshad rigs pa'i sgo 'byed/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug gi shes rab le'u'i rnam bshad rigs pa'i sgo 'byed/"@bo-x-ewts .
+
+bdr:W4CZ295080  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa mtshungs med bla ma'i zhal rgyun/"@bo-x-ewts .
+
+bdr:P5054  skos:prefLabel  "bsod nams chos 'grub/"@bo-x-ewts .
+
+bdr:WA3CN3408_P0787549fa3bd
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod brgyad pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod brgyad pa/"@bo-x-ewts .
+
+bdr:T225  skos:prefLabel  "chos spyod/"@bo-x-ewts .
+
+bdr:W19639  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa tshig nyung don gsal/"@bo-x-ewts .
+
+bdr:WA28809_P0e4a9d7d6833
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W24052 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ smon lam gyi sa bcad/"@bo-x-ewts ;
+        tmp:matchScore       "10.241266"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug smon lam gyi sa bcad/"@bo-x-ewts .
+
+bdr:W24829  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_o rgyan 'jigs med chos kyi dbang po/"@bo-x-ewts .
+
+bdr:T1478  skos:prefLabel  "zin tho/"@bo-x-ewts .
+
+bdr:WA1660  bdo:workGenre    bdr:T61 ;
+        bdo:workHasInstance  bdr:W1660 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P151 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa gzhung don rab gsal snang ba/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "spyod 'grel/"@bo-x-ewts , "Byaṅ chub sems dpaʼi spyod pa la ʼjug paʼi rnam bśad gźuṅ don rab gsal snaṅ ba :a detailed exposition of the Bodhicaryāvatāra of Ācārya Śāntideva /by Sa-bzaṅ Ma-ti Paṇ-chen ʼJam-dbyaṅs-blo-gros."@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa gzhung don rab gsal snang ba/"@bo-x-ewts , "a detailed exposition of the bodhicaryavatara of acarya santideva"@en ;
+        skos:prefLabel       "spyod 'jug 'grel pa gzhung don rab gsal snang ba/"@bo-x-ewts .
+
+bdr:W22109  a               bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_tsong kha pa/ （bkras lhun par rnying / ldi lir bskyar par brgyab pa/）"@bo-x-ewts .
+
+bdr:WA5832_P467bb369e13f
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W21857 , bdr:W24829 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ brgyud pa'i gsol 'debs/"@bo-x-ewts ;
+        tmp:matchScore       "10.767674"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug brgyud pa'i gsol 'debs/"@bo-x-ewts .
+
+bdr:W1KG3818  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long dang spyod 'jug mchan 'grel mkhan po gzhan dgas mdzad pa/"@bo-x-ewts .
+
+bdr:W1TLMTGA001667  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dka' 'grel/"@bo-x-ewts .
+
+bdr:W8LS19709  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug bshad pa'i sngon 'gro gzhon nu'i rna rgyan/"@bo-x-ewts .
+
+bdr:WA23697  bdo:workGenre   bdr:T1478 , bdr:T132 ;
+        bdo:workHasInstance  bdr:W23697 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P5298 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ zin bris 'jam dpal zhal lung /"@bo-alalc97 ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:altLabel        "byang chub sems pa'i spyod pa la 'jug pa'i zin bris 'jam dpal zhal lung /"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug zin bris 'jam dpal zhal lung /"@bo-alalc97 .
+
+bdr:WA1TLMTGA001668  bdo:workHasInstance
+                bdr:W1TLMTGA001668 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        tmp:matchScore       "7.6301246"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:P1243  skos:prefLabel  "dam pa sangs rgyas/"@bo-x-ewts .
+
+bdr:WA10206_P46ac9070e66f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i rtsod spong lta grub gsal byed me mong /"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug shes rab le'u'i rtsod spong lta grub gsal byed me mong /"@bo-x-ewts .
+
+bdr:WA3CN3408_Pdc09510aedfa
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P4069 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'i spyi don/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug shes rab le'i spyi don/"@bo-x-ewts .
+
+bdr:WA1PD153536_Pdd71aeefc04b
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bsdus don dang slob dpon zhi ba lha'i lo rgyus/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi bsdus don dang slob dpon zhi ba lha'i lo rgyus/"@bo-x-ewts .
+
+bdr:WA28942_Pb2a95969e1c9
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1PD83960 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi brgyud pa la bstod pa/"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi brgyud pa la bstod pa/"@bo-x-ewts .
+
+bdr:T394  skos:prefLabel  "nA ro chos drug"@bo-x-ewts , "six yogas of nāropa (nA ro pa)"@en .
+
+bdr:W1KG14001  a            bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug chen mo gleng ba/"@bo-x-ewts .
+
+bdr:WA2PD20790  bdo:workGenre  bdr:T208 ;
+        bdo:workHasInstance  bdr:W2PD20790 ;
+        tmp:author           bdr:P2PD20791 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dbyangs can dga' ba'i blo gros kyi gsung 'bum/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug dbyangs can dga' ba'i blo gros kyi gsung 'bum/"@bo-x-ewts .
+
+bdr:W23786  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa/"@bo-x-ewts .
+
+bdr:W1TLMTGA001679  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad zab rgyas mtha' yas snying po/"@bo-x-ewts .
+
+bdr:W3CN7826  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "rgyal sras chen po zhi ba lhas mdzad pa'i spyod 'jug bka' khrid zin bris/"@bo-x-ewts .
+
+bdr:W1KG23091  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad theg chen chos kyi rgya mtsho/"@bo-x-ewts .
+
+bdr:W1KG3408  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi rnam par bshad pa sogs 'grel pa khag cig"@bo-x-ewts .
+
+bdr:W29194  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_rgyal tshab rje (bkra shis lhun po par rnying)"@bo-x-ewts .
+
+bdr:WA1PD159108  bdo:serialHasInstance  bdr:W1PD159108 ;
+        bdo:workHasInstance    bdr:W1PD159108 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ 'grel pa byang sems gsal byed zla ba'i 'od zer/"@bo-x-ewts ;
+        tmp:matchScore         "8.229624"^^xsd:float ;
+        skos:altLabel          "慧宝丛书入菩萨行论注疏·菩提心明显月光"@zh-hans ;
+        skos:prefLabel         "spyod 'jug 'grel pa byang sems gsal byed zla ba'i 'od zer/"@bo-x-ewts .
+
+bdr:WA3CN3408_P3b60576186ec
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P0RK1768 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa sa lugs ma/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'grel pa sa lugs ma/"@bo-x-ewts .
+
+bdr:W15659  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel bshad rgyal sras yon tan bum bzang /"@bo-x-ewts .
+
+bdr:P6430  skos:prefLabel  "karma tshe dpal/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pddd2245def4c
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1790 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ chen mo'i dka' 'grel/"@bo-x-ewts ;
+        tmp:matchScore  "10.767674"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug chen mo'i dka' 'grel/"@bo-x-ewts .
+
+bdr:T1491  skos:prefLabel  "commentary on difficult points"@en , "pañjikā"@sa-x-ndia , "細疏"@zh-hant , "dka' 'grel/"@bo-x-ewts .
+
+bdr:WA1PD89051_P03eafcd91717
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P63 ;
+        tmp:labelMatch  "gsang phu blo gros mtshungs med kyis mdzad pa'i ↦spyod↤ '↦jug↤ rnam bshad rin chen snang ba/"@bo-x-ewts ;
+        tmp:matchScore  "6.878512"^^xsd:float ;
+        skos:prefLabel  "gsang phu blo gros mtshungs med kyis mdzad pa'i spyod 'jug rnam bshad rin chen snang ba/"@bo-x-ewts .
+
+bdr:W22248  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad gzhung don rab gsal snang ba/"@bo-x-ewts .
+
+bdr:T304  skos:prefLabel  "annotated commentary"@en , "mchan 'grel/"@bo-x-ewts .
+
+bdr:P7401  skos:prefLabel  "'phags pa lha/"@bo-x-ewts , "karnaripa"@sa-x-ndia .
+
+bdr:W23907  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_'jigs med bstan pa'i nyi ma/ ('bras ljongs sgang tog)"@bo-x-ewts .
+
+bdr:WA1022_P83e911ab0be1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ lung gi brgyud pa/"@bo-x-ewts ;
+        tmp:matchScore  "10.767674"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug lung gi brgyud pa/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pe3e1ff30d12d
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bcu gsum pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bcu gsum pa/"@bo-x-ewts .
+
+bdr:WA1KG11957  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W1KG11957 ;
+        bdo:workIsAbout      bdr:W22208 , bdr:W19740 ;
+        tmp:author           bdr:P1830 ;
+        tmp:labelMatch       "bzang po dpal gyis mdzad pa'i ↦spyod↤ '↦jug↤ dang mdo sde rgyan gyi 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "7.361978"^^xsd:float ;
+        skos:prefLabel       "bzang po dpal gyis mdzad pa'i spyod 'jug dang mdo sde rgyan gyi 'grel pa/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pefd7542faff7
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P153 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa gzhung don snang ba/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'grel pa gzhung don snang ba/"@bo-x-ewts .
+
+bdr:W3CN7868  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi rtsa 'grel gces btus/"@bo-x-ewts .
+
+bdr:W1904  a                bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa zla ba'i 'od zer/"@bo-x-ewts .
+
+bdr:P3299  skos:prefLabel  "the dark siddha"@en , "nag po pa/"@bo-x-ewts .
+
+bdr:T89  skos:prefLabel  "纲目"@zh-hans , "thematic outline"@en , "sa bcad/"@bo-x-ewts .
+
+bdr:P1KG3495  skos:prefLabel  "dge ba'i lha/"@bo-x-ewts .
+
+bdr:WA4CZ295080  bdo:workGenre  bdr:T1478 , bdr:T132 ;
+        bdo:workHasInstance  bdr:W4CZ295080 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa mtshungs med bla ma'i zhal rgyun/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i zin bris mtshungs med bla ma'i zhal rgyun/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug 'grel pa mtshungs med bla ma'i zhal rgyun/"@bo-x-ewts .
+
+bdr:WA4CZ1019_P885b85c56b30
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi Ti ka"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi Ti ka"@bo-x-ewts .
+
+bdr:WA3CN3408_P9d94cf5ba8ba
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1226 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bsdus don nyi ma'i 'od zer/"@bo-x-ewts ;
+        tmp:matchScore  "9.329107"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i bsdus don nyi ma'i 'od zer/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug gi bsdus don nyi ma'i 'od zer/"@bo-x-ewts .
+
+bdr:W1PD100944  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "snga 'gyur bka' ma shin tu rgyas pa/"@bo-x-ewts .
+
+bdr:W4CZ302680  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa tshig don kun gsal bar byed pa skal bzang 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA1PD137815  bdo:workHasInstance  bdr:W1PD137815 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dar TIka shan sbyar/"@bo-x-ewts ;
+        tmp:matchScore       "10.767674"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug dar TIka shan sbyar/"@bo-x-ewts .
+
+bdr:WA20503_P278e02b88b70
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "bka' gdams lha bzhi'i rnal 'byor dang 'brel ba'i ↦spyod↤ '↦jug↤ le'u bzhi'i man ngag nyams su len tshul dngos grub yongs 'du'i snye ma/"@bo-x-ewts ;
+        tmp:matchScore  "5.4475374"^^xsd:float ;
+        skos:prefLabel  "bka' gdams lha bzhi'i rnal 'byor dang 'brel ba'i spyod 'jug le'u bzhi'i man ngag nyams su len tshul dngos grub yongs 'du'i snye ma/"@bo-x-ewts .
+
+bdr:W3CN1482  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa nges legs mdzod/"@bo-x-ewts .
+
+bdr:WA00KG03  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W00KG03 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1830 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA26672_Pea53c2ed792b
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "rgyal sras zhi ba lha'i gsungs byang chub ↦spyod↤ '↦jug↤ le'u bcu las le'u bcu pa bsngo le khol du phyung pa/"@bo-x-ewts ;
+        tmp:matchScore  "5.9084773"^^xsd:float ;
+        skos:prefLabel  "rgyal sras zhi ba lha'i gsungs byang chub spyod 'jug le'u bcu las le'u bcu pa bsngo le khol du phyung pa/"@bo-x-ewts .
+
+bdr:WA1PD107142_Pb86a1ba74462
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "rdor gcod dang ↦spyod↤ '↦jug↤ gi spar byang /"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "rdor gcod dang spyod 'jug gi spar byang /"@bo-x-ewts .
+
+bdr:WA3916_P14f3e1a1dfbb
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sher le'i 'bru 'grel kun mkhyen bla ma'i gsung las btus pa rab gsal nor bu'i sgron me/"@bo-x-ewts ;
+        tmp:matchScore  "6.261697"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug sher le'i 'bru 'grel kun mkhyen bla ma'i gsung las btus pa rab gsal nor bu'i sgron me/"@bo-x-ewts .
+
+bdr:WA18049  bdo:workGenre   bdr:T1491 ;
+        bdo:workHasInstance  bdr:W18049 ;
+        bdo:workIsAbout      bdr:T1722 , bdr:W19740 ;
+        tmp:author           bdr:P5054 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i dka' 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "10.241266"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa shes rab le'u'i dka' 'grel lung rigs 'od snang /"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i dka' 'grel/"@bo-x-ewts .
+
+bdr:WA3CN3408_P14508ff705ff
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod drug pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod drug pa/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001663  bdo:workHasInstance
+                bdr:W1TLMTGA001663 ;
+        tmp:author           bdr:P3183 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sher 'grel/_sa skya pa'i mkhas pa rnams kyi+i gsung skor pod bdun pa/"@bo-x-ewts ;
+        tmp:matchScore       "6.878512"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i dka' 'grel dang lung sbyor mdor bsdus 'jam dbyangs bla ma'i dgongs gsal/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug sher 'grel/_sa skya pa'i mkhas pa rnams kyi+i gsung skor pod bdun pa/"@bo-x-ewts .
+
+bdr:W24052  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_ngag dbang nyi ma/"@bo-x-ewts .
+
+bdr:W14345  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA1KG1795  bdo:serialHasInstance  bdr:W1KG1795 ;
+        bdo:workGenre          bdr:T132 ;
+        bdo:workHasInstance    bdr:W1KG1795 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P1830 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ gi 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts ;
+        tmp:matchScore         "8.566146"^^xsd:float ;
+        skos:altLabel          "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts , "ru pu sa xing lun shi san yan zhi hai"@zh-latn-pinyin-x-ndia ;
+        skos:prefLabel         "spyod 'jug gi 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts .
+
+bdr:W1KG5465  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dar Tik shan sbyar/"@bo-x-ewts .
+
+bdr:W20325  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "rnying ma ba'i zhal 'don phyogs bsgrigs/"@bo-x-ewts .
+
+bdr:W11886  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad dgongs pa nges par gsal ba/"@bo-x-ewts .
+
+bdr:P873  skos:prefLabel  "ngag dbang chos rgyal/"@bo-x-ewts .
+
+bdr:P1219  skos:prefLabel  "smon lam tshul khrims/"@bo-x-ewts .
+
+bdr:P270  skos:prefLabel  "o rgyan 'jigs med chos kyi dbang po/"@bo-x-ewts .
+
+bdr:W3CN552  a              bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rtsa ba dang sa bcad sbyar ba/"@bo-x-ewts .
+
+bdr:W1TLMTGA001674  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "sher le'i rgya cher 'grel mchan snying po/"@bo-x-ewts .
+
+bdr:W3PD982  a              bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "khams khul nas 'tshol bsdu zhus pa'i dpe rnying dpe dkon/"@bo-x-ewts .
+
+bdr:W22273  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_tsong kha pa/（bla brang par ma/）"@bo-x-ewts .
+
+bdr:WA21957_P29e4e1b85960
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ bsngo le'i nyams len zin tho/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug bsngo le'i nyams len zin tho/"@bo-x-ewts .
+
+bdr:WA10200_Pef017fe2f790
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ rgya 'grel/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug rgya 'grel/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001675  bdo:workHasInstance
+                bdr:W1TLMTGA001675 ;
+        tmp:author           bdr:P5785 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sher le'i tshig don gsal byed kyi yig chung blo'i sgron me/"@bo-x-ewts ;
+        tmp:matchScore       "7.6301246"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug sher le'i tshig don gsal byed kyi yig chung blo'i sgron me/"@bo-x-ewts .
+
+bdr:WA1PD89051_P0ddd57f5ae6d
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P2259 ;
+        tmp:labelMatch  "gtsang nag pa brtson 'grus seng ges mdzad pa'i ↦spyod↤ '↦jug↤ gi rnam bshad/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "gtsang nag pa brtson 'grus seng ges mdzad pa'i spyod 'jug gi rnam bshad/"@bo-x-ewts .
+
+bdr:P155  skos:prefLabel  "rin chen grub/"@bo-x-ewts .
+
+bdr:W2PD20790  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dbyangs can dga' ba'i blo gros kyi gsung 'bum/"@bo-x-ewts .
+
+bdr:W4CZ328550  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi rtsa 'grel/"@bo-x-ewts .
+
+bdr:W0GR0356  a             bdo:EtextInstance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "Santideva: Bodhicaryavatara"@en .
+
+bdr:W22339  skos:prefLabel  "bhagavatī prajñāpāramitā hṛdaya"@sa-x-iast , "bcom ldan 'das ma shes rab kyi pha rol tu phyin pa'i snying po/"@bo-x-ewts , "shes rab snying po/"@bo-x-ewts .
+
+bdr:T1763  skos:prefLabel  "exegesis of the general meaning"@en , "spyi don/"@bo-x-ewts .
+
+bdr:WA2DB4569_P855223011750
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi bsdus don/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi bsdus don/"@bo-x-ewts .
+
+bdr:T4CZ16893  skos:prefLabel  "brda sprod/"@bo-x-ewts , "tibetan grammar"@en .
+
+bdr:WA1PD86474_P0514517b35e6
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ bsngo ba/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i bsngo ba/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug bsngo ba/"@bo-x-ewts .
+
+bdr:P5013  skos:prefLabel  "毗盧遮那"@zh-hant , "bai ro tsa na/"@bo-x-ewts .
+
+bdr:WA3CN3408_P6e3ea8fbf9be
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P4069 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'i gzhung don/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug shes rab le'i gzhung don/"@bo-x-ewts .
+
+bdr:W1KG11957  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "bzang po dpal gyis mdzad pa'i spyod 'jug dang mdo sde rgyan gyi 'grel pa/"@bo-x-ewts .
+
+bdr:P252  skos:prefLabel  "mi pham 'jam dbyangs rnam rgyal rgya mtsho/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001687  bdo:workHasInstance
+                bdr:W1TLMTGA001687 ;
+        tmp:author           bdr:P5054 , bdr:P258 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ TI ka'i skor/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i TI ka'i skor/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug TI ka'i skor/"@bo-x-ewts .
+
+bdr:WA1KG15384_Pdb0af91ff157
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ rnam bshad rgyal sras 'jug ngogs las bsngo ba'i le'u'i 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug rnam bshad rgyal sras 'jug ngogs las bsngo ba'i le'u'i 'grel pa/"@bo-x-ewts .
+
+bdr:WA22106_P11394d361747
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa byang chub kyi sems gsal bar byed pa zla ba'i 'od zer/"@bo-x-ewts ;
+        tmp:matchScore  "7.112038"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa byang chub kyi sems gsal bar byed pa zla ba'i 'od zer/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa byang chub kyi sems gsal bar byed pa zla ba'i 'od zer/"@bo-x-ewts .
+
+bdr:W21857  a               bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_o rgyan 'jigs med chos kyi dbang po/"@bo-x-ewts .
+
+bdr:P825  skos:prefLabel  "pad+ma dkar po/"@bo-x-ewts .
+
+bdr:P3445  skos:prefLabel  "rdo rje seng+ge"@bo-x-ewts .
+
+bdr:P1TLMTGA001653  skos:prefLabel  "'jam dbyang blo gros/"@bo-x-ewts .
+
+bdr:WA5832_Pebb9fc9362b7
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W21857 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi par byang sogs tshan pa gnyis/"@bo-x-ewts ;
+        tmp:matchScore       "9.329107"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi par byang sogs tshan pa gnyis/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pb1308631614d
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bcu gnyis pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bcu gnyis pa/"@bo-x-ewts .
+
+bdr:P5785  skos:prefLabel  "kun dga' dbang phyug"@bo-x-ewts .
+
+bdr:WA3CN3408_P6a3765e4fdc4
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P2627 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa rab tu gsal ba/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa spyod pa rab tu gsal ba/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa rab tu gsal ba/"@bo-x-ewts .
+
+bdr:W1TLMTGA001668  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:P3276  skos:prefLabel  "bi bhu ti/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001669  bdo:workHasInstance
+                bdr:W1TLMTGA001669 ;
+        tmp:labelMatch       "dpal sprul rin po che'i ↦spyod↤ '↦jug↤ zhal rgyun mkhan chen kun bzang dpal ldan nas zin bris su bkod pa/"@bo-x-ewts ;
+        tmp:matchScore       "6.096382"^^xsd:float ;
+        skos:altLabel        "dpal sprul rin po che'i spyod 'jug zhal rgyun mkhan chen kun bzang dpal ldan nas zin bris su bkod pa/"@bo-x-ewts ;
+        skos:prefLabel       "dpal spru'i zhal rgyun zin bris/"@bo-x-ewts .
+
+bdr:T2033  skos:prefLabel  "lugs kyi bstan bcos/"@bo-x-ewts , "nītiśāstra"@sa-x-iast .
+
+bdr:T238  skos:prefLabel  "graduated approach"@en , "道次第"@zh-hans , "lam rim/"@bo-x-ewts .
+
+bdr:WA1PD153536_Pa0ad6e509ca2
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sa bcad/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug sa bcad/"@bo-x-ewts .
+
+bdr:T208  skos:prefLabel  "collected works"@en , "gsung 'bum/"@bo-x-ewts .
+
+bdr:WA1KG12289  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W1KG12289 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1830 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'grel pa legs bshad rgya mtsho/"@bo-x-ewts ;
+        tmp:matchScore       "9.329107"^^xsd:float ;
+        skos:altLabel        "Byaṅ chub sems dpaʼi spyod pa la ʼjug paʼi ʼgrel pa Legs par bśad paʼi rgya mtsho /[Thogs-med kyis sbyar]"@en-x-mixed , "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa legs bshad rgya mtsho/"@bo-x-ewts .
+
+bdr:P4796  skos:prefLabel  "ngag dbang nyi ma/"@bo-x-ewts .
+
+bdr:W4998  a                bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug sher le brgal lan nyin byed snang ba/"@bo-x-ewts .
+
+bdr:WA4CZ328550  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W4CZ328550 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1830 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi rtsa 'grel legs bshad rgya mtsho/"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi rtsa 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float , "9.387328"^^xsd:float ;
+        skos:altLabel        "spyod 'jug gi rtsa 'grel legs bshad rgya mtsho/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi rtsa 'grel/"@bo-x-ewts .
+
+bdr:WA28957_Pcb6abcb65a58
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'chad thabs blo gsar mgul rgyan/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'chad thabs blo gsar mgul rgyan/"@bo-x-ewts .
+
+bdr:WA8LS17154  bdo:workGenre  bdr:T2397 ;
+        bdo:workHasInstance  bdr:W8LS17154 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        tmp:matchScore       "7.6301246"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:WA1PD95808  bdo:serialHasInstance  bdr:W1PD95808 ;
+        bdo:workGenre          bdr:T132 ;
+        bdo:workHasInstance    bdr:W1PD95808 ;
+        bdo:workIsAbout        bdr:W19740 , bdr:T360 ;
+        tmp:author             bdr:P151 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ sa 'grel/"@bo-x-ewts ;
+        tmp:matchScore         "12.001439"^^xsd:float ;
+        skos:altLabel          "觉囊入菩萨行解"@zh-hans , "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa gzhung don rab gsal snang ba/"@bo-x-ewts , "jue nang ru pu sa xing"@zh-latn-pinyin-x-ndia ;
+        skos:prefLabel         "spyod 'jug sa 'grel/"@bo-x-ewts .
+
+bdr:WA3CN3408_P2b358e60649f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa dam pa'i dgongs rgyan/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa dam pa'i dgongs pa rab gsal/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa dam pa'i dgongs rgyan/"@bo-x-ewts .
+
+bdr:P1226  skos:prefLabel  "bsod nams rgyal mtshan/"@bo-x-ewts .
+
+bdr:WA1PD89051_P35285bbd15e4
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1404 ;
+        tmp:labelMatch  "dge slong phywa pa chos kyi seng ges mdzad pa'i ↦spyod↤ '↦jug↤ bsdus don/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "dge slong phywa pa chos kyi seng ges mdzad pa'i spyod 'jug bsdus don/"@bo-x-ewts .
+
+bdr:W676  a                 bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_rgyal tshab rje/ (zhol par ma/)"@bo-x-ewts , "the collected works (gsung 'bum) of the lord rgyal tshab rje dar ma rin chen"@en .
+
+bdr:WA20913  bdo:workGenre   bdr:T132 ;
+        bdo:workHasInstance  bdr:W20913 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P297 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa rin po che'i phreng ba/"@bo-x-ewts ;
+        tmp:matchScore       "9.329107"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i TIk+ka rin po che'i phreng ba/"@bo-x-ewts , "Byaṅ chub sems dpaʼi spyod pa la ʼjug paʼi ṭīkka rin po cheʼi phreṅ ba :a detailed commentary on the Bodhicaryāvatāra of Śāntideva /by Rgyal Mkhan-po Grags-pa-rgyal-mtshan."@en-x-mixed , "a detailed commentary on the bodhicaryavatara of santideva"@en ;
+        skos:prefLabel       "spyod 'jug 'grel pa rin po che'i phreng ba/"@bo-x-ewts .
+
+bdr:WA21914  bdo:workGenre   bdr:T132 , bdr:T1KG8787 ;
+        bdo:workHasInstance  bdr:W21914 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P65 , bdr:P6161 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rtsa 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "12.001439"^^xsd:float ;
+        skos:altLabel        "ju hsing lun pen chu"@zh-latn-wadegile ;
+        skos:prefLabel       "spyod 'jug rtsa 'grel/"@bo-x-ewts .
+
+bdr:WA1CZ1269  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W1CZ1269 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P153 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA13528_Pc992f5b9802f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ le'u dgu pa'i 'grel pa zab don lta ba'i mig gcig rten 'byung gtam gyi rin chen/"@bo-x-ewts ;
+        tmp:matchScore  "6.454632"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i le'u dgu pa'i 'grel pa zab don lta ba'i mig gcig rten 'byung gtam gyi rin chen/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug le'u dgu pa'i 'grel pa zab don lta ba'i mig gcig rten 'byung gtam gyi rin chen/"@bo-x-ewts .
+
+bdr:WA3CN3408_P3590e67a3cd4
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod lnga pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod lnga pa/"@bo-x-ewts .
+
+bdr:WA8LS16587  bdo:workGenre  bdr:T89 ;
+        bdo:workHasInstance  bdr:W8LS16587 ;
+        bdo:workIsAbout      bdr:W19740 , bdr:W22339 , bdr:W3JT13389 ;
+        tmp:author           bdr:P270 ;
+        tmp:labelMatch       "sdom gsum rnam nges/ ↦spyod↤ '↦jug↤ dang sher snying bcas kyi sa bcad/"@bo-x-ewts ;
+        tmp:matchScore       "7.9185443"^^xsd:float ;
+        skos:altLabel        "sdom gsum rnam par nges pa'i sa bcad/ byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long dang shes rab snying po'i mdo'i sa bcad/"@bo-x-ewts ;
+        skos:prefLabel       "sdom gsum rnam nges/ spyod 'jug dang sher snying bcas kyi sa bcad/"@bo-x-ewts .
+
+bdr:P1830  skos:prefLabel  "thogs med bzang po dpal/"@bo-x-ewts .
+
+bdr:P258  skos:prefLabel  "'jam dbyangs mkhyen brtse'i dbang po/"@bo-x-ewts .
+
+bdr:WA1KG22345  bdo:workGenre  bdr:T1478 , bdr:T132 ;
+        bdo:workHasInstance  bdr:W1KG22345 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P6962 ;
+        tmp:labelMatch       "dpal sprul rin po che'i ↦spyod↤ '↦jug↤ zhal rgyun mkhan chen kun bzang dpal ldan nas zin bris su bkod pa/"@bo-x-ewts , "↦spyod↤ '↦jug↤ zin bris dang tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        tmp:matchScore       "6.096382"^^xsd:float , "6.878512"^^xsd:float ;
+        skos:altLabel        "dpal sprul rin po che'i spyod 'jug zhal rgyun mkhan chen kun bzang dpal ldan nas zin bris su bkod pa/"@bo-x-ewts , "byang chub sems dpa'i spyod pa la 'jug pa'i tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug zin bris dang tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:W27521  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "chos kyi dbyings su bstod pa'i 'grel pa nges don zab mo'i gter gyi kha 'byed/"@bo-x-ewts .
+
+bdr:WA22389_P62aa0cd20bdb
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ tu drangs rgyu'i lung btus rin chen phreng ba/"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug tu drangs rgyu'i lung btus rin chen phreng ba/"@bo-x-ewts .
+
+bdr:WA22642_P44853fd63709
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ mchod phreng /"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug mchod phreng /"@bo-x-ewts .
+
+bdr:WA3PD982_Pb38641c47fea
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "rgyal sras ↦spyod↤ '↦jug↤ gi mchod 'grigs bdud rtsi'i chu gter/"@bo-x-ewts , "↦spyod↤ '↦jug↤ gi mchod 'grigs bdud rtsi'i chu gter/"@bo-x-ewts ;
+        tmp:matchScore  "8.612466"^^xsd:float , "9.329107"^^xsd:float ;
+        skos:altLabel   "gdams phran/"@bo-x-ewts , "rgyal sras spyod 'jug gi mchod 'grigs bdud rtsi'i chu gter/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug gi mchod 'grigs bdud rtsi'i chu gter/"@bo-x-ewts .
+
+bdr:WA10982_P9635e7e4aa4b
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "smon lam lnga 'grel las/ ↦spyod↤ '↦jug↤ smon 'grel sems dpa'i bzhed don"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "smon lam lnga 'grel las/ spyod 'jug smon 'grel sems dpa'i bzhed don"@bo-x-ewts .
+
+bdr:WA20423_Pbf2cc98d620e
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P6161 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts , "↦spyod↤ '↦jug↤ smon lam/"@bo-x-ewts ;
+        tmp:matchScore  "8.612466"^^xsd:float , "12.001439"^^xsd:float ;
+        skos:altLabel   "spyod 'jug las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug smon lam/"@bo-x-ewts .
+
+bdr:WA3CN3408_P990361e166ce
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P4069 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel chen mi zad pa'i gter/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'grel chen mi zad pa'i gter/"@bo-x-ewts .
+
+bdr:W25983  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "bka' ma shin tu rgyas pa (kaH thog)"@bo-x-ewts .
+
+bdr:P6962  skos:prefLabel  "kun bzang dpal ldan/"@bo-x-ewts .
+
+bdr:W1TLMTGA001663  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug sher 'grel/_sa skya pa'i mkhas pa rnams kyi+i gsung skor pod bdun pa/"@bo-x-ewts .
+
+bdr:W22950  skos:prefLabel  "bshes spring /"@bo-x-ewts , "suhṛllekha"@sa-x-iast , "bshes pa'i spring yig"@bo-x-ewts .
+
+bdr:WA1KG3545  bdo:workGenre  bdr:T61 ;
+        bdo:workHasInstance  bdr:W4996 , bdr:W1KG3545 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P252 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i tshig don go slar bshad pa/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float ;
+        skos:altLabel        "shes rab kyi le'u'i tshig don go sla bar rnam par bshad pa nor bu ke ta ka"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i tshig don go slar bshad pa/"@bo-x-ewts .
+
+bdr:T61  skos:prefLabel  "vyākhyā"@sa-x-ndia , "detailed commentary"@en , "論"@zh-hant , "rnam bshad/"@bo-x-ewts .
+
+bdr:P5931  skos:prefLabel  "zla ba grags pa/"@bo-x-ewts .
+
+bdr:W4CZ301801  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug"@bo-x-ewts .
+
+bdr:T233  skos:prefLabel  "中道"@zh-hans , "madhyamaka"@sa-alalc97 , "middle way"@en , "dbu ma/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pfc4c19797203
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1827 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug shes rab le'u'i 'grel pa/"@bo-x-ewts .
+
+bdr:W1TLMTGA001675  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug sher le'i tshig don gsal byed kyi yig chung blo'i sgron me/"@bo-x-ewts .
+
+bdr:T360  skos:prefLabel  "sadangayoga"@sa-x-ewts , "sbyor drug"@bo-x-ewts .
+
+bdr:WA1TLMTGA001519  bdo:workHasInstance
+                bdr:W1TLMTGA001519 ;
+        tmp:author           bdr:P1TLMTGA001391 , bdr:P6161 , bdr:P5931 , bdr:P7401 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ dang dbu ma 'jug pa rigs tshogs lnga bzhi brgya pa bcas kyi rtsa ba/"@bo-x-ewts ;
+        tmp:matchScore       "6.878512"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug dang dbu ma 'jug pa rigs tshogs lnga bzhi brgya pa bcas kyi rtsa ba/"@bo-x-ewts .
+
+bdr:W23697  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug zin bris 'jam dpal zhal lung /"@bo-alalc97 .
+
+bdr:P4761  skos:prefLabel  "blo gros rgyal mtshan/"@bo-x-ewts .
+
+bdr:WA1NLM181_Pa1a38601bbc0
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ smon lam gyi steng nas gtong len gyi dmigs pa skyong tshul/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug smon lam gyi steng nas gtong len gyi dmigs pa skyong tshul/"@bo-x-ewts .
+
+bdr:WA3CN2232_P765fbc4752d7
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W23779 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron ma/"@bo-x-ewts .
+
+bdr:WA5062_P80af2c552e36
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W23468 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab kyi le'u'i tshig don go sla bar rnam par bshad pa nor bu ke ta ka"@bo-x-ewts ;
+        tmp:matchScore       "6.261697"^^xsd:float ;
+        skos:altLabel        "shes rab kyi le'u tshig don go sla bar rnam par bshad pa nor bu ke ta ka"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug shes rab kyi le'u'i tshig don go sla bar rnam par bshad pa nor bu ke ta ka"@bo-x-ewts .
+
+bdr:T1722  skos:prefLabel  "wisdom"@en , "智慧"@zh-hans , "prajna"@sa-x-ndia , "shes rab/"@bo-x-ewts .
+
+bdr:WA1GS66286_P49d16faf2db0
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'khor lo lta bu'i lam rgyud la ji ltar skye ba'i rim pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.361978"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'khor lo lta bu'i lam rgyud la ji ltar skye ba'i rim pa/"@bo-x-ewts .
+
+bdr:W1KG12289  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa legs bshad rgya mtsho/"@bo-x-ewts .
+
+bdr:W22274  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_tsong kha pa/ (sde dge par ma/)"@bo-x-ewts .
+
+bdr:P3379  skos:prefLabel  "阿底峡"@zh-hans , "a ti sha"@bo-x-ewts .
+
+bdr:T215  skos:prefLabel  "drawing proportions"@en , "thig ris/"@bo-x-ewts .
+
+bdr:W4CZ302675  a           bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "lam rim chen mo spyod pa spyi bslab dang spyod 'jug rtsa ba/"@bo-x-ewts .
+
+bdr:WA1KG15058_P120be67589ff
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "rje phag mo gru pas mdzad pa'i ↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore  "9.329107"^^xsd:float ;
+        skos:prefLabel  "rje phag mo gru pas mdzad pa'i spyod 'jug"@bo-x-ewts .
+
+bdr:WA3CN3408_Pd0d89938f4b1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod dgu pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.9185443"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod dgu pa/"@bo-x-ewts .
+
+bdr:W8LS17154  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:W1TLMTGA001687  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug TI ka'i skor/"@bo-x-ewts .
+
+bdr:W1KG4532  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "zhal 'don gces btus/"@bo-x-ewts .
+
+bdr:WA28942_P876785323bac
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1PD83960 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sgom rim rin chen rgyan phreng /"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:altLabel        "byang chub sems dapa'i spyod pa la 'jug pa'i sgom rim rin chen rgyan phreng /"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug sgom rim rin chen rgyan phreng /"@bo-x-ewts .
+
+bdr:WA22103_P404e0745bc99
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ le'u dang po'i 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug le'u dang po'i 'grel pa/"@bo-x-ewts .
+
+bdr:WA2DB25419_P7217ef6f8206
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ smon lam du 'jug nas 'don rgyu'i smon lam bdag gi'ang mi phyed ma/"@bo-x-ewts ;
+        tmp:matchScore  "7.112038"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug smon lam du 'jug nas 'don rgyu'i smon lam bdag gi'ang mi phyed ma/"@bo-x-ewts .
+
+bdr:W1PD95808  a            bdo:SerialInstance , bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug sa 'grel/"@bo-x-ewts .
+
+bdr:WA10206_P0a163cc6198f
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ mchod brjod kyi tshig 'grel blo gsar mgul rgyan/"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug mchod brjod kyi tshig 'grel blo gsar mgul rgyan/"@bo-x-ewts .
+
+bdr:WA3CN13006_Pbd800f29daee
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa nges legs mdzod/"@bo-x-ewts ;
+        tmp:matchScore  "10.241266"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa nges legs mdzod/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa nges legs mdzod/"@bo-x-ewts .
+
+bdr:WA3CN3408_P08284454653d
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sher le'i rgya cher 'grel mchan snying po'i don gsal nyin byed chen po/"@bo-x-ewts , "↦spyod↤ '↦jug↤ sher le'i rgya cher 'grel mchan snying po'i don gsal/"@bo-x-ewts ;
+        tmp:matchScore  "7.1392245"^^xsd:float , "8.229624"^^xsd:float ;
+        skos:altLabel   "spyod 'jug sher le'i rgya cher 'grel mchan snying po'i don gsal nyin byed chen po/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug sher le'i rgya cher 'grel mchan snying po'i don gsal/"@bo-x-ewts .
+
+bdr:P4954  skos:prefLabel  "klu sgrub/"@bo-x-ewts .
+
+bdr:WA3PD982_Pa87784d5dd6a
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "byang chub sems dpa'i spyod pa la 'jug pa'i ↦spyod↤ '↦jug↤ sa bcad don gsal me long /"@bo-x-ewts , "↦spyod↤ '↦jug↤ sa bcad don gsal me long /"@bo-x-ewts ;
+        tmp:matchScore  "6.903058"^^xsd:float , "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i spyod 'jug sa bcad don gsal me long /"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug sa bcad don gsal me long /"@bo-x-ewts .
+
+bdr:P63  skos:prefLabel  "blo gros mtshungs med/"@bo-x-ewts .
+
+bdr:WA1KG12025  bdo:workGenre  bdr:T1763 , bdr:T132 ;
+        bdo:workHasInstance  bdr:W1KG12025 ;
+        bdo:workIsAbout      bdr:T1722 , bdr:W19740 ;
+        tmp:author           bdr:P4069 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i spyi don dang gzhung 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "8.931362"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i spyi don dang gzhung 'grel/"@bo-x-ewts .
+
+bdr:W23468  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_mi pham rgya mtsho/"@bo-x-ewts .
+
+bdr:P0RK1768  skos:prefLabel  "bde ba can pa ye shes mgon/"@bo-x-ewts .
+
+bdr:W8LS16587  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "sdom gsum rnam nges/ spyod 'jug dang sher snying bcas kyi sa bcad/"@bo-x-ewts .
+
+bdr:W1KG22345  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug zin bris dang tshig 'grel 'jam dbyangs bla ma'i zhal lung bdud rtsi'i thig pa/"@bo-x-ewts .
+
+bdr:P319  skos:prefLabel  "gtsug lag 'phreng ba/"@bo-x-ewts .
+
+bdr:WA3PD982_Pf8bb1bd5b5f1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi rnam par bshad pa dam pa'i zhal lung rmongs pa'i mun sel/"@bo-x-ewts ;
+        tmp:matchScore  "7.361978"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa dam pa'i zhal lung rmongs pa'i mun sel/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug gi rnam par bshad pa dam pa'i zhal lung rmongs pa'i mun sel/"@bo-x-ewts .
+
+bdr:WA635_P0f4432d4c2eb
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i TIk+ka blo gsal ba/"@bo-x-ewts ;
+        tmp:matchScore  "8.931362"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug shes rab le'u'i TIk+ka blo gsal ba/"@bo-x-ewts .
+
+bdr:T2064  skos:prefLabel  "bodhicitta"@sa-x-ndia , "byang chub sems/"@bo-x-ewts .
+
+bdr:W1TLMTGA001669  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "dpal spru'i zhal rgyun zin bris/"@bo-x-ewts .
+
+bdr:WA4CZ301801  bdo:workGenre  bdr:T4CZ71 , bdr:T58 ;
+        bdo:workHasInstance  bdr:W4CZ301801 ;
+        bdo:workIsAbout      bdr:T1078 ;
+        tmp:author           false ;
+        tmp:author           bdr:P6161 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "13.554522"^^xsd:float ;
+        skos:altLabel        "bodhicaryavatara"@sa-x-ndia , "byang chub sems dpa'i spyod pa la 'jug pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug"@bo-x-ewts .
+
+bdr:WA3834_P65687dd60ae1
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ sa bcad/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:altLabel   "byang chub sems dapa'i spyod pa la 'jug pa'i bshad khrid kyi sa bcad/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug sa bcad/"@bo-x-ewts .
+
+bdr:WA22389_P509f7a274c45
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ bzod le'i gtso bo dgag pa/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug bzod le'i gtso bo dgag pa/"@bo-x-ewts .
+
+bdr:W18049  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug shes rab le'u'i dka' 'grel/"@bo-x-ewts .
+
+bdr:W23692  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_rgyal tshab rje (sku 'bum par ma)"@bo-x-ewts .
+
+bdr:P699  skos:prefLabel  "gzhan phan chos kyi snang ba/"@bo-x-ewts .
+
+bdr:WA3CN2232_P397e6be56762
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W23779 ;
+        tmp:labelMatch       "dpal phag mo gru pas mdzad pa'i ↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "9.329107"^^xsd:float ;
+        skos:prefLabel       "dpal phag mo gru pas mdzad pa'i spyod 'jug"@bo-x-ewts .
+
+bdr:WA8LS17113  bdo:workGenre  bdr:T89 ;
+        bdo:workHasInstance  bdr:W8LS17113 ;
+        bdo:workIsAbout      bdr:T1441 , bdr:W19740 , bdr:T58 ;
+        tmp:author           bdr:P252 , bdr:P1243 , bdr:P270 ;
+        tmp:labelMatch       "don rnam par nges pa'i shes rab ral gri /ding ri brgya rtsa dang ↦spyod↤ '↦jug↤ gi sa bcad/"@bo-x-ewts ;
+        tmp:matchScore       "6.454632"^^xsd:float ;
+        skos:altLabel        "don rnam par nges pa shes rab ral gri /zhal gdams ding ri brgya rtsa dang byang chub sems dpa'i spyod pa la 'jug pa'i sa bcad don gsal me long /"@bo-x-ewts ;
+        skos:prefLabel       "don rnam par nges pa'i shes rab ral gri /ding ri brgya rtsa dang spyod 'jug gi sa bcad/"@bo-x-ewts .
+
+bdr:W22208  skos:prefLabel  "mdo sde rgyan/"@bo-x-phon-en , "mahāyānasūtrālaṃkārakārikā"@sa-x-iast , "theg pa chen po mdo sde'i rgyan zhes bya ba'i tshig le'ur byas pa/"@bo-x-ewts .
+
+bdr:WA3CN3408_P1f093687c3ab
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1614 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ bsdus don/"@bo-x-ewts ;
+        tmp:matchScore  "12.001439"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i bsdus don/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug bsdus don/"@bo-x-ewts .
+
+bdr:P151  skos:prefLabel  "blo gros rgyal mtshan/"@bo-x-ewts .
+
+bdr:WA22102_P8f3cd9485ccd
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W1PD86340 , bdr:W20325 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ bsngo ba'i le'u/"@bo-x-ewts , "↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float , "13.702023"^^xsd:float ;
+        skos:altLabel        "spyod 'jug"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug bsngo ba'i le'u/"@bo-x-ewts .
+
+bdr:WA8LS20005  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W8LS20005 ;
+        bdo:workIsAbout      bdr:T1722 , bdr:W19740 ;
+        tmp:author           bdr:P8696 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i gzhung 'grel zab mo rten 'byung gi de kho na nyid gsal ba'i sgron me/"@bo-x-ewts , "↦spyod↤ '↦jug↤ shes rab le'u'i 'grel pa/"@bo-x-ewts ;
+        tmp:matchScore       "10.241266"^^xsd:float , "6.2798448"^^xsd:float ;
+        skos:altLabel        "spyod 'jug shes rab le'u'i gzhung 'grel zab mo rten 'byung gi de kho na nyid gsal ba'i sgron me/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i 'grel pa/"@bo-x-ewts .
+
+bdr:WA4PD975_P10a1b6dd300c
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W00JW501203 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤"@bo-x-ewts ;
+        tmp:matchScore       "13.554522"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug"@bo-x-ewts .
+
+bdr:W00KG03  a              bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi 'grel pa/"@bo-x-ewts .
+
+bdr:WA24630_P11cb4726f436
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa byang chub gzhung lam gsasl byed nyi ma'i snang ba/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i gzhung legs par bshad pa byang chub gzhung lam gsal byed nyi zla'i snang ba/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa byang chub gzhung lam gsasl byed nyi ma'i snang ba/"@bo-x-ewts .
+
+bdr:WA23923_Pf93cc601f2b4
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ las byung ba'i sems bskyed blang ba'i tshigs/"@bo-x-ewts ;
+        tmp:matchScore  "8.931362"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug las byung ba'i sems bskyed blang ba'i tshigs/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001641  bdo:workHasInstance
+                bdr:W1TLMTGA001641 ;
+        tmp:author           bdr:P873 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts ;
+        tmp:matchScore       "8.566146"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi 'bru 'grel dbu ma'i lam gyi sgron me/"@bo-x-ewts .
+
+bdr:P1649  skos:prefLabel  "bstan 'dzin rgya mtsho/"@bo-x-ewts .
+
+bdr:WA3CN3408_P315a793ea96b
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1830 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa legs bshad rgya mtsho/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug 'grel pa legs bshad rgya mtsho/"@bo-x-ewts .
+
+bdr:W1KG4472  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA8LS17155  bdo:workGenre  bdr:T304 ;
+        bdo:workHasInstance  bdr:W8LS17155 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P699 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi mchan 'grel/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa zhes bya ba'i mchan 'grel/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug gi mchan 'grel/"@bo-x-ewts .
+
+bdr:WA3CN3408_P5702fbabf92a
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P5298 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ dka' 'grel 'jam dbyangs bla ma'i zhal lung /"@bo-x-ewts ;
+        tmp:matchScore  "8.931362"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug dka' 'grel 'jam dbyangs bla ma'i zhal lung /"@bo-x-ewts .
+
+bdr:WA4CZ302680  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W4CZ302680 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P1KG10437 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa tshig don kun gsal bar byed pa skal bzang 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore       "7.361978"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i tshig don kun gsal bar byed pa skal bzang 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug 'grel pa tshig don kun gsal bar byed pa skal bzang 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA1KG2118_Pabdfcbc94ca8
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug las byung ba'i byang chub spyod pa'i smon lam/"@bo-x-ewts .
+
+bdr:W1KG2144  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "gsung 'bum/_blo gros rgyal mtshan/"@bo-x-ewts .
+
+bdr:WA4CZ74200  bdo:workGenre  bdr:T132 ;
+        bdo:workHasInstance  bdr:W4CZ74200 ;
+        bdo:workIsAbout      bdr:W19740 ;
+        tmp:author           bdr:P65 , bdr:P297 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ 'grel pa khag gnyis/"@bo-x-ewts ;
+        tmp:matchScore       "10.767674"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts , "byang chub sems pa'i spyod pa la 'jug pa'i TIk+ka rin po che'i phreng ba/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug 'grel pa khag gnyis/"@bo-x-ewts .
+
+bdr:WA3CN3408_P0dae8ade4888
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ 'grel pa thar pa'i 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore  "9.763929"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug 'grel pa thar pa'i 'jug ngogs/"@bo-x-ewts .
+
+bdr:WA5832_P59f1cf45bb9b
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W21857 , bdr:W24829 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ sgom rim rab gsal nyi ma/"@bo-x-ewts ;
+        tmp:matchScore       "9.763929"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i sgom rim rab gsal nyi ma/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug sgom rim rab gsal nyi ma/"@bo-x-ewts .
+
+bdr:W3CN4807  a             bdo:Instance ;
+        tmp:author          bdr:P4069 ;
+        tmp:instanceIsOpen  false ;
+        tmp:labelMatch      "↦spyod↤ '↦jug↤ gi 'grel bshad rgyal sras yon tan bum bzang /"@bo-x-ewts ;
+        tmp:matchScore      "8.566146"^^xsd:float ;
+        skos:prefLabel      "spyod 'jug gi 'grel bshad rgyal sras yon tan bum bzang /"@bo-x-ewts .
+
+bdr:W3JT13389  skos:prefLabel  "sdom gsum rnam nges/"@bo-x-ewts .
+
+bdr:W1KG12025  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug shes rab le'u'i spyi don dang gzhung 'grel/"@bo-x-ewts .
+
+bdr:P8205  skos:prefLabel  "ye shes sde/"@bo-x-ewts .
+
+bdr:P2271  skos:prefLabel  "bdud rtsi grags/"@bo-x-ewts .
+
+bdr:W1NLM519  a             bdo:Instance ;
+        tmp:author          bdr:P65 ;
+        tmp:instanceIsOpen  false ;
+        tmp:labelMatch      "↦spyod↤ '↦jug↤ rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts ;
+        tmp:matchScore      "9.763929"^^xsd:float ;
+        skos:prefLabel      "spyod 'jug rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts .
+
+bdr:T179  skos:prefLabel  "general preliminaries"@en , "共同前行"@zh-hans , "thun mong sngon 'gro/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pee028ebd21d0
+        bdo:langage     bdr:LangBo ;
+        tmp:author      bdr:P1226 ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi 'grel pa dgongs pa nges gsal/"@bo-x-ewts ;
+        tmp:matchScore  "9.329107"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i rnam par bshad pa dgongs pa nges par gsal ba/"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug gi 'grel pa dgongs pa nges gsal/"@bo-x-ewts .
+
+bdr:W4CZ16796  skos:prefLabel  "ārya-bhadracaryāpraṇidhānarāja"@sa-x-iast , "'phags pa bzang po spyod pa'i smon lam gyi rgyal po/"@bo-x-ewts , "bzang spyod/"@bo-x-ewts .
+
+bdr:WA1904  bdo:serialHasInstance  bdr:W1904 ;
+        bdo:workGenre          bdr:T132 ;
+        bdo:workHasInstance    bdr:W3CN3408 , bdr:W1904 ;
+        bdo:workIsAbout        bdr:W19740 ;
+        tmp:author             bdr:P155 ;
+        tmp:labelMatch         "↦spyod↤ '↦jug↤ gi 'grel pa zla ba'i 'od zer/"@bo-x-ewts ;
+        tmp:matchScore         "9.329107"^^xsd:float ;
+        skos:altLabel          "byang chub sems dpa'i spyod pa la 'jug pa'i 'grel pa byang chub kyi sems gsal bar byed pa zla ba'i 'od zer/"@bo-x-ewts ;
+        skos:prefLabel         "spyod 'jug gi 'grel pa zla ba'i 'od zer/"@bo-x-ewts .
+
+bdr:W1TLMTGA001519  a       bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug dang dbu ma 'jug pa rigs tshogs lnga bzhi brgya pa bcas kyi rtsa ba/"@bo-x-ewts .
+
+bdr:WA23685_P9d8031f892d4
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ las byung ba'i byang chub smon pa'i le'u/"@bo-x-ewts ;
+        tmp:matchScore  "8.931362"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug las byung ba'i byang chub smon pa'i le'u/"@bo-x-ewts .
+
+bdr:W4CZ16766  skos:prefLabel  "byang chub lam gyi sgron ma/"@bo-x-ewts , "bodhipathapradīpa"@sa-x-iast , "lam sgron/"@bo-x-ewts .
+
+bdr:WA2PD17471_Pead049b52f28
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W21825 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i tshig 'grel chos kyi dbang po'i bsdus don gsal byed/"@bo-x-ewts ;
+        tmp:matchScore       "7.361978"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i tshig 'grel chos kyi dbang po'i bsdus don gsal byed/"@bo-x-ewts .
+
+bdr:W1KG1011  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "tshe mchog gling gi chos spyod rab gsal/"@bo-x-ewts .
+
+bdr:WA1KG8320_Pb33a9c69e345
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W11577 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ gi brgyud 'debs/"@bo-x-ewts ;
+        tmp:matchScore       "11.3511305"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug gi brgyud 'debs/"@bo-x-ewts .
+
+bdr:T74  skos:prefLabel  "時輪"@zh-hant , "dus 'khor/"@bo-x-ewts , "kālacakra"@sa-x-ndia .
+
+bdr:P1KG10437  skos:prefLabel  "blo bzang dpal ldan/"@bo-x-ewts .
+
+bdr:P6161  skos:prefLabel  "zhi ba lha/"@bo-x-ewts .
+
+bdr:W8LS17113  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "don rnam par nges pa'i shes rab ral gri /ding ri brgya rtsa dang spyod 'jug gi sa bcad/"@bo-x-ewts .
+
+bdr:WA3CN3408_Pb1a0c8dfe7b8
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "grags chen bco brgyad las ↦spyod↤ '↦jug↤ gi 'grel skor pod bcu gcig pa/"@bo-x-ewts ;
+        tmp:matchScore  "7.6301246"^^xsd:float ;
+        skos:prefLabel  "grags chen bco brgyad las spyod 'jug gi 'grel skor pod bcu gcig pa/"@bo-x-ewts .
+
+bdr:WA29193_P65857776691b
+        bdo:langage          bdr:LangBo ;
+        bdo:workHasInstance  bdr:W20510 , bdr:W22109 , bdr:W22274 , bdr:W22273 , bdr:W22272 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ shes rab le'u'i TIk+ka blo gsal ba zhes pa/"@bo-x-ewts ;
+        tmp:matchScore       "8.229624"^^xsd:float ;
+        skos:prefLabel       "spyod 'jug shes rab le'u'i TIk+ka blo gsal ba zhes pa/"@bo-x-ewts .
+
+bdr:W8LS20005  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug shes rab le'u'i 'grel pa/"@bo-x-ewts .
+
+bdr:P1614  skos:prefLabel  "grags pa rgyal mtshan/"@bo-x-ewts .
+
+bdr:P7313  skos:prefLabel  "shes rab 'byung gnas blo gros/"@bo-x-ewts .
+
+bdr:W3CN3408  a             bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "'phags yul rgyan drug mchog gnyis kyi zhal lung /"@bo-x-ewts .
+
+bdr:W1KG988  a              bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "stag brag bsam gtan gling gi phyag bzhes mdo sngags chos spyod/"@bo-x-ewts .
+
+bdr:W8LS17155  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug gi mchan 'grel/"@bo-x-ewts .
+
+bdr:P5298  skos:prefLabel  "rin chen dpal/"@bo-x-ewts .
+
+bdr:WA3916_Pe3b6cbcf3107
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ shes rab le'u'i mchan 'grel don gsal me long /"@bo-x-ewts ;
+        tmp:matchScore  "8.566146"^^xsd:float ;
+        skos:altLabel   "byang chub sems dpa'i spyod pa la 'jug pa'i shes rab le'u'i mchan 'grel don gsal me long /"@bo-x-ewts ;
+        skos:prefLabel  "spyod 'jug shes rab le'u'i mchan 'grel don gsal me long /"@bo-x-ewts .
+
+bdr:P00KG07267  skos:prefLabel  "sarba dz+nyA de ba/"@bo-x-ewts .
+
+bdr:WA1TLMTGA001689  bdo:workHasInstance
+                bdr:W1TLMTGA001689 ;
+        tmp:author           bdr:P65 ;
+        tmp:labelMatch       "↦spyod↤ '↦jug↤ rtsa 'grel chen mo/"@bo-x-ewts ;
+        tmp:matchScore       "10.767674"^^xsd:float ;
+        skos:altLabel        "byang chub sems dpa'i spyod pa la 'jug pa'i rnam bshad rgyal sras 'jug ngogs/"@bo-x-ewts ;
+        skos:prefLabel       "spyod 'jug rtsa 'grel chen mo/"@bo-x-ewts .
+
+bdr:P64  skos:prefLabel  "blo bzang grags pa/"@bo-x-ewts .
+
+bdr:T132  skos:prefLabel  "commentary"@en , "說疏"@zh-hant , "ṭīkā"@sa-x-ndia , "'grel pa/"@bo-x-ewts .
+
+bdr:W4CZ74200  a            bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa khag gnyis/"@bo-x-ewts .
+
+bdr:W20913  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug 'grel pa rin po che'i phreng ba/"@bo-x-ewts .
+
+bdr:W21914  a               bdo:Instance ;
+        tmp:instanceIsOpen  false ;
+        skos:prefLabel      "spyod 'jug rtsa 'grel/"@bo-x-ewts .
+
+bdr:P2627  skos:prefLabel  "phyogs las rnam rgyal/"@bo-x-ewts .
+
+bdr:T102  skos:prefLabel  "polemic"@en , "brgal lan/"@bo-x-ewts .
+
+bdr:T1777  skos:prefLabel  "śāstra"@sa-x-ndia , "bstan bcos/"@bo-x-ewts , "論"@zh-hant , "treatise"@en .
+
+bdr:WA1KG10375_P385eecaa8e58
+        bdo:langage     bdr:LangBo ;
+        tmp:labelMatch  "↦spyod↤ '↦jug↤ gi mchan 'grel/"@bo-x-ewts ;
+        tmp:matchScore  "11.3511305"^^xsd:float ;
+        skos:prefLabel  "spyod 'jug gi mchan 'grel/"@bo-x-ewts .
+
+bdr:WA1KG22298  bdo:workGenre  bdr:T2579 , bdr:T977 ;
+        bdo:workHasInstance  bdr:W1KG22298 ;
+        bdo:workIsAbout      bdr:T1386 ;
+        tmp:labelMatch       "zab lam bla ma sgrub cing mchod pa'i cho ga bde chen mkha' ↦spyod↤ '↦jug↤ pa'i sgo sogs/"@bo-x-ewts ;
+        tmp:matchScore       "6.682016"^^xsd:float ;
+        skos:altLabel        "zab lam bla ma sgrub cing mchod pa'i cho ga bde chen mkha' spyod 'jug pa'i sgo sogs/"@bo-x-ewts ;
+        skos:prefLabel       "karma bka' brgyud kyi 'don 'grigs/"@bo-x-ewts .

@@ -23,6 +23,10 @@ public class TaxModel {
         model = QueryProcessor.getGraph(query);
     }
 
+    public static void initWithModel(final Model m) {
+        model = m;
+    }
+    
     public static Model getModel() {
         return model;
     }
