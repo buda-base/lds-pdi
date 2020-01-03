@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ldspdi.service.ServiceConfig;
+
 public class Watcher implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(Watcher.class);
@@ -49,8 +51,8 @@ public class Watcher implements Runnable {
 
     @Override
     public void run() {
-        // if (time > Long.parseLong(ServiceConfig.getProperty("watcherTimeLimit"))) {
-        if (time > 600) {
+        if (time > Long.parseLong(ServiceConfig.getProperty("watcherTimeLimit"))) {
+            // if (time > 600) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String s = mapper.writeValueAsString(this);
