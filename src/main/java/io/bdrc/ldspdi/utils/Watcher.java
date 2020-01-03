@@ -51,8 +51,9 @@ public class Watcher implements Runnable {
 
     @Override
     public void run() {
+
         if (time > Long.parseLong(ServiceConfig.getProperty("watcherTimeLimit"))) {
-            // if (time > 600) {
+            log.info("WATCHER DETECTED A SLOW RUNNING TEMPLATE {} in {} ms", template, time);
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String s = mapper.writeValueAsString(this);
@@ -73,7 +74,7 @@ public class Watcher implements Runnable {
     }
 
     public static void main(String[] args) {
-        Watcher w = new Watcher(800, "Tes", "template");
+        Watcher w = new Watcher(800, "Test", "template");
         w.run();
     }
 
