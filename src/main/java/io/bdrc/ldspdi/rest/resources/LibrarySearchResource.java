@@ -61,7 +61,7 @@ public class LibrarySearchResource {
             t.run();
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-        final String query = qfp.getParametizedQuery(map);
+        final String query = qfp.getParametizedQuery(map, true);
         long deb = System.currentTimeMillis();
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
         long end = System.currentTimeMillis();
@@ -128,7 +128,7 @@ public class LibrarySearchResource {
             t.run();
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-        final String query = qfp.getParametizedQuery(map);
+        final String query = qfp.getParametizedQuery(map, true);
         log.debug("Call to getLibGraphGet() with query >> " + query);
         long deb = System.currentTimeMillis();
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);

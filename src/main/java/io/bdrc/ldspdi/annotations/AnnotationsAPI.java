@@ -75,7 +75,7 @@ public class AnnotationsAPI {
         args.put("R_RES", res);
         args.put("I_SUBRANGEFIRST", rg[0].toString());
         args.put("I_SUBRANGELAST", rg[1].toString());
-        final String query = qfp.getParametizedQuery(args);
+        final String query = qfp.getParametizedQuery(args, true);
         Model model = QueryProcessor.getGraph(query, ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL), null);
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);

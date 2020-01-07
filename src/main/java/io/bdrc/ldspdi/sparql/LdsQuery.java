@@ -250,7 +250,7 @@ public class LdsQuery {
         return query;
     }
 
-    public String getParametizedQuery(Map<String, String> converted) throws RestException {
+    public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
 
         if (!checkQueryArgsSyntax().trim().equals("")) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
@@ -303,11 +303,19 @@ public class LdsQuery {
                     } catch (IllformedLocaleException ex) {
                         return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
                     }
-                    queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
+                    if (limit) {
+                        queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
+                    } else {
+                        queryStr.setLiteral(st, converted.get(st), lang);
+                    }
 
                 } else {
                     // Some literals do not have a lang associated with them
-                    queryStr.setLiteral(st, converted.get(st) + " " + lim);
+                    if (limit) {
+                        queryStr.setLiteral(st, converted.get(st));
+                    } else {
+                        queryStr.setLiteral(st, converted.get(st));
+                    }
                 }
             }
         }

@@ -133,7 +133,88 @@ public class BdrcAuthResource {
                 }
             }
 
-            final String query = qfp.getParametizedQuery(hm);
+            final String query = qfp.getParametizedQuery(hm, false);
+            if (query.startsWith(QueryConstants.QUERY_ERROR)) {
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
+            }
+            log.info("Parametized Query >> : {}", query);
+            log.info("PARAMS MAP >> : {}", hm);
+            if (query.startsWith(QueryConstants.QUERY_ERROR)) {
+                throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
+            }
+            String fmt = hm.get(QueryConstants.FORMAT);
+            if ("xml".equals(fmt)) {
+                ResultSet rs = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
+                response.setContentType("text/html");
+                return ResultSetFormatter.asXMLString(rs);
+            }
+            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query", hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
+            if ("json".equals(fmt)) {
+                Results r = new Results(res, hm);
+                byte[] buff = GlobalHelpers.getJsonBytes(r);
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"budaUsers.json\"")
+                        .body(new InputStreamResource(new ByteArrayInputStream(buff)));
+            }
+            if ("csv".equals(fmt)) {
+                byte[] buff = res.getCsvAsBytes(hm, true);
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                        .body(new InputStreamResource(new ByteArrayInputStream(buff)));
+
+            }
+            if ("csv_f".equals(fmt)) {
+                byte[] buff = res.getCsvAsBytes(hm, false);
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                        .body(new InputStreamResource(new ByteArrayInputStream(buff)));
+            }
+            hm.put(QueryConstants.REQ_METHOD, "GET");
+            hm.put("query", qfp.getQueryHtml());
+            ResultPage mod = new ResultPage(res, hm.get(QueryConstants.PAGE_NUMBER), hm, qfp.getTemplate());
+            model.addObject("model", mod);
+            model.setViewName("resPage");
+
+        } catch (Exception e) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(baos));
+            RestException re = new RestException(500, LdsError.UNKNOWN_ERR, e.getClass().getName(), baos.toString(), "");
+            try {
+                baos.close();
+            } catch (IOException e1) {
+                throw new RestException(500, LdsError.UNKNOWN_ERR, e.getClass().getName(), "Failed to close exception trace byte output stream", "");
+            }
+            throw re;
+        }
+        return (ModelAndView) model;
+    }
+
+    @GetMapping(value = "/resource-nc/userSearch")
+    public Object getUsers(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        ModelAndView model = new ModelAndView();
+        try {
+            log.info("Call to getAllUsers()");
+            HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
+            String pageSize = hm.get(QueryConstants.PAGE_SIZE);
+            String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
+            if (pageNumber == null) {
+                pageNumber = "1";
+            }
+            hm.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
+            hm.put(QueryConstants.REQ_METHOD, "GET");
+            Set<Entry<String, String>> set = hm.entrySet();
+            for (Entry<String, String> e : set) {
+                log.info("Key {} and value {}", e.getKey(), e.getValue());
+            }
+            final LdsQuery qfp = LdsQueryService.get("budaUserSearch.arq", "private");
+            if (pageSize != null) {
+                try {
+                    if (Long.parseLong(pageSize) > qfp.getLimit_max()) {
+                        return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
+                    }
+                } catch (Exception e) {
+                    throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
+                }
+            }
+
+            final String query = qfp.getParametizedQuery(hm, false);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }

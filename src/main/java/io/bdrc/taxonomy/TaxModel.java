@@ -19,7 +19,7 @@ public class TaxModel {
         final LdsQuery qfp = LdsQueryService.get(ServiceConfig.getProperty("taxtreeArqFile"), "library");
         final Map<String, String> map = new HashMap<>();
         map.put("R_RES", ServiceConfig.getProperty("taxonomyRoot"));
-        final String query = qfp.getParametizedQuery(map);
+        final String query = qfp.getParametizedQuery(map, true);
         model = QueryProcessor.getGraph(query);
     }
 
