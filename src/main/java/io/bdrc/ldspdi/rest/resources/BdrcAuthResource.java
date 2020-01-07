@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -107,7 +106,7 @@ public class BdrcAuthResource {
     }
 
     @GetMapping(value = "/resource-nc/users")
-    public Object getAllUsers(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl) throws IOException, RestException {
+    public Object getAllUsers(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
         ModelAndView model = new ModelAndView();
         try {
             log.info("Call to getAllUsers()");
@@ -145,11 +144,11 @@ public class BdrcAuthResource {
             }
             String fmt = hm.get(QueryConstants.FORMAT);
             if ("xml".equals(fmt)) {
-                ResultSet rs = QueryProcessor.getResults(query, fusekiUrl);
+                ResultSet rs = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
                 response.setContentType("text/html");
                 return ResultSetFormatter.asXMLString(rs);
             }
-            ResultSetWrapper res = QueryProcessor.getResults(query, fusekiUrl, hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
+            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query", hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
                 byte[] buff = GlobalHelpers.getJsonBytes(r);

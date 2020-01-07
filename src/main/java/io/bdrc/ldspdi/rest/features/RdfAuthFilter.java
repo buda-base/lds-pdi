@@ -30,7 +30,8 @@ public class RdfAuthFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (ServiceConfig.useAuth()) {
+        String method = ((HttpServletRequest) request).getMethod();
+        if (ServiceConfig.useAuth() && !method.equalsIgnoreCase("OPTIONS")) {
             HttpServletRequest req = (HttpServletRequest) request;
             boolean isSecuredEndpoint = true;
             request.setAttribute("access", new Access());
