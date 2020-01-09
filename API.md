@@ -1,3 +1,22 @@
+- [LDS-PDI API](#lds-pdi-api)
+  * [Summary Table of endpoints](#summary-table-of-endpoints)
+    + [Public Data endpoints](#public-data-endpoints)
+    + [Ontology endpoints](#ontology-endpoints)
+    + [Administrative Endpoints](#administrative-endpoints)
+    + [SPARQL Query templates](#sparql-query-templates)
+  * [Details](#details)
+  * [Resource endpoints](#resource-endpoints)
+      - [`/resource/{res}`](#--resource--res--)
+      - [`/resource/{res}.{ext}`](#--resource--res--ext--)
+      - [Admindata and grand endpoint](#admindata-and-grand-endpoint)
+    + [Supported RDF mime types and extensions](#supported-rdf-mime-types-and-extensions)
+  * [Query templates](#query-templates)
+    + [List of available query templates](#list-of-available-query-templates)
+  * [Query templates description](#query-templates-description)
+    + [Table query results](#table-query-results)
+      - [Controling the output](#controling-the-output)
+      - [Using JSON POST with curl](#using-json-post-with-curl)
+    + [Graph query results](#graph-query-results)
 # LDS-PDI API
 
 ## Summary Table of endpoints
