@@ -31,6 +31,6 @@ public class TaxResultTest {
         final Model resModel = Utils.getModelFromFileName(Utils.TESTDIR + "taxtest-resmodel" + ".ttl", Lang.TURTLE);
         Map<String, Object> res = WorkResults.getResultsMap(resModel);
         ObjectMapper om = new ObjectMapper();
-        om.writerWithDefaultPrettyPrinter().writeValue(System.out, ((Map<String, Object>) res.get("facets")).get("topics"));
+        om.writerWithDefaultPrettyPrinter().writeValue(System.out, (((Map<String, Object>) res.get("facets")).get("topics")));
     }
 }
