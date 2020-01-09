@@ -33,6 +33,7 @@ import io.bdrc.ldspdi.results.library.ResourceResults;
 import io.bdrc.ldspdi.results.library.RootResults;
 import io.bdrc.ldspdi.results.library.TopicAllResults;
 import io.bdrc.ldspdi.results.library.WorkAllResults;
+import io.bdrc.ldspdi.results.library.WorkInstanceResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.AsyncSparql;
@@ -155,6 +156,9 @@ public class LibrarySearchResource {
             break;
         case "workFacetGraph":
             res = WorkResults.getResultsMap(model);
+            break;
+        case "workInstancesGraph":
+            res = WorkInstanceResults.getResultsMap(model);
             break;
         case "allAssocResource":
             res = ResourceResults.getResultsMap(model);
