@@ -40,9 +40,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.HttpHeaders;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.sparql.util.Context;
@@ -56,6 +59,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.jena.sttl.CompareComplex;
 import io.bdrc.jena.sttl.ComparePredicates;
 import io.bdrc.jena.sttl.STTLWriter;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.libraries.BudaMediaTypes;
 
 public class Helpers {
@@ -63,6 +67,7 @@ public class Helpers {
     public final static Logger log = LoggerFactory.getLogger(Helpers.class);
 
     public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
+    public static String MAX_AGE_VALUE = ServiceConfig.getProperty("Max-Age");
 
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
@@ -82,6 +87,10 @@ public class Helpers {
             log.debug("FileNotFound: " + baseName);
             return null;
         }
+    }
+
+    public static void setCacheControl(HttpServletResponse resp, String pubpriv) {
+        resp.setHeader(HttpHeaders.CACHE_CONTROL, pubpriv + "," + MAX_AGE_VALUE);
     }
 
     public static void createDirIfNotExists(String dir) {

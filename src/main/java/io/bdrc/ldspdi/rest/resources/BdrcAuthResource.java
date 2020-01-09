@@ -77,6 +77,7 @@ public class BdrcAuthResource {
     @GetMapping(value = "/resource-nc/user/{res}")
     public ResponseEntity<StreamingResponseBody> userResource(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
         log.info("Call userResource()");
+        Helpers.setCacheControl(response, "public");
         try {
             String token = getToken(request.getHeader("Authorization"));
             if (token == null) {
@@ -107,6 +108,7 @@ public class BdrcAuthResource {
 
     @GetMapping(value = "/resource-nc/users")
     public Object getAllUsers(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        Helpers.setCacheControl(response, "private");
         ModelAndView model = new ModelAndView();
         try {
             log.info("Call to getAllUsers()");
@@ -188,6 +190,7 @@ public class BdrcAuthResource {
 
     @GetMapping(value = "/resource-nc/userSearch")
     public Object getUsers(HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+        Helpers.setCacheControl(response, "private");
         ModelAndView model = new ModelAndView();
         try {
             log.info("Call to getAllUsers()");

@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +49,7 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +72,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
@@ -98,23 +99,24 @@ public class PublicDataResource {
     @GetMapping("/")
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getHomePage()");
+        Helpers.setCacheControl(response, "public");
         response.sendRedirect("/index");
     }
 
     @GetMapping(value = "index", produces = MediaType.TEXT_HTML_VALUE)
-    @SpringCacheControl()
-    public ModelAndView getIndexPage() throws RestException, IOException {
+    public ModelAndView getIndexPage(HttpServletRequest request, HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getIndexPage()");
-        // DocFileModel dfm = new DocFileModel();
         ModelAndView model = new ModelAndView();
         model.addObject("model", DocFileModel.getInstance());
         model.setViewName("index");
+        Helpers.setCacheControl(response, "public");
         return model;
     }
 
     @GetMapping(value = "robots.txt", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<Object> getRobots() {
+    public ResponseEntity<Object> getRobots(HttpServletResponse response) {
         log.info("Call getRobots()");
+        Helpers.setCacheControl(response, "public");
         return ResponseEntity.ok().body(ServiceConfig.getRobots());
     }
 
@@ -131,13 +133,13 @@ public class PublicDataResource {
     public ResponseEntity<Object> getJsonContext() throws RestException {
         log.info("Call to getJsonContext()");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        return ResponseEntity.ok().header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(86400, TimeUnit.SECONDS).cachePublic()).header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
     }
 
     @GetMapping(value = "/admindata/{res:.+}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getAdResourceGraph(@PathVariable String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader("Accept") String format, HttpServletResponse resp,
             HttpServletRequest request) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
             return getAdResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
@@ -234,9 +236,9 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/graph/{res:.+}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getGrResourceGraph(@PathVariable String res, @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestHeader("Accept") String format, HttpServletResponse resp,
             HttpServletRequest request) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
             return getGrResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
@@ -278,8 +280,8 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/prefixes")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getPrefixes() throws RestException {
+    public ResponseEntity<StreamingResponseBody> getPrefixes(HttpServletResponse resp) throws RestException {
+        Helpers.setCacheControl(resp, "public");
         Model model = ModelFactory.createDefaultModel();
         model.setNsPrefixes(Prefixes.getMap());
         StreamingResponseBody stream = new StreamingResponseBody() {
@@ -292,10 +294,10 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/resource/{res:.+}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable final String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader(value = "Accept", required = false) String format,
             HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") String startChar, @RequestParam(value = "endChar", defaultValue = "999999999") String endChar)
             throws RestException, IOException {
+        Helpers.setCacheControl(response, "public");
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
@@ -385,8 +387,8 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/{base:[a-z]+}/**")
-    @SpringCacheControl()
-    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base) throws RestException, IOException {
+    public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
@@ -526,9 +528,9 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/ontology/data/{ext}", produces = MediaType.TEXT_HTML_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletResponse resp, HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
         log.info("Call to getAllOntologyData(); with ext {}", ext);
+        Helpers.setCacheControl(resp, "public");
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());

@@ -3,6 +3,7 @@ package io.bdrc.ldspdi.rest.resources;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -22,7 +23,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.library.ChunksResults;
 import io.bdrc.ldspdi.results.library.EtextResults;
 import io.bdrc.ldspdi.results.library.PersonAllResults;
@@ -50,9 +50,10 @@ public class LibrarySearchResource {
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     @PostMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getLibGraphPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") final String file, @RequestBody HashMap<String, String> map) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getLibGraphPost(HttpServletResponse response, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") final String file,
+            @RequestBody HashMap<String, String> map) throws RestException {
         log.info("Call to getLibGraphPost() with template name >> " + file);
+        Helpers.setCacheControl(response, "public");
         Thread t = null;
         AsyncSparql async = null;
         if (file.equals("rootSearchGraph")) {
@@ -115,10 +116,10 @@ public class LibrarySearchResource {
     }
 
     @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file) throws RestException {
-
+    public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file)
+            throws RestException {
         log.info("Call to getLibGraphGet() with template name >> " + file);
+        Helpers.setCacheControl(response, "public");
         HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
         Thread t = null;
         AsyncSparql async = null;

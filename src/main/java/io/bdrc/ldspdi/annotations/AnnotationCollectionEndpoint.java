@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
@@ -71,11 +70,11 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}")
-    @SpringCacheControl()
     // whole collections (no subset)
     public ResponseEntity<StreamingResponseBody> getWholeCollection(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept,
             @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
         log.info("Call to getWholeCollection() with URL: {}, accept: {}", request.getServletPath(), accept);
+        Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
@@ -94,9 +93,9 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}.{ext}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getWholeCollectionSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
-            HttpServletRequest request) throws RestException {
+            HttpServletRequest request, HttpServletResponse response) throws RestException {
+        Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionSuffix() with URL: {}", request.getServletPath());
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
@@ -108,13 +107,13 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/p{ptype}/{pnum}")
-    @SpringCacheControl()
     // Pages of whole collections
     // this is almost identical as the getWholeCollection because collections
     // currently
     // have only one page. The only difference is the json serialization.
     public ResponseEntity<StreamingResponseBody> getWholeCollectionPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("ptype") final char ptype,
-            @PathVariable("pnum") final int pnum, HttpServletRequest request) throws RestException {
+            @PathVariable("pnum") final int pnum, HttpServletRequest request, HttpServletResponse response) throws RestException {
+        Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
@@ -135,9 +134,9 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/p{ptype}/{pnum}.{ext}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getWholeCollectionPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final int pnum,
-            HttpServletRequest request) throws RestException {
+            HttpServletRequest request, HttpServletResponse response) throws RestException {
+        Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionPageSuffix() with URL: {}", request.getServletPath());
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
@@ -152,12 +151,12 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}")
-    @SpringCacheControl()
     // Collection subset
     // a subcollection corresponding to a page or character range
     public ResponseEntity<StreamingResponseBody> getCollectionSubset(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request) throws RestException {
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
+        Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType;
@@ -175,10 +174,10 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}.{ext}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getCollectionSubsetSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader("Prefer") final String preferHeader, HttpServletRequest request) throws RestException {
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader("Prefer") final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
         log.info("Call to getCollectionSubsetSuffix() with URL: {}", request.getServletPath());
+        Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
@@ -190,10 +189,10 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
-    @SpringCacheControl()
     // Collection subset page
     public ResponseEntity<StreamingResponseBody> getCollectionSubsetPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
+            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request, HttpServletResponse response) throws RestException {
+        Helpers.setCacheControl(response, "public");
         if (pnum.contains(".")) {
             String[] parts = pnum.split("\\.");
             return getCollectionSubsetPageSuffix(res, parts[1], subtype, subcoordinates, ptype, parts[0], request);
@@ -219,11 +218,8 @@ public class AnnotationCollectionEndpoint {
         return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    // @GetMapping("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}.{ext}")
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getCollectionSubsetPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
             @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
-
         log.info("Call to getCollectionSubsetPage() with URL: {}", request.getServletPath());
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);

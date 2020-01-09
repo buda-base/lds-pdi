@@ -54,7 +54,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.ResultPage;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
@@ -78,9 +77,9 @@ public class PublicTemplatesResource {
     public final static Logger log = LoggerFactory.getLogger(PublicTemplatesResource.class);
 
     @GetMapping(value = "/query/table/{file}")
-    @SpringCacheControl()
     public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
+        Helpers.setCacheControl(response, "public");
         ModelAndView model = new ModelAndView();
         try {
             HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
@@ -156,9 +155,9 @@ public class PublicTemplatesResource {
     }
 
     @PostMapping(value = "/query/table/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file, @RequestBody HashMap<String, String> map,
-            HttpServletRequest request) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(HttpServletRequest request, HttpServletResponse response, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
+            @RequestBody HashMap<String, String> map) throws RestException {
+        Helpers.setCacheControl(response, "public");
         try {
             log.info("Call to getQueryTemplateResultsJsonPost() with params : {}", map);
             if (map == null || map.size() == 0) {
@@ -198,9 +197,9 @@ public class PublicTemplatesResource {
     }
 
     @GetMapping(value = "/query/graph/{file}")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
+    public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
             @RequestParam(value = "format", defaultValue = "jsonld") final String format, @PathVariable("file") String file) throws RestException {
+        Helpers.setCacheControl(response, "public");
         MediaType mediaType = null;
         Model model = null;
         String ext = null;
@@ -250,9 +249,9 @@ public class PublicTemplatesResource {
     }
 
     @PostMapping(value = "/query/graph/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
     public ResponseEntity<StreamingResponseBody> getGraphTemplateResultsPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @RequestHeader(value = "Accept", defaultValue = "application/ld+json") String accept,
-            @PathVariable("file") String file, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
+            @PathVariable("file") String file, HttpServletResponse response, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
+        Helpers.setCacheControl(response, "public");
         if (accept.equals("*/*")) {
             accept = "application/ld+json";
         }
