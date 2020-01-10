@@ -27,7 +27,7 @@ public class TypeResults {
         Map<String, ArrayList<Field>> main = new HashMap<>();
         Map<String, ArrayList<Field>> aux = new HashMap<>();
         Map<Resource, Boolean> isInstance = new HashMap<>();
-        final StmtIterator mainIt = mod.listLiteralStatements(null, mod.getProperty("http://purl.bdrc.io/ontology/tmp/isRoot"), true);
+        final StmtIterator mainIt = mod.listLiteralStatements(null, mod.getProperty("http://purl.bdrc.io/ontology/tmp/isMain"), true);
         while (mainIt.hasNext()) {
             final Resource mainRes = mainIt.removeNext().getSubject();
             isInstance.put(mainRes, true);
