@@ -45,6 +45,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.slf4j.Logger;
@@ -494,6 +496,7 @@ public class PublicDataResource {
     }
 
     public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
+        Reasoner reasoner = getReasoner(request);
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
         log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
@@ -504,7 +507,11 @@ public class PublicDataResource {
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            OntModel model = OntData.getOntModelByBase(params.getBaseUri());
+            Model model = OntData.getOntModelByBase(params.getBaseUri());
+            // Inference here if required
+            if (reasoner != null) {
+                model = ModelFactory.createInfModel(reasoner, model);
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (JenaLangStr == "STTL") {
                 final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
@@ -637,6 +644,24 @@ public class PublicDataResource {
             return "place";
         }
         return type;
+    }
+
+    private Reasoner getReasoner(HttpServletRequest request) {
+        String reasonerUri = "";
+        String infProfile = request.getHeader("Accept-Profile");
+        if (infProfile != null) {
+            reasonerUri = infProfile;
+        } else {
+            infProfile = request.getParameter("profile");
+            if (infProfile != null) {
+                reasonerUri = infProfile;
+            }
+        }
+        Reasoner reasoner = null;
+        if (!"".contentEquals(reasonerUri)) {
+            reasoner = ReasonerRegistry.theRegistry().create(reasonerUri, null);
+        }
+        return reasoner;
     }
 
 }

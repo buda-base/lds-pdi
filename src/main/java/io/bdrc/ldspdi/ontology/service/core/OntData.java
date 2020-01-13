@@ -38,6 +38,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 import org.apache.jena.vocabulary.RDF;
@@ -497,13 +498,16 @@ public class OntData implements Runnable {
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
-        OntData.init();
+        // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        // OntData.init();
         // OntModel m =
         // OntData.getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth");
         // OntData.setOntModel(m);
         // m.write(System.out, "TURTLE");
         // System.out.println(m.size());
+        Model m = ReasonerRegistry.theRegistry().getAllDescriptions();
+        m.write(System.out, "TURTLE");
+
     }
 
 }
