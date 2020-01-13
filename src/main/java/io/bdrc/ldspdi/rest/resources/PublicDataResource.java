@@ -541,7 +541,7 @@ public class PublicDataResource {
                 }
             }
             if (reasoner != null) {
-                return ResponseEntity.ok().header("profile", reasonerUri).header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=" + reasonerUri).body(baos.toString());
+                return ResponseEntity.ok().header("Profile", reasonerUri).header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
             }
             return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
