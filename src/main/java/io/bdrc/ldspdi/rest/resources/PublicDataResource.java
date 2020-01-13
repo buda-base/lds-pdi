@@ -496,7 +496,20 @@ public class PublicDataResource {
     }
 
     public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
-        Reasoner reasoner = getReasoner(request);
+        String reasonerUri = "";
+        String infProfile = request.getHeader("Accept-Profile");
+        if (infProfile != null) {
+            reasonerUri = infProfile;
+        } else {
+            infProfile = request.getParameter("profile");
+            if (infProfile != null) {
+                reasonerUri = infProfile;
+            }
+        }
+        Reasoner reasoner = null;
+        if (!"".contentEquals(reasonerUri)) {
+            reasoner = ReasonerRegistry.theRegistry().create(reasonerUri, null);
+        }
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
         log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
@@ -526,6 +539,9 @@ public class PublicDataResource {
                     }
                     wr.write(model, baos, params.getBaseUri());
                 }
+            }
+            if (reasoner != null) {
+                return ResponseEntity.ok().header("profile", reasonerUri).header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=" + reasonerUri).body(baos.toString());
             }
             return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
@@ -644,24 +660,6 @@ public class PublicDataResource {
             return "place";
         }
         return type;
-    }
-
-    private Reasoner getReasoner(HttpServletRequest request) {
-        String reasonerUri = "";
-        String infProfile = request.getHeader("Accept-Profile");
-        if (infProfile != null) {
-            reasonerUri = infProfile;
-        } else {
-            infProfile = request.getParameter("profile");
-            if (infProfile != null) {
-                reasonerUri = infProfile;
-            }
-        }
-        Reasoner reasoner = null;
-        if (!"".contentEquals(reasonerUri)) {
-            reasoner = ReasonerRegistry.theRegistry().create(reasonerUri, null);
-        }
-        return reasoner;
     }
 
 }
