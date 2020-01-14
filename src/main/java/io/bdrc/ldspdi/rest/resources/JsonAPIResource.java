@@ -95,7 +95,6 @@ public class JsonAPIResource {
         ArrayList<QueryListItem> items = new ArrayList<>();
         for (String file : filesList) {
             String tmp = file.substring(file.lastIndexOf('/') + 1);
-            // final LdsQuery qfp = LdsQueryService.get(file + ".arq");
             final LdsQuery qfp = LdsQueryService.get(tmp);
             QueryTemplate qt = qfp.getTemplate();
             items.add(new QueryListItem(qt.getId(), "/queries/" + qt.getId(), qt.getQueryResults()));

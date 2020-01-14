@@ -68,9 +68,9 @@ public class LibrarySearchResource {
         long end = System.currentTimeMillis();
         new Watcher(end - deb, query, file).run();
         HashMap<String, Object> res = null;
+        log.debug("Parameters MAP in getLibGraphPost()>>> " + map);
         switch (file) {
         case "rootSearchGraph":
-            log.info("MAP >>> " + map);
             int etext_count = 0;
             if (t != null) {
                 try {

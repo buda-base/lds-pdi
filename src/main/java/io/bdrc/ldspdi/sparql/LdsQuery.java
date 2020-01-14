@@ -79,7 +79,6 @@ public class LdsQuery {
     }
 
     private void parseTemplate(File file) throws RestException {
-        // log.info("parse template at {}", file.getAbsolutePath());
         BufferedReader brd = null;
         HashMap<String, HashMap<String, String>> p_map = new HashMap<>();
         HashMap<String, HashMap<String, String>> o_map = new HashMap<>();

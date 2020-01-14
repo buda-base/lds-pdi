@@ -147,7 +147,6 @@ public class PublicDataResource {
             return getAdResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
         }
         final String prefixedRes = ADM_PREFIX_SHORT + res;
-        // final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         final MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         log.info("Call to getAdResourceGraph with format: {} variant is {}", format, mediaType);
         if (format == null) {
@@ -286,12 +285,7 @@ public class PublicDataResource {
         Helpers.setCacheControl(resp, "public");
         Model model = ModelFactory.createDefaultModel();
         model.setNsPrefixes(Prefixes.getMap());
-        StreamingResponseBody stream = new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) throws IOException {
-                model.write(os, "TURTLE");
-            }
-        };
+        StreamingResponseBody stream = StreamingHelpers.getModelStream(model, "ttl");
         return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(stream);
     }
 

@@ -8,8 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -85,9 +83,8 @@ public class BdrcAuthResource {
             } else {
                 Access acc = (Access) request.getAttribute("access");
                 // auth0Id corresponding to the logged on user - from the token
-                String auth0Id = acc.getUser().getAuthId();
                 log.info("User in userResource() >> {}", acc.getUser());
-                auth0Id = acc.getUser().getUserId();
+                String auth0Id = acc.getUser().getUserId();
                 Resource usr = getRdfProfile(auth0Id);
                 if (usr == null) {
                     return ResponseEntity.status(404).body(StreamingHelpers.getStream("No user was found with resource Id=" + res));
@@ -120,10 +117,6 @@ public class BdrcAuthResource {
             }
             hm.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
             hm.put(QueryConstants.REQ_METHOD, "GET");
-            Set<Entry<String, String>> set = hm.entrySet();
-            for (Entry<String, String> e : set) {
-                log.info("Key {} and value {}", e.getKey(), e.getValue());
-            }
             final LdsQuery qfp = LdsQueryService.get("budaUsers.arq", "private");
             if (pageSize != null) {
                 try {
@@ -140,7 +133,7 @@ public class BdrcAuthResource {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }
             log.info("Parametized Query >> : {}", query);
-            log.info("PARAMS MAP >> : {}", hm);
+            log.debug("PARAMS MAP >> : {}", hm);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
             }
@@ -202,10 +195,6 @@ public class BdrcAuthResource {
             }
             hm.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
             hm.put(QueryConstants.REQ_METHOD, "GET");
-            Set<Entry<String, String>> set = hm.entrySet();
-            for (Entry<String, String> e : set) {
-                log.info("Key {} and value {}", e.getKey(), e.getValue());
-            }
             final LdsQuery qfp = LdsQueryService.get("budaUserSearch.arq", "private");
             if (pageSize != null) {
                 try {
@@ -222,7 +211,7 @@ public class BdrcAuthResource {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }
             log.info("Parametized Query >> : {}", query);
-            log.info("PARAMS MAP >> : {}", hm);
+            log.debug("PARAMS MAP >> : {}", hm);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
             }
@@ -316,7 +305,7 @@ public class BdrcAuthResource {
         log.info("updating Auth data model() >>");
         Thread t = new Thread(new RdfAuthModel());
         t.start();
-        return ResponseEntity.ok("Auth Model was updated");
+        return ResponseEntity.ok("Auth Model is updating");
     }
 
     private Resource getRdfProfile(String auth0Id) throws IOException {
@@ -327,7 +316,7 @@ public class BdrcAuthResource {
         ResultSet rs = qe.execSelect();
         if (rs.hasNext()) {
             r = rs.next().getResource("?s");
-            log.info("RESOURCE >> {} and rdfId= {} ", r);
+            log.debug("RESOURCE >> {} and rdfId= {} ", r);
             return r;
         }
         qe.close();
@@ -341,7 +330,7 @@ public class BdrcAuthResource {
         ResultSet rs = qe.execSelect();
         if (rs.hasNext()) {
             Resource r = rs.next().getResource("?o");
-            log.info("RESOURCE >> {} and rdfId= {} ", r);
+            log.debug("RESOURCE >> {} and rdfId= {} ", r);
             return r;
         }
         return null;
