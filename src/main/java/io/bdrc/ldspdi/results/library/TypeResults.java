@@ -23,6 +23,8 @@ public class TypeResults {
         long start = 0;
         if (log.isDebugEnabled())
             start = System.nanoTime();
+       
+        log.error("looking for isMain");
         Map<String, Object> res = new HashMap<>();
         Map<String, ArrayList<Field>> main = new HashMap<>();
         Map<String, ArrayList<Field>> aux = new HashMap<>();
