@@ -28,11 +28,11 @@ public class TypeResults {
         Map<String, Object> res = new HashMap<>();
         Map<String, ArrayList<Field>> main = new HashMap<>();
         Map<String, ArrayList<Field>> aux = new HashMap<>();
-        Map<Resource, Boolean> isInstance = new HashMap<>();
+        Map<Resource, Boolean> isMain = new HashMap<>();
         final StmtIterator mainIt = mod.listLiteralStatements(null, mod.getProperty("http://purl.bdrc.io/ontology/tmp/isMain"), true);
         while (mainIt.hasNext()) {
             final Resource mainRes = mainIt.removeNext().getSubject();
-            isInstance.put(mainRes, true);
+            isMain.put(mainRes, true);
             log.error("ismain: "+mainRes.getLocalName());
         }
         if (log.isDebugEnabled())
@@ -43,10 +43,11 @@ public class TypeResults {
             
             final Resource subject = st.getSubject();
             
-            final Boolean subjectIsWork = isInstance.getOrDefault(subject, false);
+            final Boolean subjectIsMain = isMain.getOrDefault(subject, false);
+            log.error("subject: "+subject.getLocalName()+" is main: "+subjectIsMain);
             
             List<Field> stlist;
-            if (subjectIsWork) {
+            if (subjectIsMain) {
                 stlist = main.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
             } else {
                 stlist = aux.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
