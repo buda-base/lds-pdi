@@ -41,7 +41,6 @@ public class RdfAuthFilter implements Filter {
             try {
                 end = RdfAuthModel.getEndpoint(path);
             } catch (Exception e) {
-                e.printStackTrace();
                 end = null;
             }
             UserProfile prof = null;
