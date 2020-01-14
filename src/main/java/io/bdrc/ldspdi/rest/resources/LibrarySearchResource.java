@@ -158,9 +158,9 @@ public class LibrarySearchResource {
             res = WorkResults.getResultsMap(model);
             break;
         case "workInstancesGraph":
-            res = TypeResults.getResultsMap(model);
-            break;
         case "personGraph":
+        case "placeGraph":
+        case "typeSimpleGraph":
             res = TypeResults.getResultsMap(model);
             break;
         case "allAssocResource":

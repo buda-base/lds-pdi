@@ -31,6 +31,7 @@ public class TypeResults {
         while (mainIt.hasNext()) {
             final Resource mainRes = mainIt.removeNext().getSubject();
             isInstance.put(mainRes, true);
+            log.error("ismain: "+mainRes.getLocalName());
         }
         if (log.isDebugEnabled())
             log.debug("InstanceResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
