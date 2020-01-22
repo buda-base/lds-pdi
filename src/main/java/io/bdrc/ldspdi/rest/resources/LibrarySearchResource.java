@@ -26,13 +26,6 @@ import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.library.ChunksResults;
 import io.bdrc.ldspdi.results.library.EtextResults;
-import io.bdrc.ldspdi.results.library.PersonAllResults;
-import io.bdrc.ldspdi.results.library.PersonResults;
-import io.bdrc.ldspdi.results.library.PlaceAllResults;
-import io.bdrc.ldspdi.results.library.ResourceResults;
-import io.bdrc.ldspdi.results.library.RootResults;
-import io.bdrc.ldspdi.results.library.TopicAllResults;
-import io.bdrc.ldspdi.results.library.WorkAllResults;
 import io.bdrc.ldspdi.results.library.TypeResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -70,44 +63,24 @@ public class LibrarySearchResource {
         new Watcher(end - deb, query, file).run();
         Map<String, Object> res = null;
         switch (file) {
-        case "rootSearchGraph":
-            log.info("MAP >>> " + map);
-            int etext_count = 0;
-            if (t != null) {
-                try {
-                    t.join();
-                    ResultSet rs = async.getRes();
-                    etext_count = rs.next().getLiteral("?c").getInt();
-                } catch (InterruptedException e) {
-                    throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphPost()", e));
-                }
-            }
-            res = RootResults.getResultsMap(model, etext_count);
-            break;
-        case "personFacetGraph":
-            res = PersonResults.getResultsMap(model);
-            break;
         case "workFacetGraph":
-        case "workAllAssociations":
-            res = WorkAllResults.getResultsMap(model);
+        case "associatedWorks":
+            res = WorkResults.getResultsMap(model);
             break;
-        case "allAssocResource":
-            res = ResourceResults.getResultsMap(model);
+        case "workInstancesGraph":
+        case "personGraph":
+        case "associatedPersons":
+        case "associatedSimpleTypes":
+        case "associatedPlaces":
+        case "placeGraph":
+        case "typeSimpleGraph":
+            res = TypeResults.getResultsMap(model);
             break;
-        case "personAllAssociations":
-            res = PersonAllResults.getResultsMap(model);
-            break;
-        case "topicAllAssociations":
-            res = TopicAllResults.getResultsMap(model);
-            break;
-        case "placeAllAssociations":
-            res = PlaceAllResults.getResultsMap(model);
+        case "chunksByEtextGraph":
+            res = EtextResults.getResultsMap(model);
             break;
         case "chunksFacetGraph":
             res = ChunksResults.getResultsMap(model);
-            break;
-        case "roleAllAssociations":
-            res = ResourceResults.getResultsMap(model);
             break;
         default:
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
@@ -135,57 +108,24 @@ public class LibrarySearchResource {
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
         Map<String, Object> res = null;
         switch (file) {
-        case "rootSearchGraph":
-            int etext_count = 0;
-            if (t != null) {
-                try {
-                    t.join();
-                    ResultSet rs = async.getRes();
-                    etext_count = rs.next().getLiteral("?c").getInt();
-                } catch (InterruptedException e) {
-                    throw new RestException(500, new LdsError(LdsError.ASYNC_ERR).setContext("getLibGraphGet()", e));
-                }
-            }
-            res = RootResults.getResultsMap(model, etext_count);
-            break;
-        case "personFacetGraph":
-            res = PersonResults.getResultsMap(model);
-            break;
-        case "workAllAssociations":
-            res = WorkAllResults.getResultsMap(model);
-            break;
         case "workFacetGraph":
+        case "associatedWorks":
             res = WorkResults.getResultsMap(model);
             break;
         case "workInstancesGraph":
         case "personGraph":
+        case "associatedPersons":
+        case "associatedSimpleTypes":
+        case "associatedPlaces":
         case "placeGraph":
         case "typeSimpleGraph":
             res = TypeResults.getResultsMap(model);
-            break;
-        case "allAssocResource":
-            res = ResourceResults.getResultsMap(model);
-            break;
-        case "personAllAssociations":
-            res = PersonAllResults.getResultsMap(model);
-            break;
-        case "topicAllAssociations":
-            res = TopicAllResults.getResultsMap(model);
-            break;
-        case "placeAllAssociations":
-            res = PlaceAllResults.getResultsMap(model);
-            break;
-        case "etextFacetGraph":
-            res = EtextResults.getResultsMap(model);
             break;
         case "chunksByEtextGraph":
             res = EtextResults.getResultsMap(model);
             break;
         case "chunksFacetGraph":
             res = ChunksResults.getResultsMap(model);
-            break;
-        case "roleAllAssociations":
-            res = ResourceResults.getResultsMap(model);
             break;
         default:
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
