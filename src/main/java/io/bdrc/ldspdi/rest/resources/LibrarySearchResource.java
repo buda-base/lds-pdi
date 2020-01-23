@@ -24,8 +24,6 @@ import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
-import io.bdrc.ldspdi.results.library.ChunksResults;
-import io.bdrc.ldspdi.results.library.EtextResults;
 import io.bdrc.ldspdi.results.library.TypeResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -43,51 +41,6 @@ public class LibrarySearchResource {
 
     public final static Logger log = LoggerFactory.getLogger(LibrarySearchResource.class);
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
-
-    @PostMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getLibGraphPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") final String file, @RequestBody HashMap<String, String> map) throws RestException {
-        log.info("Call to getLibGraphPost() with template name >> " + file);
-        Thread t = null;
-        AsyncSparql async = null;
-        if (file.equals("rootSearchGraph")) {
-            async = new AsyncSparql(fusekiUrl, "Etexts_count.arq", map);
-            t = new Thread(async);
-            t.run();
-        }
-        final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-        final String query = qfp.getParametizedQuery(map);
-        long deb = System.currentTimeMillis();
-        final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
-        long end = System.currentTimeMillis();
-        new Watcher(end - deb, query, file).run();
-        Map<String, Object> res = null;
-        switch (file) {
-        case "workFacetGraph":
-        case "associatedWorks":
-            res = WorkResults.getResultsMap(model);
-            break;
-        case "workInstancesGraph":
-        case "personGraph":
-        case "associatedPersons":
-        case "associatedSimpleTypes":
-        case "associatedPlaces":
-        case "placeGraph":
-        case "typeSimpleGraph":
-            res = TypeResults.getResultsMap(model);
-            break;
-        case "chunksByEtextGraph":
-            res = EtextResults.getResultsMap(model);
-            break;
-        case "chunksFacetGraph":
-            res = ChunksResults.getResultsMap(model);
-            break;
-        default:
-            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
-        }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
-    }
 
     @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
     @SpringCacheControl()
@@ -119,16 +72,11 @@ public class LibrarySearchResource {
         case "associatedPlaces":
         case "placeGraph":
         case "typeSimpleGraph":
+        case "chunksFacetGraph":
             res = TypeResults.getResultsMap(model);
             break;
-        case "chunksByEtextGraph":
-            res = EtextResults.getResultsMap(model);
-            break;
-        case "chunksFacetGraph":
-            res = ChunksResults.getResultsMap(model);
-            break;
         default:
-            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file);
+            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query "+file);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
         }
