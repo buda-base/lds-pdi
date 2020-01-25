@@ -73,6 +73,8 @@ public class LibrarySearchResource {
         case "placeGraph":
         case "typeSimpleGraph":
         case "chunksFacetGraph":
+        case "imLuckyAssociatedGraph":
+        case "imLuckySearchGraph":
         case "etextContentFacetGraph":
             res = TypeResults.getResultsMap(model);
             break;
