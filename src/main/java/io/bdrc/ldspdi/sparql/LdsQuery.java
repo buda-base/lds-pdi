@@ -62,7 +62,6 @@ public class LdsQuery {
     private HashMap<String, String> litLangParams = new HashMap<>();
     private QueryTemplate template;
     private ArrayList<Param> params;
-    private ArrayList<Param> optParams;
     private ArrayList<Output> outputs;
     private String prefixedQuery;
     private long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
@@ -150,7 +149,6 @@ public class LdsQuery {
             if (customLimit != null) {
                 this.limit_max = Long.parseLong(customLimit);
             }
-            System.out.println("META INF >>" + metaInf);
         } catch (Exception ex) {
             log.error("QueryFile parsing error", ex);
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: " + file.getName()));
@@ -226,16 +224,13 @@ public class LdsQuery {
         return o;
     }
 
-    public String checkQueryArgsSyntax() {
-        String check = "";
-        String q_params = metaInf.get(QueryConstants.QUERY_PARAMS);
-        if (q_params == null) {
-            // no params no need to parse
+    public String checkQueryArgsSyntax(Map<String, String> converted) {
+        Set<String> keys = converted.keySet();
+        if (keys.size() == 0) {
             return "";
         }
-        String[] args = q_params.split(Pattern.compile(",").toString());
-        List<String> params = Arrays.asList(args);
-        for (String arg : args) {
+        String check = "";
+        for (String arg : keys) {
             if (!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
                 // Param is not a Lang param --> if it's not present in the query --> Send error
                 if (!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?" + arg) == -1) {
@@ -245,7 +240,7 @@ public class LdsQuery {
                 // Param is a Lang param --> check if the corresponding lit param is present
                 if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
                     String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX + arg.substring(arg.indexOf("_") + 1);
-                    if (!params.contains(expectedLiteralParam)) {
+                    if (!keys.contains(expectedLiteralParam)) {
                         check = "Arg syntax is incorrect : query does not have a literal variable " + expectedLiteralParam + " corresponding to lang "
                                 + arg + " variable";
                         return check;
@@ -254,6 +249,7 @@ public class LdsQuery {
                 }
             }
         }
+
         return "";
     }
 
@@ -262,16 +258,13 @@ public class LdsQuery {
     }
 
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
-
-        if (!checkQueryArgsSyntax().trim().equals("")) {
+        if (!checkQueryArgsSyntax(converted).trim().equals("")) {
             throw new RestException(500,
-                    new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
+                    new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax(converted)));
         }
-        // List<String> params = getQueryParams();
         List<String> params = new ArrayList<String>();
         params.addAll(getQueryParams());
         params.addAll(getQueryOptParams());
-        System.out.println("Params >> " + params);
         HashMap<String, String> litParams = getLitLangParams();
         if (converted == null) {
             converted = new HashMap<>();
@@ -382,9 +375,9 @@ public class LdsQuery {
         return Arrays.asList(template.getQueryOptParams().split(","));
     }
 
-    private static boolean hasValidParams(Set<String> reqParams, List<String> params) {
+    private boolean hasValidParams(Set<String> reqParams, List<String> params) {
         for (String pr : params) {
-            if (!reqParams.contains(pr.trim()) && !pr.equals("NONE")) {
+            if ((!reqParams.contains(pr.trim()) && !getQueryOptParams().contains(pr)) && !pr.equals("NONE")) {
                 return false;
             }
         }
@@ -397,6 +390,8 @@ public class LdsQuery {
         HashMap<String, String> map = new HashMap<>();
         map.put("L_NAME", "\"'od zer\"");
         map.put("LG_NAME", "bo-x-ewts");
+        // map.put("L_l", "\"ye shes\"");
+        // map.put("LG_l", "bo-x-ewts");
         map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
 
         System.out.println("QueryParams >>" + lds.getQueryParams());
