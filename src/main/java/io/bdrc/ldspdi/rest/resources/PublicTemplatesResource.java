@@ -77,14 +77,21 @@ public class PublicTemplatesResource {
     public final static Logger log = LoggerFactory.getLogger(PublicTemplatesResource.class);
 
     @GetMapping(value = "/query/table/{file}")
-    public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
+    public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         Helpers.setCacheControl(response, "public");
         ModelAndView model = new ModelAndView();
         try {
             HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
+
             String pageSize = hm.get(QueryConstants.PAGE_SIZE);
             String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
+            HashMap<String, String> copy = Helpers.convertMulti(request.getParameterMap());
+            copy.remove(QueryConstants.PAGE_SIZE);
+            copy.remove(QueryConstants.PAGE_NUMBER);
+            copy.remove(QueryConstants.RESULT_HASH);
+            copy.remove("null");
             if (pageNumber == null) {
                 pageNumber = "1";
             }
@@ -99,15 +106,17 @@ public class PublicTemplatesResource {
             if (pageSize != null) {
                 try {
                     if (Long.parseLong(pageSize) > qfp.getLimit_max()) {
-                        return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
+                        return (ResponseEntity<String>) ResponseEntity.status(403)
+                                .body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
                     }
                 } catch (Exception e) {
                     throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
                 }
             }
-            final String query = qfp.getParametizedQuery(hm, true);
+            log.debug("PARAMS MAP >> : {}", copy);
+            final String query = qfp.getParametizedQuery(copy, true);
             log.info("Parametized Query >> : {}", query);
-            log.debug("PARAMS MAP >> : {}", hm);
+
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in getQueryTemplateResults() " + query));
             }
@@ -121,18 +130,21 @@ public class PublicTemplatesResource {
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
                 byte[] buff = GlobalHelpers.getJsonBytes(r);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON)
+                        .header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             if ("csv".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, true);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
 
             }
             if ("csv_f".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, false);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");
@@ -155,18 +167,25 @@ public class PublicTemplatesResource {
     }
 
     @PostMapping(value = "/query/table/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(HttpServletRequest request, HttpServletResponse response, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
+    public ResponseEntity<StreamingResponseBody> getQueryTemplateResultsJsonPost(HttpServletRequest request, HttpServletResponse response,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
             @RequestBody HashMap<String, String> map) throws RestException {
         Helpers.setCacheControl(response, "public");
         try {
             log.info("Call to getQueryTemplateResultsJsonPost() with params : {}", map);
             if (map == null || map.size() == 0) {
                 LdsError lds = new LdsError(LdsError.MISSING_PARAM_ERR).setContext("in getQueryTemplateResultsJsonPost() : Map =" + map);
-                return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
+                return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(500, lds)));
 
             }
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-            final String query = qfp.getParametizedQuery(map, true);
+            HashMap<String, String> copy = map;
+            copy.remove(QueryConstants.PAGE_SIZE);
+            copy.remove(QueryConstants.PAGE_NUMBER);
+            copy.remove(QueryConstants.RESULT_HASH);
+            copy.remove("null");
+            final String query = qfp.getParametizedQuery(copy, true);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }
@@ -175,7 +194,8 @@ public class PublicTemplatesResource {
                 ResultSet res = QueryProcessor.getResults(query, fuseki);
                 return ResponseEntity.ok().contentType(MediaType.TEXT_XML).body(Helpers.getResultSetAsXml(res));
             } else {
-                ResultSetWrapper res = QueryProcessor.getResults(query, fuseki, map.get(QueryConstants.RESULT_HASH), map.get(QueryConstants.PAGE_SIZE));
+                ResultSetWrapper res = QueryProcessor.getResults(query, fuseki, map.get(QueryConstants.RESULT_HASH),
+                        map.get(QueryConstants.PAGE_SIZE));
                 map.put(QueryConstants.RESULT_HASH, Integer.toString(res.getHash()));
                 map.put(QueryConstants.PAGE_SIZE, Integer.toString(res.getPageSize()));
                 map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
@@ -197,7 +217,8 @@ public class PublicTemplatesResource {
     }
 
     @GetMapping(value = "/query/graph/{file}")
-    public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletResponse response, HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
+    public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletResponse response, HttpServletRequest request,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
             @RequestParam(value = "format", defaultValue = "jsonld") final String format, @PathVariable("file") String file) throws RestException {
         Helpers.setCacheControl(response, "public");
         MediaType mediaType = null;
@@ -210,7 +231,9 @@ public class PublicTemplatesResource {
             if (format == null && variant == null) {
                 HttpHeaders hh = new HttpHeaders();
                 hh.setAll(getGraphResourceHeaders(path, null, "List"));
-                return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + path).body(StreamingHelpers.getStream(Helpers.getMultiChoicesHtml(path, false)));
+                return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html")
+                        .header("Content-Location", request.getRequestURI() + "choice?path=" + path)
+                        .body(StreamingHelpers.getStream(Helpers.getMultiChoicesHtml(path, false)));
 
             }
             // Settings
@@ -227,7 +250,8 @@ public class PublicTemplatesResource {
             model = QueryProcessor.getGraph(query, fuseki, null);
             if (model.size() == 0) {
                 LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + hm.toString());
-                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
             }
             ext = BudaMediaTypes.getExtFromMime(mediaType);
@@ -249,8 +273,10 @@ public class PublicTemplatesResource {
     }
 
     @PostMapping(value = "/query/graph/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StreamingResponseBody> getGraphTemplateResultsPost(@RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @RequestHeader(value = "Accept", defaultValue = "application/ld+json") String accept,
-            @PathVariable("file") String file, HttpServletResponse response, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getGraphTemplateResultsPost(
+            @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
+            @RequestHeader(value = "Accept", defaultValue = "application/ld+json") String accept, @PathVariable("file") String file,
+            HttpServletResponse response, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
         Helpers.setCacheControl(response, "public");
         if (accept.equals("*/*")) {
             accept = "application/ld+json";
@@ -262,7 +288,8 @@ public class PublicTemplatesResource {
             log.info("Call to getGraphTemplateResultsPost() with file: {}, accept: {}, variant: {}, map: {}", file, accept, variant, map);
             if (variant == null) {
                 LdsError lds = new LdsError(LdsError.NO_ACCEPT_ERR).setContext(file + " in getGraphTemplateResultsPost()");
-                return ResponseEntity.status(406).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(406, lds)));
+                return ResponseEntity.status(406).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(406, lds)));
             }
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
@@ -275,7 +302,8 @@ public class PublicTemplatesResource {
             model = QueryProcessor.getGraph(query, fuseki, null);
             if (model.size() == 0) {
                 LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(file + " and params=" + map.toString());
-                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

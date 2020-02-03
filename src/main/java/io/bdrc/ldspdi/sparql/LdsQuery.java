@@ -184,7 +184,6 @@ public class LdsQuery {
     }
 
     private ArrayList<Param> buildParams(HashMap<String, HashMap<String, String>> p_map) throws RestException {
-        System.out.println("P MAP >> " + p_map);
         ArrayList<Param> p = new ArrayList<>();
         Set<String> names = p_map.keySet();
         for (String name : names) {
@@ -209,7 +208,6 @@ public class LdsQuery {
                 break;
             }
         }
-        System.out.println("P >> " + p);
         return p;
     }
 
@@ -386,14 +384,15 @@ public class LdsQuery {
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
         ServiceConfig.init();
-        LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
+        // LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
+        LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
         HashMap<String, String> map = new HashMap<>();
-        map.put("L_NAME", "\"'od zer\"");
-        map.put("LG_NAME", "bo-x-ewts");
-        // map.put("L_l", "\"ye shes\"");
-        // map.put("LG_l", "bo-x-ewts");
-        map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
-
+        // map.put("L_NAME", "\"'od zer\"");
+        // map.put("LG_NAME", "bo-x-ewts");
+        // map.put("L_l", "\"མིག་གི་ཡུལ\"");
+        // map.put("LG_l", "bo");
+        // map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
+        map.put("R_RES", "bdr:W29329");
         System.out.println("QueryParams >>" + lds.getQueryParams());
         System.out.println("QueryOptParams >>" + lds.getQueryOptParams());
         System.out.println(lds.getParametizedQuery(map, false));
