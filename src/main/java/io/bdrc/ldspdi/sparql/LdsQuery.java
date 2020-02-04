@@ -22,7 +22,6 @@ package io.bdrc.ldspdi.sparql;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,9 +36,6 @@ import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -229,7 +225,7 @@ public class LdsQuery {
         }
         String check = "";
         for (String arg : keys) {
-            if (!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
+            if (!arg.equals(QueryConstants.QUERY_NO_ARGS) && !arg.startsWith(QueryConstants.LITERAL_LIMITPREFIX)) {
                 // Param is not a Lang param --> if it's not present in the query --> Send error
                 if (!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?" + arg) == -1) {
                     check = "Arg syntax is incorrect : query does not have a ?" + arg + " variable";
@@ -382,20 +378,27 @@ public class LdsQuery {
         return true;
     }
 
-    public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.init();
-        // LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
-        LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
-        HashMap<String, String> map = new HashMap<>();
-        // map.put("L_NAME", "\"'od zer\"");
-        // map.put("LG_NAME", "bo-x-ewts");
-        // map.put("L_l", "\"མིག་གི་ཡུལ\"");
-        // map.put("LG_l", "bo");
-        // map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
-        map.put("R_RES", "bdr:W29329");
-        System.out.println("QueryParams >>" + lds.getQueryParams());
-        System.out.println("QueryOptParams >>" + lds.getQueryOptParams());
-        System.out.println(lds.getParametizedQuery(map, false));
+    public static void main(String[] args) {
+        try {
+            ServiceConfig.init();
+            HashMap<String, String> map = new HashMap<>();
+            LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
+            map.put("L_NAME", "\"'od zer\"");
+            map.put("LG_NAME", "bo-x-ewts");
+            map.put("L_lo", "\"མིག་གི་ཡུལ\"");
+            map.put("LG_l", "bo");
+            map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
+            // LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
+            // map.put("R_RES", "bdr:W29329");
+            System.out.println("QueryParams >>" + lds.getQueryParams());
+            System.out.println("QueryOptParams >>" + lds.getQueryOptParams());
+            System.out.println(lds.getParametizedQuery(map, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+            StackTraceElement[] ste = e.getStackTrace();
+            System.out.println("First >>" + ste[0].toString() + " " + e);
+            System.out.println("Last >>" + ste[ste.length - 1].toString() + " " + e);
+        }
     }
 
 }
