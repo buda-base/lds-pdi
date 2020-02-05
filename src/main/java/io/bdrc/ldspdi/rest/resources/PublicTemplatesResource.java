@@ -87,12 +87,6 @@ public class PublicTemplatesResource {
 
             String pageSize = hm.get(QueryConstants.PAGE_SIZE);
             String pageNumber = hm.get(QueryConstants.PAGE_NUMBER);
-            HashMap<String, String> copy = Helpers.convertMulti(request.getParameterMap());
-            copy.remove(QueryConstants.PAGE_SIZE);
-            copy.remove(QueryConstants.PAGE_NUMBER);
-            copy.remove(QueryConstants.RESULT_HASH);
-            copy.remove("format");
-            copy.remove("null");
             if (pageNumber == null) {
                 pageNumber = "1";
             }
@@ -114,8 +108,7 @@ public class PublicTemplatesResource {
                     throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
                 }
             }
-            log.debug("PARAMS MAP >> : {}", copy);
-            final String query = qfp.getParametizedQuery(copy, true);
+            final String query = qfp.getParametizedQuery(hm, true);
             log.info("Parametized Query >> : {}", query);
 
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
@@ -181,13 +174,7 @@ public class PublicTemplatesResource {
 
             }
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-            HashMap<String, String> copy = map;
-            copy.remove(QueryConstants.PAGE_SIZE);
-            copy.remove(QueryConstants.PAGE_NUMBER);
-            copy.remove(QueryConstants.RESULT_HASH);
-            copy.remove("format");
-            copy.remove("null");
-            final String query = qfp.getParametizedQuery(copy, true);
+            final String query = qfp.getParametizedQuery(map, true);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
             }
@@ -240,12 +227,9 @@ public class PublicTemplatesResource {
             }
             // Settings
             HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
-            HashMap<String, String> copy = Helpers.convertMulti(request.getParameterMap());
-            copy.remove("format");
-            copy.remove("null");
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-            final String query = qfp.getParametizedQuery(copy, true);
+            final String query = qfp.getParametizedQuery(hm, true);
             log.info("getGraphTemplateResults() Parametized query {}", query);
             // format is prevalent
             mediaType = BudaMediaTypes.getMimeFromExtension(format);
@@ -298,10 +282,7 @@ public class PublicTemplatesResource {
             }
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
-            HashMap<String, String> copy = map;
-            copy.remove("format");
-            copy.remove("null");
-            final String query = qfp.getParametizedQuery(copy, true);
+            final String query = qfp.getParametizedQuery(map, true);
             // format is prevalent
             mediaType = BudaMediaTypes.getMimeFromExtension(accept);
             if (mediaType == null) {
