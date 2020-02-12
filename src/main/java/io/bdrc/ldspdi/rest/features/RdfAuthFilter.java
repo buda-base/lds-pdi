@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.rest.features;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -38,9 +39,18 @@ public class RdfAuthFilter implements Filter {
             String token = getToken(req.getHeader("Authorization"));
             TokenValidation validation = null;
             String path = req.getServletPath();
-            Endpoint end;
+            log.debug("PATH in Auth filter is {} for HTTP method: {}", path, method);
+            Endpoint end = null;
             try {
-                end = RdfAuthModel.getEndpoint(path);
+                ArrayList<Endpoint> endpoints = RdfAuthModel.getEndpoints();
+                for (Endpoint e : endpoints) {
+                    if (path.startsWith(e.getPath())) {
+                        end = e;
+                        break;
+                    }
+                }
+                log.debug("ALL ENDPOINTS >> {}", endpoints);
+                log.debug("for path {} ENDPOINT IN FILTER id {} ", path, end);
             } catch (Exception e) {
                 e.printStackTrace();
                 end = null;
@@ -50,6 +60,8 @@ public class RdfAuthFilter implements Filter {
                 isSecuredEndpoint = false;
                 // endpoint is not secured - Using default (empty endpoint)
                 // for Access Object end=new Endpoint();
+            } else {
+                isSecuredEndpoint = end.isSecured(method);
             }
             if (token != null) {
                 // User is logged on
