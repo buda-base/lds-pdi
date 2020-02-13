@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +21,10 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+<<<<<<< HEAD
 import io.bdrc.ldspdi.rest.features.SpringCacheControl;
+=======
+>>>>>>> master
 import io.bdrc.ldspdi.results.library.TypeResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -32,7 +33,6 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.ldspdi.utils.Watcher;
 import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
@@ -43,10 +43,11 @@ public class LibrarySearchResource {
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, HttpServletResponse response,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file) throws RestException {
 
         log.info("Call to getLibGraphGet() with template name >> " + file);
+        Helpers.setCacheControl(response, "public");
         HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
         Thread t = null;
         AsyncSparql async = null;
@@ -56,7 +57,7 @@ public class LibrarySearchResource {
             t.run();
         }
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
-        final String query = qfp.getParametizedQuery(map);
+        final String query = qfp.getParametizedQuery(map, true);
         log.debug("Call to getLibGraphGet() with query >> " + query);
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);
         Map<String, Object> res = null;
@@ -79,8 +80,14 @@ public class LibrarySearchResource {
             res = TypeResults.getResultsMap(model);
             break;
         default:
+<<<<<<< HEAD
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query "+file);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+=======
+            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query " + file);
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+>>>>>>> master
 
         }
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));

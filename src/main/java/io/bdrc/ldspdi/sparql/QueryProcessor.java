@@ -76,7 +76,7 @@ public class QueryProcessor {
 
     public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = getPrefixes();
+            prefixes = Prefixes.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -87,7 +87,7 @@ public class QueryProcessor {
             LdsQuery qfp = LdsQueryService.get(queryName, "library");
             final Map<String, String> map = new HashMap<>();
             map.put("R_RES", URI);
-            String query = qfp.getParametizedQuery(map);
+            String query = qfp.getParametizedQuery(map, true);
             Query q = QueryFactory.create(query);
             RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
             model = conn.queryDescribe(q);
@@ -98,7 +98,7 @@ public class QueryProcessor {
 
     public static Model getDescribeModel(final String URI, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = getPrefixes();
+            prefixes = Prefixes.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -112,7 +112,7 @@ public class QueryProcessor {
 
     public static Model getGraph(final String query, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = getPrefixes();
+            prefixes = Prefixes.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -212,22 +212,6 @@ public class QueryProcessor {
             return m;
         } catch (Exception ex) {
             throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
-        }
-    }
-
-    public static String getPrefixes() throws RestException {
-        String pref = Prefixes.getPrefixesString();
-        if (pref != null) {
-            return pref;
-        } else {
-            return "prefix :      <http://purl.bdrc.io/ontology/core/>\n" + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n" + "prefix bdd:   <http://purl.bdrc.io/data/>\n" + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
-                    + "prefix bdr:   <http://purl.bdrc.io/resource/>\n" + "prefix bdan:  <http://purl.bdrc.io/annotation/>\n" + "prefix bdac:  <http://purl.bdrc.io/anncollection/>\n" + "prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/>\n"
-                    + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n" + "prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/>\n" + "prefix adr:   <http://purl.bdrc.io/resource-auth/>\n"
-                    + "prefix bf:    <http://id.loc.gov/ontologies/bibframe/>\n" + "prefix dcterms: <http://purl.org/dc/terms/>\n" + "prefix f:     <java:io.bdrc.ldspdi.sparql.functions.>\n" + "prefix foaf:  <http://xmlns.com/foaf/0.1/>\n"
-                    + "prefix iiif2: <http://iiif.io/api/presentation/2#>\n" + "prefix iiif3: <http://iiif.io/api/presentation/3#>\n" + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
-                    + "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n"
-                    + "prefix vcard: <http://www.w3.org/2006/vcard/ns#>\n" + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + "prefix text:  <http://jena.apache.org/text#>\n" + "prefix oa:    <http://www.w3.org/ns/oa#>\n"
-                    + "prefix as:    <http://www.w3.org/ns/activitystreams#>\n" + "prefix ldp:   <http://www.w3.org/ns/ldp#>\n" + "prefix sh: <http://www.w3.org/ns/shacl#>\n" + "prefix rsh: <http://purl.bdrc.io/shacl/core/shape/>";
         }
     }
 

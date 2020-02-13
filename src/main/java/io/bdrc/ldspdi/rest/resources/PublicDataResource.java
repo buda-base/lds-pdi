@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -24,14 +25,19 @@ import java.io.ByteArrayOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,10 +50,13 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +79,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
@@ -94,27 +102,29 @@ public class PublicDataResource {
     public static final String ADM_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.admindata.shortprefix");
     public static final String GRAPH_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.graph.shortprefix");
     public static final String GRAPH_PREFIX_FULL = ServiceConfig.getProperty("endpoints.graph.fullprefix");
+    private List<String> COLUMBIA_IDS = null;
 
     @GetMapping("/")
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getHomePage()");
+        Helpers.setCacheControl(response, "public");
         response.sendRedirect("/index");
     }
 
     @GetMapping(value = "index", produces = MediaType.TEXT_HTML_VALUE)
-    @SpringCacheControl()
-    public ModelAndView getIndexPage() throws RestException, IOException {
+    public ModelAndView getIndexPage(HttpServletRequest request, HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getIndexPage()");
-        // DocFileModel dfm = new DocFileModel();
         ModelAndView model = new ModelAndView();
         model.addObject("model", DocFileModel.getInstance());
         model.setViewName("index");
+        Helpers.setCacheControl(response, "public");
         return model;
     }
 
     @GetMapping(value = "robots.txt", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<Object> getRobots() {
+    public ResponseEntity<Object> getRobots(HttpServletResponse response) {
         log.info("Call getRobots()");
+        Helpers.setCacheControl(response, "public");
         return ResponseEntity.ok().body(ServiceConfig.getRobots());
     }
 
@@ -131,33 +141,38 @@ public class PublicDataResource {
     public ResponseEntity<Object> getJsonContext() throws RestException {
         log.info("Call to getJsonContext()");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        return ResponseEntity.ok().header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(86400, TimeUnit.SECONDS).cachePublic())
+                .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
     }
 
     @GetMapping(value = "/admindata/{res:.+}")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getAdResourceGraph(@PathVariable String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader("Accept") String format, HttpServletResponse resp,
-            HttpServletRequest request) throws RestException, IOException {
+    public ResponseEntity<StreamingResponseBody> getAdResourceGraph(@PathVariable String res,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader("Accept") String format,
+            HttpServletResponse resp, HttpServletRequest request) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
             return getAdResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
         }
         final String prefixedRes = ADM_PREFIX_SHORT + res;
-        // final Variant variant = request.selectVariant(MediaTypeUtils.resVariants);
         final MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         log.info("Call to getAdResourceGraph with format: {} variant is {}", format, mediaType);
         if (format == null) {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
 
         }
         if (mediaType == null) {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
@@ -171,7 +186,8 @@ public class PublicDataResource {
         Model model = QueryProcessor.getDescribeModel(prefixedRes, fusekiUrl, null);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
@@ -180,7 +196,8 @@ public class PublicDataResource {
     }
 
     // admindata/res with extension
-    public ResponseEntity<StreamingResponseBody> getAdResourceGraphExt(@PathVariable String res, @PathVariable String ext, @RequestHeader("fusekiUrl") final String fusekiUrl, @RequestHeader("Accept") String format, HttpServletRequest request)
+    public ResponseEntity<StreamingResponseBody> getAdResourceGraphExt(@PathVariable String res, @PathVariable String ext,
+            @RequestHeader("fusekiUrl") final String fusekiUrl, @RequestHeader("Accept") String format, HttpServletRequest request)
             throws RestException {
         final String prefixedRes = ADM_PREFIX_SHORT + res;
         final String fullResURI = GRAPH_PREFIX_FULL + res;
@@ -190,7 +207,9 @@ public class PublicDataResource {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getServletPath() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             throw new RestException(406, new LdsError(LdsError.GENERIC_ERR).setContext(prefixedRes));
@@ -199,7 +218,8 @@ public class PublicDataResource {
 
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
 
         }
         HttpHeaders hh = new HttpHeaders();
@@ -209,14 +229,17 @@ public class PublicDataResource {
     }
 
     // graph/res with extension
-    public ResponseEntity<StreamingResponseBody> getGrResourceGraphExt(String res, String ext, String fusekiUrl, String format, HttpServletRequest request) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getGrResourceGraphExt(String res, String ext, String fusekiUrl, String format,
+            HttpServletRequest request) throws RestException {
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
         final String fullResURI = GRAPH_PREFIX_FULL + res;
         final String graphType = "graph";
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
-            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
 
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
@@ -225,7 +248,8 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
@@ -234,9 +258,10 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/graph/{res:.+}")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getGrResourceGraph(@PathVariable String res, @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestHeader("Accept") String format, HttpServletResponse resp,
+    public ResponseEntity<StreamingResponseBody> getGrResourceGraph(@PathVariable String res,
+            @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestHeader("Accept") String format, HttpServletResponse resp,
             HttpServletRequest request) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
             return getGrResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
@@ -249,14 +274,18 @@ public class PublicDataResource {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
 
         }
         if (mediaType == null) {
             String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             HashMap<String, String> map = getResourceHeaders(request.getServletPath(), null, "Choice", null);
@@ -269,7 +298,8 @@ public class PublicDataResource {
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
@@ -278,24 +308,21 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/prefixes")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getPrefixes() throws RestException {
+    public ResponseEntity<StreamingResponseBody> getPrefixes(HttpServletResponse resp) throws RestException {
+        Helpers.setCacheControl(resp, "public");
         Model model = ModelFactory.createDefaultModel();
         model.setNsPrefixes(Prefixes.getMap());
-        StreamingResponseBody stream = new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) throws IOException {
-                model.write(os, "TURTLE");
-            }
-        };
+        StreamingResponseBody stream = StreamingHelpers.getModelStream(model, "ttl");
         return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(stream);
     }
 
     @GetMapping(value = "/resource/{res:.+}")
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable final String res, @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @RequestHeader(value = "Accept", required = false) String format,
-            HttpServletResponse response, HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") String startChar, @RequestParam(value = "endChar", defaultValue = "999999999") String endChar)
-            throws RestException, IOException {
+    public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable String res,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
+            @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request,
+            @RequestParam(value = "startChar", defaultValue = "0") String startChar,
+            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar) throws RestException, IOException {
+        Helpers.setCacheControl(response, "public");
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
@@ -308,15 +335,20 @@ public class PublicDataResource {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (mediaType == null) {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
             hh.setAll(getResourceHeaders(request.getServletPath(), null, "List", null));
-            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(406).headers(hh).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+            res = filterResourceId(res);
             String type = getDilaResourceType(res);
             if (!type.equals("")) {
                 type = type + "/?fromInner=";
@@ -333,7 +365,8 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
@@ -341,8 +374,10 @@ public class PublicDataResource {
         return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
     }
 
-    public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
-            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar, @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response, HttpServletRequest request)
+    public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext,
+            @RequestParam(value = "startChar", defaultValue = "0") String startChar,
+            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar,
+            @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
         final String prefixedRes = RES_PREFIX_SHORT + res;
@@ -351,7 +386,9 @@ public class PublicDataResource {
         log.info("Call to getFormattedResourceGraph() path is {}", request.getServletPath());
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
-            return ResponseEntity.status(300).header("Content-Type", "text/html").header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
+            return ResponseEntity.status(300).header("Content-Type", "text/html")
+                    .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
+                    .body(StreamingHelpers.getStream(html));
         }
         if (Helpers.equals(media, MediaType.TEXT_HTML)) {
             String type = getDilaResourceType(res);
@@ -376,7 +413,8 @@ public class PublicDataResource {
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
@@ -385,8 +423,9 @@ public class PublicDataResource {
     }
 
     @GetMapping(value = "/{base:[a-z]+}/**")
-    @SpringCacheControl()
-    public Object getExtOntologyHomePage(HttpServletRequest request, @RequestHeader("Accept") String format, @PathVariable String base) throws RestException, IOException {
+    public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format,
+            @PathVariable String base) throws RestException, IOException {
+        Helpers.setCacheControl(resp, "public");
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
@@ -455,7 +494,8 @@ public class PublicDataResource {
         } else {
             if (OntData.ontAllMod.getOntResource(tmp) == null) {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
-                return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
             if (format != null) {
                 MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
@@ -492,17 +532,36 @@ public class PublicDataResource {
     }
 
     public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
+        String reasonerUri = "";
+        String infProfile = request.getHeader("Accept-Profile");
+        if (infProfile != null) {
+            reasonerUri = infProfile;
+        } else {
+            infProfile = request.getParameter("profile");
+            if (infProfile != null) {
+                reasonerUri = infProfile;
+            }
+        }
+        Reasoner reasoner = null;
+        if (!"".contentEquals(reasonerUri)) {
+            reasoner = ReasonerRegistry.theRegistry().create(reasonerUri, null);
+        }
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
         log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            OntModel model = OntData.getOntModelByBase(params.getBaseUri());
+            Model model = OntData.getOntModelByBase(params.getBaseUri());
+            // Inference here if required
+            if (reasoner != null) {
+                model = ModelFactory.createInfModel(reasoner, model);
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (JenaLangStr == "STTL") {
                 final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
@@ -518,21 +577,28 @@ public class PublicDataResource {
                     wr.write(model, baos, params.getBaseUri());
                 }
             }
+            if (reasoner != null) {
+                return ResponseEntity.ok().header("Profile", reasonerUri)
+                        .header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
+            }
             return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
     }
 
     @GetMapping(value = "/ontology/data/{ext}", produces = MediaType.TEXT_HTML_VALUE)
-    @SpringCacheControl()
-    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletResponse resp, HttpServletRequest request,
+            @PathVariable("ext") String ext) throws RestException {
         log.info("Call to getAllOntologyData(); with ext {}", ext);
+        Helpers.setCacheControl(resp, "public");
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         OntModel model = OntData.ontAllMod;
         final StreamingResponseBody stream = new StreamingResponseBody() {
@@ -596,7 +662,8 @@ public class PublicDataResource {
     }
 
     private static String getEtag(Model model, String res) {
-        Statement smt = model.getProperty(ResourceFactory.createResource(RES_PREFIX + res), ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/gitRevision"));
+        Statement smt = model.getProperty(ResourceFactory.createResource(RES_PREFIX + res),
+                ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/gitRevision"));
         if (smt != null) {
             return smt.getObject().toString();
         }
@@ -635,6 +702,17 @@ public class PublicDataResource {
             return "place";
         }
         return type;
+    }
+
+    private String filterResourceId(String resId) throws IOException {
+        if (COLUMBIA_IDS == null) {
+            InputStream resource = PublicDataResource.class.getClassLoader().getResourceAsStream("columbia-id.csv");
+            COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+        }
+        if (COLUMBIA_IDS.contains(resId)) {
+            resId = "W" + resId.substring(1);
+        }
+        return resId;
     }
 
 }

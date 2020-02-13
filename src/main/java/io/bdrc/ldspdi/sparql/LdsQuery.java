@@ -1,24 +1,5 @@
 package io.bdrc.ldspdi.sparql;
 
-/*******************************************************************************
- * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- *
- * If this file is a derivation of another work the license header will appear below;
- * otherwise, this work is licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the License.
- *
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -51,101 +32,79 @@ import io.bdrc.libraries.Prefixes;
 
 public class LdsQuery {
 
-    private HashMap<String, String> metaInf;
-    private String query;
-    private String queryHtml;
-    private String queryName;
-    private HashMap<String, String> litLangParams = new HashMap<>();
-    private QueryTemplate template;
-    private ArrayList<Param> params;
-    private ArrayList<Output> outputs;
-    private String prefixedQuery;
-    private long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
-
     public final static Logger log = LoggerFactory.getLogger(LdsQuery.class);
 
+    private final String PARAM = "#param";
+    private final String OUTPUT = "#output";
+    private final String QUERY = "#Query";
+
+    private QueryTemplate template;
+    private String queryName;
+    private String query;
+    private String queryHtml;
+    private HashMap<String, String> paramsData = new HashMap<>();
+    private HashMap<String, String> outputsData = new HashMap<>();
+    private HashMap<String, String> queryData = new HashMap<>();
+    private List<String> requiredParams;
+    private List<String> optionalParams;
+    private ArrayList<String> outputsNames;
+    private HashMap<String, String> litLangParams = new HashMap<>();
+    private long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
+
     public LdsQuery(String filePath) throws RestException {
-        metaInf = new HashMap<>();
         final File f = new File(filePath);
         final String fileBaseName = f.getName();
         queryName = fileBaseName.substring(0, fileBaseName.lastIndexOf("."));
-        parseTemplate(f);
-        template = new QueryTemplate(getTemplateName(), QueryConstants.QUERY_PUBLIC_DOMAIN, metaInf.get(QueryConstants.QUERY_URL), metaInf.get(QueryConstants.QUERY_SCOPE), metaInf.get(QueryConstants.QUERY_RESULTS),
-                metaInf.get(QueryConstants.QUERY_RETURN_TYPE), metaInf.get(QueryConstants.QUERY_PARAMS), params, outputs, getQuery());
+        readTemplateData(f);
+        template = new QueryTemplate(getQueryName(), QueryConstants.QUERY_PUBLIC_DOMAIN, queryData.get(QueryConstants.QUERY_URL),
+                queryData.get(QueryConstants.QUERY_SCOPE), queryData.get(QueryConstants.QUERY_RESULTS),
+                queryData.get(QueryConstants.QUERY_RETURN_TYPE), queryData.get(QueryConstants.QUERY_PARAMS),
+                queryData.get(QueryConstants.QUERY_OPT_PARAMS), buildParams(), buildOutputs(), getQuery());
     }
 
-    public String getTemplateName() {
-        return this.queryName;
-    }
-
-    private void parseTemplate(File file) throws RestException {
-        // log.info("parse template at {}", file.getAbsolutePath());
+    private void readTemplateData(File file) throws RestException {
         BufferedReader brd = null;
-        HashMap<String, HashMap<String, String>> p_map = new HashMap<>();
-        HashMap<String, HashMap<String, String>> o_map = new HashMap<>();
         String readLine = "";
         query = "";
         queryHtml = "";
+        outputsNames = new ArrayList<String>();
         try {
             brd = new BufferedReader(new FileReader(file));
             while ((readLine = brd.readLine()) != null) {
                 readLine = readLine.trim();
-                boolean processed = false;
-                if (readLine.startsWith("#")) {
-                    readLine = readLine.substring(1);
-
-                    int index = readLine.indexOf("=");
-                    if (index != -1) {
-                        String info0 = readLine.substring(0, index);
-                        String info1 = readLine.substring(index + 1).trim();
-                        if (info0.startsWith(QueryConstants.PARAM)) {
-                            List<String> parsed = Arrays.asList(info0.split(Pattern.compile("\\.").toString()));
-                            if (parsed.size() == 3 && QueryConstants.isValidInfoType(parsed.get(2))) {
-                                HashMap<String, String> mp = p_map.get(parsed.get(1));
-                                if (mp == null) {
-                                    mp = new HashMap<>();
-                                }
-                                mp.put(parsed.get(2), info1);
-                                p_map.put(parsed.get(1), mp);
-                            } else {
-                                throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed, invalid param declaration :" + info0));
-                            }
-                            processed = true;
+                if (readLine.startsWith("#") && readLine.contains("=")) {
+                    String[] tmp = new String[2];
+                    tmp[0] = readLine.substring(0, readLine.indexOf("="));
+                    tmp[1] = readLine.substring(readLine.indexOf("=") + 1);
+                    if (readLine.startsWith(PARAM)) {
+                        paramsData.put(tmp[0].substring(1, tmp[0].length()), tmp[1].trim());
+                    }
+                    if (readLine.startsWith(OUTPUT)) {
+                        String s = readLine.substring(readLine.indexOf(".") + 1);
+                        s = s.substring(0, s.indexOf("."));
+                        if (!outputsNames.contains(s)) {
+                            outputsNames.add(s);
                         }
-                        if (info0.startsWith(QueryConstants.OUTPUT)) {
-                            List<String> parsed = Arrays.asList(info0.split(Pattern.compile("\\.").toString()));
-                            if (parsed.size() == 3 && QueryConstants.isValidOutput(parsed.get(2))) {
-                                HashMap<String, String> op = o_map.get(parsed.get(1));
-                                if (op == null) {
-                                    op = new HashMap<>();
-                                }
-                                op.put(parsed.get(2), info1);
-                                o_map.put(parsed.get(1), op);
-                            }
-                            processed = true;
-                        }
-                        if (!processed) {
-                            metaInf.put(info0, info1);
-                        }
+                        outputsData.put(tmp[0].substring(1, tmp[0].length()), tmp[1].trim());
+                    }
+                    if (readLine.startsWith(QUERY)) {
+                        queryData.put(tmp[0].substring(1, tmp[0].length()), tmp[1].trim());
                     }
                 } else {
-                    query = query + " " + readLine;
-                    queryHtml = queryHtml + " " + readLine + "<br>";
+                    if (!readLine.startsWith("#")) {
+                        query = query + " " + readLine;
+                        queryHtml = queryHtml + " " + readLine + "<br>";
+                    }
                 }
             }
             brd.close();
-            // Check the validity of the return type
-            checkReturnType();
             queryHtml = queryHtml.substring(15);
-            params = buildParams(p_map);
-            outputs = buildOutputs(o_map);
-            prefixedQuery = Prefixes.getPrefixesString() + " " + query;
-            String customLimit = getMetaInf().get(QueryConstants.QUERY_LIMIT);
+            String customLimit = queryData.get(QueryConstants.QUERY_LIMIT);
             if (customLimit != null) {
                 this.limit_max = Long.parseLong(customLimit);
             }
-        } catch (Exception ex) {
-            log.error("QueryFile parsing error", ex);
+        } catch (Exception e) {
+            log.error("QueryFile parsing error", e);
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: " + file.getName()));
         } finally {
             try {
@@ -155,139 +114,47 @@ public class LdsQuery {
         }
     }
 
-    public long getLimit_max() {
-        return limit_max;
-    }
-
-    public HashMap<String, String> getMetaInf() {
-        return metaInf;
-    }
-
-    public void setParams(ArrayList<Param> params) {
-        this.params = params;
-    }
-
-    public String getPrefixedQuery() {
-        return prefixedQuery;
-    }
-
-    private void checkReturnType() throws RestException {
-        if (!QueryConstants.isValidReturnType(metaInf.get(QueryConstants.QUERY_RETURN_TYPE))) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed :" + metaInf.get(QueryConstants.QUERY_RETURN_TYPE) + " is not a valid query return type"));
+    public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
+        String error = checkQueryArgsSyntax(converted);
+        if (!error.trim().equals("")) {
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getQueryName() + "; ERROR: " + error));
         }
-    }
-
-    private ArrayList<Param> buildParams(HashMap<String, HashMap<String, String>> p_map) throws RestException {
-        ArrayList<Param> p = new ArrayList<>();
-        Set<String> names = p_map.keySet();
-        for (String name : names) {
-            HashMap<String, String> mp = p_map.get(name);
-            switch (mp.get(QueryConstants.PARAM_TYPE)) {
-            case QueryConstants.STRING_PARAM:
-                StringParam stp = new StringParam(name);
-                stp.setLangTag(mp.get(QueryConstants.PARAM_LANGTAG));
-                stp.setIsLuceneParam(mp.get(QueryConstants.PARAM_LUCENE));
-                stp.setExample(mp.get(QueryConstants.PARAM_EXAMPLE));
-                p.add(stp);
-                break;
-            case QueryConstants.INT_PARAM:
-                IntParam intp = new IntParam(name);
-                intp.setDescription(mp.get(QueryConstants.PARAM_DESC));
-                p.add(intp);
-                break;
-            case QueryConstants.RES_PARAM:
-                ResParam rtp = new ResParam(name, mp.get(QueryConstants.PARAM_SUBTYPE));
-                rtp.setDescription(mp.get(QueryConstants.PARAM_DESC));
-                p.add(rtp);
-                break;
-            }
-        }
-        return p;
-    }
-
-    private ArrayList<Output> buildOutputs(HashMap<String, HashMap<String, String>> o_map) throws RestException {
-        ArrayList<Output> o = new ArrayList<>();
-        Set<String> names = o_map.keySet();
-        for (String name : names) {
-            HashMap<String, String> op = o_map.get(name);
-            Output output = new Output(name, op.get(QueryConstants.OUTPUT_TYPE), op.get(QueryConstants.OUTPUT_DESC));
-            o.add(output);
-        }
-        return o;
-    }
-
-    public String checkQueryArgsSyntax() {
-        String check = "";
-        String q_params = metaInf.get(QueryConstants.QUERY_PARAMS);
-        if (q_params == null) {
-            // no params no need to parse
-            return "";
-        }
-        String[] args = q_params.split(Pattern.compile(",").toString());
-        List<String> params = Arrays.asList(args);
-        for (String arg : args) {
-            if (!arg.equals(QueryConstants.QUERY_NO_ARGS)) {
-                // Param is not a Lang param --> if it's not present in the query --> Send error
-                if (!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?" + arg) == -1) {
-                    check = "Arg syntax is incorrect : query does not have a ?" + arg + " variable";
-                    return check;
-                }
-                // Param is a Lang param --> check if the corresponding lit param is present
-                if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
-                    String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX + arg.substring(arg.indexOf("_") + 1);
-                    if (!params.contains(expectedLiteralParam)) {
-                        check = "Arg syntax is incorrect : query does not have a literal variable " + expectedLiteralParam + " corresponding to lang " + arg + " variable";
-                        return check;
-                    }
-                    litLangParams.put(expectedLiteralParam, arg);
-                }
-            }
-        }
-        return "";
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public String getParametizedQuery(Map<String, String> converted) throws RestException {
-
-        if (!checkQueryArgsSyntax().trim().equals("")) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getTemplateName() + "; ERROR: " + checkQueryArgsSyntax()));
-        }
-        List<String> params = getQueryParams();
         HashMap<String, String> litParams = getLitLangParams();
         if (converted == null) {
             converted = new HashMap<>();
         }
-        if (!hasValidParams(converted.keySet(), params)) {
-            throw new RestException(500, new LdsError(LdsError.MISSING_PARAM_ERR).setContext(" in LdsQuery.getParametizedQuery() " + converted));
-        }
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(prefixedQuery, Prefixes.getPrefixMapping());
-        for (String st : converted.keySet()) {
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query, Prefixes.getPrefixMapping());
+        for (String st : getAllParams()) {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
-                queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
+                if (converted.get(st) != null) {
+                    queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
+                }
             }
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
                 String param = converted.get(st);
-                if (param.contains(":")) {
-                    if (Helpers.isValidURI(param)) {
-                        queryStr.setIri(st, param);
-                    } else {
-                        String[] parts = param.split(Pattern.compile(":").toString());
-                        if (parts[0] == null) {
-                            parts[0] = "";
-                        }
-                        // may be done automatically by parametrizedSparqlString, to be checked
-                        final String fullUri = Prefixes.getFullIRI(parts[0]);
-                        if (fullUri != null) {
-                            queryStr.setIri(st, fullUri + parts[1]);
+                if (param != null) {
+                    if (param.contains(":")) {
+                        if (Helpers.isValidURI(param)) {
+                            queryStr.setIri(st, param);
                         } else {
-                            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param + " Unknown prefix"));
+                            String[] parts = param.split(Pattern.compile(":").toString());
+                            if (parts[0] == null) {
+                                parts[0] = "";
+                            }
+                            // may be done automatically by parametrizedSparqlString, to be checked
+                            final String fullUri = Prefixes.getFullIRI(parts[0]);
+                            if (fullUri != null) {
+                                queryStr.setIri(st, fullUri + parts[1]);
+                            } else {
+                                throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
+                                        .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param + " Unknown prefix"));
+                            }
                         }
+                    } else {
+                        throw new RestException(500,
+                                new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
+                                        + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
                     }
-                } else {
-                    throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
                 }
 
             }
@@ -297,22 +164,31 @@ public class LdsQuery {
                     lim = ServiceConfig.getProperty("text_query_limit");
                 }
                 if (litParams.keySet().contains(st)) {
-                    String lang = converted.get(litParams.get(st)).toLowerCase();
-                    try {
-                        new Locale.Builder().setLanguageTag(lang).build();
-                    } catch (IllformedLocaleException ex) {
-                        return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
+                    if (converted.get(litParams.get(st)) != null) {
+                        String lang = converted.get(litParams.get(st)).toLowerCase();
+                        try {
+                            new Locale.Builder().setLanguageTag(lang).build();
+                        } catch (IllformedLocaleException ex) {
+                            return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
+                        }
+                        if (limit) {
+                            queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
+                        } else {
+                            queryStr.setLiteral(st, converted.get(st), lang);
+                        }
                     }
-                    queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
-
                 } else {
                     // Some literals do not have a lang associated with them
-                    queryStr.setLiteral(st, converted.get(st) + " " + lim);
+                    if (limit) {
+                        queryStr.setLiteral(st, converted.get(st));
+                    } else {
+                        queryStr.setLiteral(st, converted.get(st));
+                    }
                 }
             }
         }
         Query q = queryStr.asQuery();
-        if (!metaInf.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
+        if (!queryData.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
             if (q.hasLimit()) {
                 if (q.getLimit() > limit_max) {
                     q.setLimit(limit_max);
@@ -323,37 +199,178 @@ public class LdsQuery {
         }
 
         if (q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in LdsQuery.getParametizedQuery() template ->" + getTemplateName() + ".arq" + "; ERROR: " + query));
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
+                    .setContext(" in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + query));
         }
         return q.toString();
+    }
+
+    public String checkQueryArgsSyntax(Map<String, String> map) {
+        String check = "";
+        Set<String> set = map.keySet();
+        for (String required : getRequiredParams()) {
+            if (map.get(required) == null || "null".contentEquals(map.get(required))) {
+                check = "The request mandatory parameter " + required + " is missing : the query cannot be built";
+                return check;
+            }
+        }
+        for (String arg : getAllParams()) {
+            if (!arg.equals(QueryConstants.QUERY_NO_ARGS) && !arg.startsWith(QueryConstants.LITERAL_LIMITPREFIX)) {
+                // Param is not a Lang param --> if it's not present in the query --> Send error
+                if (!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?" + arg) == -1) {
+                    check = "Arg syntax is incorrect : query does not have a ?" + arg + " variable";
+                    return check;
+                }
+                // Param is a Lang param --> check if the corresponding lit param is present
+                if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
+                    String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX + arg.substring(arg.indexOf("_") + 1);
+                    if (!getAllParams().contains(expectedLiteralParam)) {
+                        check = "Arg syntax is incorrect : query does not have a literal variable " + expectedLiteralParam + " corresponding to lang "
+                                + arg + " variable";
+                        return check;
+                    }
+                    litLangParams.put(expectedLiteralParam, arg);
+                }
+            }
+        }
+        return "";
+    }
+
+    private List<String> getRequiredParams() {
+        if (requiredParams == null) {
+            if (queryData.get("QueryParams") != null) {
+                requiredParams = (Arrays.asList(queryData.get("QueryParams").split(",")));
+            } else {
+                requiredParams = new ArrayList<>();
+            }
+        }
+        return requiredParams;
+    }
+
+    private List<String> getOptionalParams() {
+        if (optionalParams == null) {
+            if (queryData.get("QueryOptParams") != null) {
+                optionalParams = (Arrays.asList(queryData.get("QueryOptParams").split(",")));
+            } else {
+                optionalParams = new ArrayList<>();
+            }
+        }
+        return optionalParams;
+    }
+
+    private ArrayList<String> getAllParams() {
+        ArrayList<String> all = new ArrayList<>();
+        for (String p : getRequiredParams()) {
+            all.add(p);
+        }
+        for (String p : getOptionalParams()) {
+            all.add(p);
+        }
+        return all;
     }
 
     public HashMap<String, String> getLitLangParams() {
         return litLangParams;
     }
 
+    private ArrayList<Param> buildParams() throws RestException {
+        ArrayList<Param> p = new ArrayList<>();
+        ArrayList<String> all = getAllParams();
+        for (String s : all) {
+            // first get the type of the param
+            String type = paramsData.get("param." + s + "." + QueryConstants.PARAM_TYPE);
+            if (type != null) {
+                String prefix = "param.";
+                switch (type) {
+                case QueryConstants.STRING_PARAM:
+                    StringParam stp = new StringParam(s);
+                    stp.setLangTag(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LANGTAG));
+                    stp.setIsLuceneParam(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LUCENE));
+                    stp.setExample(paramsData.get(prefix + s + "." + QueryConstants.PARAM_EXAMPLE));
+                    p.add(stp);
+                    break;
+                case QueryConstants.INT_PARAM:
+                    IntParam intp = new IntParam(s);
+                    intp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                    p.add(intp);
+                    break;
+                case QueryConstants.RES_PARAM:
+                    ResParam rtp = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
+                    rtp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                    p.add(rtp);
+                    break;
+                }
+            }
+        }
+        return p;
+    }
+
+    private ArrayList<Output> buildOutputs() throws RestException {
+        ArrayList<Output> o = new ArrayList<>();
+        for (String s : outputsNames) {
+            String prefix = "output.";
+            Output output = new Output(s, outputsData.get(prefix + s + "." + QueryConstants.OUTPUT_TYPE),
+                    outputsData.get(prefix + s + "." + QueryConstants.OUTPUT_DESC));
+            o.add(output);
+        }
+        return o;
+    }
+
+    public String getQueryName() {
+        return queryName;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
     public String getQueryHtml() {
         return queryHtml;
+    }
+
+    public HashMap<String, String> getParamsData() {
+        return paramsData;
+    }
+
+    public HashMap<String, String> getOutputsData() {
+        return outputsData;
+    }
+
+    public HashMap<String, String> getQueryData() {
+        return queryData;
     }
 
     public QueryTemplate getTemplate() {
         return template;
     }
 
-    public List<String> getQueryParams() {
-        if (template.getQueryParams() == null) {
-            return new ArrayList<String>();
-        }
-        return Arrays.asList(template.getQueryParams().split(","));
+    public long getLimit_max() {
+        return limit_max;
     }
 
-    private static boolean hasValidParams(Set<String> reqParams, List<String> params) {
-        for (String pr : params) {
-            if (!reqParams.contains(pr.trim()) && !pr.equals("NONE")) {
-                return false;
-            }
+    public static void main(String[] args) {
+        try {
+            ServiceConfig.init();
+            HashMap<String, String> map = new HashMap<>();
+            LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
+            // LdsQueryNew lds = new LdsQueryNew("lds-queries/public/Etexts_count.arq");
+            // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
+            map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
+            map.put("L_NAME", "\"'od zer\"");
+            map.put("LG_NAME", "bo-x-ewts");
+            // map.put("L_l", "\"མིག་གི་ཡུལ\"");
+            // map.put("LG_l", "bo");
+            map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
+            // LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
+            // map.put("R_RES", "bdr:W29329");
+            System.out.println("Required Params >>" + lds.getRequiredParams());
+            System.out.println("Optional Params >>" + lds.getOptionalParams());
+            System.out.println("CHECK >>" + lds.checkQueryArgsSyntax(map));
+            System.out.println("Query >>" + lds.getQuery());
+            System.out.println("Parametized Query >>" + lds.getParametizedQuery(map, false));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return true;
     }
 
 }

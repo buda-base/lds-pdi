@@ -45,6 +45,14 @@ public class TypeResults {
             if (st.getPredicate().equals(tmpIsMain))
                 continue;
             
+            log.debug("InstanceResults.getResultMap(), checkpoint1: {}", (System.nanoTime() - start) / 1000);
+        StmtIterator allIterator = mod.listStatements();
+        while (allIterator.hasNext()) {
+            final Statement st = allIterator.next();
+
+            if (st.getPredicate().equals(tmpIsMain))
+                continue;
+
             final Resource subject = st.getSubject();
             List<Field> stlist;
             if (isMain.getOrDefault(subject, false)) {
@@ -59,4 +67,5 @@ public class TypeResults {
         res.put("aux", aux);
         return res;
     }
+}
 }

@@ -43,7 +43,6 @@ public class Results {
     public boolean firstPage;
     public ResultPageLinks pLinks;
     public HashMap<String, List<String>> head;
-    // public Head head;
     public HashMap<String, ArrayList<Row>> results;
 
     public Results(ResultSetWrapper res, HashMap<String, String> hm) throws RestException {

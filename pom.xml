@@ -220,7 +220,7 @@
           <artifactId>slf4j-simple</artifactId>
         </exclusion>
       </exclusions>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
     </dependency> 
     <dependency>
       <groupId>io.bdrc.libraries</groupId>
@@ -231,7 +231,7 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.6.4</version>
+      <version>0.8.2</version>
     </dependency>   
 	<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 	<dependency>
