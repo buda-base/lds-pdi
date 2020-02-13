@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.rest.resources;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -24,11 +25,11 @@ import java.io.ByteArrayOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -102,17 +102,7 @@ public class PublicDataResource {
     public static final String ADM_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.admindata.shortprefix");
     public static final String GRAPH_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.graph.shortprefix");
     public static final String GRAPH_PREFIX_FULL = ServiceConfig.getProperty("endpoints.graph.fullprefix");
-    public static List<String> COLUMBIA_IDS = null;
-
-    static {
-        try (Stream<String> lines = Files.lines(Paths.get(System.getProperty("user.dir") + "/src/main/resources/columbia-id.csv"))) {
-            COLUMBIA_IDS = lines.collect(Collectors.toList());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
+    private List<String> COLUMBIA_IDS = null;
 
     @GetMapping("/")
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
@@ -714,7 +704,11 @@ public class PublicDataResource {
         return type;
     }
 
-    private String filterResourceId(String resId) {
+    private String filterResourceId(String resId) throws IOException {
+        if (COLUMBIA_IDS == null) {
+            InputStream resource = PublicDataResource.class.getClassLoader().getResourceAsStream("columbia-id.csv");
+            COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+        }
         if (COLUMBIA_IDS.contains(resId)) {
             resId = "W" + resId.substring(1);
         }
