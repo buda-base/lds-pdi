@@ -22,7 +22,7 @@ public class TypeResults {
     public final static Logger log = LoggerFactory.getLogger(TypeResults.class);
 
     public final static Property tmpIsMain = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/tmp/isMain");
-    
+
     public static Map<String, Object> getResultsMap(final Model mod) throws RestException {
         long start = 0;
         if (log.isDebugEnabled())
@@ -37,14 +37,6 @@ public class TypeResults {
             isMain.put(mainRes, true);
         }
         if (log.isDebugEnabled())
-            log.debug("InstanceResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
-        StmtIterator allIterator = mod.listStatements();
-        while (allIterator.hasNext()) {
-            final Statement st = allIterator.next();
-            
-            if (st.getPredicate().equals(tmpIsMain))
-                continue;
-            
             log.debug("InstanceResults.getResultMap(), checkpoint1: {}", (System.nanoTime() - start) / 1000);
         StmtIterator allIterator = mod.listStatements();
         while (allIterator.hasNext()) {
@@ -67,5 +59,4 @@ public class TypeResults {
         res.put("aux", aux);
         return res;
     }
-}
 }

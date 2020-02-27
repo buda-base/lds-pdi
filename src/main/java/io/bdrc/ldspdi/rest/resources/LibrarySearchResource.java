@@ -21,10 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-<<<<<<< HEAD
-import io.bdrc.ldspdi.rest.features.SpringCacheControl;
-=======
->>>>>>> master
 import io.bdrc.ldspdi.results.library.TypeResults;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -80,15 +76,9 @@ public class LibrarySearchResource {
             res = TypeResults.getResultsMap(model);
             break;
         default:
-<<<<<<< HEAD
-            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query "+file);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
-=======
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query " + file);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
->>>>>>> master
-
         }
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
     }
