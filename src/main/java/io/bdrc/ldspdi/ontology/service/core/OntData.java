@@ -75,7 +75,7 @@ public class OntData implements Runnable {
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
             odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
