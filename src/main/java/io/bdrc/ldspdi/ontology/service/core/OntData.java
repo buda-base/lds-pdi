@@ -141,8 +141,10 @@ public class OntData implements Runnable {
 
     private static void updateFusekiDataset() throws RestException {
         log.info("FUSEKI URL IS >>" + fusekiUrl);
-        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
-        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
+        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
     }
 
@@ -152,7 +154,7 @@ public class OntData implements Runnable {
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf");
+            OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
             odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
@@ -166,10 +168,12 @@ public class OntData implements Runnable {
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Global model size :" + ontAllMod.size());
-            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
+            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
             log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")).size());
             log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")));
-            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                    fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                     OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
             readGithubJsonLDContext();
             updateFusekiDataset();
@@ -197,7 +201,8 @@ public class OntData implements Runnable {
     }
 
     public static ArrayList<OntResource> getDomainUsages(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "    ?s rdfs:domain <" + uri + "> ." + "} order by ?p ?s";
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "    ?s rdfs:domain <" + uri
+                + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
         if (global) {
             qexec = QueryExecutionFactory.create(query, ontAllMod);
@@ -219,7 +224,8 @@ public class OntData implements Runnable {
     }
 
     public static ArrayList<OntResource> getRangeUsages(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {" + "    ?s rdfs:range <" + uri + "> ." + "} order by ?p ?s";
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {" + "    ?s rdfs:range <"
+                + uri + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
         if (global) {
             qexec = QueryExecutionFactory.create(query, ontAllMod);
@@ -241,7 +247,8 @@ public class OntData implements Runnable {
     }
 
     public static ArrayList<OntResource> getSubProps(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {" + "    ?s rdfs:subPropertyOf <" + uri + "> ." + "} order by ?p ?s";
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {"
+                + "    ?s rdfs:subPropertyOf <" + uri + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
         if (global) {
             qexec = QueryExecutionFactory.create(query, ontAllMod);
@@ -263,7 +270,8 @@ public class OntData implements Runnable {
     }
 
     public static ArrayList<OntResource> getParentProps(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   <" + uri + "> rdfs:subPropertyOf ?s ." + "} order by ?s";
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   <" + uri
+                + "> rdfs:subPropertyOf ?s ." + "} order by ?s";
         QueryExecution qexec = null;
         if (global) {
             qexec = QueryExecutionFactory.create(query, ontAllMod);
@@ -285,7 +293,8 @@ public class OntData implements Runnable {
     }
 
     public static ArrayList<OntResource> getSubClassesOf(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   ?s rdfs:subClassOf <" + uri + "> ." + "} order by ?s";
+        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   ?s rdfs:subClassOf <"
+                + uri + "> ." + "} order by ?s";
         QueryExecution qexec = null;
         if (global) {
             qexec = QueryExecutionFactory.create(query, ontAllMod);
