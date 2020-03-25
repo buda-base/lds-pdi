@@ -73,7 +73,8 @@ public class BdrcAuthResource {
     }
 
     @GetMapping(value = "/resource-nc/user/{res}")
-    public ResponseEntity<StreamingResponseBody> userResource(@PathVariable("res") final String res, HttpServletResponse response, HttpServletRequest request) throws IOException, RestException {
+    public ResponseEntity<StreamingResponseBody> userResource(@PathVariable("res") final String res, HttpServletResponse response,
+            HttpServletRequest request) throws IOException, RestException {
         log.info("Call userResource()");
         Helpers.setCacheControl(response, "public");
         try {
@@ -99,7 +100,8 @@ public class BdrcAuthResource {
             }
         } catch (Exception e) {
             log.error("Call userResource() failed", e);
-            return ResponseEntity.status(404).body(StreamingHelpers.getStream("Could not find the requested resource " + res + " Exception is:" + e.getMessage()));
+            return ResponseEntity.status(404)
+                    .body(StreamingHelpers.getStream("Could not find the requested resource " + res + " Exception is:" + e.getMessage()));
         }
     }
 
@@ -121,7 +123,8 @@ public class BdrcAuthResource {
             if (pageSize != null) {
                 try {
                     if (Long.parseLong(pageSize) > qfp.getLimit_max()) {
-                        return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
+                        return (ResponseEntity<String>) ResponseEntity.status(403)
+                                .body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
                     }
                 } catch (Exception e) {
                     throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
@@ -143,22 +146,26 @@ public class BdrcAuthResource {
                 response.setContentType("text/html");
                 return ResultSetFormatter.asXMLString(rs);
             }
-            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query", hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
+            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query",
+                    hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
                 byte[] buff = GlobalHelpers.getJsonBytes(r);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"budaUsers.json\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers.json\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             if ("csv".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, true);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
 
             }
             if ("csv_f".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, false);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");
@@ -199,7 +206,8 @@ public class BdrcAuthResource {
             if (pageSize != null) {
                 try {
                     if (Long.parseLong(pageSize) > qfp.getLimit_max()) {
-                        return (ResponseEntity<String>) ResponseEntity.status(403).body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
+                        return (ResponseEntity<String>) ResponseEntity.status(403)
+                                .body("The requested page size exceeds the current limit (" + qfp.getLimit_max() + ")");
                     }
                 } catch (Exception e) {
                     throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
@@ -221,22 +229,26 @@ public class BdrcAuthResource {
                 response.setContentType("text/html");
                 return ResultSetFormatter.asXMLString(rs);
             }
-            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query", hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
+            ResultSetWrapper res = QueryProcessor.getResults(query, ServiceConfig.getProperty("fusekiAuthData") + "query",
+                    hm.get(QueryConstants.RESULT_HASH), hm.get(QueryConstants.PAGE_SIZE));
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
                 byte[] buff = GlobalHelpers.getJsonBytes(r);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"budaUsers.json\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers.json\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             if ("csv".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, true);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
 
             }
             if ("csv_f".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, false);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV).header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                        .header("Content-Disposition", "attachment; filename=\"budaUsers_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             hm.put(QueryConstants.REQ_METHOD, "GET");
@@ -267,7 +279,8 @@ public class BdrcAuthResource {
         m.setNsPrefixes(Prefixes.getPrefixMapping());
         if (m.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_RES_ERR).setContext(res);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         Calendar cal = Calendar.getInstance();
         if (ServiceConfig.useAuth()) {
@@ -275,7 +288,8 @@ public class BdrcAuthResource {
         }
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(StreamingHelpers.getModelStream(m, "ttl"));
+        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl"))
+                .body(StreamingHelpers.getModelStream(m, "ttl"));
     }
 
     @GetMapping(value = "/authmodel")
@@ -287,7 +301,8 @@ public class BdrcAuthResource {
         }
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(StreamingHelpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null));
+        return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl"))
+                .body(StreamingHelpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null));
     }
 
     @GetMapping(value = "/authmodel/updated")
@@ -308,9 +323,17 @@ public class BdrcAuthResource {
         return ResponseEntity.ok("Auth Model is updating");
     }
 
+    @PostMapping(value = "/callbacks/model/bdrc-auth")
+    public ResponseEntity<String> readAuthModel() {
+        log.info("updating Auth data model() >>");
+        RdfAuthModel.readAuthModel();
+        return ResponseEntity.ok("Updated auth Model was read");
+    }
+
     private Resource getRdfProfile(String auth0Id) throws IOException {
         Resource r = null;
-        String query = "select distinct ?s where  {  ?s <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> <http://purl.bdrc.io/resource-nc/auth/" + auth0Id + "> }";
+        String query = "select distinct ?s where  {  ?s <http://purl.bdrc.io/ontology/ext/user/hasUserProfile> <http://purl.bdrc.io/resource-nc/auth/"
+                + auth0Id + "> }";
         log.info("QUERY >> {} and service: {} ", query, ServiceConfig.getProperty("fusekiAuthData") + "query");
         QueryExecution qe = QueryProcessor.getResultSet(query, ServiceConfig.getProperty("fusekiAuthData") + "query");
         ResultSet rs = qe.execSelect();

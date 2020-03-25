@@ -125,6 +125,7 @@ public class QueryProcessor {
             RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
             model = conn.queryConstruct(q);
             ResultsCache.addToCache(model, hash);
+            conn.close();
         }
         return model;
     }
@@ -211,14 +212,16 @@ public class QueryProcessor {
             Model m = qexec.execDescribe();
             return m;
         } catch (Exception ex) {
-            throw new RestException(500, new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
+            throw new RestException(500,
+                    new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
         }
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
         ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
 
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf")
+                .openConnection();
         InputStream stream = connection.getInputStream();
         Model tmp = ModelFactory.createDefaultModel();
         tmp.read(stream, RDFLanguages.strLangRDFXML);

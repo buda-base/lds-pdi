@@ -10,10 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.EventListener;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -77,10 +79,13 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         SpringApplication.run(SpringBootLdspdi.class, args);
     }
 
-    /*
-     * @Override protected SpringApplicationBuilder
-     * configure(SpringApplicationBuilder application) { return
-     * application.sources(SpringBootLdspdi.class); }
-     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void doSomethingAfterStartup() {
+        if ("true".equals(AuthProps.getProperty("useAuth"))) {
+            log.info("SpringBootIIIFPres uses auth, updating auth data...");
+            // RdfAuthModel.init();
+            RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
+        }
+    }
 
 }

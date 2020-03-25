@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import io.bdrc.auth.Access;
 import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
-import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
@@ -67,6 +66,7 @@ public class RdfAuthFilter implements Filter {
                 // Getting his profile
                 validation = new TokenValidation(token);
                 prof = validation.getUser();
+
             }
             if (isSecuredEndpoint) {
                 // Endpoint is secure
