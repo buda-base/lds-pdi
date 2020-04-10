@@ -40,7 +40,7 @@ public class CacheAccessModel {
         return getConfig().getCacheName();
     }
 
-    public ICompositeCacheAttributes.DiskUsagePattern getDiskUsagePattern(){
+    public ICompositeCacheAttributes.DiskUsagePattern getDiskUsagePattern() {
         return getConfig().getDiskUsagePattern();
     }
 
@@ -61,19 +61,19 @@ public class CacheAccessModel {
     }
 
     public String getMemoryCacheName() {
-        String tmp=getConfig().getMemoryCacheName();
-        return tmp.substring(tmp.lastIndexOf('.')+1);
+        String tmp = getConfig().getMemoryCacheName();
+        return tmp.substring(tmp.lastIndexOf('.') + 1);
     }
 
     public long getShrinkerIntervalSeconds() {
         return getConfig().getShrinkerIntervalSeconds();
     }
 
-    public boolean  isUseDisk() {
+    public boolean isUseDisk() {
         return getConfig().isUseDisk();
     }
 
-    public boolean  isUseLateral() {
+    public boolean isUseLateral() {
         return getConfig().isUseLateral();
     }
 
@@ -85,7 +85,6 @@ public class CacheAccessModel {
         return getConfig().isUseRemote();
     }
 
-
     /**
      * Cache stats
      */
@@ -93,7 +92,7 @@ public class CacheAccessModel {
         return ResultsCache.CACHE.getDefaultElementAttributes();
     }
 
-    private CompositeCache<Integer,Object> getCacheControl() {
+    private CompositeCache<Integer, Object> getCacheControl() {
         return ResultsCache.CACHE.getCacheControl();
     }
 
@@ -143,10 +142,10 @@ public class CacheAccessModel {
         return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
     }
 
-    private static HashMap<ObjectName,MemoryPoolMXBean> getMemoryPoolBean(){
+    private static HashMap<ObjectName, MemoryPoolMXBean> getMemoryPoolBean() {
         List<MemoryPoolMXBean> l = ManagementFactory.getMemoryPoolMXBeans();
-        HashMap<ObjectName,MemoryPoolMXBean> map=new HashMap<>();
-        for(MemoryPoolMXBean mx:l) {
+        HashMap<ObjectName, MemoryPoolMXBean> map = new HashMap<>();
+        for (MemoryPoolMXBean mx : l) {
             map.put(mx.getObjectName(), mx);
         }
         return map;
@@ -156,10 +155,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Code Cache")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getCodeMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getCodeMemoryUsage()", ex));
         }
     }
 
@@ -167,10 +164,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Metaspace")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getMetaMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getMetaMemoryUsage()", ex));
         }
     }
 
@@ -178,10 +173,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=Compressed Class Space")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getCompressedMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getCompressedMemoryUsage()", ex));
         }
     }
 
@@ -189,10 +182,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Eden Space")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getEdenMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getEdenMemoryUsage()", ex));
         }
     }
 
@@ -200,10 +191,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Survivor Space")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getSurvivorMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getSurvivorMemoryUsage()", ex));
         }
     }
 
@@ -211,10 +200,8 @@ public class CacheAccessModel {
         try {
 
             return getMemoryPoolBean().get(new ObjectName("java.lang:type=MemoryPool,name=PS Old Gen")).getUsage();
-        }
-        catch(MalformedObjectNameException ex) {
-            throw new RestException(5001,new LdsError(LdsError.GENERIC_ERR).
-                    setContext(" in CacheAccessModel.getOldMemoryUsage()",ex));
+        } catch (MalformedObjectNameException ex) {
+            throw new RestException(5001, new LdsError(LdsError.GENERIC_ERR).setContext(" in CacheAccessModel.getOldMemoryUsage()", ex));
         }
     }
 
@@ -257,7 +244,6 @@ public class CacheAccessModel {
     /*
      * Utilities
      */
-
 
     public String format(long l) {
         return new DecimalFormat("#,###,###").format(l);
