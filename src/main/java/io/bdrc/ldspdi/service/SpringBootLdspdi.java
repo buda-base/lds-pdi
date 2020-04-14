@@ -76,7 +76,6 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         }
         ResultsCache.init();
         GitService.update();
-
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication.run(SpringBootLdspdi.class, args);
