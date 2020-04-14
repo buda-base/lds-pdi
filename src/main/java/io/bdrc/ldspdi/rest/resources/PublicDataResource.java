@@ -79,6 +79,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
+import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
@@ -557,7 +558,17 @@ public class PublicDataResource {
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            Model model = OntData.getOntModelByBase(params.getBaseUri());
+            Model model = null;
+            // There should be a better test
+            // Eventually merge OntData and OntShapesData ?
+            // Moving on for now
+            if (params.getBaseUri().contains("/shapes/")) {
+                log.info("In getOntologyResourceAsFile(), Picking up shapes model for {}", params.getBaseUri());
+                model = OntShapesData.getOntModelByBase(params.getBaseUri());
+            } else {
+                log.info("In getOntologyResourceAsFile(), Picking up normal model for {}", params.getBaseUri());
+                model = OntData.getOntModelByBase(params.getBaseUri());
+            }
             // Inference here if required
             if (reasoner != null) {
                 model = ModelFactory.createInfModel(reasoner, model);

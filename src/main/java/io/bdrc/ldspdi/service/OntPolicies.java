@@ -34,7 +34,7 @@ public class OntPolicies {
 
     private static OntPolicy loadPolicy(Resource r, FileManager fm) {
         Statement st = r.getProperty(ResourceFactory.createProperty("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#publicURI"));
-        String baseUri = st.getObject().asResource().getURI();
+        String baseUri = computeUri(st.getObject().asResource().getURI());
         String graph = defaultGraph;
         st = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/ontGraph"));
         if (st != null) {
@@ -84,6 +84,10 @@ public class OntPolicies {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private static String computeUri(String uri) {
+        return uri.replace("purl.bdrc.io", ServiceConfig.getProperty("serverRoot"));
     }
 
     public static ArrayList<String> getValidBaseUri() {

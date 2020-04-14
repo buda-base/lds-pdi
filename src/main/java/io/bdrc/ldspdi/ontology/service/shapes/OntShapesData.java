@@ -50,7 +50,14 @@ public class OntShapesData {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        s = s.replace("purl.bdrc.io", ServiceConfig.getProperty("serverRoot"));
+        log.info("parseBaseUri returned {}", s);
         return s;
+    }
+
+    public static OntModel getOntModelByBase(String baseUri) throws RestException {
+        log.info("In getOntModelByBase, Picking up shapes model for {} and keySet {}", baseUri, modelsBase.keySet());
+        return modelsBase.get(baseUri);
     }
 
     public static void addOntModelByBase(String baseUri, OntModel om) {

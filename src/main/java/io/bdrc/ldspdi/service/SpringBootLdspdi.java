@@ -25,6 +25,7 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.taxonomy.TaxModel;
 
@@ -74,6 +75,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         ResultsCache.init();
         GitService.update();
         OntData.init();
+        OntShapesData.init();
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication.run(SpringBootLdspdi.class, args);

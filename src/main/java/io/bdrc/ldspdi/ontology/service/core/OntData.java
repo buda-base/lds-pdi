@@ -108,6 +108,7 @@ public class OntData implements Runnable {
     }
 
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
+        log.info("In getOntModelByBase, Picking up normal model for {} and keySet {}", baseUri, modelsBase.keySet());
         return modelsBase.get(baseUri);
     }
 
