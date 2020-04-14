@@ -76,8 +76,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         }
         ResultsCache.init();
         GitService.update();
-        OntData.init();
-        OntShapesData.init();
+
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication.run(SpringBootLdspdi.class, args);
@@ -85,6 +84,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
+        OntData.init();
+        OntShapesData.init();
         if ("true".equals(AuthProps.getProperty("useAuth"))) {
             log.info("SpringBootLdspdi uses auth, updating auth data...");
             // RdfAuthModel.init();

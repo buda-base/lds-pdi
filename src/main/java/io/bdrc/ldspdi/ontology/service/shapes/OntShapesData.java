@@ -40,7 +40,7 @@ public class OntShapesData {
                 ontAllMod.add(om);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
             }
-            log.info("Done with OntShapesData initialization !");
+            log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }

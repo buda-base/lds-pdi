@@ -103,9 +103,11 @@ public class OntPolicies {
     }
 
     public static boolean isBaseUri(String s) {
+        log.info("Map Uri key set >> {} and test uri={}", map.keySet(), s);
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        log.info("Map Uri key Tested Uri >> {} ", s);
         return map.containsKey(s);
     }
 
