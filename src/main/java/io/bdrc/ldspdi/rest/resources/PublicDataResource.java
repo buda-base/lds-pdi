@@ -549,13 +549,15 @@ public class PublicDataResource {
         }
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
-        log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
+
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
+        log.info("In getOntologyResourceAsFile(), RES = {} and ext= {} and jenalang={}", res, ext, JenaLangStr);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
+        log.info("In getOntologyResourceAsFile(), isBaseUri uri {} baseuri= {}", res, OntPolicies.isBaseUri(res));
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
             Model model = null;
