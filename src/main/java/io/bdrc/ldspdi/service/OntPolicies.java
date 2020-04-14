@@ -26,6 +26,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 public class OntPolicies {
 
     public static final String policiesUrl = ServiceConfig.getProperty("ontPoliciesUrl");
+    public static final String shapesPoliciesUrl = ServiceConfig.getProperty("ontShapesPoliciesUrl");
     public static HashMap<String, OntPolicy> map;
     private static Model mod;
     private static String defaultGraph;
@@ -57,12 +58,20 @@ public class OntPolicies {
             InputStream stream = connection.getInputStream();
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
-            ResIterator it2 = mod.listResourcesWithProperty(RDF.type, ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
+            connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
+            InputStream shapesStream = connection.getInputStream();
+            Model shapesMod = ModelFactory.createDefaultModel();
+            shapesMod.read(shapesStream, RDFLanguages.strLangRDFXML);
+            mod.add(shapesMod);
+            ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
+                    ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
                 Resource r = it2.next();
-                defaultGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject().asResource().getURI();
+                defaultGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
+                        .asResource().getURI();
             }
-            ResIterator it1 = mod.listResourcesWithProperty(RDF.type, ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
+            ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
+                    ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
             while (it1.hasNext()) {
                 Resource r = it1.next();
                 OntPolicy op = loadPolicy(r, fm);
@@ -70,6 +79,7 @@ public class OntPolicies {
                 log.info("loaded OntPolicy >> {}", op);
             }
             stream.close();
+            shapesStream.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
