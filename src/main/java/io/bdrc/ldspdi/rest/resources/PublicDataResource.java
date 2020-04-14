@@ -594,7 +594,8 @@ public class PublicDataResource {
                 return ResponseEntity.ok().header("Profile", reasonerUri)
                         .header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
             }
-            return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
+            return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
+                    .body(baos.toString());
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
