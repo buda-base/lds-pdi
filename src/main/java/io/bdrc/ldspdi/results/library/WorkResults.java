@@ -36,22 +36,21 @@ public class WorkResults {
         Map<String, Object> facets = new HashMap<>();
         HashSet<String> tops = new HashSet<>();
         Map<Resource, Boolean> isWork = new HashMap<>();
-        //ResIterator workit = mod.listResourcesWithProperty(RDF.type, mod.getResource("http://purl.bdrc.io/ontology/core/Work"));
         ResIterator workit = mod.listResourcesWithProperty(RDF.type);
         while (workit.hasNext()) {
             Resource work = workit.next();
             isWork.put(work, true);
         }
         if (log.isDebugEnabled())
-            log.debug("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
+            log.debug("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime() - start) / 1000);
         StmtIterator allIterator = mod.listStatements();
         while (allIterator.hasNext()) {
             Statement st = allIterator.next();
-            
+
             final Resource subject = st.getSubject();
-            
+
             final Boolean subjectIsWork = isWork.getOrDefault(subject, false);
-            
+
             List<Field> stlist;
             if (subjectIsWork) {
                 stlist = main.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
@@ -61,7 +60,8 @@ public class WorkResults {
             stlist.add(Field.getField(st));
 
             String prop = st.getPredicate().getURI();
-            if (prop.equals(Taxonomy.WORK_GENRE) || prop.equals(Taxonomy.WORK_IS_ABOUT) && st.getObject().asResource().getLocalName().startsWith("T")) {
+            if (prop.equals(Taxonomy.WORK_GENRE)
+                    || prop.equals(Taxonomy.WORK_IS_ABOUT) && st.getObject().asResource().getLocalName().startsWith("T")) {
                 Taxonomy.processTopicStatement(st, tops, Wtopics, WorkBranch, topics);
             }
         }
@@ -69,7 +69,7 @@ public class WorkResults {
         res.put("aux", aux);
         facets.put("topics", Taxonomy.buildFacetTree(tops, topics));
         if (log.isDebugEnabled())
-            log.debug("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
+            log.debug("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime() - start) / 1000);
         res.put("facets", facets);
         return res;
     }

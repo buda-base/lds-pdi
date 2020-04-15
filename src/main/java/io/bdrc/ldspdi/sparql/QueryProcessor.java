@@ -157,7 +157,7 @@ public class QueryProcessor {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        log.info("Service fuseki >> {} Graph >> {} and InfModel Size >> ", fusekiUrl, graph, mod.listStatements().toSet().size());
+        log.info("Service fuseki >> {} Graph >> {} and InfModel Size >> {}", fusekiUrl, graph, mod.listStatements().toSet().size());
         DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         access.putModel(graph, mod);
     }

@@ -79,6 +79,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
+import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.OntPolicies;
@@ -438,9 +439,6 @@ public class PublicDataResource {
         boolean isBase = false;
         String baseUri = "";
         String tmp = request.getRequestURL().toString().replace("https", "http");
-        // DO not Remove below : this is useful for local testing
-        // String tmp = "http://purl.bdrc.io/ontology/admin";
-        // String tmp = "http://purl.bdrc.io/ontology/core/Etext";
         log.info("getExtOntologyHomePage tmp is >> {}", tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = parseBaseUri(tmp);
@@ -557,7 +555,12 @@ public class PublicDataResource {
         }
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            Model model = OntData.getOntModelByBase(params.getBaseUri());
+            Model model = null;
+            if (res.contains("/shapes/")) {
+                model = OntShapesData.getOntModelByBase(params.getBaseUri());
+            } else {
+                model = OntData.getOntModelByBase(params.getBaseUri());
+            }
             // Inference here if required
             if (reasoner != null) {
                 model = ModelFactory.createInfModel(reasoner, model);

@@ -40,6 +40,7 @@ public class ServiceConfig {
     static Properties prop = new Properties();
     public final static String FUSEKI_URL = "fusekiUrl";
     public static String LOCAL_QUERIES_DIR;
+    public static String SERVER_ROOT;
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged with
@@ -54,10 +55,34 @@ public class ServiceConfig {
             input = ServiceConfig.class.getClassLoader().getResourceAsStream("edit.properties");
             prop.load(input);
             input.close();
+            final String configPath = System.getProperty("ldspdi.configpath");
+            if (configPath != null) {
+                log.info("getting properties from {}", configPath + "ldspdi.properties");
+                try {
+                    InputStream is = new FileInputStream(configPath + "ldspdi.properties");
+                    prop.load(is);
+                    is.close();
+                    if (useAuth()) {
+                        try {
+                            is = new FileInputStream(configPath + "ldspdi-private.properties");
+                            prop.load(is);
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            log.warn("No custom properties file could be found: using default props");
+                        }
+                    }
+                } catch (IOException e) {
+                    log.warn("No custom properties file could be found: using default props");
+                }
+            } else {
+                log.info("using default properties");
+            }
+            SERVER_ROOT = prop.getProperty("serverRoot");
+            OntPolicies.init();
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }
-        OntPolicies.init();
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {

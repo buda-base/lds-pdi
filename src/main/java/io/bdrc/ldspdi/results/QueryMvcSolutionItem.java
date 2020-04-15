@@ -11,6 +11,7 @@ import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.libraries.Prefixes;
 
 public class QueryMvcSolutionItem {
@@ -31,9 +32,10 @@ public class QueryMvcSolutionItem {
                     if (node.asNode().isBlank()) {
                         tmp = res.getLocalName();
                     } else {
-                        if (Uri.startsWith("http://purl.bdrc.io/resource")) {
-                            tmp = "<a href=/resource/" + res.getLocalName() + "> " + res.getLocalName() + "</a>  " + "<a href=/resource/" + res.getLocalName() + ".ttl> (ttl)</a>";
-                        } else if (Uri.startsWith("http://purl.bdrc.io/ontology/core/")) {
+                        if (Uri.startsWith("http://" + ServiceConfig.SERVER_ROOT + "/resource")) {
+                            tmp = "<a href=/resource/" + res.getLocalName() + "> " + res.getLocalName() + "</a>  " + "<a href=/resource/"
+                                    + res.getLocalName() + ".ttl> (ttl)</a>";
+                        } else if (Uri.startsWith("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")) {
                             tmp = "<a href=\"" + Uri + "\"> " + res.getLocalName() + "</a>";
                         } else {
                             tmp = "<a href=\"" + Uri + "\"> " + Uri + "</a>";

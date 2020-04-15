@@ -142,10 +142,10 @@ public class OntData implements Runnable {
     private static void updateFusekiDataset() throws RestException {
         log.info("FUSEKI URL IS >>" + fusekiUrl);
         QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
-        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph());
+        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
     }
 
     @Override
@@ -162,19 +162,17 @@ public class OntData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
-                // if (!uri.equals("http://purl.bdrc.io/ontology/ext/auth/")) {
                 ontAllMod.add(om);
-                // }
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
-            log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")).size());
-            log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")));
-            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph());
+            log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")).size());
+            log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")));
+            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                     fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
             readGithubJsonLDContext();
             updateFusekiDataset();
 
@@ -470,7 +468,7 @@ public class OntData implements Runnable {
     };
 
     public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
-        OntModel om = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/admin");
+        OntModel om = OntData.getOntModelByBase("http://" + ServiceConfig.SERVER_ROOT + "/ontology/admin");
         return om.listAnnotationProperties().toList();
     }
 
@@ -502,17 +500,13 @@ public class OntData implements Runnable {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
         return s;
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
         // OntData.init();
-        // OntModel m =
-        // OntData.getOntModelByBase("http://purl.bdrc.io/ontology/ext/auth");
-        // OntData.setOntModel(m);
-        // m.write(System.out, "TURTLE");
-        // System.out.println(m.size());
         Model m = ReasonerRegistry.theRegistry().getAllDescriptions();
         m.write(System.out, "TURTLE");
 

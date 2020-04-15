@@ -14,7 +14,7 @@ import org.apache.jena.rdf.model.RDFWriter;
 
 public class ModelWriteTest {
 
-    static String testUrl = "https://raw.githubusercontent.com/buda-base/lds-pdi/master/test.ttl";
+    static String testUrl = "https://raw.githubusercontent.com/buda-base/lds-pdi/newbiblio/test.ttl";
     // static String
     // testUrl="https://raw.githubusercontent.com/buda-base/owl-schema/master/global.ttl";
 

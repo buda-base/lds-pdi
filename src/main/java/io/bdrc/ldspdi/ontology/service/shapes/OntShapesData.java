@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class OntShapesData {
@@ -50,6 +51,7 @@ public class OntShapesData {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
         return s;
     }
 
@@ -57,10 +59,20 @@ public class OntShapesData {
         modelsBase.put(baseUri, om);
     }
 
+    public static OntModel getOntModelByBase(String baseUri) {
+        return modelsBase.get(baseUri);
+    }
+
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         OntShapesData.init();
-        System.out.println(OntShapesData.modelsBase.keySet());
+        OntData.init();
+        for (String key : OntShapesData.modelsBase.keySet()) {
+            System.out.println(key + " HAS MODEL : >>" + (OntShapesData.getOntModelByBase(key) != null));
+        }
+        for (String key : OntData.modelsBase.keySet()) {
+            System.out.println(key + " HAS MODEL : >>" + (OntData.getOntModelByBase(key) != null));
+        }
     }
 
 }
