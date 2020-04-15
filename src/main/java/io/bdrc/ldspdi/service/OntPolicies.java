@@ -59,11 +59,6 @@ public class OntPolicies {
             InputStream stream = connection.getInputStream();
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
-            connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
-            InputStream shapesStream = connection.getInputStream();
-            Model shapesMod = ModelFactory.createDefaultModel();
-            shapesMod.read(shapesStream, RDFLanguages.strLangRDFXML);
-            mod.add(shapesMod);
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
@@ -71,6 +66,11 @@ public class OntPolicies {
                 defaultGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
                         .asResource().getURI();
             }
+            connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
+            InputStream shapesStream = connection.getInputStream();
+            Model shapesMod = ModelFactory.createDefaultModel();
+            shapesMod.read(shapesStream, RDFLanguages.strLangRDFXML);
+            mod.add(shapesMod);
             ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
             while (it1.hasNext()) {

@@ -638,6 +638,14 @@ public class PublicDataResource {
         return ResponseEntity.ok().body("Ontologies are being updated");
     }
 
+    @GetMapping(value = "/callbacks/github/owl-schema")
+    public ResponseEntity<String> updateTestOntology() throws RestException {
+        log.info("updating Ontology models() >>");
+        Thread t = new Thread(new OntData());
+        t.start();
+        return ResponseEntity.ok().body("Ontologies are being updated");
+    }
+
     private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {
         HashMap<String, MediaType> map = BudaMediaTypes.getResExtensionMimeMap();
         HashMap<String, String> headers = new HashMap<>();

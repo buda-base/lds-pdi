@@ -143,10 +143,10 @@ public class OntData implements Runnable {
     private static void updateFusekiDataset() throws RestException {
         log.info("FUSEKI URL IS >>" + fusekiUrl);
         QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph());
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "update 1");
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "update 2");
 
     }
 
@@ -154,7 +154,6 @@ public class OntData implements Runnable {
     public void run() {
         try {
             OntPolicies.init();
-            OntShapesData.init();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
@@ -171,15 +170,15 @@ public class OntData implements Runnable {
             }
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph());
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "run 1");
             log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")).size());
             log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")));
             QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                     fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
-
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "run 2");
             readGithubJsonLDContext();
-            updateFusekiDataset();
+            // updateFusekiDataset();
+            OntShapesData.init();
 
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);

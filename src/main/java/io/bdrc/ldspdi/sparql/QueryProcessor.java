@@ -153,11 +153,12 @@ public class QueryProcessor {
         return qe;
     }
 
-    public static void updateOntology(Model mod, String fusekiUrl, String graph) {
+    public static void updateOntology(Model mod, String fusekiUrl, String graph, String caller) {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        log.info("Service fuseki >> {} Graph >> {} and InfModel Size >> {}", fusekiUrl, graph, mod.listStatements().toSet().size());
+        log.info("Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
+                mod.listStatements().toSet().size());
         DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         access.putModel(graph, mod);
     }
