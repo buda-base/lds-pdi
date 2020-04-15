@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class OntShapesData {
@@ -67,6 +68,7 @@ public class OntShapesData {
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         OntShapesData.init();
+        OntData.init();
         System.out.println(OntShapesData.modelsBase.keySet());
     }
 

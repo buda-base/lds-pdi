@@ -143,10 +143,10 @@ public class OntData implements Runnable {
     private static void updateFusekiDataset() throws RestException {
         log.info("FUSEKI URL IS >>" + fusekiUrl);
         QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
-        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/core/")).getGraph());
+        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth")),
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth/")).getGraph());
     }
 
     @Override
@@ -170,12 +170,14 @@ public class OntData implements Runnable {
             }
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph());
-            log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")).size());
-            log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")));
-            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
-                    fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph());
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/core/")).getGraph());
+            log.info("Auth model size :"
+                    + getOntModelByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth")).size());
+            log.info("Auth policy {}",
+                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth/")));
+            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth")),
+                    fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies
+                            .getOntologyByBase(parseBaseUri("http://" + ServiceConfig.getProperty("serverRoot") + "/ontology/ext/auth/")).getGraph());
             readGithubJsonLDContext();
             updateFusekiDataset();
 
@@ -503,6 +505,7 @@ public class OntData implements Runnable {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        s = s.replace("purl.bdrc.io", ServiceConfig.getProperty("serverRoot"));
         return s;
     }
 

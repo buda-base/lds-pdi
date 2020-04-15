@@ -439,9 +439,6 @@ public class PublicDataResource {
         boolean isBase = false;
         String baseUri = "";
         String tmp = request.getRequestURL().toString().replace("https", "http");
-        // DO not Remove below : this is useful for local testing
-        // String tmp = "http://purl.bdrc.io/ontology/admin";
-        // String tmp = "http://purl.bdrc.io/ontology/core/Etext";
         log.info("getExtOntologyHomePage tmp is >> {}", tmp);
         if (OntPolicies.isBaseUri(tmp)) {
             baseUri = parseBaseUri(tmp);
@@ -576,19 +573,23 @@ public class PublicDataResource {
                 model = ModelFactory.createInfModel(reasoner, model);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if (JenaLangStr == "STTL") {
-                final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
-                writer.output(baos);
-            } else {
-                if (JenaLangStr == RDFLanguages.strLangTurtle) {
-                    model.write(baos, "TURTLE");
+            if (model != null) {
+                if (JenaLangStr == "STTL") {
+                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
+                    writer.output(baos);
                 } else {
-                    org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
-                    if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                        wr.setProperty("xmlbase", params.getBaseUri());
+                    if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                        model.write(baos, "TURTLE");
+                    } else {
+                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                        if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                            wr.setProperty("xmlbase", params.getBaseUri());
+                        }
+                        wr.write(model, baos, params.getBaseUri());
                     }
-                    wr.write(model, baos, params.getBaseUri());
                 }
+            } else {
+                return ResponseEntity.status(404).body("No model found for " + params.getBaseUri());
             }
             if (reasoner != null) {
                 return ResponseEntity.ok().header("Profile", reasonerUri)
