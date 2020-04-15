@@ -34,7 +34,9 @@ import io.bdrc.taxonomy.TaxModel;
 
 public class SpringBootLdspdi extends SpringBootServletInitializer {
 
-    public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class);
+    // public final static Logger log =
+    // LoggerFactory.getLogger(SpringBootLdspdi.class);
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, RestException {
         final String configPath = System.getProperty("ldspdi.configpath");
@@ -59,8 +61,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
+        OntData.init();
+        OntShapesData.init();
         if ("true".equals(AuthProps.getProperty("useAuth"))) {
-            log.info("SpringBootIIIFPres uses auth, updating auth data...");
+            log.info("SpringBootLdspdi uses auth, updating auth data...");
             // RdfAuthModel.init();
             RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
         }

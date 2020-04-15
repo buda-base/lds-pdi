@@ -96,7 +96,7 @@ import io.bdrc.libraries.formatters.TTLRDFWriter;
 @RequestMapping("/")
 public class PublicDataResource {
 
-    public final static Logger log = LoggerFactory.getLogger(PublicDataResource.class);
+    public final static Logger log = LoggerFactory.getLogger("default");
 
     public static final String RES_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.resource.shortprefix");
     public static final String RES_PREFIX = ServiceConfig.getProperty("endpoints.resource.fullprefix");
@@ -546,19 +546,22 @@ public class PublicDataResource {
         }
         String res = request.getRequestURL().toString().replace("https", "http");
         res = res.substring(0, res.lastIndexOf('.')) + "/";
-        log.info("In getOntologyResourceAsFile(), RES = {} and ext= {}", res, ext);
+
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
+        log.info("In getOntologyResourceAsFile(), RES = {} and ext= {} and jenalang={}", res, ext, JenaLangStr);
         if (JenaLangStr == null) {
             LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
+        log.info("In getOntologyResourceAsFile(), isBaseUri uri {} baseuri= {}", res, OntPolicies.isBaseUri(res));
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
             Model model = null;
             if (res.contains("/shapes/")) {
                 model = OntShapesData.getOntModelByBase(params.getBaseUri());
             } else {
+
                 model = OntData.getOntModelByBase(params.getBaseUri());
             }
             // Inference here if required
@@ -566,25 +569,30 @@ public class PublicDataResource {
                 model = ModelFactory.createInfModel(reasoner, model);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if (JenaLangStr == "STTL") {
-                final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
-                writer.output(baos);
-            } else {
-                if (JenaLangStr == RDFLanguages.strLangTurtle) {
-                    model.write(baos, "TURTLE");
+            if (model != null) {
+                if (JenaLangStr == "STTL") {
+                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
+                    writer.output(baos);
                 } else {
-                    org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
-                    if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                        wr.setProperty("xmlbase", params.getBaseUri());
+                    if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                        model.write(baos, "TURTLE");
+                    } else {
+                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                        if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                            wr.setProperty("xmlbase", params.getBaseUri());
+                        }
+                        wr.write(model, baos, params.getBaseUri());
                     }
-                    wr.write(model, baos, params.getBaseUri());
                 }
+            } else {
+                return ResponseEntity.status(404).body("No model found for " + params.getBaseUri());
             }
             if (reasoner != null) {
                 return ResponseEntity.ok().header("Profile", reasonerUri)
                         .header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
             }
-            return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
+            return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
+                    .body(baos.toString());
         } else {
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)

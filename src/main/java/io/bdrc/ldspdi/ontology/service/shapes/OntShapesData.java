@@ -41,7 +41,7 @@ public class OntShapesData {
                 ontAllMod.add(om);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
             }
-            log.info("Done with OntShapesData initialization !");
+            log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
@@ -52,6 +52,7 @@ public class OntShapesData {
             s = s.substring(0, s.length() - 1);
         }
         s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
+
         return s;
     }
 
@@ -73,6 +74,7 @@ public class OntShapesData {
         for (String key : OntData.modelsBase.keySet()) {
             System.out.println(key + " HAS MODEL : >>" + (OntData.getOntModelByBase(key) != null));
         }
+
     }
 
 }

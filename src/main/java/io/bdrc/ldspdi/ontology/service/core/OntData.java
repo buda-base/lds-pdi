@@ -146,6 +146,7 @@ public class OntData implements Runnable {
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
+
     }
 
     @Override
@@ -173,6 +174,7 @@ public class OntData implements Runnable {
             QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                     fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                     OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph());
+
             readGithubJsonLDContext();
             updateFusekiDataset();
 
@@ -501,6 +503,7 @@ public class OntData implements Runnable {
             s = s.substring(0, s.length() - 1);
         }
         s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
+
         return s;
     }
 
