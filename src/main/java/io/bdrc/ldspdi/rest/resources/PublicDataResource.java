@@ -435,98 +435,103 @@ public class PublicDataResource {
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
             return getOntologyResourceAsFile(request, parts[1]);
         }
-        log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
-        boolean isBase = false;
-        String baseUri = "";
-        String tmp = request.getRequestURL().toString().replace("https", "http");
-        log.info("getExtOntologyHomePage tmp is >> {}", tmp);
-        if (OntPolicies.isBaseUri(tmp)) {
-            baseUri = parseBaseUri(tmp);
-            isBase = true;
-        }
-        log.info("getExtOntologyHomePage absolute path >> {} and other = {}", request.getRequestURL().toString(), other);
-        if (OntPolicies.isBaseUri(parseBaseUri(tmp + other))) {
-            baseUri = parseBaseUri(tmp + other);
-            isBase = true;
-        }
-        log.info("getExtOntologyHomePage baseUri is >> {}", baseUri);
-        // Is the full request uri a baseuri?
-        if (isBase) {
-            // if accept header is present
-            if (format != null) {
-                log.info("getExtOntologyHomePage IS BASE and Format is >> {}", format);
-                MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
-                log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
-                if (mediaType == null) {
-                    return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
-                }
-                String url = OntPolicies.getOntologyByBase(baseUri).getFileUri();
-                // using cache if available
-                byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
-                if (byteArr == null) {
-                    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                    InputStream input = connection.getInputStream();
-                    byteArr = IOUtils.toByteArray(input);
-                    input.close();
-                    ResultsCache.addToCache(byteArr, url.hashCode());
-                }
-                OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-                OntDocumentManager odm = new OntDocumentManager();
-                odm.setProcessImports(false);
-                oms.setDocumentManager(odm);
-                OntModel om = OntData.getOntModelByBase(baseUri);
-                OntData.setOntModel(om);
-                om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
-                // browser request : serving html page
-                if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
-                    ModelAndView model = new ModelAndView();
-                    model.addObject("path", path);
-                    model.setViewName("ontologyHome");
-                    return (ModelAndView) model;
-                } else {
-                    final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(BudaMediaTypes.getExtFromMime(mediaType));
-                    log.debug("getExtOntologyHomePage JenaLangStr is >> {}", JenaLangStr);
-                    return (String) writeStream(om, JenaLangStr).toString();
-                }
+        if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
+            log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
+            boolean isBase = false;
+            String baseUri = "";
+            String tmp = request.getRequestURL().toString().replace("https", "http");
+            log.info("getExtOntologyHomePage tmp is >> {}", tmp);
+            if (OntPolicies.isBaseUri(tmp)) {
+                baseUri = parseBaseUri(tmp);
+                isBase = true;
             }
-        } else {
-            if (OntData.ontAllMod.getOntResource(tmp) == null) {
-                LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
-                return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            log.info("getExtOntologyHomePage absolute path >> {} and other = {}", request.getRequestURL().toString(), other);
+            if (OntPolicies.isBaseUri(parseBaseUri(tmp + other))) {
+                baseUri = parseBaseUri(tmp + other);
+                isBase = true;
             }
-            if (format != null) {
-                MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
-                log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
-                if (mediaType == null) {
-                    return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
-                }
-                if (OntData.isClass(tmp, true)) {
-                    log.info("CLASS>>" + tmp);
-                    OntClassModel ocm = new OntClassModel(tmp, true);
-                    if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
-                        ModelAndView model = new ModelAndView();
-                        model.addObject("model", ocm);
-                        model.setViewName("ontClassView");
-                        return (ModelAndView) model;
+            log.info("getExtOntologyHomePage baseUri is >> {}", baseUri);
+            // Is the full request uri a baseuri?
+            if (isBase) {
+                // if accept header is present
+                if (format != null) {
+                    log.info("getExtOntologyHomePage IS BASE and Format is >> {}", format);
+                    MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
+                    log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
+                    if (mediaType == null) {
+                        return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                     }
-
-                } else {
-                    log.info("PROP>>" + tmp);
-                    OntPropModel opm = new OntPropModel(tmp, true);
+                    String url = OntPolicies.getOntologyByBase(baseUri).getFileUri();
+                    // using cache if available
+                    byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
+                    if (byteArr == null) {
+                        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                        InputStream input = connection.getInputStream();
+                        byteArr = IOUtils.toByteArray(input);
+                        input.close();
+                        ResultsCache.addToCache(byteArr, url.hashCode());
+                    }
+                    OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+                    OntDocumentManager odm = new OntDocumentManager();
+                    odm.setProcessImports(false);
+                    oms.setDocumentManager(odm);
+                    OntModel om = OntData.getOntModelByBase(baseUri);
+                    OntData.setOntModel(om);
+                    om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
+                    // browser request : serving html page
                     if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                         ModelAndView model = new ModelAndView();
-                        model.addObject("model", opm);
-                        model.setViewName("ontPropView");
+                        model.addObject("path", path);
+                        model.setViewName("ontologyHome");
                         return (ModelAndView) model;
+                    } else {
+                        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(BudaMediaTypes.getExtFromMime(mediaType));
+                        log.debug("getExtOntologyHomePage JenaLangStr is >> {}", JenaLangStr);
+                        return (String) writeStream(om, JenaLangStr).toString();
                     }
                 }
             } else {
-                return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
-            }
-        }
-        return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
+                if (OntData.ontAllMod.getOntResource(tmp) == null) {
+                    LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
+                    return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                            .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+                }
+                if (format != null) {
+                    MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
+                    log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
+                    if (mediaType == null) {
+                        return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
+                    }
+                    if (OntData.isClass(tmp, true)) {
+                        log.info("CLASS>>" + tmp);
+                        OntClassModel ocm = new OntClassModel(tmp, true);
+                        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+                            ModelAndView model = new ModelAndView();
+                            model.addObject("model", ocm);
+                            model.setViewName("ontClassView");
+                            return (ModelAndView) model;
+                        }
 
+                    } else {
+                        log.info("PROP>>" + tmp);
+                        OntPropModel opm = new OntPropModel(tmp, true);
+                        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+                            ModelAndView model = new ModelAndView();
+                            model.addObject("model", opm);
+                            model.setViewName("ontPropView");
+                            return (ModelAndView) model;
+                        }
+                    }
+                } else {
+                    return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
+                }
+            }
+            return (ResponseEntity<String>) ResponseEntity.status(404).body("Not found");
+        } else {
+            ModelAndView model = new ModelAndView();
+            model.setViewName("disabled");
+            return (ModelAndView) model;
+        }
     }
 
     public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
