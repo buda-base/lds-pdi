@@ -25,18 +25,30 @@ import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 
 public class OntPolicies {
 
+    private static final String CORE_TYPE = "core";
+    private static final String SHAPES_TYPE = "shapes";
+
     public static final String policiesUrl = ServiceConfig.getProperty("ontPoliciesUrl");
     public static final String shapesPoliciesUrl = ServiceConfig.getProperty("ontShapesPoliciesUrl");
-    public static HashMap<String, OntPolicy> map;
+    public static HashMap<String, OntPolicy> mapAll;
+    public static HashMap<String, OntPolicy> mapCore;
+    public static HashMap<String, OntPolicy> mapShapes;
     private static Model mod;
-    private static String defaultGraph;
+    private static String defaultCoreGraph;
+    private static String defaultShapesGraph;
     public final static Logger log = LoggerFactory.getLogger(OntPolicies.class);
 
-    private static OntPolicy loadPolicy(Resource r, FileManager fm) {
+    private static OntPolicy loadPolicy(Resource r, FileManager fm, String type) {
         Statement st = r.getProperty(ResourceFactory.createProperty("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#publicURI"));
         String baseUri = st.getObject().asResource().getURI();
         baseUri = baseUri.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
-        String graph = defaultGraph;
+        String graph = null;
+        if (type.equals(CORE_TYPE)) {
+            graph = defaultCoreGraph;
+        }
+        if (type.equals(SHAPES_TYPE)) {
+            graph = defaultShapesGraph;
+        }
         st = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/ontGraph"));
         if (st != null) {
             graph = st.getObject().asResource().getURI();
@@ -51,11 +63,24 @@ public class OntPolicies {
     }
 
     public static void init() {
+        mapAll = new HashMap<>();
+        set(CORE_TYPE);
+        set(SHAPES_TYPE);
+    }
+
+    public static void set(String type) {
         try {
-            map = new HashMap<>();
+            HashMap<String, OntPolicy> map = new HashMap<>();
+            String graph = "";
             OntDocumentManager odm = new OntDocumentManager(policiesUrl);
             FileManager fm = odm.getFileManager();
-            HttpURLConnection connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
+            HttpURLConnection connection = null;
+            if (type.equals(CORE_TYPE)) {
+                connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
+            }
+            if (type.equals(SHAPES_TYPE)) {
+                connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
+            }
             InputStream stream = connection.getInputStream();
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
@@ -63,24 +88,27 @@ public class OntPolicies {
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
                 Resource r = it2.next();
-                defaultGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
-                        .asResource().getURI();
+                graph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject().asResource()
+                        .getURI();
             }
-            connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
-            InputStream shapesStream = connection.getInputStream();
-            Model shapesMod = ModelFactory.createDefaultModel();
-            shapesMod.read(shapesStream, RDFLanguages.strLangRDFXML);
-            mod.add(shapesMod);
             ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
             while (it1.hasNext()) {
                 Resource r = it1.next();
-                OntPolicy op = loadPolicy(r, fm);
+                OntPolicy op = loadPolicy(r, fm, type);
                 map.put(op.getBaseUri(), op);
+                mapAll.put(op.getBaseUri(), op);
                 log.info("loaded OntPolicy >> {}", op);
             }
             stream.close();
-            shapesStream.close();
+            if (type.equals(CORE_TYPE)) {
+                mapCore = map;
+                defaultCoreGraph = graph;
+            }
+            if (type.equals(SHAPES_TYPE)) {
+                mapShapes = map;
+                defaultShapesGraph = graph;
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -92,10 +120,10 @@ public class OntPolicies {
     }
 
     public static ArrayList<String> getValidBaseUri() {
-        Set<String> keys = map.keySet();
+        Set<String> keys = mapAll.keySet();
         ArrayList<String> valid = new ArrayList<>();
         for (String s : keys) {
-            OntPolicy p = map.get(s);
+            OntPolicy p = mapAll.get(s);
             if (p.isVisible()) {
                 valid.add(p.getBaseUri());
             }
@@ -104,16 +132,16 @@ public class OntPolicies {
     }
 
     public static boolean isBaseUri(String s) {
-        log.info("Map Uri key set >> {} and test uri={}", map.keySet(), s);
+        log.info("Map Uri key set >> {} and test uri={}", mapAll.keySet(), s);
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
-        log.info("Map Uri key Tested Uri >> {} ", s);
-        return map.containsKey(s);
+        log.info("Map Uri key Tested Uri >> {} is base={} ", s, mapAll.containsKey(s));
+        return mapAll.containsKey(s);
     }
 
     public static OntPolicy getOntologyByBase(String name) {
-        return map.get(name);
+        return mapAll.get(name);
     }
 
 }

@@ -17,9 +17,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 
-public class OntShapesData {
+public class OntShapesData implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
@@ -64,17 +66,39 @@ public class OntShapesData {
         return modelsBase.get(baseUri);
     }
 
+    private static void updateFusekiDataset() throws RestException {
+        String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        OntPolicies.init();
+        log.info("ONTPOLICY IN UPDATE FUSEKI {}",
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")));
+        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")).getGraph(),
+                "shapesSchema update");
+    }
+
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         OntShapesData.init();
         OntData.init();
         for (String key : OntShapesData.modelsBase.keySet()) {
-            System.out.println(key + " HAS MODEL : >>" + (OntShapesData.getOntModelByBase(key) != null));
+            System.out.println(key + " HAS GRAPH : >>" + (OntPolicies.getOntologyByBase(key).getGraph()));
         }
         for (String key : OntData.modelsBase.keySet()) {
-            System.out.println(key + " HAS MODEL : >>" + (OntData.getOntModelByBase(key) != null));
+            System.out.println(key + " HAS GRAPH : >>" + (OntPolicies.getOntologyByBase(key).getGraph()));
         }
 
+    }
+
+    @Override
+    public void run() {
+        init();
+        try {
+            updateFusekiDataset();
+        } catch (RestException e) {
+            // TODO Auto-generated catch block
+            log.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
     }
 
 }

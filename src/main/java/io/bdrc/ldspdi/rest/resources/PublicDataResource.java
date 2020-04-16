@@ -638,7 +638,21 @@ public class PublicDataResource {
         return ResponseEntity.ok().body("Ontologies are being updated");
     }
 
+    @PostMapping(value = "/callbacks/github/shapes", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateShapesOntology() throws RestException {
+        log.info("updating Shape Ontology models() >>");
+        Thread t = new Thread(new OntShapesData());
+        t.start();
+        return ResponseEntity.ok().body("Shapes Ontologies are being updated");
+    }
+
     /*
+     * @GetMapping(value = "/callbacks/github/shapes") public ResponseEntity<String>
+     * updateGetShapesOntology() throws RestException {
+     * log.info("updating Shape Ontology models() >>"); Thread t = new Thread(new
+     * OntShapesData()); t.start(); return
+     * ResponseEntity.ok().body("Shapes Ontologies are being updated"); }
+     * 
      * @GetMapping(value = "/callbacks/github/owl-schema") public
      * ResponseEntity<String> updateTestOntology() throws RestException {
      * log.info("updating Ontology models() >>"); Thread t = new Thread(new
