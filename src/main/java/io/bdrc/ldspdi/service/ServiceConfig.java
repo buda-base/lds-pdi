@@ -107,7 +107,7 @@ public class ServiceConfig {
         if (fusekiUrl != null) {
             prop.setProperty(FUSEKI_URL, fusekiUrl);
         }
-        OntPolicies.init();
+        // OntPolicies.init();
     }
 
     public static boolean useAuth() {
