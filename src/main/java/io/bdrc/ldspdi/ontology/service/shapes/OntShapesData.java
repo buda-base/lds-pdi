@@ -34,7 +34,7 @@ public class OntShapesData implements Runnable {
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
-            odm.setProcessImports(false);
+            // odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
@@ -88,13 +88,6 @@ public class OntShapesData implements Runnable {
         for (String st : updates.keySet()) {
             QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
         }
-        /*
-         * QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0,
-         * fusekiUrl.lastIndexOf('/')) + "/data",
-         * OntPolicies.getOntologyByBase(parseBaseUri("http://" +
-         * ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")).getGraph(),
-         * "shapesSchema update");
-         */
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
