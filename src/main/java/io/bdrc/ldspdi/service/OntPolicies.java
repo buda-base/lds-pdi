@@ -144,4 +144,8 @@ public class OntPolicies {
         return mapAll.get(name);
     }
 
+    public static HashMap<String, OntPolicy> getMapShapes() {
+        return mapShapes;
+    }
+
 }

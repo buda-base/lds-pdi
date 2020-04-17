@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
+import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -71,13 +72,34 @@ public class OntShapesData implements Runnable {
         OntPolicies.init();
         log.info("ONTPOLICY IN UPDATE FUSEKI {}",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")));
-        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")).getGraph(),
-                "shapesSchema update");
+        HashMap<String, OntPolicy> policies = OntPolicies.getMapShapes();
+        HashMap<String, OntModel> updates = new HashMap<>();
+        for (String s : policies.keySet()) {
+            OntPolicy op = policies.get(s);
+            String graph = op.getGraph();
+            OntModel m = updates.get(graph);
+            if (m != null) {
+                m.add(getOntModelByBase(op.getBaseUri()));
+            } else {
+                m = getOntModelByBase(op.getBaseUri());
+            }
+            updates.put(graph, m);
+        }
+        for (String st : updates.keySet()) {
+            QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
+        }
+        /*
+         * QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0,
+         * fusekiUrl.lastIndexOf('/')) + "/data",
+         * OntPolicies.getOntologyByBase(parseBaseUri("http://" +
+         * ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")).getGraph(),
+         * "shapesSchema update");
+         */
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
+        OntPolicies.init();
         OntShapesData.init();
         OntData.init();
         for (String key : OntShapesData.modelsBase.keySet()) {
@@ -86,7 +108,7 @@ public class OntShapesData implements Runnable {
         for (String key : OntData.modelsBase.keySet()) {
             System.out.println(key + " HAS GRAPH : >>" + (OntPolicies.getOntologyByBase(key).getGraph()));
         }
-
+        updateFusekiDataset();
     }
 
     @Override
