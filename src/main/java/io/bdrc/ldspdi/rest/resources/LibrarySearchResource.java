@@ -59,6 +59,7 @@ public class LibrarySearchResource {
         Map<String, Object> res = null;
         switch (file) {
         case "workFacetGraph":
+        case "instanceFacetGraph":
         case "associatedWorks":
             res = WorkResults.getResultsMap(model);
             break;
