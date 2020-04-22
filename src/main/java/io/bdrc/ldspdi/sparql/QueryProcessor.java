@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-
 /*******************************************************************************
  * Copyright (c) 2017 Buddhist Digital Resource Center (BDRC)
  *
@@ -38,6 +35,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
@@ -139,8 +138,10 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        Model m = access.getModel(ServiceConfig.getProperty(graph));
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+        Model m = rvf.fetch(ServiceConfig.getProperty(graph));
+        // DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
+        // Model m = access.getModel(ServiceConfig.getProperty(graph));
         return m;
     }
 
@@ -159,8 +160,22 @@ public class QueryProcessor {
         }
         log.info("Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
                 mod.listStatements().toSet().size());
-        DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        access.putModel(graph, mod);
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+        rvf.put(graph, mod);
+        // DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
+        // access.putModel(graph, mod);
+    }
+
+    public static Model getAnyGraph(String graph, String fusekiUrl) {
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+        return rvf.fetch(graph);
+    }
+
+    public static Model getAnyGraph(String graph) {
+        return getAnyGraph(graph, null);
     }
 
     public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {

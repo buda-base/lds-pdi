@@ -5,6 +5,7 @@ public class OntPolicy {
     public String baseUri;
     public String graph;
     public String fileUri;
+    public String file;
     public boolean visible;
 
     public OntPolicy() {
@@ -15,11 +16,12 @@ public class OntPolicy {
         this.visible = false;
     }
 
-    public OntPolicy(String baseUri, String graph, String fileuri, boolean visible) {
+    public OntPolicy(String baseUri, String graph, String fileuri, String file, boolean visible) {
         super();
         this.baseUri = parseBaseUri(baseUri);
         this.graph = graph;
         this.fileUri = fileuri;
+        this.file = file;
         this.visible = visible;
     }
 
@@ -62,9 +64,17 @@ public class OntPolicy {
         this.fileUri = fileUri;
     }
 
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
     @Override
     public String toString() {
-        return "OntPolicy [baseUri=" + baseUri + ", graph=" + graph + ", fileUri=" + fileUri + ", visible=" + visible + "]";
+        return "OntPolicy [baseUri=" + baseUri + ", graph=" + graph + ", fileUri=" + fileUri + ", file=" + file + ", visible=" + visible + "]";
     }
 
 }

@@ -9,7 +9,7 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    
-    <jena.version>3.12.0</jena.version>
+    <jena.version>3.14.0</jena.version>
     <springboot.version>2.1.8.RELEASE</springboot.version>
     <jcs.version>2.2.1</jcs.version>
     <jetty.version>9.4.12.v20180830</jetty.version>

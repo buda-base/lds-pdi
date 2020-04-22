@@ -58,7 +58,12 @@ public class OntPolicies {
         if (st != null) {
             visible = st.getObject().asLiteral().getBoolean();
         }
-        OntPolicy op = new OntPolicy(baseUri, graph, fm.mapURI(baseUri), visible);
+        st = r.getProperty(ResourceFactory.createProperty("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#altURL"));
+        String file = "";
+        if (st != null) {
+            file = st.getObject().toString();
+        }
+        OntPolicy op = new OntPolicy(baseUri, graph, fm.mapURI(baseUri), file, visible);
         return op;
     }
 
@@ -98,7 +103,7 @@ public class OntPolicies {
                 OntPolicy op = loadPolicy(r, fm, type);
                 map.put(op.getBaseUri(), op);
                 mapAll.put(op.getBaseUri(), op);
-                log.info("loaded OntPolicy >> {}", op);
+                log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
             stream.close();
             if (type.equals(CORE_TYPE)) {
@@ -141,7 +146,19 @@ public class OntPolicies {
     }
 
     public static OntPolicy getOntologyByBase(String name) {
-        return mapAll.get(name);
+        OntPolicy op = mapAll.get(name);
+        if (op == null) {
+            op = mapAll.get(name.substring(0, name.length() - 1));
+        }
+        return op;
+    }
+
+    public static OntPolicy getShapeOntologyByBase(String name) {
+        OntPolicy op = mapShapes.get(name);
+        if (op == null) {
+            op = mapShapes.get(name.substring(0, name.length() - 1));
+        }
+        return op;
     }
 
     public static HashMap<String, OntPolicy> getMapShapes() {

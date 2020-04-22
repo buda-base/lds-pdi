@@ -73,6 +73,7 @@ public class OntData implements Runnable {
 
     public static void init() {
         try {
+            OntPolicies.init();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
@@ -125,7 +126,6 @@ public class OntData implements Runnable {
         JSONLD_CONTEXT = st.toString();
         lastUpdated = Calendar.getInstance().getTime();
         update = Long.toString(System.currentTimeMillis());
-        // update = new EntityTag(Long.toString(System.currentTimeMillis()));
     }
 
     /*

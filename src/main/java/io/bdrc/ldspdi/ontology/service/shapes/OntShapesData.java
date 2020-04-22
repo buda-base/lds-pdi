@@ -25,23 +25,28 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 public class OntShapesData implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
-    public static HashMap<String, OntModel> modelsBase = new HashMap<>();
+    public static HashMap<String, Model> modelsBase = new HashMap<>();
     public static OntModel ontAllMod;
 
     public static void init() {
         try {
+            OntPolicies.init();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
-            // odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
+            System.out.println("SHAPES POLICIES >> " + OntPolicies.mapShapes);
             while (it.hasNext()) {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
-                OntModel om = odm.getOntology(uri, oms);
-                ontAllMod.add(om);
+                // OntModel om = odm.getOntology(uri, oms);
+                String ss = uri.replace("purl.bdrc.io", "localhost:8080");
+                OntPolicy op = OntPolicies.getShapeOntologyByBase(ss);
+                log.info("POLICY from uri {} is {}", ss, op);
+                Model om = ModelFactory.createDefaultModel();
+                om.read(op.getFile(), "TTL");
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
@@ -59,42 +64,59 @@ public class OntShapesData implements Runnable {
         return s;
     }
 
-    public static void addOntModelByBase(String baseUri, OntModel om) {
+    public static void addOntModelByBase(String baseUri, Model om) {
         modelsBase.put(baseUri, om);
     }
 
-    public static OntModel getOntModelByBase(String baseUri) {
+    public static Model getOntModelByBase(String baseUri) {
         return modelsBase.get(baseUri);
     }
 
     private static void updateFusekiDataset() throws RestException {
         String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         OntPolicies.init();
-        log.info("ONTPOLICY IN UPDATE FUSEKI {}",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/shapes/core/")));
         HashMap<String, OntPolicy> policies = OntPolicies.getMapShapes();
-        HashMap<String, OntModel> updates = new HashMap<>();
+        HashMap<String, Model> updates = new HashMap<>();
         for (String s : policies.keySet()) {
             OntPolicy op = policies.get(s);
             String graph = op.getGraph();
-            OntModel m = updates.get(graph);
+            Model m = (Model) updates.get(graph);
             if (m != null) {
-                m.add(getOntModelByBase(op.getBaseUri()));
+
+                m.add((Model) getOntModelByBase(op.getBaseUri()));
             } else {
-                m = getOntModelByBase(op.getBaseUri());
+                m = (Model) getOntModelByBase(op.getBaseUri());
             }
             updates.put(graph, m);
         }
         for (String st : updates.keySet()) {
+            // Display input Model
+            if (st.contains("PersonShapes")) {
+                System.out.println("************************************" + st);
+                updates.get(st).write(System.out, "TURTLE");
+            }
             QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
+            // Display corresponding created named graph
+            System.out.println("##########################################" + st);
+            QueryProcessor.getAnyGraph(st, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data").write(System.out, "TURTLE");
+
         }
+    }
+
+    public static void basicTest() {
+        String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        String url = "https://raw.githubusercontent.com/buda-base/editor-templates/master/templates/core/person.shapes.ttl";
+        Model m = ModelFactory.createDefaultModel();
+        m.read(url, "TTL");
+        System.out.println("MODEL SIZE=" + m.size());
+        QueryProcessor.updateOntology(m, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", "http://purl.bdrc.io/graph/PersonShapesTest",
+                " update");
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
-        OntPolicies.init();
         OntShapesData.init();
-        OntData.init();
+        // OntData.init();
         for (String key : OntShapesData.modelsBase.keySet()) {
             System.out.println(key + " HAS GRAPH : >>" + (OntPolicies.getOntologyByBase(key).getGraph()));
         }
@@ -102,6 +124,7 @@ public class OntShapesData implements Runnable {
             System.out.println(key + " HAS GRAPH : >>" + (OntPolicies.getOntologyByBase(key).getGraph()));
         }
         updateFusekiDataset();
+        // basicTest();
     }
 
     @Override
