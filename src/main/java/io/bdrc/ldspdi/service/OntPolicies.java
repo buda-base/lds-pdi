@@ -93,8 +93,10 @@ public class OntPolicies {
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             while (it2.hasNext()) {
                 Resource r = it2.next();
-                graph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject().asResource()
-                        .getURI();
+                // graph =
+                // r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject().asResource()
+                // .getURI();
+                graph = null;
             }
             ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
@@ -103,7 +105,7 @@ public class OntPolicies {
                 OntPolicy op = loadPolicy(r, fm, type);
                 map.put(op.getBaseUri(), op);
                 mapAll.put(op.getBaseUri(), op);
-                log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
+                // log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
             stream.close();
             if (type.equals(CORE_TYPE)) {

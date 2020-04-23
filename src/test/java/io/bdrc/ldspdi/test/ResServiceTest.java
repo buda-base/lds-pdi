@@ -86,6 +86,7 @@ public class ResServiceTest {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/C68.ttl");
         HttpResponse resp = client.execute(get);
+        System.out.println("STATUS AllOk() >> " + resp.getStatusLine().getStatusCode());
         assertTrue(resp.getStatusLine().getStatusCode() == 200);
         resp.getEntity().writeTo(System.out);
     }
