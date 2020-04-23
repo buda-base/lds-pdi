@@ -43,12 +43,6 @@ public class OntPolicies {
         String baseUri = st.getObject().asResource().getURI();
         baseUri = baseUri.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
         String graph = null;
-        if (type.equals(CORE_TYPE)) {
-            graph = defaultCoreGraph;
-        }
-        if (type.equals(SHAPES_TYPE)) {
-            graph = defaultShapesGraph;
-        }
         st = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/ontGraph"));
         if (st != null) {
             graph = st.getObject().asResource().getURI();
@@ -91,12 +85,20 @@ public class OntPolicies {
             mod.read(stream, RDFLanguages.strLangRDFXML);
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
+            String defGraph = null;
             while (it2.hasNext()) {
                 Resource r = it2.next();
-                // graph =
-                // r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject().asResource()
-                // .getURI();
-                graph = null;
+                defGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
+                        .asResource().getURI();
+                // graph = null;
+            }
+            if (type.equals(CORE_TYPE)) {
+                mapCore = map;
+                defaultCoreGraph = defGraph;
+            }
+            if (type.equals(SHAPES_TYPE)) {
+                mapShapes = map;
+                defaultShapesGraph = defGraph;
             }
             ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
@@ -108,14 +110,7 @@ public class OntPolicies {
                 // log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
             stream.close();
-            if (type.equals(CORE_TYPE)) {
-                mapCore = map;
-                defaultCoreGraph = graph;
-            }
-            if (type.equals(SHAPES_TYPE)) {
-                mapShapes = map;
-                defaultShapesGraph = graph;
-            }
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

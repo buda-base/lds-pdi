@@ -35,9 +35,9 @@ public class OntShapesData implements Runnable {
             OntPolicies.init();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
-            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_DL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
-            oms.setDocumentManager(odm);
+            // oms.setDocumentManager(odm);
             odm.setProcessImports(true);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
