@@ -34,8 +34,8 @@ public class OntPolicies {
     public static HashMap<String, OntPolicy> mapCore;
     public static HashMap<String, OntPolicy> mapShapes;
     private static Model mod;
-    private static String defaultCoreGraph;
-    private static String defaultShapesGraph;
+    public static String defaultCoreGraph;
+    public static String defaultShapesGraph;
     public final static Logger log = LoggerFactory.getLogger(OntPolicies.class);
 
     private static OntPolicy loadPolicy(Resource r, FileManager fm, String type) {
@@ -90,7 +90,6 @@ public class OntPolicies {
                 Resource r = it2.next();
                 defGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
                         .asResource().getURI();
-                // graph = null;
             }
             if (type.equals(CORE_TYPE)) {
                 mapCore = map;
@@ -107,7 +106,7 @@ public class OntPolicies {
                 OntPolicy op = loadPolicy(r, fm, type);
                 map.put(op.getBaseUri(), op);
                 mapAll.put(op.getBaseUri(), op);
-                // log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
+                log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
             stream.close();
 
@@ -134,11 +133,9 @@ public class OntPolicies {
     }
 
     public static boolean isBaseUri(String s) {
-        log.info("Map Uri key set >> {} and test uri={}", mapAll.keySet(), s);
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
-        log.info("Map Uri key Tested Uri >> {} is base={} ", s, mapAll.containsKey(s));
         return mapAll.containsKey(s);
     }
 
