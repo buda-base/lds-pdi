@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -26,28 +25,20 @@ public class OntShapesData implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
     public static HashMap<String, Model> modelsBase = new HashMap<>();
-    public static OntModel ontAllMod;
-
-    private static final String SHAPE_ONT = "http://purl.bdrc.io/shapes/core/PersonShapes/";
 
     public static void init() {
         try {
             OntPolicies.init();
             modelsBase = new HashMap<>();
-            Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
-            // oms.setDocumentManager(odm);
             odm.setProcessImports(true);
-            ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
-                // if (uri.equals(SHAPE_ONT)) {
                 OntModel om = odm.getOntology(uri, oms);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
-                // }
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
         } catch (Exception ex) {
@@ -60,7 +51,6 @@ public class OntShapesData implements Runnable {
             s = s.substring(0, s.length() - 1);
         }
         s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
-
         return s;
     }
 
@@ -82,12 +72,8 @@ public class OntShapesData implements Runnable {
             String graph = op.getGraph();
             Model m = updates.get(graph);
             if (m != null) {
-                // System.out.println("*M NOT NULL for graph " + graph + " baseUri" +
-                // op.getBaseUri());
                 m.add(getOntModelByBase(op.getBaseUri()));
             } else {
-                // System.out.println("*M IS NULL for graph " + graph + " baseUri" +
-                // op.getBaseUri());
                 m = getOntModelByBase(op.getBaseUri());
             }
             if (graph != null) {
@@ -95,14 +81,11 @@ public class OntShapesData implements Runnable {
             }
             global.add(m);
         }
+        // Individuals graphs
         for (String st : updates.keySet()) {
-            if (st.contains("PersonShapes")) {
-                QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
-
-            } else {
-                QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
-            }
+            QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
         }
+        // Global shapes model
         QueryProcessor.updateOntology(global, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.defaultShapesGraph,
                 " update");
     }
@@ -110,15 +93,6 @@ public class OntShapesData implements Runnable {
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         OntShapesData.init();
-        // OntData.init();
-        for (String key : OntShapesData.modelsBase.keySet()) {
-            // System.out.println(key + " HAS GRAPH : >>" +
-            // (OntPolicies.getOntologyByBase(key).getGraph()));
-        }
-        for (String key : OntData.modelsBase.keySet()) {
-            // System.out.println(key + " HAS GRAPH : >>" +
-            // (OntPolicies.getOntologyByBase(key).getGraph()));
-        }
         updateFusekiDataset();
     }
 

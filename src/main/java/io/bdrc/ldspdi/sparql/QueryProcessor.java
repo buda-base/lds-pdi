@@ -140,8 +140,6 @@ public class QueryProcessor {
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
         Model m = rvf.fetch(ServiceConfig.getProperty(graph));
-        // DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        // Model m = access.getModel(ServiceConfig.getProperty(graph));
         return m;
     }
 
@@ -162,8 +160,6 @@ public class QueryProcessor {
                 mod.listStatements().toSet().size());
         RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
         rvf.put(graph, mod);
-        // DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        // access.putModel(graph, mod);
     }
 
     public static Model getAnyGraph(String graph, String fusekiUrl) {

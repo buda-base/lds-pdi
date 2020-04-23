@@ -116,10 +116,6 @@ public class OntPolicies {
         }
     }
 
-    private static String computeUri(String uri) {
-        return uri.replace("purl.bdrc.io", ServiceConfig.getProperty("serverRoot"));
-    }
-
     public static ArrayList<String> getValidBaseUri() {
         Set<String> keys = mapAll.keySet();
         ArrayList<String> valid = new ArrayList<>();
