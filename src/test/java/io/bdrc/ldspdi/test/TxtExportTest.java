@@ -49,12 +49,12 @@ public class TxtExportTest {
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl = "http://localhost:2252/bdrcrw";
+        fusekiUrl = "http://localhost:2252/newcorerw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         // Creating a fuseki server
-        server = FusekiServer.create().port(2252).add("/bdrcrw", srvds).build();
+        server = FusekiServer.create().port(2252).add("/newcorerw", srvds).build();
         server.start();
     }
 
@@ -66,7 +66,8 @@ public class TxtExportTest {
 
     @Test
     public void testSimpleRequestSimple() throws NumberFormatException, URISyntaxException, ClientProtocolException, IOException {
-        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port"))).setPath("/resource/UT11577_004_0000.txt").setParameter("startChar", Integer.toString(1234))
+        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port")))
+                .setPath("/resource/UT11577_004_0000.txt").setParameter("startChar", Integer.toString(1234))
                 .setParameter("endChar", Integer.toString(2444)).build();
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet(uri);

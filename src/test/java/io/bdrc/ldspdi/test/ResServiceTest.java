@@ -3,6 +3,8 @@ package io.bdrc.ldspdi.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.jena.atlas.io.StringWriterI;
@@ -53,6 +56,7 @@ import io.bdrc.libraries.BudaMediaTypes;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
+
 public class ResServiceTest {
 
     @Autowired
@@ -66,12 +70,12 @@ public class ResServiceTest {
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl = "http://localhost:2246/bdrcrw";
+        fusekiUrl = "http://localhost:2252/newcorerw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         // Creating a fuseki server
-        server = FusekiServer.create().port(2246).add("/bdrcrw", srvds).build();
+        server = FusekiServer.create().port(2252).add("/newcorerw", srvds).build();
         server.start();
     }
 
@@ -82,9 +86,11 @@ public class ResServiceTest {
     }
 
     @Test
-    public void AllOk() throws IOException {
+    public void AllOk() throws IOException, NumberFormatException, URISyntaxException {
+        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port")))
+                .setPath("/resource/C68.ttl").build();
         HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/C68.ttl");
+        HttpGet get = new HttpGet(uri);
         HttpResponse resp = client.execute(get);
         System.out.println("STATUS AllOk() >> " + resp.getStatusLine().getStatusCode());
         assertTrue(resp.getStatusLine().getStatusCode() == 200);

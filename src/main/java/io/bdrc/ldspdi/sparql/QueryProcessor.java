@@ -121,10 +121,12 @@ public class QueryProcessor {
         if (model == null) {
             log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
-            RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
-            model = conn.queryConstruct(q);
+            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            // RDFConnection conn =
+            // RDFConnectionRemote.create().destination(fusekiUrl).build();
+            model = rvf.queryConstruct(q);
             ResultsCache.addToCache(model, hash);
-            conn.close();
+            rvf.close();
         }
         return model;
     }
@@ -147,7 +149,10 @@ public class QueryProcessor {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl, QueryFactory.create(query));
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+        QueryExecution qe = rvf.query(query);
+        // QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,
+        // QueryFactory.create(query));
         qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;
     }
