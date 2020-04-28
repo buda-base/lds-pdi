@@ -327,19 +327,12 @@ public class OntData implements Runnable {
         return map;
     }
 
-    public static boolean isClass(final String uri, boolean global) {
-        OntModel md = null;
-        if (global) {
-            md = ontAllMod;
-        } else {
-            md = ontMod;
-        }
-        if (md.getOntResource(uri) != null) {
-            return md.getOntResource(uri).isClass();
-        } else {
-            return false;
-        }
-    }
+    /*
+     * public static boolean isClass(final String uri, boolean global) { OntModel md
+     * = null; if (global) { md = ontAllMod; } else { md = ontMod; } if
+     * (md.getOntResource(uri) != null) { return md.getOntResource(uri).isClass(); }
+     * else { return false; } }
+     */
 
     public static int getNumPrefixes(boolean global) {
         if (global) {

@@ -24,13 +24,16 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 public class OntShapesData implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
-    public static HashMap<String, Model> modelsBase = new HashMap<>();
+    public static HashMap<String, OntModel> modelsBase = new HashMap<>();
+    static OntModel ontMod;
 
     public static void init() {
         try {
             OntPolicies.init();
+
             modelsBase = new HashMap<>();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            ontMod = ModelFactory.createOntologyModel(oms);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
             odm.setProcessImports(true);
             Iterator<String> it = odm.listDocuments();
@@ -39,6 +42,7 @@ public class OntShapesData implements Runnable {
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
+                ontMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
         } catch (Exception ex) {
@@ -54,11 +58,11 @@ public class OntShapesData implements Runnable {
         return s;
     }
 
-    public static void addOntModelByBase(String baseUri, Model om) {
+    public static void addOntModelByBase(String baseUri, OntModel om) {
         modelsBase.put(baseUri, om);
     }
 
-    public static Model getOntModelByBase(String baseUri) {
+    public static OntModel getOntModelByBase(String baseUri) {
         return modelsBase.get(baseUri);
     }
 
@@ -94,6 +98,10 @@ public class OntShapesData implements Runnable {
         ServiceConfig.init();
         OntShapesData.init();
         updateFusekiDataset();
+    }
+
+    public static OntModel getOntModel() {
+        return ontMod;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
 
 import io.bdrc.libraries.Prefixes;
@@ -47,5 +48,13 @@ public class OntologyUtils {
         }
 
     };
+
+    public static boolean isClass(final String uri, OntModel ontMod) {
+        if (ontMod.getOntResource(uri) != null) {
+            return ontMod.getOntResource(uri).isClass();
+        } else {
+            return false;
+        }
+    }
 
 }
