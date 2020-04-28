@@ -132,6 +132,8 @@ public class OntPolicies {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
+        System.out.println("BASE URI TO TEST >> " + s);
+        System.out.println("MAP ENTRY SET >> " + mapAll.keySet());
         return mapAll.containsKey(s);
     }
 

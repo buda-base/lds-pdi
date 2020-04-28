@@ -43,9 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -426,6 +424,7 @@ public class PublicDataResource {
     @GetMapping(value = "/{base:[a-z]+}/**")
     public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format,
             @PathVariable String base) throws RestException, IOException {
+
         Helpers.setCacheControl(resp, "public");
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
@@ -471,10 +470,11 @@ public class PublicDataResource {
                         input.close();
                         ResultsCache.addToCache(byteArr, url.hashCode());
                     }
-                    OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-                    OntDocumentManager odm = new OntDocumentManager();
-                    odm.setProcessImports(false);
-                    oms.setDocumentManager(odm);
+                    /*
+                     * OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM); OntDocumentManager
+                     * odm = new OntDocumentManager(); odm.setProcessImports(false);
+                     * oms.setDocumentManager(odm);
+                     */
                     OntModel om = OntData.getOntModelByBase(baseUri);
                     OntData.setOntModel(om);
                     om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
@@ -599,6 +599,7 @@ public class PublicDataResource {
             return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
                     .body(baos.toString());
         } else {
+
             LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));

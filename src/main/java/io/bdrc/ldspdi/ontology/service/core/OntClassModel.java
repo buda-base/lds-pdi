@@ -29,6 +29,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -56,20 +57,29 @@ public class OntClassModel {
 
     protected String uri;
     protected OntClass clazz;
+    protected OntModel ontMod;
 
     public OntClassModel(String uri, boolean global) {
         this.uri = uri;
         if (global) {
             clazz = OntData.ontAllMod.getOntClass(uri);
+            ontMod = OntData.ontAllMod;
         } else {
             clazz = OntData.ontMod.getOntClass(uri);
+            ontMod = OntData.ontMod;
         }
     }
 
-    public OntClassModel(OntClass c) {
+    public OntClassModel(String uri, OntModel ontMod) {
+        this.uri = uri;
+        clazz = ontMod.getOntClass(uri);
+        this.ontMod = ontMod;
+    }
 
+    public OntClassModel(OntClass c, OntModel ontMod) {
         this.uri = c.getURI();
         clazz = c;
+        this.ontMod = ontMod;
     }
 
     public boolean isPresent() {
@@ -85,7 +95,7 @@ public class OntClassModel {
     }
 
     public String getId() {
-        return OntData.ontAllMod.shortForm(uri);
+        return ontMod.shortForm(uri);
     }
 
     public boolean hasParent() {
@@ -106,13 +116,12 @@ public class OntClassModel {
     public List<OntClassModel> getSubclasses() {
         List<OntClass> subs = clazz.listSubClasses(true).toList();
         List<OntClassModel> models = new ArrayList<>();
-
         for (OntClass c : subs) {
             if (!c.isAnon()) {
-                models.add(new OntClassModel(c));
+                models.add(new OntClassModel(c, ontMod));
             }
         }
-        Collections.sort(models, OntData.ontClassModelComparator);
+        Collections.sort(models, OntologyUtils.ontClassModelComparator);
         return models;
     }
 
@@ -121,10 +130,10 @@ public class OntClassModel {
         List<OntClassModel> models = new ArrayList<>();
         for (OntClass c : sups) {
             if (!c.isAnon()) {
-                models.add(new OntClassModel(c));
+                models.add(new OntClassModel(c, ontMod));
             }
         }
-        Collections.sort(models, OntData.ontClassModelComparator);
+        Collections.sort(models, OntologyUtils.ontClassModelComparator);
         return models;
     }
 
@@ -133,7 +142,7 @@ public class OntClassModel {
         ExtendedIterator<Individual> it = (ExtendedIterator<Individual>) clazz.listInstances(true);
 
         List<Individual> inds = it.toList();
-        Collections.sort(inds, OntData.individualComparator);
+        Collections.sort(inds, OntologyUtils.individualComparator);
         return inds;
     }
 
@@ -176,12 +185,13 @@ public class OntClassModel {
 
     public List<OntProperty> getAllClassProperties() {
         ArrayList<OntProperty> list = new ArrayList<>();
-        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(), ResourceFactory.createResource(uri).asNode());
-        ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
+        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(),
+                ResourceFactory.createResource(uri).asNode());
+        ExtendedIterator<Triple> ext = ontMod.getGraph().find(tp);
         while (ext.hasNext()) {
             Triple tpp = ext.next();
             String st = tpp.getSubject().getURI();
-            OntProperty prop = OntData.ontMod.getOntProperty(st);
+            OntProperty prop = ontMod.getOntProperty(st);
             list.add(prop);
         }
         return list;

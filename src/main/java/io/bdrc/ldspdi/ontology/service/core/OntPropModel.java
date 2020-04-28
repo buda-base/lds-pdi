@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.ontology.InverseFunctionalProperty;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.ontology.SymmetricProperty;
@@ -49,15 +50,18 @@ public class OntPropModel {
     public List<String> comments;
     public List<String[]> commentsLang;
     public OntProperty prop;
+    OntModel ontMod;
 
     public OntPropModel(String uri, boolean global) {
         this.uri = uri;
         if (global) {
             this.name = OntData.ontAllMod.shortForm(uri);
             prop = OntData.ontAllMod.getOntProperty(uri);
+            this.ontMod = OntData.ontAllMod;
         } else {
             this.name = OntData.ontMod.shortForm(uri);
             prop = OntData.ontMod.getOntProperty(uri);
+            this.ontMod = OntData.ontMod;
         }
         comments = new ArrayList<>();
         commentsLang = new ArrayList<>();
@@ -69,10 +73,10 @@ public class OntPropModel {
         }
         StmtIterator it = null;
         if (global) {
-            it = ((Model) OntData.ontAllMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
+            it = ((Model) ontMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
 
         } else {
-            it = ((Model) OntData.ontMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
+            it = ((Model) ontMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
 
         }
         while (it.hasNext()) {
@@ -80,10 +84,10 @@ public class OntPropModel {
             String pred = st.getPredicate().getURI();
             switch (pred) {
             case DOMAIN:
-                domain = getRdfListElements(st, global);
+                domain = getRdfListElements(st);
                 break;
             case RANGE:
-                range = getRdfListElements(st, global);
+                range = getRdfListElements(st);
                 break;
             case LABEL:
                 this.label = st.getObject().asLiteral().getString();
@@ -95,13 +99,50 @@ public class OntPropModel {
              */
             case TYPE:
                 this.rdfTypeUri = st.getObject().asNode().getURI();
+                this.rdfType = ontMod.shortForm(rdfTypeUri);
+                break;
+            }
+        }
+    }
+
+    public OntPropModel(String uri, OntModel ontMod) {
+        this.uri = uri;
+        this.name = ontMod.shortForm(uri);
+        prop = ontMod.getOntProperty(uri);
+        this.ontMod = ontMod;
+        comments = new ArrayList<>();
+        commentsLang = new ArrayList<>();
+        if (prop != null) {
+            for (RDFNode node : prop.listComments(null).toList()) {
+                comments.add(node.toString());
+                commentsLang.add(new String[] { node.asLiteral().getString(), node.asLiteral().getLanguage() });
+            }
+        }
+        StmtIterator it = null;
+        it = ((Model) OntData.ontMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
+        while (it.hasNext()) {
+            Statement st = it.next();
+            String pred = st.getPredicate().getURI();
+            switch (pred) {
+            case DOMAIN:
+                domain = getRdfListElements(st);
+                break;
+            case RANGE:
+                range = getRdfListElements(st);
+                break;
+            case LABEL:
+                this.label = st.getObject().asLiteral().getString();
+                this.labelLang = st.getObject().asLiteral().getLanguage();
+                break;
+            case TYPE:
+                this.rdfTypeUri = st.getObject().asNode().getURI();
                 this.rdfType = OntData.ontAllMod.shortForm(rdfTypeUri);
                 break;
             }
         }
     }
 
-    public ArrayList<String> getRdfListElements(Statement st, boolean global) {
+    public ArrayList<String> getRdfListElements(Statement st) {
         ArrayList<String> elts = new ArrayList<>();
         if (st.getObject().isURIResource()) {
             this.domainUri = st.getObject().asNode().getURI();
@@ -110,11 +151,7 @@ public class OntPropModel {
         }
         Resource rs = null;
         if (st.getObject().isAnon()) {
-            if (global) {
-                rs = OntData.ontAllMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
-            } else {
-                rs = OntData.ontMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
-            }
+            rs = ontMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
             StmtIterator stmt = rs.listProperties(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#unionOf"));
             while (stmt.hasNext()) {
                 List<RDFNode> list = stmt.next().getObject().asResource().as(RDFList.class).asJavaList();
@@ -232,7 +269,8 @@ public class OntPropModel {
 
     @Override
     public String toString() {
-        return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range=" + range + ", domain=" + domain + "]";
+        return "OntPropModel [uri=" + uri + ", name=" + name + ", rdfType=" + rdfType + ", label=" + label + ", range=" + range + ", domain=" + domain
+                + "]";
     }
 
     public List<Property> getAdminAnnotProps() {

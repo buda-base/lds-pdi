@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.UnionClass;
 import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ public class OntClassParent {
     OntClass sup3r;
     String uri;
     boolean global;
+    OntModel ontMod;
 
     final static Logger log = LoggerFactory.getLogger(OntClassParent.class);
 
@@ -33,6 +35,13 @@ public class OntClassParent {
         isAnonymous = sup3r.isAnon();
     }
 
+    public OntClassParent(String uri, OntModel ontMod) {
+        this.uri = uri;
+        sup3r = ontMod.getOntClass(uri).getSuperClass();
+        this.ontMod = ontMod;
+        isAnonymous = sup3r.isAnon();
+    }
+
     public ArrayList<OntClassModel> getParents() {
         ArrayList<OntClassModel> list = new ArrayList<>();
         if (isAnonymous) {
@@ -42,7 +51,7 @@ public class OntClassParent {
                 list.add(new OntClassModel(node.asResource().getURI(), global));
             }
         } else {
-            list.add(new OntClassModel(sup3r));
+            list.add(new OntClassModel(sup3r, ontMod));
         }
         return list;
     }
