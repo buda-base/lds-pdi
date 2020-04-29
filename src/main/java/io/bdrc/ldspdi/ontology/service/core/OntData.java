@@ -88,7 +88,7 @@ public class OntData implements Runnable {
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
-            updateFusekiDataset();
+            //updateFusekiDataset();
             readGithubJsonLDContext();
             adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
