@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,6 +53,7 @@ import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.libraries.Prefixes;
 
 public class OntData implements Runnable {
 
@@ -84,11 +86,11 @@ public class OntData implements Runnable {
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 ontAllMod.add(om);
-                addOntModelByBase(parseBaseUri(uri), om);
+                OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             updateFusekiDataset();
             readGithubJsonLDContext();
-            adminAnnotProps = getAdminAnnotProps();
+            adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);
@@ -164,7 +166,7 @@ public class OntData implements Runnable {
                 log.info("OntManagerDoc :" + uri);
                 OntModel om = odm.getOntology(uri, oms);
                 ontAllMod.add(om);
-                addOntModelByBase(parseBaseUri(uri), om);
+                OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             log.info("Global model size :" + ontAllMod.size());
             QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
@@ -316,10 +318,10 @@ public class OntData implements Runnable {
     }
 
     public static HashMap<String, ArrayList<OntResource>> getAllSubProps(final String uri, boolean global) throws RestException {
-        final ArrayList<OntResource> props = getDomainUsages(uri, global);
+        final ArrayList<OntResource> props = OntData.getDomainUsages(uri, global);
         final HashMap<String, ArrayList<OntResource>> map = new HashMap<>();
         for (final OntResource rs : props) {
-            final ArrayList<OntResource> l = getSubProps(rs.getURI(), global);
+            final ArrayList<OntResource> l = OntData.getSubProps(rs.getURI(), global);
             if (l.size() > 1) {
                 map.put(rs.getURI(), l);
             }
@@ -327,12 +329,19 @@ public class OntData implements Runnable {
         return map;
     }
 
-    /*
-     * public static boolean isClass(final String uri, boolean global) { OntModel md
-     * = null; if (global) { md = ontAllMod; } else { md = ontMod; } if
-     * (md.getOntResource(uri) != null) { return md.getOntResource(uri).isClass(); }
-     * else { return false; } }
-     */
+    public static boolean isClass(final String uri, boolean global) {
+        OntModel md = null;
+        if (global) {
+            md = ontAllMod;
+        } else {
+            md = ontMod;
+        }
+        if (md.getOntResource(uri) != null) {
+            return md.getOntResource(uri).isClass();
+        } else {
+            return false;
+        }
+    }
 
     public static int getNumPrefixes(boolean global) {
         if (global) {
@@ -376,7 +385,7 @@ public class OntData implements Runnable {
 
             }
         }
-        Collections.sort(rez, OntologyUtils.ontClassComparator);
+        Collections.sort(rez, OntData.ontClassComparator);
         return rez;
     }
 
@@ -385,10 +394,10 @@ public class OntData implements Runnable {
         final List<OntClassModel> models = new ArrayList<>();
         for (final OntClass root : roots) {
             if (!root.isAnon()) {
-                models.add(new OntClassModel(root, ontMod));
+                models.add(new OntClassModel(root));
             }
         }
-        Collections.sort(models, OntologyUtils.ontClassModelComparator);
+        Collections.sort(models, OntData.ontClassModelComparator);
         return models;
     }
 
@@ -401,7 +410,7 @@ public class OntData implements Runnable {
                 classes.add(ocl);
             }
         }
-        Collections.sort(classes, OntologyUtils.ontClassComparator);
+        Collections.sort(classes, OntData.ontClassComparator);
         return classes;
     }
 
@@ -414,23 +423,61 @@ public class OntData implements Runnable {
                 list.add(pr);
             }
         }
-        Collections.sort(list, OntologyUtils.propComparator);
+        Collections.sort(list, OntData.propComparator);
         return list;
     }
 
     public static List<Individual> getAllIndividuals() {
         final List<Individual> indv = ontMod.listIndividuals().toList();
-        Collections.sort(indv, OntologyUtils.individualComparator);
+        Collections.sort(indv, individualComparator);
         return indv;
     }
 
+    public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
+        @Override
+        public int compare(OntClass class1, OntClass class2) {
+            if (Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
+                return class1.getLocalName().compareTo(class2.getLocalName());
+            }
+            return Prefixes.getPrefix(class1.getNameSpace()).compareTo(Prefixes.getPrefix(class2.getNameSpace()));
+        }
+
+    };
+
+    public final static Comparator<OntClassModel> ontClassModelComparator = new Comparator<OntClassModel>() {
+        @Override
+        public int compare(OntClassModel class1, OntClassModel class2) {
+            return ontClassComparator.compare(class1.clazz, class2.clazz);
+        }
+
+    };
+
+    public final static Comparator<Individual> individualComparator = new Comparator<Individual>() {
+        @Override
+        public int compare(Individual class1, Individual class2) {
+            return class1.getLocalName().compareTo(class2.getLocalName());
+        }
+
+    };
+
+    public final static Comparator<OntProperty> propComparator = new Comparator<OntProperty>() {
+        @Override
+        public int compare(OntProperty prop1, OntProperty prop2) {
+            if (Prefixes.getPrefix(prop1.getNameSpace()).equals(Prefixes.getPrefix(prop2.getNameSpace()))) {
+                return prop1.getLocalName().compareTo(prop2.getLocalName());
+            }
+            return Prefixes.getPrefix(prop1.getNameSpace()).compareTo(Prefixes.getPrefix(prop2.getNameSpace()));
+        }
+
+    };
+
     public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
-        OntModel om = getOntModelByBase("http://" + ServiceConfig.SERVER_ROOT + "/ontology/admin");
+        OntModel om = OntData.getOntModelByBase("http://" + ServiceConfig.SERVER_ROOT + "/ontology/admin");
         return om.listAnnotationProperties().toList();
     }
 
     public static boolean isAdminAnnotProp(Property op) {
-        return adminAnnotProps.contains(op);
+        return OntData.adminAnnotProps.contains(op);
     }
 
     public static void rdf10tordf11(OntModel o) {

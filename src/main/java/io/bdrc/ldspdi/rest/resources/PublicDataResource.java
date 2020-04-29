@@ -43,7 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -77,7 +79,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.ontology.service.core.OntologyUtils;
 import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
@@ -425,13 +426,6 @@ public class PublicDataResource {
     @GetMapping(value = "/{base:[a-z]+}/**")
     public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format,
             @PathVariable String base) throws RestException, IOException {
-        boolean shape = request.getRequestURL().toString().contains("/shapes/");
-        OntModel globalModel;
-        if (shape) {
-            globalModel = OntShapesData.getOntModel();
-        } else {
-            globalModel = OntData.ontAllMod;
-        }
         Helpers.setCacheControl(resp, "public");
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
@@ -439,7 +433,7 @@ public class PublicDataResource {
         if (other.contains(".")) {
             String[] parts = other.split("\\.");
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
-            return getOntologyResourceAsFile(request, parts[1], shape, globalModel);
+            return getOntologyResourceAsFile(request, parts[1]);
         }
         if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
             log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
@@ -477,17 +471,12 @@ public class PublicDataResource {
                         input.close();
                         ResultsCache.addToCache(byteArr, url.hashCode());
                     }
-                    /*
-                     * OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM); OntDocumentManager
-                     * odm = new OntDocumentManager(); odm.setProcessImports(false);
-                     * oms.setDocumentManager(odm);
-                     */
-                    OntModel om = ModelFactory.createOntologyModel();
-                    /*
-                     * if (shape) { om = OntShapesData.getOntModelByBase(baseUri); } else { om =
-                     * OntData.getOntModelByBase(baseUri); }
-                     */
-                    // OntData.setOntModel(om);
+                    OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+                    OntDocumentManager odm = new OntDocumentManager();
+                    odm.setProcessImports(false);
+                    oms.setDocumentManager(odm);
+                    OntModel om = OntData.getOntModelByBase(baseUri);
+                    OntData.setOntModel(om);
                     om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                     // browser request : serving html page
                     if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
@@ -502,7 +491,7 @@ public class PublicDataResource {
                     }
                 }
             } else {
-                if (globalModel.getOntResource(tmp) == null) {
+                if (OntData.ontAllMod.getOntResource(tmp) == null) {
                     LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext("Ont resource is null for " + tmp);
                     return (ResponseEntity<StreamingResponseBody>) ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                             .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
@@ -513,9 +502,9 @@ public class PublicDataResource {
                     if (mediaType == null) {
                         return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                     }
-                    if (OntologyUtils.isClass(tmp, globalModel)) {
+                    if (OntData.isClass(tmp, true)) {
                         log.info("CLASS>>" + tmp);
-                        OntClassModel ocm = new OntClassModel(tmp, globalModel);
+                        OntClassModel ocm = new OntClassModel(tmp, true);
                         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                             ModelAndView model = new ModelAndView();
                             model.addObject("model", ocm);
@@ -525,7 +514,7 @@ public class PublicDataResource {
 
                     } else {
                         log.info("PROP>>" + tmp);
-                        OntPropModel opm = new OntPropModel(tmp, globalModel);
+                        OntPropModel opm = new OntPropModel(tmp, true);
                         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                             ModelAndView model = new ModelAndView();
                             model.addObject("model", opm);
@@ -545,7 +534,7 @@ public class PublicDataResource {
         }
     }
 
-    public Object getOntologyResourceAsFile(HttpServletRequest request, String ext, boolean shape, OntModel globalModel) throws RestException {
+    public Object getOntologyResourceAsFile(HttpServletRequest request, String ext) throws RestException {
         String reasonerUri = "";
         String infProfile = request.getHeader("Accept-Profile");
         if (infProfile != null) {
@@ -574,9 +563,10 @@ public class PublicDataResource {
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
             Model model = null;
-            if (shape) {
+            if (res.contains("/shapes/")) {
                 model = OntShapesData.getOntModelByBase(params.getBaseUri());
             } else {
+
                 model = OntData.getOntModelByBase(params.getBaseUri());
             }
             // Inference here if required
@@ -609,42 +599,9 @@ public class PublicDataResource {
             return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
                     .body(baos.toString());
         } else {
-            res = res.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
-            if (res.endsWith("/")) {
-                res = res.substring(0, res.length() - 1);
-            }
-            String query = "describe <" + res + ">";
-            Model m = QueryProcessor.getGraphFromModel(query, globalModel);
-            log.info("Not a base Uri serving {} and jenalang={}", res, JenaLangStr);
-            // Resource cl = globalModel.getResource(res);
-            if (m != null) {
-                // Model m = cl.getModel();
-                if (reasoner != null) {
-                    // m = ModelFactory.createInfModel(reasoner, m);
-                }
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                if (JenaLangStr == "STTL") {
-                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(m, null);
-                    writer.output(baos);
-                } else {
-                    if (JenaLangStr == RDFLanguages.strLangTurtle) {
-                        m.write(baos, "TURTLE");
-                    } else {
-                        org.apache.jena.rdf.model.RDFWriter wr = m.getWriter(JenaLangStr);
-                        if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
-                            wr.setProperty("xmlbase", null);
-                        }
-                        wr.write(m, baos, null);
-                    }
-                }
-                return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
-                        .body(baos.toString());
-
-            } else {
-                LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
-                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
-            }
+            LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
     }
 
