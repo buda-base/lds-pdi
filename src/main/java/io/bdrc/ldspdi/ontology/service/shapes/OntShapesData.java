@@ -25,11 +25,13 @@ public class OntShapesData implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
     public static HashMap<String, Model> modelsBase = new HashMap<>();
+    private static Model fullMod;
 
     public static void init() {
         try {
             OntPolicies.init();
             modelsBase = new HashMap<>();
+            fullMod = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
             odm.setProcessImports(true);
@@ -39,11 +41,16 @@ public class OntShapesData implements Runnable {
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
+                fullMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
+    }
+
+    public static Model getFullModel() {
+        return fullMod;
     }
 
     private static String parseBaseUri(String s) {

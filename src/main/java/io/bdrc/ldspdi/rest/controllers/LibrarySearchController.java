@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.controllers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +33,9 @@ import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
-public class LibrarySearchResource {
+public class LibrarySearchController {
 
-    public final static Logger log = LoggerFactory.getLogger(LibrarySearchResource.class);
+    public final static Logger log = LoggerFactory.getLogger(LibrarySearchController.class);
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
 
     @GetMapping(value = "/lib/{file}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,9 +72,9 @@ import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
-public class PublicTemplatesResource {
+public class PublicTemplatesController {
 
-    public final static Logger log = LoggerFactory.getLogger(PublicTemplatesResource.class);
+    public final static Logger log = LoggerFactory.getLogger(PublicTemplatesController.class);
 
     @GetMapping(value = "/query/table/{file}")
     public Object getQueryTemplateResults(HttpServletResponse response, HttpServletRequest request,

@@ -30,12 +30,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.annotations.AnnotationEndpoint;
-import io.bdrc.ldspdi.rest.resources.PublicDataResource;
+import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.test.Utils;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { AnnotationEndpoint.class, PublicDataResource.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { AnnotationEndpoint.class, PublicDataController.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class AnnotationTest {
 

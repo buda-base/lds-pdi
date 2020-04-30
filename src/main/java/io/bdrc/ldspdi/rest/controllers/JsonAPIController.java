@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.controllers;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -52,12 +52,12 @@ import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
-public class JsonAPIResource {
+public class JsonAPIController {
 
-    public final static Logger log = LoggerFactory.getLogger(JsonAPIResource.class);
+    public final static Logger log = LoggerFactory.getLogger(JsonAPIController.class);
     private List<String> fileList;
 
-    public JsonAPIResource() throws RestException {
+    public JsonAPIController() throws RestException {
         fileList = getQueryTemplates();
     }
 

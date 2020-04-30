@@ -42,11 +42,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.LdsPdiExceptionHandler;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
-import io.bdrc.ldspdi.rest.resources.PublicTemplatesResource;
+import io.bdrc.ldspdi.rest.controllers.PublicTemplatesController;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { PublicTemplatesResource.class, OntData.class, LdsPdiExceptionHandler.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { PublicTemplatesController.class, OntData.class, LdsPdiExceptionHandler.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class TemplatesTest1 {
 

@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -94,7 +94,7 @@ import io.bdrc.libraries.formatters.TTLRDFWriter;
 
 @RestController
 @RequestMapping("/")
-public class PublicDataResource {
+public class PublicDataController {
 
     public final static Logger log = LoggerFactory.getLogger("default");
 
@@ -562,15 +562,9 @@ public class PublicDataResource {
         log.info("In getOntologyResourceAsFile(), isBaseUri uri {} baseuri= {}", res, OntPolicies.isBaseUri(res));
         if (OntPolicies.isBaseUri(res)) {
             OntPolicy params = OntPolicies.getOntologyByBase(parseBaseUri(res));
-            Model model = null;
-            if (res.contains("/shapes/")) {
-                model = OntShapesData.getOntModelByBase(params.getBaseUri());
-            } else {
-
-                model = OntData.getOntModelByBase(params.getBaseUri());
-            }
+            Model model = OntData.getOntModelByBase(params.getBaseUri());
             // Inference here if required
-            if (reasoner != null) {
+            if (reasoner != null && model != null) {
                 model = ModelFactory.createInfModel(reasoner, model);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -744,7 +738,7 @@ public class PublicDataResource {
 
     private String filterResourceId(String resId) throws IOException {
         if (COLUMBIA_IDS == null) {
-            InputStream resource = PublicDataResource.class.getClassLoader().getResourceAsStream("columbia-id.csv");
+            InputStream resource = PublicDataController.class.getClassLoader().getResourceAsStream("columbia-id.csv");
             COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
         }
         if (COLUMBIA_IDS.contains(resId)) {

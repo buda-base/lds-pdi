@@ -88,7 +88,7 @@ public class OntData implements Runnable {
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
-            // updateFusekiDataset();
+            updateFusekiDataset();
             readGithubJsonLDContext();
             adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
@@ -142,6 +142,12 @@ public class OntData implements Runnable {
 
     private static void updateFusekiDataset() throws RestException {
         log.info("FUSEKI URL IS >>" + fusekiUrl);
+        log.info("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
+                parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/"));
+        log.info("updateFusekiDataset() is ontAllModByBaseNull {}",
+                (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")) == null));
+        log.info("updateFusekiDataset() is ontAllMod by base graph uri {}",
+                (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph()));
         QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "update 1");
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),

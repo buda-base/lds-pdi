@@ -1,4 +1,4 @@
-package io.bdrc.ldspdi.rest.resources;
+package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,9 +56,9 @@ import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
 @RequestMapping("/")
-public class BdrcAuthResource {
+public class BdrcAuthController {
 
-    public final static Logger log = LoggerFactory.getLogger(BdrcAuthResource.class);
+    public final static Logger log = LoggerFactory.getLogger(BdrcAuthController.class);
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
     public static final String BDU_PFX = "http://purl.bdrc.io/resource-nc/user/";
     public static final String PRIVATE_PFX = "http://purl.bdrc.io/graph-nc/user-private/";

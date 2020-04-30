@@ -57,6 +57,11 @@ public class OntPolicies {
         if (st != null) {
             file = st.getObject().toString();
         }
+        if (type.equals(CORE_TYPE)) {
+            if (graph == null) {
+                graph = defaultCoreGraph;
+            }
+        }
         OntPolicy op = new OntPolicy(baseUri, graph, fm.mapURI(baseUri), file, visible);
         return op;
     }

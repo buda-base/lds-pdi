@@ -157,14 +157,22 @@ public class QueryProcessor {
         return qe;
     }
 
-    public static void updateOntology(Model mod, String fusekiUrl, String graph, String caller) {
+    public static boolean updateOntology(Model mod, String fusekiUrl, String graph, String caller) {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        if (mod == null || graph == null) {
+            log.error("updateOntology() was called with null model or null graph");
+            return false;
         }
         log.info("Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
                 mod.listStatements().toSet().size());
         RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
         rvf.put(graph, mod);
+        rvf.close();
+        log.info("updateOntology() is done updating for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
+                mod.listStatements().toSet().size());
+        return true;
     }
 
     public static Model getAnyGraph(String graph, String fusekiUrl) {
