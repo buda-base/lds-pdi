@@ -593,9 +593,37 @@ public class PublicDataController {
             return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
                     .body(baos.toString());
         } else {
-            LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+
+            res = res.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
+            if (res.endsWith("/")) {
+                res = res.substring(0, res.length() - 1);
+            }
+            String query = "describe <" + res + ">";
+            log.info("Looking up model for {}", res);
+            Model model = QueryProcessor.getGraphFromModel(query, OntData.ontAllMod);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            if (model != null && model.size() > 0) {
+                if (JenaLangStr == "STTL") {
+                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, null);
+                    writer.output(baos);
+                } else {
+                    if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                        model.write(baos, "TURTLE");
+                    } else {
+                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                        if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
+                            wr.setProperty("xmlbase", null);
+                        }
+                        wr.write(model, baos, null);
+                    }
+                }
+                return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
+                        .body(baos.toString());
+            } else {
+                LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                        .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+            }
         }
     }
 
