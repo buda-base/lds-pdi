@@ -49,6 +49,29 @@ public class ShaclDataController {
         return processShapeUrl(request.getRequestURL().toString(), true, response);
     }
 
+    @GetMapping(value = "/ontology/shapes/core")
+    public ResponseEntity<StreamingResponseBody> getShaclAllOntGraph(@RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
+            @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
+            throws RestException, IOException {
+        log.info("getShaclAllOntGraph {} ", request.getRequestURL());
+        String url = request.getRequestURL().toString();
+        Model m = OntShapesData.getFullModel();
+        boolean ext = hasValidExtension(url);
+        String extension = "ttl";
+        MediaType mt = null;
+        if (ext) {
+            extension = url.substring(url.lastIndexOf(".") + 1);
+            url = url.substring(0, url.lastIndexOf("."));
+            mt = BudaMediaTypes.getMimeFromExtension(extension);
+            log.info("getShaclOntGraph() Url is {} and is baseuri {}", url, OntPolicies.isBaseUri(url));
+        }
+        if (mt == null || extension == null) {
+            mt = BudaMediaTypes.MT_TTL;
+            extension = "ttl";
+        }
+        return ResponseEntity.ok().contentType(mt).body(StreamingHelpers.getModelStream(m, extension, url, null));
+    }
+
     private ResponseEntity<StreamingResponseBody> processShapeUrl(String url, boolean resource, HttpServletResponse response) throws RestException {
         Model m = ModelFactory.createDefaultModel();
         MediaType mt = null;
