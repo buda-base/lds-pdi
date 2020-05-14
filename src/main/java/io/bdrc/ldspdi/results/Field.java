@@ -16,7 +16,9 @@ public class Field extends HashMap<String,String>{
     
     public static Field getField(Statement st) {
         if(st.getObject().isLiteral()) {
-            return new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(),st.getObject().asLiteral().getValue().toString());  
+            //String value = st.getObject().asLiteral().getValue().toString();
+            String value = st.getObject().asLiteral().getLexicalForm();
+            return new LiteralStringField(st.getPredicate().getURI(),st.getObject().asLiteral().getLanguage(), value);  
         }else {
             if(st.getObject().isAnon()) {
                 return new Field(st.getPredicate().getURI(),"_:"+st.getObject().asNode().getBlankNodeLabel());
