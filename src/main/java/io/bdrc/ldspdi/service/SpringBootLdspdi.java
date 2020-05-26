@@ -65,7 +65,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         OntShapesData.init();
         if ("true".equals(AuthProps.getProperty("useAuth"))) {
             log.info("SpringBootLdspdi uses auth, updating auth data...");
-            // RdfAuthModel.init();
+            RdfAuthModel.init();
             RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
         }
     }

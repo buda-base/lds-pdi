@@ -39,6 +39,11 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpHeaders;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -46,6 +51,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.Models;
 
 public class Helpers {
 
@@ -53,6 +59,7 @@ public class Helpers {
 
     public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
     public static String MAX_AGE_VALUE = ServiceConfig.getProperty("Max-Age");
+    public static Property IS_IN_ROOT_INSTANCE = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/core/inRootInstance");
 
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
@@ -153,6 +160,25 @@ public class Helpers {
                 ResultSetFormatter.outputAsXML(os, rs);
             }
         };
+    }
+
+    public static String tofullResourceUri(String prefixedUri) {
+        String res = prefixedUri.substring(prefixedUri.lastIndexOf(":") + 1);
+        return Models.BDR + res;
+    }
+
+    public static String toPrefixedResourceUri(String fullUri) {
+        String res = fullUri.substring(fullUri.lastIndexOf("/") + 1);
+        return "bdr:" + res;
+    }
+
+    public static String getRootInstanceUri(String prefixedUri, Model m) {
+        NodeIterator it = m.listObjectsOfProperty(ResourceFactory.createResource(tofullResourceUri(prefixedUri)), IS_IN_ROOT_INSTANCE);
+        if (it.hasNext()) {
+            RDFNode st = it.next();
+            return toPrefixedResourceUri(st.asResource().getURI());
+        }
+        return null;
     }
 
     public static boolean equals(MediaType mt, MediaType mt1) {

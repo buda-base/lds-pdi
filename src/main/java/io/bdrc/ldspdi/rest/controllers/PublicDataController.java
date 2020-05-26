@@ -348,6 +348,12 @@ public class PublicDataController {
                     .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
                     .body(StreamingHelpers.getStream(html));
         }
+        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
+        if (model.size() == 0) {
+            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
+                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
+        }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
             res = filterResourceId(res);
             String type = getDilaResourceType(res);
@@ -361,14 +367,17 @@ public class PublicDataController {
             for (Entry<String, String> e : set) {
                 response.setHeader(e.getKey(), e.getValue());
             }
-            response.sendRedirect(ServiceConfig.getProperty("showUrl") + type + res);
+            String root = Helpers.getRootInstanceUri(prefixedRes, model);
+            log.info("resource has root {}", root);
+            if (root != null) {
+                response.sendRedirect(ServiceConfig.getProperty("showUrl") + root + "?part=" + prefixedRes);
+                log.info("send redirect {}", ServiceConfig.getProperty("showUrl") + root + "?part=" + prefixedRes);
+            } else {
+                log.info("send redirect {}", ServiceConfig.getProperty("showUrl") + type + res);
+                response.sendRedirect(ServiceConfig.getProperty("showUrl") + type + res);
+            }
         }
-        final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
-        if (model.size() == 0) {
-            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
-        }
+
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
@@ -667,20 +676,6 @@ public class PublicDataController {
         t.start();
         return ResponseEntity.ok().body("Shapes Ontologies are being updated");
     }
-
-    /*
-     * @GetMapping(value = "/callbacks/github/shapes") public ResponseEntity<String>
-     * updateGetShapesOntology() throws RestException {
-     * log.info("updating Shape Ontology models() >>"); Thread t = new Thread(new
-     * OntShapesData()); t.start(); return
-     * ResponseEntity.ok().body("Shapes Ontologies are being updated"); }
-     * 
-     * @GetMapping(value = "/callbacks/github/owl-schema") public
-     * ResponseEntity<String> updateTestOntology() throws RestException {
-     * log.info("updating Ontology models() >>"); Thread t = new Thread(new
-     * OntData()); t.start(); return
-     * ResponseEntity.ok().body("Ontologies are being updated"); }
-     */
 
     private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {
         HashMap<String, MediaType> map = BudaMediaTypes.getResExtensionMimeMap();
