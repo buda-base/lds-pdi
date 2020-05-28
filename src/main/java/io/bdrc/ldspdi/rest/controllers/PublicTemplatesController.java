@@ -63,7 +63,6 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
 import io.bdrc.libraries.GlobalHelpers;
@@ -315,9 +314,6 @@ public class PublicTemplatesController {
             Thread t = new Thread(new GitService());
             t.start();
             Prefixes.loadPrefixes();
-            DocFileModel.clearCache();
-            LdsQueryService.clearCache();
-            ResultsCache.clearCache();
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(baos));

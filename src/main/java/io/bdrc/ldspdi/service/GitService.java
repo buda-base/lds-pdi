@@ -30,6 +30,11 @@ import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
+import io.bdrc.ldspdi.utils.DocFileModel;
+
 public class GitService implements Runnable {
 
     private static String GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
@@ -87,6 +92,14 @@ public class GitService implements Runnable {
 
     @Override
     public void run() {
+        try {
+            DocFileModel.clearCache();
+        } catch (RestException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        LdsQueryService.clearCache();
+        ResultsCache.clearCache();
         update();
     }
 
