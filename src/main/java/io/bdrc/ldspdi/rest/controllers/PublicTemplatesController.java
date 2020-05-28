@@ -230,7 +230,7 @@ public class PublicTemplatesController {
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
             final String query = qfp.getParametizedQuery(hm, true);
-            log.info("getGraphTemplateResults() Parametized query {}", query);
+            log.debug("getGraphTemplateResults() Parametized query {}", query);
             // format is prevalent
             mediaType = BudaMediaTypes.getMimeFromExtension(format);
             if (mediaType == null) {
