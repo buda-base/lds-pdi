@@ -671,10 +671,14 @@ public class PublicDataController {
 
     @PostMapping(value = "/callbacks/github/shapes", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateShapesOntology() throws RestException {
-        log.info("updating Shape Ontology models() >>");
-        Thread t = new Thread(new OntShapesData());
-        t.start();
-        return ResponseEntity.ok().body("Shapes Ontologies are being updated");
+        if (!ServiceConfig.isInChina()) {
+            log.info("updating Shape Ontology models() >>");
+            Thread t = new Thread(new OntShapesData());
+            t.start();
+            return ResponseEntity.ok().body("Shapes Ontologies are being updated");
+        } else {
+            return ResponseEntity.ok().body("Shapes Ontologies are not used in this configuration");
+        }
     }
 
     private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {

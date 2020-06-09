@@ -46,14 +46,15 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             log.error("Primary config could not be load in ServiceConfig", e1);
             throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
         }
-        if (ServiceConfig.useAuth()) {
+        if (ServiceConfig.useAuth() && !ServiceConfig.isInChina()) {
             AuthProps.init(ServiceConfig.getProperties());
             RdfAuthModel.readAuthModel();
         }
         ResultsCache.init();
-        GitService.update();
-        // OntData.init();
-        // OntShapesData.init();
+        // Pull lds-queries repo from git if not in china
+        if (!ServiceConfig.isInChina()) {
+            GitService.update();
+        }
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication.run(SpringBootLdspdi.class, args);
@@ -62,12 +63,15 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         OntData.init();
-        OntShapesData.init();
-        if ("true".equals(AuthProps.getProperty("useAuth"))) {
-            log.info("SpringBootLdspdi uses auth, updating auth data...");
-            RdfAuthModel.init();
-            RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
+        if (!ServiceConfig.isInChina()) {
+            OntShapesData.init();
+            if ("true".equals(AuthProps.getProperty("useAuth"))) {
+                log.info("SpringBootLdspdi uses auth, updating auth data...");
+                RdfAuthModel.init();
+                RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
+            }
         }
+        log.info("SERVER IS IN CHINA {}", ServiceConfig.isInChina());
     }
 
 }

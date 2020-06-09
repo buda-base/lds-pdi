@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -29,6 +30,7 @@ public class OntPolicies {
     private static final String SHAPES_TYPE = "shapes";
 
     public static final String policiesUrl = ServiceConfig.getProperty("ontPoliciesUrl");
+    public static final String localPolicies = ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf";
     public static final String shapesPoliciesUrl = ServiceConfig.getProperty("ontShapesPoliciesUrl");
     public static HashMap<String, OntPolicy> mapAll;
     public static HashMap<String, OntPolicy> mapCore;
@@ -69,7 +71,10 @@ public class OntPolicies {
     public static void init() {
         mapAll = new HashMap<>();
         set(CORE_TYPE);
-        set(SHAPES_TYPE);
+        // We don't use shapes in china
+        if (!ServiceConfig.isInChina()) {
+            set(SHAPES_TYPE);
+        }
     }
 
     public static void set(String type) {
@@ -80,12 +85,19 @@ public class OntPolicies {
             FileManager fm = odm.getFileManager();
             HttpURLConnection connection = null;
             if (type.equals(CORE_TYPE)) {
-                connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
+                if (!ServiceConfig.isInChina()) {
+                    connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
+                }
             }
             if (type.equals(SHAPES_TYPE)) {
                 connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
             }
-            InputStream stream = connection.getInputStream();
+            InputStream stream = null;
+            if (!ServiceConfig.isInChina()) {
+                stream = connection.getInputStream();
+            } else {
+                stream = new FileInputStream(localPolicies);
+            }
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type,

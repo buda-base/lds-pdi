@@ -118,6 +118,16 @@ public class ServiceConfig {
         return prop.getProperty("brand").equals("BDRC");
     }
 
+    public static boolean isInChina() {
+        String val = prop.getProperty("serverLocation");
+        if (val != null) {
+            if (val.equals("china")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String getProperty(String key) {
         return prop.getProperty(key);
     }

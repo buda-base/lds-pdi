@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -99,9 +100,9 @@ public class OntShapesData implements Runnable {
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
-        // OntData.init();
-        OntShapesData.init();
-        fullMod.write(System.out, "TURTLE");
+        OntData.init();
+        // OntShapesData.init();
+        // fullMod.write(System.out, "TURTLE");
         updateFusekiDataset();
     }
 

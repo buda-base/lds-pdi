@@ -1,7 +1,9 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -77,7 +79,12 @@ public class OntData implements Runnable {
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
+            OntDocumentManager odm = null;
+            if (!ServiceConfig.isInChina()) {
+                odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
+            } else {
+                odm = new OntDocumentManager(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf");
+            }
             odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
@@ -114,9 +121,15 @@ public class OntData implements Runnable {
     }
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
-        URL url = new URL(ServiceConfig.getProperty("jsonContextURL"));
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        InputStream stream = null;
+        if (!ServiceConfig.isInChina()) {
+            URL url = new URL(ServiceConfig.getProperty("jsonContextURL"));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            stream = connection.getInputStream();
+        } else {
+            stream = new FileInputStream(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/context.jsonld");
+        }
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
         StringBuilder st = new StringBuilder();
         String line;
         while ((line = in.readLine()) != null) {
@@ -163,7 +176,12 @@ public class OntData implements Runnable {
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
+            OntDocumentManager odm = null;
+            if (!ServiceConfig.isInChina()) {
+                odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
+            } else {
+                odm = new OntDocumentManager(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf");
+            }
             odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
