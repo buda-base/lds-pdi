@@ -1,0 +1,1 @@
+[inverseOf1: (?P owl:inverseOf ?Q) -> (?Q owl:inverseOf ?P) ]

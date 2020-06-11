@@ -40,10 +40,13 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.reasoner.ReasonerRegistry;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
+import org.apache.jena.reasoner.rulesys.Rule;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL2;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.ReasonerVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +73,7 @@ public class OntData implements Runnable {
     static Date lastUpdated;
     public static HashMap<String, OntModel> modelsBase = new HashMap<>();
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-    final static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+    static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     static List<AnnotationProperty> adminAnnotProps;
 
     public static void init() {
@@ -161,7 +164,11 @@ public class OntData implements Runnable {
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")) == null));
         log.info("updateFusekiDataset() is ontAllMod by base graph uri {}",
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph()));
-        QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
+        List<Rule> miniRules = GenericRuleReasoner.loadRules(System.getProperty("user.dir") + "/src/main/resources/inverseOf.rules");
+        Reasoner reasoner = new GenericRuleReasoner(miniRules);
+        reasoner.setParameter(ReasonerVocabulary.PROPruleMode, "forward");
+        InfModel core = ModelFactory.createInfModel(reasoner, ontAllMod);
+        QueryProcessor.updateOntology(core, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "update 1");
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
@@ -534,10 +541,10 @@ public class OntData implements Runnable {
     }
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
-        // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
+        // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/newcorerw/query");
         // OntData.init();
-        Model m = ReasonerRegistry.theRegistry().getAllDescriptions();
-        m.write(System.out, "TURTLE");
+        // Model m = ReasonerRegistry.theRegistry().getAllDescriptions();
+        // m.write(System.out, "TURTLE");
 
     }
 
