@@ -40,10 +40,14 @@ public class OntShapesData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
+                String tmp = uri.substring(0, uri.length() - 1);
+                // Helpers.writeModelToFile(om, tmp.substring(tmp.lastIndexOf("/") + 1) +
+                // ".ttl");
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
+            updateFusekiDataset();
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
@@ -107,10 +111,9 @@ public class OntShapesData implements Runnable {
 
     @Override
     public void run() {
-        init();
         try {
-            updateFusekiDataset();
-        } catch (RestException e) {
+            init();
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             log.error(e.getMessage(), e);
             e.printStackTrace();

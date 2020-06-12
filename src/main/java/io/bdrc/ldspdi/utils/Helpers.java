@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -183,6 +184,13 @@ public class Helpers {
 
     public static boolean equals(MediaType mt, MediaType mt1) {
         return (mt.getType().equals(mt1.getType()) && mt.getSubtype().equals(mt1.getSubtype()));
+    }
+
+    public static void writeModelToFile(Model m, String filename) throws IOException {
+        log.info("Writing model to file {}" + filename);
+        FileOutputStream fos = new FileOutputStream(filename);
+        m.write(fos, "TURTLE");
+        fos.close();
     }
 
 }
