@@ -1,9 +1,7 @@
 package io.bdrc.ldspdi.sparql;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,14 +29,13 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
-import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,6 +184,20 @@ public class QueryProcessor {
         return getAnyGraph(graph, null);
     }
 
+    public static void dropMultipleGraphs(ArrayList<String> graphUris, String fusekiEndpoint) {
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiEndpoint);
+        for (String uri : graphUris) {
+            rvf.delete(uri);
+        }
+        rvf.close();
+    }
+
+    public static void dropSingleGraph(String graph, String fusekiEndpoint) {
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiEndpoint);
+        rvf.delete(graph);
+        rvf.close();
+    }
+
     public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -243,19 +254,26 @@ public class QueryProcessor {
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
-
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf")
-                .openConnection();
-        InputStream stream = connection.getInputStream();
-        Model tmp = ModelFactory.createDefaultModel();
-        tmp.read(stream, RDFLanguages.strLangRDFXML);
-        // tmp.write(System.out, "TURTLE");
-        stream.close();
-
-        Model m = QueryProcessor.getDescribeModel("bda:AccessOpen", null, null);
-        System.out.println("MODEL SIZE : " + m.size());
-        m.write(System.out, "TURTLE");
+        // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/newcorerw/query");
+        // System.out.println("FUSEKI >>" +
+        // ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL));
+        String fusekiQuery = "http://buda1.bdrc.io:13180/fuseki/newcorerw/query";
+        String fusekiUpdate = "http://buda1.bdrc.io:13180/fuseki/newcorerw/data";
+        String query = "select distinct ?g where { graph ?g { ?s ?p <http://www.w3.org/ns/shacl#NodeShape> } }";
+        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiQuery);
+        ArrayList<String> toDrop = new ArrayList<>();
+        QueryExecution qe = rvf.query(query);
+        ResultSet rs = qe.execSelect();
+        while (rs.hasNext()) {
+            QuerySolution qs = rs.next();
+            String s = qs.get("?g").asNode().getURI();
+            System.out.println(" S=" + s);
+            if (!toDrop.contains(s)) {
+                toDrop.add(s);
+            }
+        }
+        qe.close();
+        QueryProcessor.dropMultipleGraphs(toDrop, fusekiUpdate);
 
     }
 }

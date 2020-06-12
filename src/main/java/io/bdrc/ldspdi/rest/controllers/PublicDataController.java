@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -634,31 +633,6 @@ public class PublicDataController {
                         .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
             }
         }
-    }
-
-    @GetMapping(value = "/ontology/data/{ext}", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<StreamingResponseBody> getAllOntologyData(HttpServletResponse resp, HttpServletRequest request,
-            @PathVariable("ext") String ext) throws RestException {
-        log.info("Call to getAllOntologyData(); with ext {}", ext);
-        Helpers.setCacheControl(resp, "public");
-        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
-        if (JenaLangStr == null) {
-            LdsError lds = new LdsError(LdsError.URI_SYNTAX_ERR).setContext(request.getRequestURL().toString());
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
-        }
-        OntModel model = OntData.ontAllMod;
-        final StreamingResponseBody stream = new StreamingResponseBody() {
-            @Override
-            public void writeTo(OutputStream os) throws IOException {
-                if (JenaLangStr == "STTL") {
-                    model.write(os, "TURTLE");
-                } else {
-                    model.write(os, JenaLangStr);
-                }
-            }
-        };
-        return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(stream);
     }
 
     @PostMapping(value = "/callbacks/github/owl-schema", consumes = MediaType.APPLICATION_JSON_VALUE)

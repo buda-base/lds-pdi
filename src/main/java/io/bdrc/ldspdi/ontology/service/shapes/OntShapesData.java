@@ -100,7 +100,7 @@ public class OntShapesData implements Runnable {
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         // OntData.init();
-        // OntShapesData.init();
+        OntShapesData.init();
         // fullMod.write(System.out, "TURTLE");
         // updateFusekiDataset();
     }

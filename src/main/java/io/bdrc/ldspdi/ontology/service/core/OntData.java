@@ -168,6 +168,7 @@ public class OntData implements Runnable {
         Reasoner reasoner = new GenericRuleReasoner(miniRules);
         reasoner.setParameter(ReasonerVocabulary.PROPruleMode, "forward");
         InfModel core = ModelFactory.createInfModel(reasoner, ontAllMod);
+        core.write(System.out, "TURTLE");
         QueryProcessor.updateOntology(core, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "update 1");
         QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
