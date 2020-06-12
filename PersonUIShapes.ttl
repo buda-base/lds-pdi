@@ -1,0 +1,281 @@
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix PersonUIShapes: <http://purl.bdrc.io/shapes/core/PersonUIShapes/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix bda:   <http://purl.bdrc.io/admin.data/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix lcsh:  <http://id.loc.gov/authorities/subjects/> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+
+bds:PersonShape-hasBrother
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "This Person may have zero or more brothers."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has brother"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:PersonShape-hasOlderSister
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more older sisters."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has older sister"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:PersonNamePropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Name relations"@en .
+
+bds:PersonShape-personName
+        dash:viewer     dash:DetailsViewer ;
+        sh:description  "this Person may have one or more names."@en ;
+        sh:name         "person name"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape-personTeacherOf
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more students."@en ;
+        sh:group        bds:StudentTeacherPropertyGroup ;
+        sh:name         "teacher of"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-hasGrandmother
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most two Grandmothers."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has grandmother"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonShape-hasSpouse
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most one spouse."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has spouse"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape-hasOlderBrother
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more older brothers."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has older brother"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:PersonShape-hasWife
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most one wife."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has wife"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape-hasGrandson
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more grandsons."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has grandson"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonShape-hasSibling
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more siblings."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has sibling"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:StudentTeacherPropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Student/Teacher relations"@en ;
+        sh:group    bds:AssociatedPersonsPropertyGroup ;
+        sh:order    "0"^^xsd:decimal .
+
+bds:PersonShape-hasYoungerSister
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more younger sisters."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has younger sister"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bdo:Person  bds:uiShapeGraph  bdg:PersonUIShapes .
+
+bds:PersonShape-hasDaughter
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more daughters."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has daughter"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-hasGranddaughter
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more granddaughters."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has granddaughter"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonShape-hasCousin
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more cousins."@en ;
+        sh:name         "has cousin"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonShape-genderMale
+        sh:name  "male"@en .
+
+bds:EventPropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Event relations"@en ;
+        sh:order    "1"^^xsd:decimal .
+
+bds:PersonEventShape-personEventRole
+        dash:editor  dash:InstancesSelectEditor ;
+        sh:name      "role associated with the event"@en .
+
+bds:AssociatedPersonsPropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Kinshp relations"@en ;
+        sh:order    "3"^^xsd:decimal .
+
+bds:IdentityPropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Identity relations"@en ;
+        sh:order    "0"^^xsd:decimal .
+
+bds:PersonShape-hasGrandChild
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more grandchildren."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has grandchild"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonNameShape-personNameLabel
+        dash:editor      dash:TextAreaWithLangEditor ;
+        dash:singleLine  true ;
+        sh:description   "this Person has a name given by the label."@en ;
+        sh:group         bds:PersonNamePropertyGroup ;
+        sh:name          "name label"@en ;
+        sh:order         "1"^^xsd:decimal .
+
+bds:PersonShape-hasGrandfather
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most two Grandfathers."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has grandfather"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonEventShape-personEventCorporation
+        dash:editor  dash:InstancesSelectEditor ;
+        sh:name      "corporation associated with the event"@en .
+
+bds:KinshipPropertyGroup
+        a           sh:PropertyGroup ;
+        rdfs:label  "Kinshp relations"@en ;
+        sh:group    bds:AssociatedPersonsPropertyGroup ;
+        sh:order    "1"^^xsd:decimal .
+
+bds:PersonShape-personStudentOf
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more teachers."@en ;
+        sh:group        bds:StudentTeacherPropertyGroup ;
+        sh:name         "student of"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape-hasParent
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most two parents."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has parent"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-personEvent
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more events like birth, death, ordination."@en ;
+        sh:group        bds:EventPropertyGroup ;
+        sh:name         "has event"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape  bds:isUIhape  true .
+
+bds:PersonShape-hasSister
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more sisters."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has sister"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:PersonShape-hasGrandParent
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero upto 4 grandparents."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has grandparent"@en ;
+        sh:order        "3"^^xsd:decimal .
+
+bds:PersonShape-hasMother
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have at most one mother."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has mother"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-genderFemale
+        sh:name  "female"@en .
+
+bds:PersonShape-kinWith
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more kin."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has kin"@en .
+
+bds:PersonShape-hasSon
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more sons."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has son"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-hasHusband
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have a husband."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has husband"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+bds:PersonShape-hasYoungerBrother
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have zero or more younger brothers."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has younger brother"@en ;
+        sh:order        "2"^^xsd:decimal .
+
+bds:PersonShape-personGender
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "may have at most one :personGender or none if not known."@en ;
+        sh:group        bds:IdentityPropertyGroup ;
+        sh:name         "has gender"@en ;
+        sh:order        "1"^^xsd:decimal .
+
+bds:PersonShape-hasFather
+        dash:editor     dash:InstancesSelectEditor ;
+        sh:description  "this Person may have a father."@en ;
+        sh:group        bds:KinshipPropertyGroup ;
+        sh:name         "has father"@en ;
+        sh:order        "0"^^xsd:decimal .
+
+PersonUIShapes:  a       owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/PersonShapes/> , <http://purl.bdrc.io/shapes/core/EventUIShapes/> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "SHACL UI templates for Person" .

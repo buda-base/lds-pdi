@@ -1,0 +1,127 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix WorkShapes: <http://purl.bdrc.io/shapes/core/WorkShapes/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+bds:WorkShape-workTitle
+        a               sh:PropertyShape ;
+        sh:class        bdo:WorkBibliographicalTitle ;
+        sh:description  "there must be a single bibliographic title for a work"@en ;
+        sh:maxCount     1 ;
+        sh:minCount     1 ;
+        sh:name         "title"@en ;
+        sh:order        "2"^^xsd:decimal ;
+        sh:path         bdo:workTitle .
+
+bds:WorkShape  a         sh:NodeShape ;
+        rdfs:label       "Work shape"@en ;
+        rdfs:subClassOf  rdfs:Resource ;
+        sh:property      bds:WorkShape-creator , bds:WorkShape-workTitle2 , bds:WorkShape-workTitle , bds:WorkShape-bf_identifiedBy , bds:WorkShape-hasTranslation , bds:WorkShape-hasInstance ;
+        sh:targetClass   bdo:Work .
+
+bds:WorkShape-creator
+        a               sh:PropertyShape ;
+        sh:class        bdo:AgentAsCreator ;
+        sh:description  "this Work may have zero or more creators"@en ;
+        sh:minCount     0 ;
+        sh:name         "creator"@en ;
+        sh:nodeKind     sh:IRI ;
+        sh:order        "3"^^xsd:decimal ;
+        sh:path         bdo:creator .
+
+bds:SerialMemberShape-hasInstance
+        a               sh:PropertyShape ;
+        sh:class        bdo:Instance ;
+        sh:description  "this SerialMember may have a SerialInstance"@en ;
+        sh:maxCount     1 ;
+        sh:minCount     0 ;
+        sh:name         "has serial instance"@en ;
+        sh:path         bdo:hasInstance .
+
+bds:SerialMemberShape-memberOf
+        a               sh:PropertyShape ;
+        sh:class        bdo:SerialWork ;
+        sh:description  "this SerialMember is a series member of a SerialWork"@en ;
+        sh:maxCount     1 ;
+        sh:minCount     1 ;
+        sh:name         "series member"@en ;
+        sh:path         bdo:memberOf .
+
+bds:WorkShape-workTitle2
+        a               sh:PropertyShape ;
+        sh:class        bdo:WorkTitle ;
+        sh:description  "there can be 0 or more bdo:WorkTitle other than bdo:WorkBibliographicTitle"@en ;
+        sh:minCount     0 ;
+        sh:name         "title"@en ;
+        sh:not          [ a         sh:NodeShape ;
+                          sh:class  bdo:WorkBibliographicalTitle
+                        ] ;
+        sh:order        2.1 ;
+        sh:path         bdo:workTitle .
+
+bds:WorkShape-hasInstance
+        a               sh:PropertyShape ;
+        sh:class        bdo:Instance ;
+        sh:description  "this Work may have zero or more Instances"@en ;
+        sh:minCount     0 ;
+        sh:name         "has instance"@en ;
+        sh:path         bdo:hasInstance .
+
+WorkShapes:  a           owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/RootShapes/> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "Initial SHACL constraints for Works" .
+
+bds:WorkShape-hasTranslation
+        a               sh:PropertyShape ;
+        sh:class        bdo:Work ;
+        sh:description  "this Work may have zero or more tanslations" ;
+        sh:minCount     0 ;
+        sh:name         "work has translation"@en ;
+        sh:path         bdo:hasTranslation .
+
+bds:SerialWorkShape-hasMember
+        a               sh:PropertyShape ;
+        sh:class        bdo:SerialMember ;
+        sh:description  "this SerialWork has zero or more SerialMembers"@en ;
+        sh:minCount     0 ;
+        sh:name         "has series member"@en ;
+        sh:path         bdo:hasMember .
+
+bds:SerialMemberShape
+        a               sh:NodeShape ;
+        rdfs:label      "SerialMember Shape"@en ;
+        sh:property     bds:SerialMemberShape-memberOf , bds:SerialMemberShape-hasInstance ;
+        sh:targetClass  bdo:SerialMember .
+
+bds:SerialWorkShape  a  sh:NodeShape ;
+        rdfs:label      "SerialWork Shape"@en ;
+        sh:property     bds:SerialWorkShape-hasMember ;
+        sh:targetClass  bdo:SerialWork .
+
+bds:WorkShape-bf_identifiedBy
+        a            sh:PropertyShape ;
+        sh:class     bdo:WorkIdentifier ;
+        sh:minCount  0 ;
+        sh:name      "identifies Work shape"@en ;
+        sh:path      bf:identifiedBy .

@@ -1,0 +1,130 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix BaseShapes: <http://purl.bdrc.io/shapes/core/BaseShapes/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+bds:RDFS  a         sh:PrefixDeclaration ;
+        sh:declare  [ sh:namespace  "http://www.w3.org/2000/01/rdf-schema#" ;
+                      sh:prefix     "rdfs"
+                    ] .
+
+bds:identifierPrefix  a  owl:DatatypeProperty ;
+        rdfs:domain      rdfs:Resource ;
+        rdfs:label       "prefix for resource id"@en ;
+        rdfs:range       xsd:string ;
+        skos:definition  "prefix to use when generating identifier for a resource"@en .
+
+bds:topShapeGraph  a  owl:ObjectProperty ;
+        rdfs:domain  bdo:Entity ;
+        rdfs:range   xsd:anyURI .
+
+bds:ADM  a          sh:PrefixDeclaration ;
+        sh:declare  [ sh:namespace  "http://purl.bdrc.io/ontology/admin/" ;
+                      sh:prefix     "adm"
+                    ] .
+
+bds:BDR  a          sh:PrefixDeclaration ;
+        sh:declare  [ sh:namespace  "http://purl.bdrc.io/resource/" ;
+                      sh:prefix     "bdr"
+                    ] .
+
+bds:IgnoreShape  a       bds:ShapeType ;
+        rdfs:label       "node shape is ignored for editing"@en ;
+        skos:definition  "this shape indicates internal resource that is not editable"@en .
+
+bds:ExternalShape  a     bds:ShapeType ;
+        rdfs:label       "node shape refers to resource external to focus node graph"@en ;
+        skos:definition  "this shape indicates external resource that is not contained in the focus node graph"@en .
+
+bds:uiShapeGraph  a  owl:ObjectProperty ;
+        rdfs:domain  bdo:Entity ;
+        rdfs:range   xsd:anyURI .
+
+bds:SortDirection  a  owl:Class .
+
+bds:SortAscending  a     bds:SortDirection ;
+        rdfs:label       "sort ascending"@en ;
+        skos:definition  "items should be sorted in ascending order"@en .
+
+bds:ShapeType  a  owl:Class .
+
+bds:localShapeGraph  a  owl:ObjectProperty ;
+        rdfs:domain  bdo:Entity ;
+        rdfs:range   xsd:anyURI .
+
+bds:FacetShape  a        bds:ShapeType ;
+        rdfs:label       "node shape is a facet"@en ;
+        skos:definition  "this shape applies to a resource contained in the graph of root Resource that is a facet of the containing resource"@en .
+
+bds:propertyShapeType
+        a                owl:ObjectProperty ;
+        rdfs:domain      sh:PropertyShape ;
+        rdfs:label       "node shape type"@en ;
+        rdfs:range       bds:ShapeType ;
+        skos:definition  "type of a node shape to discriminate among fact shapes, internal shapes, and so on"@en .
+
+bds:increment  a         owl:DatatypeProperty ;
+        rdfs:domain      sh:PropertyShape ;
+        rdfs:label       "increment by"@en ;
+        rdfs:range       xsd:integer ;
+        skos:definition  "an amount to increment the value of the sh:path property by"@en .
+
+bds:BDO  a          sh:PrefixDeclaration ;
+        sh:declare  [ sh:namespace  "http://purl.bdrc.io/ontology/core/" ;
+                      sh:prefix     "bdo"
+                    ] .
+
+bds:sortRank  a          owl:DatatypeProperty ;
+        rdfs:domain      sh:PropertyShape ;
+        rdfs:label       "sort rank"@en ;
+        rdfs:range       xsd:integer ;
+        skos:definition  "values of the sh:path property are used to sort results before higher ranked properties."@en .
+
+bds:InternalShape  a     bds:ShapeType ;
+        rdfs:label       "node shape is internal"@en ;
+        skos:definition  "this shape applies to internal resources such as Volumes in an Imagegroup"@en .
+
+bds:sortDirection  a     owl:ObjecttypeProperty ;
+        rdfs:domain      sh:PropertyShape ;
+        rdfs:label       "sort direction"@en ;
+        rdfs:range       bds:SortDirection ;
+        skos:definition  "values of the sh:path property are sorted in the specified direction."@en .
+
+BaseShapes:  a           owl:Ontology ;
+        owl:imports      <http://datashapes.org/dash> ;
+        owl:versionInfo  "Buda extension to shacl vocabulary" .
+
+bds:SortDescending  a    bds:SortDirection ;
+        rdfs:label       "sort descending"@en ;
+        skos:definition  "items should be sorted in descending order"@en .
+
+bds:RDF  a          sh:PrefixDeclaration ;
+        sh:declare  [ sh:namespace  "http://www.w3.org/1999/02/22-rdf-syntax-ns#" ;
+                      sh:prefix     "rdf"
+                    ] .
+
+bds:nodeShapeType  a     owl:ObjectProperty ;
+        rdfs:domain      sh:NodeShape ;
+        rdfs:label       "node shape type"@en ;
+        rdfs:range       bds:ShapeType ;
+        skos:definition  "type of a node shape to discriminate among fact shapes, internal shapes, and so on"@en .

@@ -1,0 +1,122 @@
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix PersonLocalShapes: <http://purl.bdrc.io/shapes/core/PersonLocalShapes/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix bda:   <http://purl.bdrc.io/admin.data/> .
+
+bds:CheckPersonNameClass
+        a                   sh:NodeShape ;
+        rdfs:label          "Check PersonName Class Shape"@en ;
+        sh:message          ":personName object must be subClassOf* bdo:PersonName" ;
+        sh:sparql           [ a            sh:SPARQLConstraint ;
+                              sh:prefixes  bds:BDO , bds:RDFS , bds:RDF ;
+                              sh:select    "\n        select distinct $this\n        where {\n            filter not exists { $this rdf:type/rdfs:subClassOf* bdo:PersonName . } .\n        }\t  \n      "
+                            ] ;
+        sh:targetObjectsOf  bdo:personName .
+
+bds:PersonShape-personName
+        a            sh:PropertyShape ;
+        sh:message   "There must be at least one :personName object and each must be an IRI - no blank nodes"@en ;
+        sh:minCount  1 ;
+        sh:nodeKind  sh:IRI ;
+        sh:path      bdo:personName .
+
+bds:PersonEventShape  a    sh:NodeShape ;
+        rdfs:label         "Person Event Shape"@en ;
+        bds:nodeShapeType  bds:FacetShape ;
+        sh:property        bds:PersonEventShape-personEventRole ;
+        sh:targetClass     bdo:PersonEvent .
+
+bds:PersonEventShape-personEventRole
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:message   "At most one :personEventRole allowed"@en ;
+        sh:path      bdo:personEventRole .
+
+bds:CheckPersonEventClass
+        a                   sh:NodeShape ;
+        rdfs:label          "Check PersonEvent Class Shape"@en ;
+        sh:message          ":personEvent object must be subClassOf* bdo:PersonEvent" ;
+        sh:sparql           [ a            sh:SPARQLConstraint ;
+                              sh:prefixes  bds:BDO , bds:RDFS , bds:RDF ;
+                              sh:select    "\n        select distinct $this\n        where {\n            filter not exists { $this rdf:type/rdfs:subClassOf* bdo:PersonEvent . } .\n        }\t  \n      "
+                            ] ;
+        sh:targetObjectsOf  bdo:personEvent .
+
+bds:PersonShape-personGender
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:message   "At most one bdo:personGender allowed"@en ;
+        sh:path      bdo:personGender .
+
+bds:PersonShape-personEvent
+        a            sh:PropertyShape ;
+        sh:message   ":personEvent object must be an IRI - no blank nodes"@en ;
+        sh:nodeKind  sh:IRI ;
+        sh:path      bdo:personEvent .
+
+bds:PersonNameShape-personNameLabel
+        a            sh:PropertyShape ;
+        sh:datatype  rdf:langString ;
+        sh:maxCount  1 ;
+        sh:message   "A PersonName must have exactly one rdfs:label"@en ;
+        sh:minCount  1 ;
+        sh:path      rdfs:label .
+
+bds:CheckRoleClass  a       sh:NodeShape ;
+        rdfs:label          "Check Role Class Shape"@en ;
+        sh:message          ":personEventRole object must be subClassOf* bdo:Role" ;
+        sh:sparql           [ a            sh:SPARQLConstraint ;
+                              sh:prefixes  bds:BDO , bds:RDFS , bds:RDF ;
+                              sh:select    "\n        select distinct $this\n        where {\n            filter not exists { $this rdf:type/rdfs:subClassOf* bdo:Role . } .\n        }\t  \n      "
+                            ] ;
+        sh:targetObjectsOf  bdo:personEventRole .
+
+PersonLocalShapes:  a    owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/EventLocalShapes/> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "SHACL constraints for a internal elements of a Person graph" .
+
+bds:CheckPersonClass  a     sh:NodeShape ;
+        rdfs:label          "Check Person Class Shape"@en ;
+        sh:message          "focusNode must be a bdo:Person" ;
+        sh:sparql           [ a            sh:SPARQLConstraint ;
+                              sh:prefixes  bds:BDO , bds:ADM , bds:RDF ;
+                              sh:select    "\n        select distinct $this\n        where {\n            ?s adm:adminAbout $this ;\n               bdo:isRoot true .\n            filter not exists { $this rdf:type bdo:Person . } .\n        }\t  \n      "
+                            ] ;
+        sh:targetObjectsOf  adm:adminAbout .
+
+bds:CheckGenderClass  a     sh:NodeShape ;
+        rdfs:label          "Check Gender Class Shape"@en ;
+        sh:message          ":personGender object must be instance of bdo:Gender" ;
+        sh:sparql           [ a            sh:SPARQLConstraint ;
+                              sh:prefixes  bds:BDO , bds:RDFS , bds:RDF ;
+                              sh:select    "\n        select distinct $this\n        where {\n            filter not exists { $this rdf:type bdo:Gender . } .\n        }\t  \n      "
+                            ] ;
+        sh:targetObjectsOf  bdo:personGender .
+
+bdo:Person  bds:localShapeGraph  bdg:PersonLocalShapes .
+
+bds:PersonNameShape  a     sh:NodeShape ;
+        rdfs:label         "Person Name Shape"@en ;
+        bds:nodeShapeType  bds:FacetShape ;
+        sh:property        bds:PersonNameShape-personNameLabel ;
+        sh:targetClass     bdo:PersonName .
+
+bds:PersonShape  a            sh:NodeShape ;
+        rdfs:label            "Person Shape"@en ;
+        bds:identifierPrefix  "P" ;
+        sh:property           bds:PersonShape-personName , bds:PersonShape-personGender , bds:PersonShape-personEvent ;
+        sh:targetClass        bdo:Person .

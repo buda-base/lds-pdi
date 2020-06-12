@@ -1,0 +1,35 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix RootShapes: <http://purl.bdrc.io/shapes/core/RootShapes/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+bds:NoteShape-noteSource
+        a         sh:PropertyShape ;
+        sh:class  bdo:BiblioEntity ;
+        sh:path   bdo:noteSource .
+
+RootShapes:  a           owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/RootLocalShapes/> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "Initial SHACL constraints" .
+
+bds:NoteShape  sh:property  bds:NoteShape-noteSource .

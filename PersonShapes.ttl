@@ -1,0 +1,235 @@
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix PersonShapes: <http://purl.bdrc.io/shapes/core/PersonShapes/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix bda:   <http://purl.bdrc.io/admin.data/> .
+
+bds:PersonShape-personStudentOf
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:path                bdo:personStudentOf .
+
+bds:PersonShape-personTeacherOf
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:path                bdo:personTeacherOf .
+
+bds:PersonShape-genderMale
+        a            sh:PropertyShape ;
+        sh:hasValue  bdr:GenderMale ;
+        sh:maxCount  1 ;
+        sh:minCount  1 ;
+        sh:path      bdo:personGender .
+
+bds:PersonEventShape  sh:property  bds:PersonEventShape-personEventCorporation .
+
+bds:PersonShape-hasGranddaughter
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasGranddaughter .
+
+bds:PersonShape-hasSibling
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:path                bdo:hasSibling .
+
+bds:PersonShape-hasGrandson
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A grandson must be Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasGrandson .
+
+bds:PersonShape-hasOlderBrother
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "An older brother must be Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasOlderBrother .
+
+bds:PersonShape-hasBrother
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A brother must be a Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasBrother .
+
+bds:PersonEventShape-personEventCorporation
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShapeShape ;
+        sh:class               bdo:Corporation ;
+        sh:path                bdo:personEventCorporation .
+
+PersonShapes:  a         owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/PersonLocalShapes/> , <http://purl.bdrc.io/shapes/core/EventShapes/> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "SHACL constraints for Person" .
+
+bds:PersonShape-hasHusband
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A husband must be Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasHusband .
+
+bds:PersonShape-hasGrandParent
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:maxCount            4 ;
+        sh:message             "A person may have at most 4 grandparents"@en ;
+        sh:path                bdo:hasGrandParent .
+
+bds:PersonShape-hasSon
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A son must be Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasSon .
+
+bds:PersonShape-hasSister
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A sister must be Female"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasSister .
+
+bds:PersonShape-genderFemale
+        a            sh:PropertyShape ;
+        sh:hasValue  bdr:GenderFemale ;
+        sh:maxCount  1 ;
+        sh:minCount  1 ;
+        sh:path      bdo:personGender .
+
+bds:PersonShape-hasCousin
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:path                bdo:hasCousin .
+
+bds:PersonShape-hasParent
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:maxCount            2 ;
+        sh:message             "A person may have at most 2 parents"@en ;
+        sh:path                bdo:hasParent .
+
+bds:PersonShape-hasGrandfather
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:maxCount            2 ;
+        sh:message             "A person may have at most 2 Male grandfathers"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasGrandfather .
+
+bds:PersonShape-hasGrandChild
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:order               "3"^^xsd:decimal ;
+        sh:path                bdo:hasGrandChild .
+
+bds:PersonShape-hasOlderSister
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "An older sister must be Female"@en ;
+        sh:order               "2"^^xsd:decimal ;
+        sh:path                bdo:hasOlderSister .
+
+bds:PersonShape-hasGrandmother
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:maxCount            2 ;
+        sh:message             "A person may have at most 2 Female grandmothers"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasGrandmother .
+
+bds:PersonShape-kinWith
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:path                bdo:kinWith .
+
+bds:PersonShape-hasYoungerBrother
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A younger brother must be Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasYoungerBrother .
+
+bds:PersonShape-hasWife
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:maxCount            1 ;
+        sh:message             "A wife must be Female. There is at most one wife"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasWife .
+
+bds:PersonShape-hasSpouse
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:class               bdo:Person ;
+        sh:maxCount            1 ;
+        sh:message             "A person may have at most one spouse"@en ;
+        sh:path                bdo:hasSpouse .
+
+bdo:Person  bds:topShapeGraph  bdg:PersonShapes .
+
+bds:PersonShape-hasDaughter
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A daughter must be a Female"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasDaughter .
+
+bds:PersonShape-hasMother
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:maxCount            1 ;
+        sh:message             "A mother must be Female. There is at most one mother"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasMother .
+
+bds:MaleShape  a           sh:NodeShape ;
+        rdfs:label         "Male Shape"@en ;
+        bds:nodeShapeType  bds:IgnoreShape ;
+        sh:property        bds:PersonShape-genderMale .
+
+bds:PersonShape-hasFather
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:maxCount            1 ;
+        sh:message             "A father must be a Male"@en ;
+        sh:node                bds:MaleShape ;
+        sh:path                bdo:hasFather .
+
+bds:PersonShape  sh:property  bds:PersonShape-hasBrother , bds:PersonShape-hasSon , bds:PersonShape-hasMother , bds:PersonShape-hasCousin , bds:PersonShape-personStudentOf , bds:PersonShape-kinWith , bds:PersonShape-hasGrandfather , bds:PersonShape-hasGrandmother , bds:PersonShape-hasGranddaughter , bds:PersonShape-hasParent , bds:PersonShape-hasGrandParent , bds:PersonShape-personTeacherOf , bds:PersonShape-hasOlderBrother , bds:PersonShape-hasGrandson , bds:PersonShape-hasSpouse , bds:PersonShape-hasFather , bds:PersonShape-hasSister , bds:PersonShape-hasOlderSister , bds:PersonShape-hasGrandChild , bds:PersonShape-hasYoungerSister , bds:PersonShape-hasYoungerBrother , bds:PersonShape-hasDaughter , bds:PersonShape-hasSibling .
+
+bds:PersonShape-hasYoungerSister
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:ExternalShape ;
+        sh:message             "A younger sister must be Female"@en ;
+        sh:node                bds:FemaleShape ;
+        sh:path                bdo:hasYoungerSister .
+
+bds:FemaleShape  a         sh:NodeShape ;
+        rdfs:label         "Female Shape"@en ;
+        bds:nodeShapeType  bds:IgnoreShape ;
+        sh:property        bds:PersonShape-genderFemale .

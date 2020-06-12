@@ -1,0 +1,55 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix AdminShapes: <http://purl.bdrc.io/shapes/adm/AdminShapes/> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+bdsa:AdmEntityShape-status
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:FacetShape ;
+        sh:class               adm:Status ;
+        sh:description         "must be exactly one adm:status of value adm:StatusType"@en ;
+        sh:maxCount            1 ;
+        sh:minCount            1 ;
+        sh:name                "status"@en ;
+        sh:nodeKind            sh:IRI ;
+        sh:path                adm:status .
+
+bdsa:AdmEntityShape  a  sh:NodeShape ;
+        rdfs:label      "Admin Entity shape"@en ;
+        sh:property     bdsa:AdmEntityShape-logEntry , bdsa:AdmEntityShape-status ;
+        sh:targetClass  bdo:Entity .
+
+bdsa:AdmEntityShape-logEntry
+        a                      sh:PropertyShape ;
+        bds:propertyShapeType  bds:IgnoreShape ;
+        sh:class               adm:LogEntry ;
+        sh:description         "must have one or more adm:logEntry of value adm:LogEntry"@en ;
+        sh:minCount            1 ;
+        sh:name                "log entry"@en ;
+        sh:nodeKind            sh:IRI ;
+        sh:path                adm:logEntry .
+
+AdminShapes:  a          owl:Ontology ;
+        owl:imports      bdo: , <http://purl.bdrc.io/ontology/adm/types/Access> , <http://datashapes.org/dash> ;
+        owl:versionInfo  "Initial SHACL constraints core admin shapes" .

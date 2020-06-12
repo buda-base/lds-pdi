@@ -1,0 +1,88 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix ItemShapes: <http://purl.bdrc.io/shapes/core/ItemShapes/> .
+
+bds:ItemPhysicalAssetShape
+        a               sh:NodeShape ;
+        rdfs:label      "Item Shape"@en ;
+        sh:property     bds:ItemPhysicalAssetShape-onDate , bds:ItemPhysicalAssetShape-onOrAbout , bds:ItemPhysicalAssetShape-notBefore , bds:ItemPhysicalAssetShape-bf_identifiedBy , bds:ItemPhysicalAssetShape-notAfter , bds:ItemPhysicalAssetShape-bf_heldBy , bds:ItemPhysicalAssetShape-heldAt ;
+        sh:targetClass  bdo:ItemPhysicalAsset .
+
+bds:ItemPhysicalAssetShape-onOrAbout
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:minCount  0 ;
+        sh:name      "acquired on or about"@en ;
+        sh:nodeKind  xsd:string ;
+        sh:path      bdo:onOrAbout .
+
+bds:ItemPhysicalAssetShape-notAfter
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:minCount  0 ;
+        sh:name      "acquired not after"@en ;
+        sh:nodeKind  xsd:gYear ;
+        sh:path      bdo:notAfter .
+
+ItemShapes:  a           owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/RootShapes/> , bdo: , <http://datashapes.org/dash> ;
+        owl:versionInfo  "Initial SHACL constraints for Item and its subclasses" .
+
+bds:ItemPhysicalAssetShape-notBefore
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:minCount  0 ;
+        sh:name      "acquired not before"@en ;
+        sh:nodeKind  xsd:gYear ;
+        sh:path      bdo:notBefore .
+
+bds:ItemPhysicalAssetShape-bf_heldBy
+        a            sh:PropertyShape ;
+        sh:class     bdo:Agent ;
+        sh:minCount  0 ;
+        sh:name      "held by"@en ;
+        sh:path      bf:heldBy .
+
+bds:ItemPhysicalAssetShape-onDate
+        a            sh:PropertyShape ;
+        sh:maxCount  1 ;
+        sh:minCount  0 ;
+        sh:name      "acquired on"@en ;
+        sh:nodeKind  xsd:date ;
+        sh:path      bdo:onDate .
+
+bds:ItemPhysicalAssetShape-heldAt
+        a            sh:PropertyShape ;
+        sh:class     bdo:ItemIdentifier ;
+        sh:minCount  0 ;
+        sh:name      "is held at"@en ;
+        sh:path      bdo:heldAt .
+
+bds:ItemPhysicalAssetShape-bf_identifiedBy
+        a            sh:PropertyShape ;
+        sh:class     bdo:ItemIdentifier ;
+        sh:minCount  0 ;
+        sh:name      "identified by"@en ;
+        sh:path      bf:identifiedBy .

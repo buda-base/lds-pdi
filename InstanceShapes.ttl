@@ -1,0 +1,95 @@
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tosh:  <http://topbraid.org/tosh#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix InstanceShapes: <http://purl.bdrc.io/shapes/core/InstanceShapes/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix swa:   <http://topbraid.org/swa#> .
+@prefix dash:  <http://datashapes.org/dash#> .
+@prefix bdsa:  <http://purl.bdrc.io/ontology/shapes/adm/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+bds:SerialInstanceShape-instanceOf
+        a               sh:PropertyShape ;
+        sh:class        bdo:SerialMember ;
+        sh:description  "this is an instance of a SerialMember"@en ;
+        sh:minCount     1 ;
+        sh:name         "instance of serial"@en ;
+        sh:path         bdo:instanceOf .
+
+bds:InstanceShape  a    sh:NodeShape ;
+        rdfs:label      "Instance Shape"@en ;
+        sh:property     bds:InstanceShape-bf_identifiedBy , bds:InstanceShape-instanceOf , bds:InstanceShape-creator ;
+        sh:targetClass  bdo:Instance .
+
+bds:PhysicalInstanceShape
+        a               sh:NodeShape ;
+        rdfs:label      "PhysicalInstance Shape"@en ;
+        sh:property     bds:PhysicalInstanceShape-printMethod , bds:PhysicalInstanceShape-binding ;
+        sh:targetClass  bdo:PhysicalInstance .
+
+bds:InstanceShape-creator
+        a               sh:PropertyShape ;
+        sh:class        bdo:AgentAsCreator ;
+        sh:description  "this Instance may have zero or more creators."@en ;
+        sh:minCount     0 ;
+        sh:name         "instance has translation"@en ;
+        sh:path         bdo:creator .
+
+bds:InstanceShape-instanceOf
+        a               sh:PropertyShape ;
+        sh:class        bdo:Work ;
+        sh:description  "this Instance is an instance of at least one Work"@en ;
+        sh:minCount     1 ;
+        sh:name         "instance of"@en ;
+        sh:path         bdo:instanceOf .
+
+bds:SerialInstanceShape
+        a               sh:NodeShape ;
+        rdfs:label      "SerialInstance Shape"@en ;
+        sh:property     bds:SerialInstanceShape-instanceOf ;
+        sh:targetClass  bdo:SerialInstance .
+
+InstanceShapes:  a       owl:Ontology ;
+        owl:imports      <http://purl.bdrc.io/shapes/core/RootShapes/> , bdo: , <http://datashapes.org/dash> ;
+        owl:versionInfo  "Initial SHACL constraints for Instance and its subclasses" .
+
+bds:PhysicalInstanceShape-printMethod
+        a               sh:PropertyShape ;
+        sh:class        bdo:PrintMethod ;
+        sh:description  "this PhysicalInstance may have a single PrintMethod"@en ;
+        sh:maxCount     1 ;
+        sh:minCount     0 ;
+        sh:name         "instance print method"@en ;
+        sh:path         bdo:printMethod .
+
+bds:InstanceShape-bf_identifiedBy
+        a            sh:PropertyShape ;
+        sh:class     bdo:InstanceIdentifier ;
+        sh:minCount  0 ;
+        sh:name      "identifies instance shape"@en ;
+        sh:path      bf:identifiedBy .
+
+bds:PhysicalInstanceShape-binding
+        a               sh:PropertyShape ;
+        sh:class        bdo:Binding ;
+        sh:description  "this PhysicalInstance may have a single Binding"@en ;
+        sh:maxCount     1 ;
+        sh:minCount     0 ;
+        sh:name         "instance binding"@en ;
+        sh:path         bdo:binding .
