@@ -20,6 +20,7 @@ import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.Helpers;
 
 public class OntShapesData implements Runnable {
 
@@ -41,6 +42,8 @@ public class OntShapesData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
+                String tmp = uri.substring(0, uri.length() - 1);
+                Helpers.writeModelToFile(om, tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl");
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
