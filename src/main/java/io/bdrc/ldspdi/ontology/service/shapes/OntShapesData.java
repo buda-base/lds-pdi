@@ -31,18 +31,16 @@ public class OntShapesData implements Runnable {
         try {
             OntPolicies.init();
             modelsBase = new HashMap<>();
-            fullMod = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
             odm.setProcessImports(true);
+            odm.setCacheModels(true);
             Iterator<String> it = odm.listDocuments();
+            fullMod = ModelFactory.createDefaultModel();
             while (it.hasNext()) {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
-                String tmp = uri.substring(0, uri.length() - 1);
-                // Helpers.writeModelToFile(om, tmp.substring(tmp.lastIndexOf("/") + 1) +
-                // ".ttl");
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
@@ -77,7 +75,6 @@ public class OntShapesData implements Runnable {
         String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         HashMap<String, OntPolicy> policies = OntPolicies.getMapShapes();
         HashMap<String, Model> updates = new HashMap<>();
-        Model global = ModelFactory.createDefaultModel();
         for (String s : policies.keySet()) {
             OntPolicy op = policies.get(s);
             String graph = op.getGraph();
@@ -90,14 +87,13 @@ public class OntShapesData implements Runnable {
             if (graph != null) {
                 updates.put(graph, m);
             }
-            global.add(m);
         }
         // Individuals graphs
         for (String st : updates.keySet()) {
             QueryProcessor.updateOntology(updates.get(st), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", st, st + " update");
         }
         // Global shapes model
-        QueryProcessor.updateOntology(global, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.defaultShapesGraph,
+        QueryProcessor.updateOntology(getFullModel(), fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data", OntPolicies.defaultShapesGraph,
                 " update");
     }
 
