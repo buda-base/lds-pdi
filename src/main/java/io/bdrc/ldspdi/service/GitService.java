@@ -103,7 +103,7 @@ public class GitService implements Runnable {
     @Override
     public void run() {
         try {
-            if (!mode.equals(SHAPES)) {
+            if (!SHAPES.equals(mode)) {
                 DocFileModel.clearCache();
             }
         } catch (RestException e) {
@@ -116,10 +116,10 @@ public class GitService implements Runnable {
             update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
             update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
         }
-        if (mode.equals(QUERIES)) {
+        if (QUERIES.equals(mode)) {
             update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
         }
-        if (mode.equals(SHAPES)) {
+        if (SHAPES.equals(mode)) {
             update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
             log.info("updating Shape Ontology models() >>");
             Thread t = new Thread(new OntShapesData());

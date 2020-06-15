@@ -164,7 +164,8 @@ public class OntData implements Runnable {
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")) == null));
         log.info("updateFusekiDataset() is ontAllMod by base graph uri {}",
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph()));
-        List<Rule> miniRules = GenericRuleReasoner.loadRules(System.getProperty("user.dir") + "/src/main/resources/inverseOf.rules");
+        String rule = "[inverseOf1: (?P owl:inverseOf ?Q) -> (?Q owl:inverseOf ?P) ]";
+        List<Rule> miniRules = Rule.parseRules(rule);
         Reasoner reasoner = new GenericRuleReasoner(miniRules);
         reasoner.setParameter(ReasonerVocabulary.PROPruleMode, "forward");
         InfModel core = ModelFactory.createInfModel(reasoner, ontAllMod);
