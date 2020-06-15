@@ -187,7 +187,7 @@ public class Helpers {
     }
 
     public static void writeModelToFile(Model m, String filename) throws IOException {
-        log.info("Writing model to file {}" + filename);
+        log.info("Writing model to file {}", filename);
         FileOutputStream fos = new FileOutputStream(filename);
         m.write(fos, "TURTLE");
         fos.close();

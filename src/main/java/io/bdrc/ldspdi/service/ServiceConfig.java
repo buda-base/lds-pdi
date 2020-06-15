@@ -40,6 +40,7 @@ public class ServiceConfig {
     static Properties prop = new Properties();
     public final static String FUSEKI_URL = "fusekiUrl";
     public static String LOCAL_QUERIES_DIR;
+    public static String LOCAL_SHAPES_DIR;
     public static String SERVER_ROOT;
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
@@ -48,6 +49,7 @@ public class ServiceConfig {
     public static void init() throws JsonParseException, JsonMappingException, IOException {
         try {
             LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            LOCAL_SHAPES_DIR = System.getProperty("user.dir") + "/editor-templates/";
             log.info("getting properties from packaged ldspdi.properties");
             InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
             prop.load(input);

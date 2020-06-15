@@ -78,9 +78,9 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -646,8 +646,9 @@ public class PublicDataController {
     @PostMapping(value = "/callbacks/github/shapes", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateShapesOntology() throws RestException {
         if (!ServiceConfig.isInChina()) {
-            log.info("updating Shape Ontology models() >>");
-            Thread t = new Thread(new OntShapesData());
+            GitService gs = new GitService();
+            gs.setMode(GitService.SHAPES);
+            Thread t = new Thread(gs);
             t.start();
             return ResponseEntity.ok().body("Shapes Ontologies are being updated");
         } else {

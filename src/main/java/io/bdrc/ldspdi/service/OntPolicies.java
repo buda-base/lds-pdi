@@ -31,7 +31,7 @@ public class OntPolicies {
 
     public static final String policiesUrl = ServiceConfig.getProperty("ontPoliciesUrl");
     public static final String localPolicies = ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf";
-    public static final String shapesPoliciesUrl = ServiceConfig.getProperty("ontShapesPoliciesUrl");
+    public static final String shapesPoliciesUrl = System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf";
     public static HashMap<String, OntPolicy> mapAll;
     public static HashMap<String, OntPolicy> mapCore;
     public static HashMap<String, OntPolicy> mapShapes;
@@ -84,20 +84,22 @@ public class OntPolicies {
             OntDocumentManager odm = new OntDocumentManager(policiesUrl);
             FileManager fm = odm.getFileManager();
             HttpURLConnection connection = null;
+            InputStream stream = null;
             if (type.equals(CORE_TYPE)) {
                 if (!ServiceConfig.isInChina()) {
                     connection = (HttpURLConnection) new URL(policiesUrl).openConnection();
+                    stream = connection.getInputStream();
+                } else {
+                    stream = new FileInputStream(localPolicies);
                 }
             }
             if (type.equals(SHAPES_TYPE)) {
-                connection = (HttpURLConnection) new URL(shapesPoliciesUrl).openConnection();
+                stream = new FileInputStream(shapesPoliciesUrl);
             }
-            InputStream stream = null;
-            if (!ServiceConfig.isInChina()) {
-                stream = connection.getInputStream();
-            } else {
-                stream = new FileInputStream(localPolicies);
-            }
+            /*
+             * if (!ServiceConfig.isInChina()) { stream = connection.getInputStream(); }
+             * else { stream = new FileInputStream(localPolicies); }
+             */
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type,

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
+import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -33,7 +34,9 @@ public class OntShapesData implements Runnable {
             OntPolicies.init();
             modelsBase = new HashMap<>();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = new OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
+            // OntDocumentManager odm = new
+            // OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
+            OntDocumentManager odm = new OntDocumentManager(System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf");
             odm.setProcessImports(true);
             odm.setCacheModels(true);
             Iterator<String> it = odm.listDocuments();
@@ -103,7 +106,11 @@ public class OntShapesData implements Runnable {
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, RestException {
         ServiceConfig.init();
         // OntData.init();
-        OntShapesData.init();
+        // OntShapesData.init();
+        GitService gs = new GitService();
+        gs.setMode(GitService.SHAPES);
+        Thread t = new Thread(gs);
+        t.start();
         // fullMod.write(System.out, "TURTLE");
         // updateFusekiDataset();
     }
