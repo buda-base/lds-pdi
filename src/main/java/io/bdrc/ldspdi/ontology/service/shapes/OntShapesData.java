@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.ontology.service.shapes;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
@@ -23,19 +26,29 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 
-public class OntShapesData implements Runnable {
+public class OntShapesData {
 
     public final static Logger log = LoggerFactory.getLogger(OntShapesData.class);
     public static HashMap<String, Model> modelsBase = new HashMap<>();
     private static Model fullMod;
+    private String payload;
+    private String commitId;
 
-    public static void init() {
+    public OntShapesData(String payload, String commitId) {
+        super();
+        this.payload = payload;
+        this.commitId = commitId;
+    }
+
+    public void update() {
         try {
+            if (commitId == null) {
+                JsonNode node = new ObjectMapper().readTree(payload);
+                commitId = node.get("commits").elements().next().get("id").asText();
+            }
             OntPolicies.init();
             modelsBase = new HashMap<>();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            // OntDocumentManager odm = new
-            // OntDocumentManager(ServiceConfig.getProperty("ontShapesPoliciesUrl"));
             OntDocumentManager odm = new OntDocumentManager(System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf");
             odm.setProcessImports(true);
             odm.setCacheModels(true);
@@ -46,7 +59,11 @@ public class OntShapesData implements Runnable {
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 String tmp = uri.substring(0, uri.length() - 1);
-                Helpers.writeModelToFile(om, tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl");
+                File directory = new File(commitId);
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+                Helpers.writeModelToFile(om, commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl");
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
@@ -115,15 +132,10 @@ public class OntShapesData implements Runnable {
         // updateFusekiDataset();
     }
 
-    @Override
-    public void run() {
-        try {
-            init();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            log.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-    }
+    /*
+     * @Override public void run() { try { init(); } catch (Exception e) { // TODO
+     * Auto-generated catch block log.error(e.getMessage(), e); e.printStackTrace();
+     * } }
+     */
 
 }

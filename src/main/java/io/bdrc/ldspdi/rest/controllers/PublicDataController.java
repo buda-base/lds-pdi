@@ -62,12 +62,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
@@ -83,6 +87,7 @@ import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.service.Webhook;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -636,7 +641,9 @@ public class PublicDataController {
     }
 
     @PostMapping(value = "/callbacks/github/owl-schema", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateOntology() throws RestException {
+    public ResponseEntity<String> updateOntology(@RequestBody String payload) throws RestException, IOException {
+        JsonNode node = new ObjectMapper().readTree(payload);
+        String commitId = node.get("commits").elements().next().get("id").asText();
         log.info("updating Ontology models() >>");
         Thread t = new Thread(new OntData());
         t.start();
@@ -644,11 +651,10 @@ public class PublicDataController {
     }
 
     @PostMapping(value = "/callbacks/github/shapes", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateShapesOntology() throws RestException {
+    public ResponseEntity<String> updateShapesOntology(@RequestBody String payload) throws RestException, IOException {
         if (!ServiceConfig.isInChina()) {
-            GitService gs = new GitService();
-            gs.setMode(GitService.SHAPES);
-            Thread t = new Thread(gs);
+            Webhook wh = new Webhook(payload, GitService.SHAPES);
+            Thread t = new Thread(wh);
             t.start();
             return ResponseEntity.ok().body("Shapes Ontologies are being updated");
         } else {

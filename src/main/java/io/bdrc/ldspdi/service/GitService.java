@@ -23,6 +23,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -30,26 +34,38 @@ import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.utils.DocFileModel;
 
 public class GitService implements Runnable {
 
-    private static String GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
-    private static String GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
-    private static String GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
-    private static String GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
-    private static Repository localRepo;
+    static String GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
+    static String GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
+    static String GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
+    static String GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
+    static Repository localRepo;
     public static String QUERIES = "queries";
     public static String SHAPES = "shapes";
     private static String mode;
 
+    public GitService() {
+        super();
+        GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
+        GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
+        GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
+        GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
+    }
+
     final static Logger log = LoggerFactory.getLogger(GitService.class);
 
-    public static void update(String localPath, String remoteUrl) {
+    public String update(String localPath, String remoteUrl)
+            throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+        String commit = null;
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         File localGit = new File(localPath + "/.git");
         log.info("LOCAL GIT >> {}", localGit);
@@ -67,13 +83,14 @@ public class GitService implements Runnable {
             } catch (IOException ex) {
                 ex.printStackTrace();
                 log.error("Git was unable to setup repository at init time " + localGit.getPath() + " directory ", ex.getMessage());
-                return;
             }
-            updateRepo(localRepo);
+            commit = updateRepo(localRepo);
+
         }
+        return commit;
     }
 
-    private static void initRepo(String localPath, String remoteUrl) {
+    private void initRepo(String localPath, String remoteUrl) {
         try {
             log.info("Cloning {} into dir {}", remoteUrl, localPath);
             Git result = Git.cloneRepository().setDirectory(new File(localPath)).setURI(remoteUrl).call();
@@ -85,15 +102,19 @@ public class GitService implements Runnable {
         }
     }
 
-    private static void updateRepo(Repository localRepo) {
+    private String updateRepo(Repository localRepo)
+            throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+        String commitId = null;
         try {
             log.info("LOCAL REPO >> {}", localRepo);
             Git git = new Git(localRepo);
             git.pull().call();
             git.close();
+            commitId = localRepo.resolve(Constants.HEAD).getName().substring(0, 7);
         } catch (Exception ex) {
             log.error(" Git was unable to pull in directory {}, message: {}", localRepo, ex.getMessage());
         }
+        return commitId;
     }
 
     public void setMode(String m) {
@@ -113,18 +134,46 @@ public class GitService implements Runnable {
         LdsQueryService.clearCache();
         ResultsCache.clearCache();
         if (mode == null) {
-            update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
-            update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
+            try {
+                update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         if (QUERIES.equals(mode)) {
-            update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
+            try {
+                update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         if (SHAPES.equals(mode)) {
-            update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
+            try {
+                update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             log.info("updating Shape Ontology models() >>");
-            Thread t = new Thread(new OntShapesData());
-            t.start();
+            // Thread t = new Thread(new OntShapesData());
+            // t.start();
         }
+    }
+
+    public static void main(String... args) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.init();
+        GitService gs = new GitService();
+        gs.setMode(GitService.SHAPES);
+        System.out.println("DIR >>" + ServiceConfig.LOCAL_SHAPES_DIR);
+        gs.update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
     }
 
 }

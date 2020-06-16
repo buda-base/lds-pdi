@@ -54,7 +54,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -210,7 +209,6 @@ public class OntData implements Runnable {
                     OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "run 2");
             readGithubJsonLDContext();
             // updateFusekiDataset();
-            OntShapesData.init();
 
         } catch (Exception ex) {
             log.error("Error updating OntModel", ex);

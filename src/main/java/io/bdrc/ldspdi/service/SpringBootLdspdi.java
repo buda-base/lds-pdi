@@ -22,7 +22,6 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
-import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.taxonomy.TaxModel;
 
@@ -65,7 +64,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     public void doSomethingAfterStartup() {
         OntData.init();
         if (!ServiceConfig.isInChina()) {
-            OntShapesData.init();
+            // OntShapesData.init();
+            Webhook wh = new Webhook(null, GitService.SHAPES);
+            Thread t = new Thread(wh);
+            t.start();
             if ("true".equals(AuthProps.getProperty("useAuth"))) {
                 log.info("SpringBootLdspdi uses auth, updating auth data...");
                 RdfAuthModel.init();
