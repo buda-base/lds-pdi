@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,14 +53,17 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.Prefixes;
 
-public class OntData implements Runnable {
+public class OntData /* implements Runnable */ {
 
     public static InfModel infMod;
     public static OntModel ontMod;
@@ -74,19 +78,31 @@ public class OntData implements Runnable {
     final static Resource RDFPL = ResourceFactory.createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
     static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     static List<AnnotationProperty> adminAnnotProps;
+    private String payload;
+    private String commitId;
 
-    public static void init() {
+    public OntData(String payload, String commitId) {
+        super();
+        this.payload = payload;
+        this.commitId = commitId;
+    }
+
+    public void init() {
         try {
+            if (commitId == null) {
+                JsonNode node = new ObjectMapper().readTree(payload);
+                commitId = node.get("commits").elements().next().get("id").asText();
+            }
             OntPolicies.init();
             modelsBase = new HashMap<>();
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = null;
-            if (!ServiceConfig.isInChina()) {
-                odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
-            } else {
-                odm = new OntDocumentManager(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf");
-            }
+            // if (!ServiceConfig.isInChina()) {
+            // odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
+            // } else {
+            odm = new OntDocumentManager(System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf");
+            // }
             odm.setProcessImports(false);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
@@ -94,6 +110,23 @@ public class OntData implements Runnable {
                 String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
+                String tmp = uri.substring(0, uri.length() - 1);
+                File directory = new File("ontologies/");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+                directory = new File("ontologies/" + commitId);
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+                String file = null;
+                try {
+                    file = "ontologies/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
+                    Helpers.writeModelToFile(om, file);
+                } catch (Exception ex) {
+                    // do absolutely nothing so the shapoes are loaded anyway - just log
+                    log.info("Could not write file {}", file);
+                }
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
@@ -174,45 +207,6 @@ public class OntData implements Runnable {
                 fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
                 OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "update 2");
 
-    }
-
-    @Override
-    public void run() {
-        try {
-            OntPolicies.init();
-            modelsBase = new HashMap<>();
-            Model md = ModelFactory.createDefaultModel();
-            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-            OntDocumentManager odm = null;
-            if (!ServiceConfig.isInChina()) {
-                odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
-            } else {
-                odm = new OntDocumentManager(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/ont-policy.rdf");
-            }
-            odm.setProcessImports(false);
-            ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            Iterator<String> it = odm.listDocuments();
-            while (it.hasNext()) {
-                String uri = it.next();
-                log.info("OntManagerDoc :" + uri);
-                OntModel om = odm.getOntology(uri, oms);
-                ontAllMod.add(om);
-                OntData.addOntModelByBase(parseBaseUri(uri), om);
-            }
-            log.info("Global model size :" + ontAllMod.size());
-            QueryProcessor.updateOntology(ontAllMod, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "run 1");
-            log.info("Auth model size :" + getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")).size());
-            log.info("Auth policy {}", OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")));
-            QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
-                    fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                    OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "run 2");
-            readGithubJsonLDContext();
-            // updateFusekiDataset();
-
-        } catch (Exception ex) {
-            log.error("Error updating OntModel", ex);
-        }
     }
 
     public static OWLPropsCharacteristics getOwlCharacteristics(boolean global) throws IOException, RestException {

@@ -1,7 +1,5 @@
 package io.bdrc.ldspdi.ontology.service.core;
 
-import java.io.IOException;
-
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -38,11 +36,6 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import io.bdrc.ldspdi.service.ServiceConfig;
 
 /**
  * This model is based on a URI for an OntClass in OntAccess.MODEL
@@ -176,7 +169,8 @@ public class OntClassModel {
 
     public List<OntProperty> getAllClassProperties() {
         ArrayList<OntProperty> list = new ArrayList<>();
-        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(), ResourceFactory.createResource(uri).asNode());
+        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(),
+                ResourceFactory.createResource(uri).asNode());
         ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
         while (ext.hasNext()) {
             Triple tpp = ext.next();
@@ -202,14 +196,6 @@ public class OntClassModel {
 
     public RDFNode getPropertyValue(Property p) {
         return clazz.getPropertyValue(p);
-    }
-
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/bdrcrw/query");
-        OntData.init();
-        OntClassModel mod = new OntClassModel("http://purl.bdrc.io/ontology/core/EtextChunk", true);
-        System.out.println("ADMIN ANNOT PROPS >> " + OntData.adminAnnotProps);
-        System.out.println(mod.getAdminAnnotProps());
     }
 
 }

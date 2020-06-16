@@ -2,6 +2,9 @@ package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
 
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,14 +17,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.taxonomy.TaxModel;
 
@@ -37,7 +36,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     // LoggerFactory.getLogger(SpringBootLdspdi.class);
     public final static Logger log = LoggerFactory.getLogger("default");
 
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, RestException {
+    public static void main(String[] args)
+            throws RestException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
         final String configPath = System.getProperty("ldspdi.configpath");
         try {
             ServiceConfig.init();
@@ -52,8 +52,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         ResultsCache.init();
         // Pull lds-queries repo from git if not in china
         if (!ServiceConfig.isInChina()) {
-            Thread t = new Thread(new GitService());
-            t.start();
+            GitService gs = new GitService();
+            gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
         }
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
@@ -62,7 +62,9 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
-        OntData.init();
+        Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES);
+        Thread t_ont = new Thread(wh_ont);
+        t_ont.start();
         if (!ServiceConfig.isInChina()) {
             // OntShapesData.init();
             Webhook wh = new Webhook(null, GitService.SHAPES);

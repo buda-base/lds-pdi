@@ -59,6 +59,7 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
+import io.bdrc.ldspdi.service.Webhook;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryConstants;
@@ -308,10 +309,11 @@ public class PublicTemplatesController {
     }
 
     @PostMapping(value = "/callbacks/github/lds-queries", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateQueries() throws RestException {
+    public ResponseEntity<String> updateQueries(@RequestBody String payload) throws RestException {
         try {
             log.info("updating query templates >>");
-            Thread t = new Thread(new GitService());
+            Webhook wh = new Webhook(payload, GitService.QUERIES);
+            Thread t = new Thread(wh);
             t.start();
             Prefixes.loadPrefixes();
         } catch (Exception e) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
 
 public class Webhook implements Runnable {
@@ -32,6 +33,24 @@ public class Webhook implements Runnable {
             }
             OntShapesData osd = new OntShapesData(payload, commitId);
             osd.update();
+        }
+        if (GitService.ONTOLOGIES.equals(mode)) {
+            try {
+                commitId = gs.update(GitService.GIT_ONT_PATH, GitService.GIT_ONT_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            OntData od = new OntData(payload, commitId);
+            od.init();
+        }
+        if (GitService.QUERIES.equals(mode)) {
+            try {
+                commitId = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

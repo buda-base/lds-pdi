@@ -645,8 +645,13 @@ public class PublicDataController {
         JsonNode node = new ObjectMapper().readTree(payload);
         String commitId = node.get("commits").elements().next().get("id").asText();
         log.info("updating Ontology models() >>");
-        Thread t = new Thread(new OntData());
-        t.start();
+        if (!ServiceConfig.isInChina()) {
+            Webhook wh = new Webhook(payload, GitService.ONTOLOGIES);
+            Thread t = new Thread(wh);
+            t.start();
+        } else {
+            return ResponseEntity.ok().body("Ontologies webhook is not used in this configuration");
+        }
         return ResponseEntity.ok().body("Ontologies are being updated");
     }
 

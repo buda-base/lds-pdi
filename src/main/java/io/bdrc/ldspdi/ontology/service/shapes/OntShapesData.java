@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
-import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -59,11 +58,22 @@ public class OntShapesData {
                 log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 String tmp = uri.substring(0, uri.length() - 1);
-                File directory = new File(commitId);
+                File directory = new File("shapes/");
                 if (!directory.exists()) {
                     directory.mkdir();
                 }
-                Helpers.writeModelToFile(om, commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl");
+                directory = new File("shapes/" + commitId);
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+                String file = null;
+                try {
+                    file = "shapes/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
+                    Helpers.writeModelToFile(om, file);
+                } catch (Exception ex) {
+                    // do absolutely nothing so the shapoes are loaded anyway - just log
+                    log.info("Could not write file {}", file);
+                }
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
@@ -124,10 +134,7 @@ public class OntShapesData {
         ServiceConfig.init();
         // OntData.init();
         // OntShapesData.init();
-        GitService gs = new GitService();
-        gs.setMode(GitService.SHAPES);
-        Thread t = new Thread(gs);
-        t.start();
+
         // fullMod.write(System.out, "TURTLE");
         // updateFusekiDataset();
     }

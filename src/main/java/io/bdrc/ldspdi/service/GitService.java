@@ -37,20 +37,18 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.results.ResultsCache;
-import io.bdrc.ldspdi.sparql.LdsQueryService;
-import io.bdrc.ldspdi.utils.DocFileModel;
-
-public class GitService implements Runnable {
+public class GitService /* implements Runnable */ {
 
     static String GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
     static String GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
+    static String GIT_ONT_PATH = ServiceConfig.LOCAL_ONT_DIR;
     static String GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
     static String GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
+    static String GIT_ONT_REMOTE_URL = ServiceConfig.getProperty("git_ontologies_remote_url");
     static Repository localRepo;
     public static String QUERIES = "queries";
     public static String SHAPES = "shapes";
+    public static String ONTOLOGIES = "ontologies";
     private static String mode;
 
     public GitService() {
@@ -59,6 +57,8 @@ public class GitService implements Runnable {
         GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
         GIT_REMOTE_URL = ServiceConfig.getProperty("git_remote_url");
         GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
+        GIT_ONT_PATH = ServiceConfig.LOCAL_ONT_DIR;
+        GIT_ONT_REMOTE_URL = ServiceConfig.getProperty("git_ontologies_remote_url");
     }
 
     final static Logger log = LoggerFactory.getLogger(GitService.class);
@@ -121,59 +121,13 @@ public class GitService implements Runnable {
         mode = m;
     }
 
-    @Override
-    public void run() {
-        try {
-            if (!SHAPES.equals(mode)) {
-                DocFileModel.clearCache();
-            }
-        } catch (RestException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        LdsQueryService.clearCache();
-        ResultsCache.clearCache();
-        if (mode == null) {
-            try {
-                update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            try {
-                update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        if (QUERIES.equals(mode)) {
-            try {
-                update(GIT_LOCAL_PATH, GIT_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        if (SHAPES.equals(mode)) {
-            try {
-                update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            log.info("updating Shape Ontology models() >>");
-            // Thread t = new Thread(new OntShapesData());
-            // t.start();
-        }
-    }
-
     public static void main(String... args) throws JsonParseException, JsonMappingException, IOException {
         ServiceConfig.init();
         GitService gs = new GitService();
-        gs.setMode(GitService.SHAPES);
-        System.out.println("DIR >>" + ServiceConfig.LOCAL_SHAPES_DIR);
-        gs.update(GIT_SHAPES_PATH, GIT_SHAPES_REMOTE_URL);
+        gs.setMode(GitService.ONTOLOGIES);
+        System.out.println("DIR >>" + ServiceConfig.LOCAL_ONT_DIR);
+        String commitId = gs.update(GIT_ONT_PATH, GIT_ONT_REMOTE_URL);
+        System.out.println(commitId);
     }
 
 }
