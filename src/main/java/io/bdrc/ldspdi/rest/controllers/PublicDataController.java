@@ -268,8 +268,8 @@ public class PublicDataController {
             HttpServletRequest request) throws RestException, IOException {
         Helpers.setCacheControl(resp, "public");
         if (res.contains(".")) {
-            String[] parts = res.split("\\.");
-            return getGrResourceGraphExt(parts[0], parts[1], fusekiUrl, format, request);
+            // String[] parts = res.split("\\.");
+            return getGrResourceGraphExt(res.substring(0, res.lastIndexOf(".")), res.substring(res.lastIndexOf(".") + 1), fusekiUrl, format, request);
         }
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
         final String fullResURI = GRAPH_PREFIX_FULL + res;
