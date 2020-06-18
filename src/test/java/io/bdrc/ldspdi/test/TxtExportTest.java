@@ -73,7 +73,7 @@ public class TxtExportTest {
         HttpGet get = new HttpGet(uri);
         HttpResponse resp = client.execute(get);
         System.out.println(resp.getStatusLine());
-        resp.getEntity().writeTo(System.out);
+        //resp.getEntity().writeTo(System.out);
         assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 }

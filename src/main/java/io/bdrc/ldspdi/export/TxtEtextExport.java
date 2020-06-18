@@ -6,17 +6,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.jena.query.QuerySolution;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.bdrc.auth.Access;
+import io.bdrc.auth.Access.AccessLevel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.GeoLocation;
+import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.StreamingHelpers;
 
 public class TxtEtextExport {
@@ -36,6 +43,9 @@ public class TxtEtextExport {
     static class StartCharComparator implements Comparator<QuerySolution> {
         @Override
         public int compare(QuerySolution a, QuerySolution b) {
+            // there is one solution that contains the access, etc. we put it first
+            if (!a.contains("chunkstart")) return -1;
+            if (!b.contains("chunkstart")) return 1;
             return a.getLiteral("chunkstart").getString().compareTo(b.getLiteral("chunkstart").getString());
         }
     }
@@ -47,6 +57,8 @@ public class TxtEtextExport {
         Collections.sort(sols, startCharComparatorInstance);
         final StringBuilder sb = new StringBuilder();
         for (QuerySolution qs : sols) {
+            if (!qs.contains("chunkstart"))
+                continue;
             final int qsStartChar = qs.getLiteral("chunkstart").getInt();
             final int qsEndChar = qs.getLiteral("chunkend").getInt();
             final String qsContent = qs.getLiteral("chunkcontent").getString();
@@ -62,11 +74,31 @@ public class TxtEtextExport {
         }
         return sb.toString();
     }
-
-    public static ResponseEntity<StreamingResponseBody> getResponse(final String resUri, final Integer startChar, final Integer endChar) throws RestException {
+    
+    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar) throws RestException {
         final ResultSetWrapper res = getResults(resUri, startChar, endChar);
-        if (res.numResults == 0) {
+        if (res.numResults < 2) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
+        }
+        List<QuerySolution> sols = res.getQuerySolutions();
+        Collections.sort(sols, startCharComparatorInstance);
+        QuerySolution qs = sols.get(0);
+        if (!qs.contains("ric")) {
+            throw new RestException(500, LdsError.UNKNOWN_ERR, "cannot get information from Fuseki about access of "+resUri);
+        }
+        boolean restrictedInChina = qs.get("ric").asLiteral().getBoolean();
+        if (restrictedInChina && GeoLocation.isFromChina(request)) {
+            return ResponseEntity.status(451).contentType(MediaType.TEXT_PLAIN).body(StreamingHelpers.getStream("Etext not available in your geographical area"));
+        }
+        Access acc = (Access) request.getAttribute("access");
+        if (acc == null)
+            acc = new Access();
+        final String accessShortName = qs.get("access").asResource().getLocalName();
+        final String statusShortName = qs.get("status").asResource().getLocalName();
+        final AccessLevel al = acc.hasResourceAccess(accessShortName, statusShortName, qs.get("einst").asResource().getURI());
+        if (al != AccessLevel.OPEN) {
+            return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache())
+                    .body(StreamingHelpers.getStream("Insufficient rights"));
         }
         final String resStr = getStringForTxt(res, startChar, endChar);
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").body(StreamingHelpers.getStream(resStr));

@@ -423,7 +423,7 @@ public class PublicDataController {
             return MarcExport.getResponse(media, RES_PREFIX + res);
         }
         if (ext.equals("txt")) {
-            return TxtEtextExport.getResponse(RES_PREFIX + res, Integer.parseInt(startChar), Integer.parseInt(endChar));
+            return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar), Integer.parseInt(endChar));
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
