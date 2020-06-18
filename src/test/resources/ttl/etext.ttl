@@ -1,9 +1,11 @@
 @prefix :      <http://purl.bdrc.io/ontology/core/> .
 @prefix bdr:   <http://purl.bdrc.io/resource/> .
-@prefix bd:    <http://www.bigdata.com/rdf#> .
 @prefix bdg:   <http://purl.bdrc.io/graph/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
 
 bdr:UT11577_004_0000  a   :Etext , :EtextNonPaginated ;
         :eTextHasChunk    [ :chunkContents   "ཐུགས་དམ་གྱི་སྐབས་རྣམས་སུ་གདུལ་བྱ་དག་པ་འགའ་ཞིག་ལ་ཆོས་ཀྱི་རྣམ་གྲངས་བསམ་གྱིས་མི་ཁྱབ་པ་གསུངས་སོ། །དགུང་ལོ་དྲུག་ཅུ་རེ་བདུན་བཞེས་པ་ན་སྐུ་ལུས་ཅུང་ཟད་ཤེད་ཆུང་བར་གྱུར་ཀྱང་གཞན་དོན་གྱིས་ཁུར་གྱི་སྟོབས་ཀྱིས། དགེ་བའི་བཤེས་གཉེན་ཁྱད་པར་ཅན་འགའ་ཞིག་ལ་ཀྲི་ཡ་ས་མུ་ཙྪའི་དཀྱིལ་འཁོར་དུ་དབང་བསྐུར་བ་མཛད་པས། ཅུང་ཟད་སྐུ་བསྙེལ་བར་གྱུར་པ་ན། དེ་དག་གི་ཆོས་ཀྱི་འཕྲོ་རྣམས་བདག་ལ་རྫོགས་པར་གྱིས་ཤིག་གསུངས་ནས། བླ་མ་དམ་པ་ཉིད་ཞིང་འདིའི་གདུལ་བྱའི་དོན་རེ་ཞིག་རྫོགས་པ་དང༌། རྟག་འཛིན་ཅན་གྱི་སྐྱེ་བོ་ཆོས་ལ་བསྐུལ་བའི་ཕྱིར་དང༌། ཞིང་ཁམས་གཞན་དུ་གདུལ་བྱ་མཐའ་ཡས་པ་སྨིན་གྲོལ་གྱི་ལམ་ལ་འགོད་པའི་ཆེད་དུ། ཆུ་ཕོ་འབྲུག་གི་ལོ། ནག་པ་ཟླ་བའི་ཚེས་བཅོ་བརྒྱད་ཀྱི་སྲོད་ཀྱི་ཆ་ལ། གཟུགས་ཀྱི་སྐུའི་སྤྲུལ་པ་ཆོས་ཀྱི་སྐུ་ཞི་བ་ཆེན་པོའི་དབྱིངས་སུ་བསྡུ་བར་མཛད་དོ། །འོན་ཀྱང་བླ་མ་ཉིད་ཀྱི་ཐུགས་རྗེའི་ཕྲིན་ལས་ལས་སྤྲུལ་པའི་སྐུ་སྣ་ཚོགས་ཀྱིས་འགྲོ་བའི་དོན་མཛད་པ་ཕྲིན་ལས་ཀྱི་འཁོར་ལོ་ནི་རྒྱུན་མི་ཆད་པ་ཉིད་དོ། །དེ་ལྟར་དཔལ་ལྡན་བླ་མའི་ཡོན་ཏན་ནི། །བསྐལ་བར་བརྗོད་ཀྱང་ཟད་པར་ག་ལ་ནུས། །འོན་ཀྱང་དད་པས་ཅུང་ཟད་བྲིས་འདི་ལ། །རྒྱས་སྲས་བླ་མའི་ཐུགས་རྗེ་འཇུག་གྱུར་ཅིག\n\n།དཔལ་ལྡན་བླ་མ་དམ་པ་ཆོས་ཀྱི་རྗེ་ས་བཟང་འཕགས་པའི་རྣམ་པར་ཐར་པ་མདོར་བསྡུས་པ་འདི་བླ་མ་དམ་པ་དེ་ཉིད་ལ་མི་ཕྱེད་པའི་དད་པ་དང་ལྡན་པ། སློབ་དཔོན་ཚུལ་ཁྲིམས་རྒྱལ་མཚན་གྱིས་ཐོག་མར་བསྐུལ་བ་དང༌། "@bo ;
@@ -56,6 +58,19 @@ bdr:UT11577_004_0000  a   :Etext , :EtextNonPaginated ;
                             :sliceEndChar    9537 ;
                             :sliceStartChar  8359
                           ] ;
-        :eTextInItem      bdr:I11577_E001 ;
+        :eTextInInstance     bdr:IE11577;
         :eTextIsVolume    4 ;
         :isRoot           true .
+
+bda:IE11577  a   adm:AdminData ;
+   bdo:isRoot    true ;
+   adm:access    bda:AccessOpen ;
+   adm:adminAbout  bdr:IE11577 ;
+   adm:contentProvider  bda:CP004 ;
+   adm:facetIndex  45 ;
+   adm:gitPath   "3c/IE11577.trig" ;
+   adm:gitRepo   bda:GR0013 ;
+   adm:gitRevision  "0cc5567f99c23c90226a23e19fe54977f5fd594c" ;
+   adm:graphId   bdg:IE11577 ;
+   adm:metadataLegal  bda:LD_BDRC_CC0 ;
+   adm:status    bda:StatusReleased .

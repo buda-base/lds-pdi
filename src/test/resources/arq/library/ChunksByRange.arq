@@ -12,11 +12,19 @@
 #param.I_END.type=int
 #param.I_END.desc=the index of the last char that's needed
 
-select ?chunkcontent ?chunkstart ?chunkend 
+select ?chunkcontent ?chunkstart ?chunkend ?einst ?access ?ric ?status
 where { 
+  {
+    ?R_RES :eTextInInstance ?einst .
+    ?einstAdm adm:adminAbout  ?einst .
+    ?einstAdm adm:access ?access .
+    ?einstAdm adm:status ?status .
+    BIND(EXISTS{?einstAdm adm:restrictedInChina true} as ?ric)
+  } union { 
     ?R_RES :eTextHasChunk ?c .
     ?c :chunkContents ?chunkcontent ;
        :sliceStartChar ?chunkstart ;
        :sliceEndChar ?chunkend .
     FILTER (?chunkstart <= ?I_END && ?chunkend >= ?I_START)
+  }
 }
