@@ -301,6 +301,7 @@ public class PublicDataController {
             resp.sendRedirect(request.getRequestURL().toString() + ".trig");
         }
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
+        log.info("Call to getResourceGraph with prefixedRes {}, fuseki {}, graphType {}", prefixedRes, fusekiUrl, graphType);
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)

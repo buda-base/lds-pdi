@@ -29,7 +29,6 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -54,8 +53,10 @@ public class QueryProcessor {
     public final static Logger log = LoggerFactory.getLogger(QueryProcessor.class);
 
     public static Model getCoreResourceGraph(final String URI, String fusekiUrl, String prefixes, String type) throws RestException {
+        log.info("Call to getResourceGraph with prefixedRes {}, fuseki {}, graphType {}", URI, fusekiUrl, type);
         switch (type) {
         case "graph":
+            log.info("GRAPH TYPE getResourceGraph with prefixedRes {}, fuseki {}", URI, fusekiUrl);
             return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
         case "describe":
             return getDescribeModel(URI, fusekiUrl, prefixes);
@@ -85,10 +86,13 @@ public class QueryProcessor {
             map.put("R_RES", URI);
             String query = qfp.getParametizedQuery(map, true);
             Query q = QueryFactory.create(query);
+            log.info("QUERY >> {}", query);
             RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
-            model = conn.queryDescribe(q);
+            // model = conn.queryDescribe(q);
+            model = conn.queryConstruct(q);
             ResultsCache.addToCache(model, hash);
         }
+        log.info("getSimpleResourceGraph() return model of size {} from fuseki {}", model.size(), fusekiUrl);
         return model;
     }
 
@@ -114,7 +118,8 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         final int hash = Objects.hashCode(query);
-        Model model = (Model) ResultsCache.getObjectFromCache(hash);
+        // Model model = (Model) ResultsCache.getObjectFromCache(hash);
+        Model model = null;
         if (model == null) {
             log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
@@ -254,26 +259,10 @@ public class QueryProcessor {
     }
 
     public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
-        // ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/newcorerw/query");
+        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/corerw/query");
         // System.out.println("FUSEKI >>" +
         // ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL));
-        String fusekiQuery = "http://buda1.bdrc.io:13180/fuseki/newcorerw/query";
-        String fusekiUpdate = "http://buda1.bdrc.io:13180/fuseki/newcorerw/data";
-        String query = "select distinct ?g where { graph ?g { ?s ?p <http://www.w3.org/ns/shacl#NodeShape> } }";
-        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiQuery);
-        ArrayList<String> toDrop = new ArrayList<>();
-        QueryExecution qe = rvf.query(query);
-        ResultSet rs = qe.execSelect();
-        while (rs.hasNext()) {
-            QuerySolution qs = rs.next();
-            String s = qs.get("?g").asNode().getURI();
-            System.out.println(" S=" + s);
-            if (!toDrop.contains(s)) {
-                toDrop.add(s);
-            }
-        }
-        qe.close();
-        QueryProcessor.dropMultipleGraphs(toDrop, fusekiUpdate);
-
+        Model m = QueryProcessor.getCoreResourceGraph("bdg:ontologySchema", null, null, "graph");
+        m.write(System.out, "TURTLE");
     }
 }
