@@ -42,5 +42,8 @@ jcs.usr.elementattributes.IsLateral=false
 jcs.usr.elementattributes.MaxLife=900
 jcs.usr.elementattributes.IdleTime=300
 
-
+jcs.geoloc=
+jcs.geoloc.cacheattributes=org.apache.commons.jcs.engine.CompositeCacheAttributes
+jcs.geoloc.cacheattributes.MaxObjects=1000
+jcs.geoloc.cacheattributes.MemoryCacheName=org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
 
