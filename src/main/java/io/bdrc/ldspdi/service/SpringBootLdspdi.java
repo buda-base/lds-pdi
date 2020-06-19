@@ -37,7 +37,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     public final static Logger log = LoggerFactory.getLogger("default");
 
     public static void main(String[] args)
-            throws RestException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+            throws RestException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException, InterruptedException {
         final String configPath = System.getProperty("ldspdi.configpath");
         try {
             ServiceConfig.init();
@@ -52,7 +52,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         ResultsCache.init();
         // Pull lds-queries repo from git if not in china
         if (!ServiceConfig.isInChina()) {
-            GitService gs = new GitService();
+            GitService gs = new GitService(0);
             gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
         }
         TaxModel.fetchModel();

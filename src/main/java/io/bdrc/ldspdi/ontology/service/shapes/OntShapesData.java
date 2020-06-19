@@ -139,10 +139,4 @@ public class OntShapesData {
         // updateFusekiDataset();
     }
 
-    /*
-     * @Override public void run() { try { init(); } catch (Exception e) { // TODO
-     * Auto-generated catch block log.error(e.getMessage(), e); e.printStackTrace();
-     * } }
-     */
-
 }

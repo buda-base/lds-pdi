@@ -17,7 +17,7 @@ public class Webhook implements Runnable {
         super();
         this.payload = payload;
         this.mode = mode;
-        this.gs = new GitService();
+        this.gs = new GitService(15);
         gs.setMode(mode);
     }
 
@@ -27,7 +27,7 @@ public class Webhook implements Runnable {
         if (GitService.SHAPES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_SHAPES_PATH, GitService.GIT_SHAPES_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
+            } catch (RevisionSyntaxException | IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -37,7 +37,7 @@ public class Webhook implements Runnable {
         if (GitService.ONTOLOGIES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_ONT_PATH, GitService.GIT_ONT_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
+            } catch (RevisionSyntaxException | IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -47,7 +47,7 @@ public class Webhook implements Runnable {
         if (GitService.QUERIES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException e) {
+            } catch (RevisionSyntaxException | IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

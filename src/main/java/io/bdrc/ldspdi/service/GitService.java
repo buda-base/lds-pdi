@@ -21,6 +21,7 @@ package io.bdrc.ldspdi.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -50,8 +51,9 @@ public class GitService /* implements Runnable */ {
     public static String SHAPES = "shapes";
     public static String ONTOLOGIES = "ontologies";
     private static String mode;
+    private int delayInSeconds;
 
-    public GitService() {
+    public GitService(int delayInSeconds) {
         super();
         GIT_LOCAL_PATH = ServiceConfig.LOCAL_QUERIES_DIR;
         GIT_SHAPES_PATH = ServiceConfig.LOCAL_SHAPES_DIR;
@@ -59,12 +61,14 @@ public class GitService /* implements Runnable */ {
         GIT_SHAPES_REMOTE_URL = ServiceConfig.getProperty("git_shapes_remote_url");
         GIT_ONT_PATH = ServiceConfig.LOCAL_ONT_DIR;
         GIT_ONT_REMOTE_URL = ServiceConfig.getProperty("git_ontologies_remote_url");
+        this.delayInSeconds = delayInSeconds;
     }
 
     final static Logger log = LoggerFactory.getLogger(GitService.class);
 
     public String update(String localPath, String remoteUrl)
-            throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+            throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException, InterruptedException {
+        TimeUnit.SECONDS.sleep(delayInSeconds);
         String commit = null;
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         File localGit = new File(localPath + "/.git");
@@ -121,9 +125,10 @@ public class GitService /* implements Runnable */ {
         mode = m;
     }
 
-    public static void main(String... args) throws JsonParseException, JsonMappingException, IOException {
+    public static void main(String... args)
+            throws JsonParseException, JsonMappingException, IOException, RevisionSyntaxException, InterruptedException {
         ServiceConfig.init();
-        GitService gs = new GitService();
+        GitService gs = new GitService(0);
         gs.setMode(GitService.ONTOLOGIES);
         System.out.println("DIR >>" + ServiceConfig.LOCAL_ONT_DIR);
         String commitId = gs.update(GIT_ONT_PATH, GIT_ONT_REMOTE_URL);
