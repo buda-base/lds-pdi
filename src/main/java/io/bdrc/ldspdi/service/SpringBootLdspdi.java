@@ -62,12 +62,12 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
-        Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES);
+        Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
         Thread t_ont = new Thread(wh_ont);
         t_ont.start();
         if (!ServiceConfig.isInChina()) {
             // OntShapesData.init();
-            Webhook wh = new Webhook(null, GitService.SHAPES);
+            Webhook wh = new Webhook(null, GitService.SHAPES, 0);
             Thread t = new Thread(wh);
             t.start();
             if ("true".equals(AuthProps.getProperty("useAuth"))) {

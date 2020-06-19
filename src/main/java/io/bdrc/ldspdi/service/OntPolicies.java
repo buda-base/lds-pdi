@@ -27,7 +27,7 @@ public class OntPolicies {
     private static final String CORE_TYPE = "core";
     private static final String SHAPES_TYPE = "shapes";
 
-    public static final String policiesUrl = System.getProperty("user.dir") + "owl-schema/ont-policy.rdf";
+    public static final String policiesUrl = System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf";
     public static final String shapesPoliciesUrl = System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf";
     public static HashMap<String, OntPolicy> mapAll;
     public static HashMap<String, OntPolicy> mapCore;

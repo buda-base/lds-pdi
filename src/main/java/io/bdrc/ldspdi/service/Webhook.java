@@ -21,6 +21,14 @@ public class Webhook implements Runnable {
         gs.setMode(mode);
     }
 
+    public Webhook(String payload, String mode, int delayInSeconds) {
+        super();
+        this.payload = payload;
+        this.mode = mode;
+        this.gs = new GitService(delayInSeconds);
+        gs.setMode(mode);
+    }
+
     @Override
     public void run() {
         String commitId = null;
