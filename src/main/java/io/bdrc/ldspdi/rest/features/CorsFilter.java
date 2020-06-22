@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Order(2)
 public class CorsFilter implements Filter {
 
-    static final int ACCESS_CONTROL_MAX_AGE_IN_SECONDS = 24 * 60 * 60;
+    public static final int ACCESS_CONTROL_MAX_AGE_IN_SECONDS = 24 * 60 * 60;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

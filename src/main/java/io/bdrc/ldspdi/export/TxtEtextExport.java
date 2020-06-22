@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,12 +19,12 @@ import io.bdrc.auth.Access;
 import io.bdrc.auth.Access.AccessLevel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.GeoLocation;
-import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.StreamingHelpers;
 
 public class TxtEtextExport {
@@ -100,8 +101,17 @@ public class TxtEtextExport {
             return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache())
                     .body(StreamingHelpers.getStream("Insufficient rights"));
         }
+        CacheControl cc = CacheControl.maxAge(CorsFilter.ACCESS_CONTROL_MAX_AGE_IN_SECONDS, TimeUnit.SECONDS);
+        if (!accessShortName.equals("AccessOpen") || restrictedInChina) {
+            cc = cc.cachePrivate();
+        } else {
+            cc = cc.cachePublic();
+        }
         final String resStr = getStringForTxt(res, startChar, endChar);
-        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").body(StreamingHelpers.getStream(resStr));
+        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD")
+                .header("Vary", "Negotiate, Accept")
+                .cacheControl(cc)
+                .body(StreamingHelpers.getStream(resStr));
     }
 
 }
