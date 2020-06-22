@@ -135,7 +135,7 @@ public class LibrarySearchController {
             cc = cc.cachePublic();
         }
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
-        if (mediaType == null) {
+        if (mediaType == null || mediaType == MediaType.TEXT_HTML) {
             mediaType = BudaMediaTypes.MT_TTL;
         }
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
