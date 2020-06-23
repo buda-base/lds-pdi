@@ -8,7 +8,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 import com.opencsv.CSVWriter;
 
-import io.bdrc.libraries.Prefixes;
+import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QSWriter {
 
@@ -21,7 +21,7 @@ public class QSWriter {
             if (node == null) {
                 csvrow[varIdx] = "";
             } else if (node.isURIResource()) {
-                csvrow[varIdx] = Prefixes.getPrefixedIRI(node.asResource().getURI());
+                csvrow[varIdx] = ServiceConfig.PREFIX.getPrefixedIRI(node.asResource().getURI());
             } else if (node.isLiteral()) {
                 csvrow[varIdx] = node.asLiteral().getValue().toString();
             } else if (node.isAnon()) {

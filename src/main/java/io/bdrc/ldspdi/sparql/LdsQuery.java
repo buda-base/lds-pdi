@@ -28,7 +28,6 @@ import io.bdrc.ldspdi.objects.json.ResParam;
 import io.bdrc.ldspdi.objects.json.StringParam;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.libraries.Prefixes;
 
 public class LdsQuery {
 
@@ -123,7 +122,7 @@ public class LdsQuery {
         if (converted == null) {
             converted = new HashMap<>();
         }
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query, Prefixes.getPrefixMapping());
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query, ServiceConfig.PREFIX.getPrefixMapping());
         for (String st : getAllParams()) {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (converted.get(st) != null) {
@@ -142,7 +141,7 @@ public class LdsQuery {
                                 parts[0] = "";
                             }
                             // may be done automatically by parametrizedSparqlString, to be checked
-                            final String fullUri = Prefixes.getFullIRI(parts[0]);
+                            final String fullUri = ServiceConfig.PREFIX.getFullIRI(parts[0]);
                             if (fullUri != null) {
                                 queryStr.setIri(st, fullUri + parts[1]);
                             } else {

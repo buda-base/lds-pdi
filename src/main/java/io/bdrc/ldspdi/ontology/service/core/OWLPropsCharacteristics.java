@@ -19,7 +19,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.libraries.Prefixes;
 
 public class OWLPropsCharacteristics {
 
@@ -44,13 +43,14 @@ public class OWLPropsCharacteristics {
     HashMap<String, String> inverseOfProps;
 
     public OWLPropsCharacteristics(Model m) throws IOException, RestException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(ServiceConfig.class.getClassLoader().getResourceAsStream("arq/OwlProps.arq")));
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(ServiceConfig.class.getClassLoader().getResourceAsStream("arq/OwlProps.arq")));
         StringBuilder out = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             out.append(line);
         }
-        String query = Prefixes.getPrefixesString() + " " + out.toString();
+        String query = ServiceConfig.PREFIX.getPrefixesString() + " " + out.toString();
         QueryExecution qexec = QueryExecutionFactory.create(query, m);
         propsModel = qexec.execConstruct();
         getInverseOfProps();

@@ -92,7 +92,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
-import io.bdrc.libraries.Prefixes;
 import io.bdrc.libraries.StreamingHelpers;
 import io.bdrc.libraries.formatters.TTLRDFWriter;
 
@@ -197,7 +196,8 @@ public class PublicDataController {
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().contentType(mediaType).headers(hh).body(StreamingHelpers.getModelStream(model, ext, RES_PREFIX + res, null));
+        return ResponseEntity.ok().contentType(mediaType).headers(hh)
+                .body(StreamingHelpers.getModelStream(model, ext, RES_PREFIX + res, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     // admindata/res with extension
@@ -229,7 +229,8 @@ public class PublicDataController {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().contentType(media).headers(hh).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().contentType(media).headers(hh)
+                .body(StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 
@@ -258,7 +259,8 @@ public class PublicDataController {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(media)
+                .body(StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 
@@ -310,15 +312,16 @@ public class PublicDataController {
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(mediaType)
+                .body(StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     @GetMapping(value = "/prefixes")
     public ResponseEntity<StreamingResponseBody> getPrefixes(HttpServletResponse resp) throws RestException {
         Helpers.setCacheControl(resp, "public");
         Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefixes(Prefixes.getMap());
-        StreamingResponseBody stream = StreamingHelpers.getModelStream(model, "ttl");
+        model.setNsPrefixes(ServiceConfig.PREFIX.getMap());
+        StreamingResponseBody stream = StreamingHelpers.getModelStream(model, "ttl", ServiceConfig.PREFIX.getPrefixMap());
         return ResponseEntity.ok().contentType(BudaMediaTypes.getMimeFromExtension("ttl")).body(stream);
     }
 
@@ -386,7 +389,8 @@ public class PublicDataController {
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
-        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().contentType(mediaType)
+                .body(StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res, @PathVariable("ext") String ext,
@@ -433,7 +437,8 @@ public class PublicDataController {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
-        return ResponseEntity.ok().headers(hh).contentType(media).body(StreamingHelpers.getModelStream(model, ext, fullResURI, null));
+        return ResponseEntity.ok().headers(hh).contentType(media)
+                .body(StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 

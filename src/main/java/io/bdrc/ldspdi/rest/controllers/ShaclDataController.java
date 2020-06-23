@@ -69,7 +69,8 @@ public class ShaclDataController {
             mt = BudaMediaTypes.MT_TTL;
             extension = "ttl";
         }
-        return ResponseEntity.ok().contentType(mt).body(StreamingHelpers.getModelStream(m, extension, url, null));
+        return ResponseEntity.ok().contentType(mt)
+                .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     private ResponseEntity<StreamingResponseBody> processShapeUrl(String url, boolean resource, HttpServletResponse response) throws RestException {
@@ -101,7 +102,8 @@ public class ShaclDataController {
         }
         Helpers.setCacheControl(response, "public");
         if (m != null && m.size() > 0) {
-            return ResponseEntity.ok().contentType(mt).body(StreamingHelpers.getModelStream(m, extension, url, null));
+            return ResponseEntity.ok().contentType(mt)
+                    .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)
                 .body(StreamingHelpers.getStream("The requested shape could not be found"));

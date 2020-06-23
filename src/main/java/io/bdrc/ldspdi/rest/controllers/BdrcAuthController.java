@@ -51,7 +51,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
 import io.bdrc.libraries.GlobalHelpers;
-import io.bdrc.libraries.Prefixes;
 import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
@@ -80,7 +79,8 @@ public class BdrcAuthController {
         try {
             String token = getToken(request.getHeader("Authorization"));
             if (token == null) {
-                return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModelFromUserId(false, res), "jsonld"));
+                return ResponseEntity.status(200)
+                        .body(StreamingHelpers.getModelStream(getUserModelFromUserId(false, res), "jsonld", ServiceConfig.PREFIX.getPrefixMap()));
             } else {
                 Access acc = (Access) request.getAttribute("access");
                 // auth0Id corresponding to the logged on user - from the token
@@ -94,9 +94,11 @@ public class BdrcAuthController {
                 String n = getAuth0IdFromUserId(res).asResource().getURI();
                 n = n.substring(n.lastIndexOf("/") + 1);
                 if (acc.getUser().isAdmin() || auth0Id.equals(n)) {
-                    return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(true, getRdfProfile(n)), "jsonld"));
+                    return ResponseEntity.status(200).body(
+                            StreamingHelpers.getModelStream(getUserModel(true, getRdfProfile(n)), "jsonld", ServiceConfig.PREFIX.getPrefixMap()));
                 }
-                return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(getUserModel(false, getRdfProfile(n)), "jsonld"));
+                return ResponseEntity.status(200)
+                        .body(StreamingHelpers.getModelStream(getUserModel(false, getRdfProfile(n)), "jsonld", ServiceConfig.PREFIX.getPrefixMap()));
             }
         } catch (Exception e) {
             log.error("Call userResource() failed", e);
@@ -276,7 +278,7 @@ public class BdrcAuthController {
         log.info("Call getAuthResource()");
         String query = "describe <http://purl.bdrc.io/resource-nc/auth/" + res + ">";
         Model m = QueryProcessor.getGraphFromModel(query, QueryProcessor.getAuthGraph(null, "authDataGraph"));
-        m.setNsPrefixes(Prefixes.getPrefixMapping());
+        m.setNsPrefixes(ServiceConfig.PREFIX.getPrefixMapping());
         if (m.size() == 0) {
             LdsError lds = new LdsError(LdsError.MISSING_RES_ERR).setContext(res);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
@@ -289,7 +291,7 @@ public class BdrcAuthController {
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl"))
-                .body(StreamingHelpers.getModelStream(m, "ttl"));
+                .body(StreamingHelpers.getModelStream(m, "ttl", ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     @GetMapping(value = "/authmodel")
@@ -302,7 +304,7 @@ public class BdrcAuthController {
         SimpleDateFormat formatter = new SimpleDateFormat(PATTERN_ASCTIME, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         return ResponseEntity.ok().header("Last-Modified", formatter.format(cal.getTime())).contentType(BudaMediaTypes.getMimeFromExtension("ttl"))
-                .body(StreamingHelpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null));
+                .body(StreamingHelpers.getModelStream(QueryProcessor.getAuthGraph(null, "authDataGraph"), null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     @GetMapping(value = "/authmodel/updated")

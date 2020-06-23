@@ -46,7 +46,6 @@ import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.libraries.Prefixes;
 
 public class QueryProcessor {
 
@@ -73,7 +72,7 @@ public class QueryProcessor {
 
     public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = Prefixes.getPrefixesString();
+            prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -98,7 +97,7 @@ public class QueryProcessor {
 
     public static Model getDescribeModel(final String URI, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = Prefixes.getPrefixesString();
+            prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
@@ -112,7 +111,7 @@ public class QueryProcessor {
 
     public static Model getGraph(final String query, String fusekiUrl, String prefixes) throws RestException {
         if (prefixes == null) {
-            prefixes = Prefixes.getPrefixesString();
+            prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);

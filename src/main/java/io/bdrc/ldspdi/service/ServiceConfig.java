@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.libraries.Prefix;
 
 public class ServiceConfig {
 
@@ -43,6 +44,7 @@ public class ServiceConfig {
     public static String LOCAL_SHAPES_DIR;
     public static String LOCAL_ONT_DIR;
     public static String SERVER_ROOT;
+    public static Prefix PREFIX;
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged with
@@ -83,10 +85,15 @@ public class ServiceConfig {
                 log.info("using default properties");
             }
             SERVER_ROOT = prop.getProperty("serverRoot");
+            PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
             OntPolicies.init();
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }
+    }
+
+    public static void loadPrefixes() {
+        PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {

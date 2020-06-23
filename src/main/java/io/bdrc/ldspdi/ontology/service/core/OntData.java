@@ -61,7 +61,6 @@ import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
-import io.bdrc.libraries.Prefixes;
 
 public class OntData /* implements Runnable */ {
 
@@ -460,10 +459,10 @@ public class OntData /* implements Runnable */ {
     public final static Comparator<OntClass> ontClassComparator = new Comparator<OntClass>() {
         @Override
         public int compare(OntClass class1, OntClass class2) {
-            if (Prefixes.getPrefix(class1.getNameSpace()).equals(Prefixes.getPrefix(class2.getNameSpace()))) {
+            if (ServiceConfig.PREFIX.getPrefix(class1.getNameSpace()).equals(ServiceConfig.PREFIX.getPrefix(class2.getNameSpace()))) {
                 return class1.getLocalName().compareTo(class2.getLocalName());
             }
-            return Prefixes.getPrefix(class1.getNameSpace()).compareTo(Prefixes.getPrefix(class2.getNameSpace()));
+            return ServiceConfig.PREFIX.getPrefix(class1.getNameSpace()).compareTo(ServiceConfig.PREFIX.getPrefix(class2.getNameSpace()));
         }
 
     };
@@ -487,10 +486,10 @@ public class OntData /* implements Runnable */ {
     public final static Comparator<OntProperty> propComparator = new Comparator<OntProperty>() {
         @Override
         public int compare(OntProperty prop1, OntProperty prop2) {
-            if (Prefixes.getPrefix(prop1.getNameSpace()).equals(Prefixes.getPrefix(prop2.getNameSpace()))) {
+            if (ServiceConfig.PREFIX.getPrefix(prop1.getNameSpace()).equals(ServiceConfig.PREFIX.getPrefix(prop2.getNameSpace()))) {
                 return prop1.getLocalName().compareTo(prop2.getLocalName());
             }
-            return Prefixes.getPrefix(prop1.getNameSpace()).compareTo(Prefixes.getPrefix(prop2.getNameSpace()));
+            return ServiceConfig.PREFIX.getPrefix(prop1.getNameSpace()).compareTo(ServiceConfig.PREFIX.getPrefix(prop2.getNameSpace()));
         }
 
     };

@@ -31,11 +31,13 @@ import io.bdrc.libraries.formatters.JSONLDFormatter.DocType;
 @RequestMapping("/annotations/")
 public class AnnotationsAPI {
 
-    final static Model COLL_SERV = ModelFactory.createDefaultModel().read(AnnotationsAPI.class.getClassLoader().getResourceAsStream("collectionService.ttl"), "http://api.bdrc.io/annotations/", "TURTLE");
+    final static Model COLL_SERV = ModelFactory.createDefaultModel()
+            .read(AnnotationsAPI.class.getClassLoader().getResourceAsStream("collectionService.ttl"), "http://api.bdrc.io/annotations/", "TURTLE");
     final static String annotSearchQueryFile = "annotLayerSearch.arq";
 
     @GetMapping(value = "/collectionService")
-    public ResponseEntity<StreamingResponseBody> collectionService(@RequestHeader(value = "Accept", required = false) String accept, HttpServletRequest request) throws RestException {
+    public ResponseEntity<StreamingResponseBody> collectionService(@RequestHeader(value = "Accept", required = false) String accept,
+            HttpServletRequest request) throws RestException {
         MediaType mediaType;
         if (accept == null || accept.contains("text/html")) {
             mediaType = BudaMediaTypes.MT_JSONLD;
@@ -48,12 +50,14 @@ public class AnnotationsAPI {
         COLL_SERV.write(System.out, "JSON-LD");
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return bb.body(StreamingHelpers.getModelStream(COLL_SERV, ext, "http://api.bdrc.io/annotations/collectionService", null));
+        return bb.body(StreamingHelpers.getModelStream(COLL_SERV, ext, "http://api.bdrc.io/annotations/collectionService", null,
+                ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 
     @GetMapping(value = "/search/{res}/")
-    public ResponseEntity<StreamingResponseBody> search(@RequestHeader(value = "Accept", required = false) String accept, @PathVariable("res") String res, HttpServletRequest request) throws RestException {
+    public ResponseEntity<StreamingResponseBody> search(@RequestHeader(value = "Accept", required = false) String accept,
+            @PathVariable("res") String res, HttpServletRequest request) throws RestException {
         MediaType mediaType;
         if (accept == null || accept.contains("text/html")) {
             mediaType = BudaMediaTypes.MT_JSONLD;
@@ -79,7 +83,8 @@ public class AnnotationsAPI {
         Model model = QueryProcessor.getGraph(query, ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL), null);
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return bb.body(StreamingHelpers.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", dct));
+        return bb.body(StreamingHelpers.getModelStream(model, ext, "http://api.bdrc.io/annotations/collectionService", dct,
+                ServiceConfig.PREFIX.getPrefixMap()));
     }
 
 }

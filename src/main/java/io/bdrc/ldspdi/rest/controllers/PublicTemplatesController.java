@@ -59,6 +59,7 @@ import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.results.Results;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.service.Webhook;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
@@ -67,7 +68,6 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
 import io.bdrc.libraries.GlobalHelpers;
-import io.bdrc.libraries.Prefixes;
 import io.bdrc.libraries.StreamingHelpers;
 
 @RestController
@@ -257,7 +257,7 @@ public class PublicTemplatesController {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext));
+        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 
@@ -305,7 +305,8 @@ public class PublicTemplatesController {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType)));
+        return ResponseEntity.ok().contentType(mediaType)
+                .body(StreamingHelpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType), ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     @PostMapping(value = "/callbacks/github/lds-queries", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -315,7 +316,7 @@ public class PublicTemplatesController {
             Webhook wh = new Webhook(payload, GitService.QUERIES);
             Thread t = new Thread(wh);
             t.start();
-            Prefixes.loadPrefixes();
+            ServiceConfig.loadPrefixes();
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(baos));

@@ -71,8 +71,10 @@ public class AnnotationCollectionEndpoint {
 
     @GetMapping("/{res}")
     // whole collections (no subset)
-    public ResponseEntity<StreamingResponseBody> getWholeCollection(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept,
-            @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getWholeCollection(@PathVariable("res") final String res,
+            @RequestHeader(value = "Accept", required = false) final String accept,
+            @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response)
+            throws RestException {
         log.info("Call to getWholeCollection() with URL: {}, accept: {}", request.getServletPath(), accept);
         Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
@@ -88,12 +90,14 @@ public class AnnotationCollectionEndpoint {
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML))
             AnnotationUtils.htmlResponse(request, response, prefixedCollectionRes);
         final Prefer prefer = getPrefer(preferHeader);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
+                prefixedCollectionRes);
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
     @GetMapping("/{res}.{ext}")
-    public ResponseEntity<StreamingResponseBody> getWholeCollectionSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionSuffix(@PathVariable("res") final String res,
+            @PathVariable("ext") final String ext, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
             HttpServletRequest request, HttpServletResponse response) throws RestException {
         Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionSuffix() with URL: {}", request.getServletPath());
@@ -102,7 +106,8 @@ public class AnnotationCollectionEndpoint {
             return AnnotationUtils.mediaTypeChoiceResponse(request);
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = getPrefer(preferHeader);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
+                prefixedCollectionRes);
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), null);
     }
 
@@ -111,7 +116,8 @@ public class AnnotationCollectionEndpoint {
     // this is almost identical as the getWholeCollection because collections
     // currently
     // have only one page. The only difference is the json serialization.
-    public ResponseEntity<StreamingResponseBody> getWholeCollectionPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("ptype") final char ptype,
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionPage(@PathVariable("res") final String res,
+            @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("ptype") final char ptype,
             @PathVariable("pnum") final int pnum, HttpServletRequest request, HttpServletResponse response) throws RestException {
         Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
@@ -129,12 +135,14 @@ public class AnnotationCollectionEndpoint {
             if (mediaType == null)
                 return AnnotationUtils.mediaTypeChoiceResponse(request);
         }
-        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
+                prefixedCollectionRes);
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
     @GetMapping("/{res}/p{ptype}/{pnum}.{ext}")
-    public ResponseEntity<StreamingResponseBody> getWholeCollectionPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final int pnum,
+    public ResponseEntity<StreamingResponseBody> getWholeCollectionPageSuffix(@PathVariable("res") final String res,
+            @PathVariable("ext") final String ext, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final int pnum,
             HttpServletRequest request, HttpServletResponse response) throws RestException {
         Helpers.setCacheControl(response, "public");
         log.info("Call to getWholeCollectionPageSuffix() with URL: {}", request.getServletPath());
@@ -146,15 +154,18 @@ public class AnnotationCollectionEndpoint {
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
             return AnnotationUtils.mediaTypeChoiceResponse(request);
-        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange, prefixedCollectionRes);
+        final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
+                prefixedCollectionRes);
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), null);
     }
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}")
     // Collection subset
     // a subcollection corresponding to a page or character range
-    public ResponseEntity<StreamingResponseBody> getCollectionSubset(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader(value = "Prefer", required = false) final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getCollectionSubset(@PathVariable("res") final String res,
+            @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
+            HttpServletRequest request, HttpServletResponse response) throws RestException {
         log.info("Call to getWholeCollectionPage() with URL: {}, accept: {}", request.getServletPath(), accept);
         Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
@@ -174,8 +185,10 @@ public class AnnotationCollectionEndpoint {
     }
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}.{ext}")
-    public ResponseEntity<StreamingResponseBody> getCollectionSubsetSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader("Prefer") final String preferHeader, HttpServletRequest request, HttpServletResponse response) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetSuffix(@PathVariable("res") final String res,
+            @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @RequestHeader("Prefer") final String preferHeader,
+            HttpServletRequest request, HttpServletResponse response) throws RestException {
         log.info("Call to getCollectionSubsetSuffix() with URL: {}", request.getServletPath());
         Helpers.setCacheControl(response, "public");
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
@@ -190,8 +203,10 @@ public class AnnotationCollectionEndpoint {
 
     @GetMapping("/{res}/sub/{subtype}/{subcoordinates}/p{ptype}/{pnum}")
     // Collection subset page
-    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPage(@PathVariable("res") final String res, @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request, HttpServletResponse response) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPage(@PathVariable("res") final String res,
+            @RequestHeader(value = "Accept", required = false) final String accept, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype,
+            @PathVariable("pnum") final String pnum, HttpServletRequest request, HttpServletResponse response) throws RestException {
         Helpers.setCacheControl(response, "public");
         if (pnum.contains(".")) {
             String[] parts = pnum.split("\\.");
@@ -218,8 +233,10 @@ public class AnnotationCollectionEndpoint {
         return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPageSuffix(@PathVariable("res") final String res, @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
-            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype, @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getCollectionSubsetPageSuffix(@PathVariable("res") final String res,
+            @PathVariable("ext") final String ext, @PathVariable("subtype") final String subtype,
+            @PathVariable("subcoordinates") final String subcoordinates, @PathVariable("ptype") final char ptype,
+            @PathVariable("pnum") final String pnum, HttpServletRequest request) throws RestException {
         log.info("Call to getCollectionSubsetPage() with URL: {}", request.getServletPath());
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = CollectionUtils.pageUrlCharToPrefer.get(ptype);
@@ -234,15 +251,15 @@ public class AnnotationCollectionEndpoint {
         return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
     }
 
-    private ResponseEntity<StreamingResponseBody> getResponse(final Model model, DocType docType, final String collectionAliasUri, final MediaType mediaType, final Prefer prefer, final String path, final String tcn) throws RestException {
+    private ResponseEntity<StreamingResponseBody> getResponse(final Model model, DocType docType, final String collectionAliasUri,
+            final MediaType mediaType, final Prefer prefer, final String path, final String tcn) throws RestException {
         if (model.size() < 2) // there is a count added in the construct so there should always be one triple
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(collectionAliasUri));
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         CollectionUtils.toW3CCollection(model, collectionAliasUri, prefer);
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, path, ext, tcn, null, mediaType, true);
-        return bb.body(StreamingHelpers.getModelStream(model, ext, collectionAliasUri, docType));
-
+        return bb.body(StreamingHelpers.getModelStream(model, ext, collectionAliasUri, docType, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
 }

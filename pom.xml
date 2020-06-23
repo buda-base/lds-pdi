@@ -247,19 +247,8 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.13.1</version>
-    </dependency>   
-    <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
-    <!-- >dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>      
-    </dependency-->
-    <!-- https://mvnrepository.com/artifact/org.seaborne.rdf-delta/rdf-patch -->
-    <!-- >dependency>
-        <groupId>org.seaborne.rdf-delta</groupId>
-        <artifactId>rdf-patch</artifactId>
-        <version>0.7.0</version>
-    </dependency-->
+      <version>0.13.5</version>
+    </dependency> 
     <!-- https://mvnrepository.com/artifact/org.seaborne.rdf-delta/rdf-delta-server-local -->
     <dependency>
         <groupId>org.seaborne.rdf-delta</groupId>

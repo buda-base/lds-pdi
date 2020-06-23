@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
-import io.bdrc.libraries.Prefixes;
 
 public class QueryMvcSolutionItem {
 
@@ -20,7 +19,7 @@ public class QueryMvcSolutionItem {
     public HashMap<String, String> dataRow;
 
     public QueryMvcSolutionItem(QuerySolution qs, List<String> headers) {
-        NodeFormatterTTL nf = new NodeFormatterTTL(null, Prefixes.getPrefixMap());
+        NodeFormatterTTL nf = new NodeFormatterTTL(null, ServiceConfig.PREFIX.getPrefixMap());
         dataRow = new HashMap<>();
         for (String key : headers) {
             RDFNode node = qs.get(key);

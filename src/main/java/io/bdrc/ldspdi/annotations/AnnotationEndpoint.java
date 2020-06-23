@@ -57,7 +57,9 @@ public class AnnotationEndpoint {
     public static final String ANC_PREFIX = "http://purl.bdrc.io/anncollection/";
 
     @GetMapping(value = "/{res}")
-    public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable("res") String res, @RequestHeader(value = "Accept", required = false) String accept, HttpServletRequest request, HttpServletResponse response) throws RestException {
+    public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable("res") String res,
+            @RequestHeader(value = "Accept", required = false) String accept, HttpServletRequest request, HttpServletResponse response)
+            throws RestException {
         log.info("Call to getResourceGraph() with URL: {}, accept: {}", request.getServletPath(), accept);
         MediaType mediaType;
         // spec says that when the Accept: header is absent, JSON-LD should be answered
@@ -97,13 +99,15 @@ public class AnnotationEndpoint {
         // return ResponseEntity.ok().body(Helpers.getModelStream(model, ext, ANN_PREFIX
         // + res, docType));
         response = AnnotationUtils.setRespHeaders(response, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, docType));
+        return (ResponseEntity<StreamingResponseBody>) ResponseEntity.ok().contentType(mediaType)
+                .body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, docType, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     @GetMapping(value = "/{res}.{ext}")
     // these are always W3C web annotations, maybe there could be another endpoint
     // for OA
-    public Object getResourceGraphSuffix(@PathVariable("res") String res, @PathVariable("ext") final String ext, HttpServletRequest request) throws RestException {
+    public Object getResourceGraphSuffix(@PathVariable("res") String res, @PathVariable("ext") final String ext, HttpServletRequest request)
+            throws RestException {
         log.info("Call to getResourceGraphSuffix() with URL: {}", request.getServletPath());
         MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null) {
@@ -118,7 +122,8 @@ public class AnnotationEndpoint {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes));
         BodyBuilder bb = ResponseEntity.ok();
         bb = AnnotationUtils.setRespHeaders(bb, request.getServletPath(), ext, "Choice", null, mediaType, false);
-        return (ResponseEntity<StreamingResponseBody>) bb.body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, DocType.ANN));
+        return (ResponseEntity<StreamingResponseBody>) bb
+                .body(StreamingHelpers.getModelStream(model, ext, ANN_PREFIX + res, DocType.ANN, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     static int getJsonLdMode(final MediaType mediaType) {

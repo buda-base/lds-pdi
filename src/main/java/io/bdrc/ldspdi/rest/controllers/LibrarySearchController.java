@@ -48,7 +48,6 @@ public class LibrarySearchController {
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
 
-    
     @GetMapping(value = "/lib/{file}")
     public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, HttpServletResponse response,
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
@@ -64,7 +63,8 @@ public class LibrarySearchController {
         switch (file) {
         case "ChunksByPage":
         case "Chunks":
-            // in these cases we filter out the response according to the restrictions of the etext
+            // in these cases we filter out the response according to the restrictions of
+            // the etext
             return filteredChunkResponse(request, model, format);
         case "workFacetGraph":
         case "instanceFacetGraph":
@@ -91,14 +91,13 @@ public class LibrarySearchController {
         }
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
     }
-    
+
     public ResponseEntity<StreamingResponseBody> filteredChunkResponse(final HttpServletRequest request, final Model m, final String format) {
         // find admin data:
         final ResIterator admDataI = m.listResourcesWithProperty(m.createProperty(ADM, "adminAbout"));
         if (!admDataI.hasNext()) {
             log.info("can't find adminAbout in the results, return 404");
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getStream("\"Nothing found\""));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found\""));
         }
         final Resource admData = admDataI.next();
         final Resource access = admData.getPropertyResourceValue(m.createProperty(ADM, "access"));
@@ -107,26 +106,25 @@ public class LibrarySearchController {
         final Statement ricS = admData.getProperty(m.createProperty(ADM, "restrictedInChina"));
         if (access == null || status == null || ricS == null) {
             log.info("can't find access, status or restrictedInChina in the results, return 404");
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getStream("\"Nothing found\""));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found\""));
         }
         boolean ric = ricS.getBoolean();
         if (ric && GeoLocation.isFromChina(request)) {
             return ResponseEntity.status(451).cacheControl(CacheControl.noCache()).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getStream("\"Etext not available in your geographical area\""));
         }
-        // we filter out the triples that are only useful for the filter and not to the actual answer:
+        // we filter out the triples that are only useful for the filter and not to the
+        // actual answer:
         m.removeAll(admData, null, null);
         if (m.isEmpty())
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getStream("\"Nothing found\""));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found\""));
         Access acc = (Access) request.getAttribute("access");
         if (acc == null)
             acc = new Access();
         final AccessLevel al = acc.hasResourceAccess(access.getLocalName(), status.getLocalName(), einst.getURI());
         if (al != AccessLevel.OPEN) {
-            return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache()).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getStream("\"Insufficient rights\""));
+            return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache())
+                    .contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Insufficient rights\""));
         }
         CacheControl cc = CacheControl.maxAge(CorsFilter.ACCESS_CONTROL_MAX_AGE_IN_SECONDS, TimeUnit.SECONDS);
         if (!access.getLocalName().equals("AccessOpen") || ric) {
@@ -140,7 +138,7 @@ public class LibrarySearchController {
         }
         final String ext = BudaMediaTypes.getExtFromMime(mediaType);
         return ResponseEntity.status(200).contentType(mediaType).cacheControl(cc)
-                .body(StreamingHelpers.getModelStream(m, ext, einst.getURI(), null));
+                .body(StreamingHelpers.getModelStream(m, ext, einst.getURI(), null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
 }
