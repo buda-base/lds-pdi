@@ -123,6 +123,7 @@ public class LdsQuery {
             converted = new HashMap<>();
         }
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query, ServiceConfig.PREFIX.getPrefixMapping());
+
         for (String st : getAllParams()) {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (converted.get(st) != null) {
@@ -177,11 +178,13 @@ public class LdsQuery {
                         }
                     }
                 } else {
-                    // Some literals do not have a lang associated with them
-                    if (limit) {
-                        queryStr.setLiteral(st, converted.get(st));
-                    } else {
-                        queryStr.setLiteral(st, converted.get(st));
+                    if (converted.get(st) != null) {
+                        // Some literals do not have a lang associated with them
+                        if (limit) {
+                            queryStr.setLiteral(st, converted.get(st));
+                        } else {
+                            queryStr.setLiteral(st, converted.get(st));
+                        }
                     }
                 }
             }
@@ -351,11 +354,11 @@ public class LdsQuery {
         try {
             ServiceConfig.init();
             HashMap<String, String> map = new HashMap<>();
-            LdsQuery lds = new LdsQuery("lds-queries/library/personFacetGraphTest.arq");
+            LdsQuery lds = new LdsQuery("lds-queries/public/OntologyUiStrings.arq");
             // LdsQueryNew lds = new LdsQueryNew("lds-queries/public/Etexts_count.arq");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
             map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
-            map.put("L_NAME", "\"'od zer\"");
+            map.put("L_LNG", "en");
             map.put("LG_NAME", "bo-x-ewts");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
