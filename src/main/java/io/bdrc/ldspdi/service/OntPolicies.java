@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -19,6 +18,9 @@ import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 
@@ -78,8 +80,7 @@ public class OntPolicies {
         try {
             HashMap<String, OntPolicy> map = new HashMap<>();
             String graph = "";
-            OntDocumentManager odm = new OntDocumentManager(policiesUrl);
-            FileManager fm = odm.getFileManager();
+            FileManager fm = FileManager.get().clone(); // the global FileManager
             InputStream stream = null;
             if (type.equals(CORE_TYPE)) {
                 stream = new FileInputStream(policiesUrl);
@@ -89,6 +90,7 @@ public class OntPolicies {
             }
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
+            // mod.write(System.out, "TURTLE");
             ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             String defGraph = null;
@@ -159,6 +161,11 @@ public class OntPolicies {
 
     public static HashMap<String, OntPolicy> getMapShapes() {
         return mapShapes;
+    }
+
+    public static void main(String... arg) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.init();
+        OntPolicies.init();
     }
 
 }

@@ -97,12 +97,9 @@ public class OntData /* implements Runnable */ {
             Model md = ModelFactory.createDefaultModel();
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = null;
-            // if (!ServiceConfig.isInChina()) {
-            // odm = new OntDocumentManager(ServiceConfig.getProperty("ontPoliciesUrl"));
-            // } else {
             odm = new OntDocumentManager(System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf");
-            // }
             odm.setProcessImports(false);
+            oms.setDocumentManager(odm);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {

@@ -89,7 +89,6 @@ public class GitService /* implements Runnable */ {
                 log.error("Git was unable to setup repository at init time " + localGit.getPath() + " directory ", ex.getMessage());
             }
             commit = updateRepo(localRepo);
-
         }
         return commit;
     }
@@ -110,11 +109,12 @@ public class GitService /* implements Runnable */ {
             throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
         String commitId = null;
         try {
-            log.info("LOCAL REPO >> {}", localRepo);
+            log.info("UPDATING LOCAL REPO >> {}", localRepo);
             Git git = new Git(localRepo);
             git.pull().call();
             git.close();
             commitId = localRepo.resolve(Constants.HEAD).getName().substring(0, 7);
+            log.info("LOCAL REPO >> {} was updated with commit {}", localRepo, commitId);
         } catch (Exception ex) {
             log.error(" Git was unable to pull in directory {}, message: {}", localRepo, ex.getMessage());
         }
