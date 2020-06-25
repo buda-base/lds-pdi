@@ -26,8 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,9 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -454,8 +452,8 @@ public class PublicDataController {
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
             return getOntologyResourceAsFile(request, parts[1]);
         }
-        if (ServiceConfig.SERVER_ROOT.equals("purl.btttdrc.io")) {
-            // if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
+        // if (ServiceConfig.SERVER_ROOT.equals("localhost:8080")) {
+        if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
             log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
             boolean isBase = false;
             String baseUri = "";
@@ -477,24 +475,21 @@ public class PublicDataController {
                 if (format != null) {
                     log.info("getExtOntologyHomePage IS BASE and Format is >> {}", format);
                     MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
-                    log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
+                    log.info("getExtOntologyHomePage VARIANT is >> {} and path is {}", mediaType, baseUri);
                     if (mediaType == null) {
                         return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                     }
-                    String url = OntPolicies.getOntologyByBase(baseUri).getFileUri();
+                    String url = OntPolicies.getOntologyByBase(baseUri).getFile().replace("RDF", "owl-schema");
+                    log.info("getExtOntologyHomePage FILE URI is >> {} and path is {}", url, baseUri);
                     // using cache if available
                     byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
                     if (byteArr == null) {
-                        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                        URLConnection connection = (URLConnection) new URL(url).openConnection();
                         InputStream input = connection.getInputStream();
                         byteArr = IOUtils.toByteArray(input);
                         input.close();
                         ResultsCache.addToCache(byteArr, url.hashCode());
                     }
-                    OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
-                    OntDocumentManager odm = new OntDocumentManager();
-                    odm.setProcessImports(false);
-                    oms.setDocumentManager(odm);
                     OntModel om = OntData.getOntModelByBase(baseUri);
                     OntData.setOntModel(om);
                     om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
@@ -518,7 +513,7 @@ public class PublicDataController {
                 }
                 if (format != null) {
                     MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
-                    log.info("getExtOntologyHomePage VARIANT is >> {}", mediaType);
+                    log.info("getExtOntologyHomePage VARIANT NOT BASE is >> {} and path is {}", mediaType, tmp);
                     if (mediaType == null) {
                         return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                     }
