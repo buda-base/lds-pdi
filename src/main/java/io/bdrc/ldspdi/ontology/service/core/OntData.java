@@ -185,6 +185,7 @@ public class OntData /* implements Runnable */ {
     }
 
     private static void updateFusekiDataset() throws RestException {
+        OntPolicies.init();
         log.info("FUSEKI URL IS >>" + fusekiUrl);
         log.info("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
                 parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/"));
