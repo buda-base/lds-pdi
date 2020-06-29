@@ -53,7 +53,6 @@ public class LibrarySearchController {
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
             @RequestHeader("Accept") String format) throws RestException {
         log.info("Call to getLibGraphGet() with template name >> " + file);
-        Helpers.setCacheControl(response, "public");
         HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
         final String query = qfp.getParametizedQuery(map, true);
@@ -85,10 +84,12 @@ public class LibrarySearchController {
             res = TypeResults.getResultsMap(model);
             break;
         default:
+            Helpers.setCacheControl(response, "public");
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query " + file);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
+        Helpers.setCacheControl(response, "public");
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
     }
 
