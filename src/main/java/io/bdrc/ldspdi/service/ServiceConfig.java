@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.libraries.LibProps;
 import io.bdrc.libraries.Prefix;
 
 public class ServiceConfig {
@@ -84,6 +85,7 @@ public class ServiceConfig {
             } else {
                 log.info("using default properties");
             }
+            LibProps.init(prop);
             SERVER_ROOT = prop.getProperty("serverRoot");
             PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
             OntPolicies.init();
@@ -112,7 +114,8 @@ public class ServiceConfig {
              * AuthProps.init(prop); }
              */
             AuthProps.init(prop);
-            PREFIX = new Prefix(System.getProperty("user.dir") + "/src/test/resources/prefixes.txt");
+            LibProps.init(prop);
+            PREFIX = new Prefix("src/test/resources/prefixes.txt");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -150,6 +153,13 @@ public class ServiceConfig {
 
     public static String getRobots() {
         return "User-agent: *" + System.lineSeparator() + "Disallow: /";
+    }
+
+    public static void main(String... arg) throws JsonParseException, JsonMappingException, IOException {
+        ServiceConfig.initForTests("");
+        System.out.println(LibProps.getProperty("jsonldContextFile"));
+        String tmp = LibProps.getProperty("jsonldContextFile");
+        FileInputStream in = new FileInputStream(tmp);
     }
 
 }

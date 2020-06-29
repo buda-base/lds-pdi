@@ -247,7 +247,7 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.13.5</version>
+      <version>0.13.7</version>
     </dependency> 
     <!-- https://mvnrepository.com/artifact/org.seaborne.rdf-delta/rdf-delta-server-local -->
     <dependency>
