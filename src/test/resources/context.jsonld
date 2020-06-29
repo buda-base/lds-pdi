@@ -1,0 +1,523 @@
+
+{
+  "@context" : {
+    "type" : "@type",
+    "@vocab" : "http://purl.bdrc.io/ontology/core/",
+    "adm" : "http://purl.bdrc.io/ontology/admin/",
+    "bdd" : "http://purl.bdrc.io/data/",
+    "bf" : "http://id.loc.gov/ontologies/bibframe/",
+    "bdo" : "http://purl.bdrc.io/ontology/core/",
+    "bdr" : "http://purl.bdrc.io/resource/",
+    "bdan" : "http://purl.bdrc.io/annotation/",
+    "bdac" : "http://purl.bdrc.io/anncollection/",
+    "owl" : "http://www.w3.org/2002/07/owl#",
+    "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+    "skos" : "http://www.w3.org/2004/02/skos/core#",
+    "tbr" : "http://purl.bdrc.io/ontology/toberemoved/",
+    "tmp" : "http://purl.bdrc.io/ontology/tmp/",
+    "vcard" : "http://www.w3.org/2006/vcard/ns#",
+    "xsd" : "http://www.w3.org/2001/XMLSchema#",
+    "contentProvider" : {
+      "@type" : "@id"
+    },
+    "corporationHasMember" : {
+      "@type" : "@id"
+    },
+    "corporationMember" : {
+      "@type" : "@id"
+    },
+    "corporationMemberType" : {
+      "@type" : "@id"
+    },
+    "corporationRegion" : {
+      "@type" : "@id"
+    },
+    "creator" : {
+      "@type" : "@id"
+    },
+    "eTextHasChunk" : {
+      "@type" : "@id"
+    },
+    "eTextHasPage" : {
+      "@type" : "@id"
+    },
+    "eTextInItem" : {
+      "@type" : "@id"
+    },
+    "eTextResource" : {
+      "@type" : "@id"
+    },
+    "eventPeriod" : {
+      "@type" : "@id"
+    },
+    "eventWhere" : {
+      "@type" : "@id"
+    },
+    "eventWho" : {
+      "@type" : "@id"
+    },
+    "hasAunt" : {
+      "@type" : "@id"
+    },
+    "hasBrother" : {
+      "@type" : "@id"
+    },
+    "hasBrotherInLaw" : {
+      "@type" : "@id"
+    },
+    "hasChild" : {
+      "@type" : "@id"
+    },
+    "hasCousin" : {
+      "@type" : "@id"
+    },
+    "hasDaughter" : {
+      "@type" : "@id"
+    },
+    "hasDimensions" : {
+      "@type" : "xsd:anyURI"
+    },
+    "hasFather" : {
+      "@type" : "@id"
+    },
+    "hasFatherInLaw" : {
+      "@type" : "@id"
+    },
+    "hasGrandChild" : {
+      "@type" : "@id"
+    },
+    "hasGrandParent" : {
+      "@type" : "@id"
+    },
+    "hasGranddaughter" : {
+      "@type" : "@id"
+    },
+    "hasGrandfather" : {
+      "@type" : "@id"
+    },
+    "hasGrandmother" : {
+      "@type" : "@id"
+    },
+    "hasGrandson" : {
+      "@type" : "@id"
+    },
+    "hasHusband" : {
+      "@type" : "@id"
+    },
+    "hasInLaw" : {
+      "@type" : "@id"
+    },
+    "hasIncarnation" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationActivities" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationBody" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationGeneral" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationMind" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationQualities" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationSpeech" : {
+      "@type" : "@id"
+    },
+    "hasIncarnationYangtse" : {
+      "@type" : "@id"
+    },
+    "hasManifest" : {
+      "@type" : "@id"
+    },
+    "hasMaternalAunt" : {
+      "@type" : "@id"
+    },
+    "hasMaternalUncle" : {
+      "@type" : "@id"
+    },
+    "hasMother" : {
+      "@type" : "@id"
+    },
+    "hasMotherInLaw" : {
+      "@type" : "@id"
+    },
+    "hasNephew" : {
+      "@type" : "@id"
+    },
+    "hasNibling" : {
+      "@type" : "@id"
+    },
+    "hasNiece" : {
+      "@type" : "@id"
+    },
+    "hasOlderBrother" : {
+      "@type" : "@id"
+    },
+    "hasOlderSister" : {
+      "@type" : "@id"
+    },
+    "hasParent" : {
+      "@type" : "@id"
+    },
+    "hasParentInLaw" : {
+      "@type" : "@id"
+    },
+    "hasParentSibling" : {
+      "@type" : "@id"
+    },
+    "hasPaternalAunt" : {
+      "@type" : "@id"
+    },
+    "hasPaternalUncle" : {
+      "@type" : "@id"
+    },
+    "hasSibling" : {
+      "@type" : "@id"
+    },
+    "hasSiblingInLaw" : {
+      "@type" : "@id"
+    },
+    "hasSister" : {
+      "@type" : "@id"
+    },
+    "hasSisterInLaw" : {
+      "@type" : "@id"
+    },
+    "hasSon" : {
+      "@type" : "@id"
+    },
+    "hasSpouse" : {
+      "@type" : "@id"
+    },
+    "hasUncle" : {
+      "@type" : "@id"
+    },
+    "hasUnknownKinship" : {
+      "@type" : "@id"
+    },
+    "hasWife" : {
+      "@type" : "@id"
+    },
+    "hasYoungerBrother" : {
+      "@type" : "@id"
+    },
+    "hasYoungerSister" : {
+      "@type" : "@id"
+    },
+    "incarnationActivities" : {
+      "@type" : "@id"
+    },
+    "incarnationBody" : {
+      "@type" : "@id"
+    },
+    "incarnationGeneral" : {
+      "@type" : "@id"
+    },
+    "incarnationMind" : {
+      "@type" : "@id"
+    },
+    "incarnationQualities" : {
+      "@type" : "@id"
+    },
+    "incarnationSpeech" : {
+      "@type" : "@id"
+    },
+    "incarnationYangtse" : {
+      "@type" : "@id"
+    },
+    "isIncarnation" : {
+      "@type" : "@id"
+    },
+    "instanceOf" : {
+      "@type" : "@id"
+    },
+    "itemForInstance" : {
+      "@type" : "@id"
+    },
+    "itemHasVolume" : {
+      "@type" : "@id"
+    },
+    "itemLibrary" : {
+      "@type" : "@id"
+    },
+    "kinWith" : {
+      "@type" : "@id"
+    },
+    "language" : {
+      "@type" : "@id"
+    },
+    "lineageDownFrom" : {
+      "@type" : "@id"
+    },
+    "lineageDownTo" : {
+      "@type" : "@id"
+    },
+    "lineageFrom" : {
+      "@type" : "@id"
+    },
+    "lineageHolder" : {
+      "@type" : "@id"
+    },
+    "lineageObject" : {
+      "@type" : "@id"
+    },
+    "lineageReceived" : {
+      "@type" : "@id"
+    },
+    "lineageRef" : {
+      "@type" : "@id"
+    },
+    "lineageType" : {
+      "@type" : "@id"
+    },
+    "lineageWho" : {
+      "@type" : "@id"
+    },
+    "lineageWork" : {
+      "@type" : "@id"
+    },
+    "note" : {
+      "@type" : "@id"
+    },
+    "noteSource" : {
+      "@type" : "@id"
+    },
+    "pageHasLine" : {
+      "@type" : "@id"
+    },
+    "paginatedBy" : {
+      "@type" : "@id"
+    },
+    "personEvent" : {
+      "@type" : "@id"
+    },
+    "personEventCorporation" : {
+      "@type" : "@id"
+    },
+    "personEventRole" : {
+      "@type" : "@id"
+    },
+    "personGender" : {
+      "@type" : "@id"
+    },
+    "personHasConsort" : {
+      "@type" : "@id"
+    },
+    "personName" : {
+      "@type" : "@id"
+    },
+    "personOfSect" : {
+      "@type" : "@id"
+    },
+    "personStudentOf" : {
+      "@type" : "@id"
+    },
+    "personTeacherOf" : {
+      "@type" : "@id"
+    },
+    "placeAddress" : {
+      "@type" : "@id"
+    },
+    "placeContains" : {
+      "@type" : "@id"
+    },
+    "placeEvent" : {
+      "@type" : "@id"
+    },
+    "placeEventAffiliation" : {
+      "@type" : "@id"
+    },
+    "placeIsNear" : {
+      "@type" : "@id"
+    },
+    "placeLocatedIn" : {
+      "@type" : "@id"
+    },
+    "placeType" : {
+      "@type" : "@id"
+    },
+    "script" : {
+      "@type" : "@id"
+    },
+    "seeAlso" : {
+      "@type" : "@id"
+    },
+    "sliceEndChunk" : {
+      "@type" : "bdo:SliceLoc"
+    },
+    "sliceStartChunk" : {
+      "@type" : "bdo:SliceLoc"
+    },
+    "taxHasSubClass" : {
+      "@type" : "@id"
+    },
+    "taxSubClassOf" : {
+      "@type" : "@id"
+    },
+    "taxSubclassRelation" : {
+      "@type" : "@id"
+    },
+    "transliteration" : {
+      "@type" : "@id"
+    },
+    "volumeHasEtext" : {
+      "@type" : "@id"
+    },
+    "volumeOf" : {
+      "@type" : "@id"
+    },
+    "workDerivativeOf" : {
+      "@type" : "@id"
+    },
+    "workEvent" : {
+      "@type" : "@id"
+    },
+    "instanceEvent" : {
+      "@type" : "@id"
+    },
+    "workGenre" : {
+      "@type" : "@id"
+    },
+    "workHasDerivative" : {
+      "@type" : "@id"
+    },
+    "workHasTranslation" : {
+      "@type" : "@id"
+    },
+    "workHasInstance" : {
+      "@type" : "@id"
+    },
+    "instanceHasItem" : {
+      "@type" : "@id"
+    },
+    "itemHasVolume" : {
+      "@type" : "@id"
+    },
+    "serialHasMember" : {
+      "@type" : "@id"
+    },
+    "serialInstanceOf" : {
+      "@type" : "@id"
+    },
+    "serialMemberOf" : {
+      "@type" : "@id"
+    },
+    "serialHasInstance" : {
+      "@type" : "@id"
+    },
+    "hasPart" : {
+      "@type" : "@id"
+    },
+    "instanceHasReproduction" : {
+      "@type" : "@id"
+    },
+    "workHasSite" : {
+      "@type" : "@id"
+    },
+    "hasSourcePrintery" : {
+      "@type" : "@id"
+    },
+    "workHasTranslation" : {
+      "@type" : "@id"
+    },
+    "workIsAbout" : {
+      "@type" : "@id"
+    },
+    "workIsSimilarTo" : {
+      "@type" : "@id"
+    },
+    "bf:identifiedBy" : {
+      "@type" : "@id"
+    },
+    "contentLocation" : {
+      "@type" : "@id"
+    },
+    "contentLocationInstance" : {
+      "@type" : "@id"
+    },
+    "material" : {
+      "@type" : "@id"
+    },
+    "workPagination" : {
+      "@type" : "@id"
+    },
+    "partOf" : {
+      "@type" : "@id"
+    },
+    "partType" : {
+      "@type" : "@id"
+    },
+    "workReproductionOf" : {
+      "@type" : "@id"
+    },
+    "hasTitle" : {
+      "@type" : "@id"
+    },
+    "workTranslationOf" : {
+      "@type" : "@id"
+    },
+    "workType" : {
+      "@type" : "@id"
+    },
+    "adm:access" : {
+      "@type" : "@id"
+    },
+    "adm:convertToClass" : {
+      "@type" : "@id"
+    },
+    "adm:license" : {
+      "@type" : "@id"
+    },
+    "adm:logDate" : {
+      "@type" : "xsd:dateTime"
+    },
+    "adm:logEntry" : {
+      "@type" : "@id"
+    },
+    "adm:logWho" : {
+      "@type" : "@id"
+    },
+    "adm:outline" : {
+      "@type" : "@id"
+    },
+    "adm:outlineLogEntry" : {
+      "@type" : "@id"
+    },
+    "adm:outlineType" : {
+      "@type" : "@id"
+    },
+    "adm:place_TLM_taxonomy" : {
+      "@type" : "@id"
+    },
+    "adm:productHasOrg" : {
+      "@type" : "@id"
+    },
+    "adm:productIncludes" : {
+      "@type" : "@id"
+    },
+    "adm:status" : {
+      "@type" : "@id"
+    },
+    "adm:workInProduct" : {
+      "@type" : "@id"
+    },
+    "rdf:subject" : {
+      "@type" : "@id"
+    },
+    "rdf:predicate" : {
+      "@type" : "@id"
+    },
+    "adm:supportedBy" : {
+      "@type" : "@id"
+    },
+    "adm:contradictedBy" : {
+      "@type" : "@id"
+    }
+  }
+}
