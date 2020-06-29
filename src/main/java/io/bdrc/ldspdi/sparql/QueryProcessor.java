@@ -117,8 +117,7 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         final int hash = Objects.hashCode(query);
-        // Model model = (Model) ResultsCache.getObjectFromCache(hash);
-        Model model = null;
+        Model model = (Model) ResultsCache.getObjectFromCache(hash);
         if (model == null) {
             log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
@@ -141,8 +140,13 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
-        Model m = rvf.fetch(ServiceConfig.getProperty(graph));
+        final int hash = Objects.hashCode("authModel");
+        Model m = (Model) ResultsCache.getObjectFromCache(hash);
+        if (m == null) {
+            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            m = rvf.fetch(ServiceConfig.getProperty(graph));
+            ResultsCache.addToCache(m, hash);
+        }
         return m;
     }
 
