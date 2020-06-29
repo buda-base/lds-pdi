@@ -112,6 +112,7 @@ public class ServiceConfig {
              * AuthProps.init(prop); }
              */
             AuthProps.init(prop);
+            PREFIX = new Prefix("prefixes.txt");
         } catch (IOException ex) {
             ex.printStackTrace();
         }

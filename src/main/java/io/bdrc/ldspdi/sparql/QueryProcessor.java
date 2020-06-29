@@ -117,8 +117,7 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         final int hash = Objects.hashCode(query);
-        // Model model = (Model) ResultsCache.getObjectFromCache(hash);
-        Model model = null;
+        Model model = (Model) ResultsCache.getObjectFromCache(hash);
         if (model == null) {
             log.trace("executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
