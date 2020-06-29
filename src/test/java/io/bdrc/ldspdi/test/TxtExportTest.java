@@ -10,7 +10,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
@@ -49,12 +48,12 @@ public class TxtExportTest {
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        fusekiUrl = "http://localhost:2252/newcorerw";
+        fusekiUrl = "http://localhost:22152/newcorerw";
         ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         // Creating a fuseki server
-        server = FusekiServer.create().port(2252).add("/newcorerw", srvds).build();
+        server = FusekiServer.create().port(22152).add("/newcorerw", srvds).build();
         server.start();
     }
 
@@ -66,14 +65,13 @@ public class TxtExportTest {
 
     @Test
     public void testSimpleRequestSimple() throws NumberFormatException, URISyntaxException, ClientProtocolException, IOException {
-        URI uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(Integer.parseInt(environment.getProperty("local.server.port")))
-                .setPath("/resource/UT11577_004_0000.txt").setParameter("startChar", Integer.toString(1234))
-                .setParameter("endChar", Integer.toString(2444)).build();
+        URI uri = new URI(
+                "http://localhost:" + environment.getProperty("local.server.port") + "/resource/UT11577_004_0000.txt?startChar=1234&endChar=2444");
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet(uri);
         HttpResponse resp = client.execute(get);
         System.out.println(resp.getStatusLine());
-        //resp.getEntity().writeTo(System.out);
+        // resp.getEntity().writeTo(System.out);
         assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 }
