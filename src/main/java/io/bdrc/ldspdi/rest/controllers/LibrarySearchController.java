@@ -97,9 +97,7 @@ public class LibrarySearchController {
         final ResIterator admDataI = m.listResourcesWithProperty(m.createProperty(ADM, "adminAbout"));
         if (!admDataI.hasNext()) {
             log.info("can't find adminAbout in the results, return 404");
-            //return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (adminAbout)\""));
-            return ResponseEntity.status(200).contentType(BudaMediaTypes.MT_TTL)
-                    .body(StreamingHelpers.getModelStream(m, "ttl", null, null, ServiceConfig.PREFIX.getPrefixMap()));
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (adminAbout)\""));
         }
         final Resource admData = admDataI.next();
         final Resource access = admData.getPropertyResourceValue(m.createProperty(ADM, "access"));
@@ -117,7 +115,7 @@ public class LibrarySearchController {
         }
         // we filter out the triples that are only useful for the filter and not to the
         // actual answer:
-        m.removeAll(admData, null, null);
+        //m.removeAll(admData, null, null);
         if (m.isEmpty())
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (empty)\""));
         Access acc = (Access) request.getAttribute("access");
