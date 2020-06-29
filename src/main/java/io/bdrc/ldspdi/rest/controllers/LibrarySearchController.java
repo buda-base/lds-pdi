@@ -97,7 +97,9 @@ public class LibrarySearchController {
         final ResIterator admDataI = m.listResourcesWithProperty(m.createProperty(ADM, "adminAbout"));
         if (!admDataI.hasNext()) {
             log.info("can't find adminAbout in the results, return 404");
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (adminAbout)\""));
+            //return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (adminAbout)\""));
+            return ResponseEntity.status(200).contentType(BudaMediaTypes.MT_TTL)
+                    .body(StreamingHelpers.getModelStream(m, "ttl", null, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         final Resource admData = admDataI.next();
         final Resource access = admData.getPropertyResourceValue(m.createProperty(ADM, "access"));
