@@ -88,15 +88,15 @@
     </c:if>
     
     
-<c:if test = "${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri()).size()>0}">
+<c:if test = "${OntData.getOwlCharacteristics().getOwlProps(model.getUri()).size()>0}">
 <b>Characteristics: </b>
-<c:forEach items="${OntData.getOwlCharacteristics(true).getOwlProps(model.getUri())}" var="owlprop"> 
- <a href="${owlprop}">${OntData.getOwlCharacteristics(true).getPrefixed(owlprop)}</a> 
+<c:forEach items="${OntData.getOwlCharacteristics().getOwlProps(model.getUri())}" var="owlprop"> 
+ <a href="${owlprop}">${OntData.getOwlCharacteristics().getPrefixed(owlprop)}</a> 
 </c:forEach>
 </c:if>
-<c:if test = "${OntData.getOwlCharacteristics(true).isInverseOfProp(model.getUri())}">
-<b>Is Inverse of: </b><a href="${OntData.getOwlCharacteristics(true).getInverseOfProp(model.getUri())}">
-${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacteristics(true).getInverseOfProp(model.getUri()))}</a>
+<c:if test = "${OntData.getOwlCharacteristics().isInverseOfProp(model.getUri())}">
+<b>Is Inverse of: </b><a href="${OntData.getOwlCharacteristics().getInverseOfProp(model.getUri())}">
+${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics().getInverseOfProp(model.getUri()))}</a>
 </c:if>
 
 <!-- SUB PROPS -->
@@ -138,10 +138,10 @@ ${OntData.getOwlCharacteristics(true).getShortInverse(OntData.getOwlCharacterist
         
     </c:if> 
     <!-- PARENT PROPS -->
-    <c:if test = "${model.getParentProps(true).size()>0}">
+    <c:if test = "${model.getParentProps().size()>0}">
         <h3>Parent properties: </h3>
         
-        <c:forEach items="${model.getParentProps(true)}" var="prop">         
+        <c:forEach items="${model.getParentProps()}" var="prop">         
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            

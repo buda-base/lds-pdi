@@ -43,8 +43,7 @@
 <td style="vertical-align:middle;text-align:center;font-size:28px">${ServiceConfig.getProperty("ontName")} - Ontology homepage<br></td>
 </tr>
 </table>
-
-
+<c:set var="baseUri" value="${path}"/>
 <p style="text-align:center;font-size:20px;"><b>Ontology details</b></p>
 <p style="text-align:center;font-size:16px;">
 <a href="#prefixes">Prefixes</a> / 
@@ -56,41 +55,41 @@
 
 <!-- PREFIXES -->
 <a name="prefixes"></a> 
-<p style="text-align:center;font-size:20px;"><b>${OntData.getNumPrefixes(false)} Prefixes</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getNumPrefixes(baseUri)} Prefixes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>prefix</th><th>name space</th></tr>
-<c:forEach items="${OntData.getPrefixMap(false).keySet()}" var="k">
+<c:forEach items="${OntData.getPrefixMap(baseUri).keySet()}" var="k">
     <c:set var="val" value="${k}"/>
-    <tr><td>${k}:</td><td>${OntData.getPrefixMap(false).get(val)}</td></tr>
+    <tr><td>${k}:</td><td>${OntData.getPrefixMap(baseUri).get(val)}</td></tr>
 </c:forEach> 
 </table> 
 
 <!-- ROOT CLASSES -->
 <a name="root"></a>
-<p style="text-align:center;font-size:20px;"><b>${OntData.getNumRootClasses()} simple root classes</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getNumRootClasses(baseUri)} simple root classes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
-<c:forEach items="${OntData.getOntRootClasses()}" var="root">    
+<c:forEach items="${OntData.getOntRootClasses(path)}" var="root">    
     <tr><td><a href="${root.getUri()}">${root.getId()}</a></td></tr>
 </c:forEach> 
 </table> 
 
 <!-- ALL CLASSES -->
 <a name="all"></a>
-<p style="text-align:center;font-size:20px;"><b>${OntData.getAllClasses().size()} classes</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllClasses(baseUri).size()} classes</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th></tr>
-<c:forEach items="${OntData.getAllClasses()}" var="cls">    
+<c:forEach items="${OntData.getAllClasses(baseUri)}" var="cls">    
     <tr><td><a href="${cls.getURI()}">${OntData.ontAllMod.shortForm(cls.getURI())}</a></td></tr>
 </c:forEach> 
 </table>
 
 <!-- ALL PROPERTIES -->
 <a name="allprops"></a>
-<p style="text-align:center;font-size:20px;"><b>${OntData.getAllProps().size()} properties</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllProps(baseUri).size()} properties</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>local name</th><th>property type</th></tr>
-<c:forEach items="${OntData.getAllProps()}" var="prop">    
+<c:forEach items="${OntData.getAllProps(baseUri)}" var="prop">    
     <tr><td><a href="${prop.getURI()}">${OntData.ontAllMod.shortForm(prop.getURI())}</a></td>
     <td><c:choose>
                 <c:when test="${prop.isObjectProperty() || prop.isInverseFunctionalProperty()}">
@@ -109,20 +108,20 @@
 
 <!-- ALL INDIVIDUALS -->
 <a name="indiv"></a>
-<p style="text-align:center;font-size:20px;"><b>${OntData.getAllIndividuals().size()} individuals</b></p>
+<p style="text-align:center;font-size:20px;"><b>${OntData.getAllIndividuals(baseUri).size()} individuals</b></p>
 <table style="width:55%;margin:auto">
 <tr><th>Local name</th><th> Class</th></tr>
-<c:forEach items="${OntData.getAllIndividuals()}" var="ind">    
+<c:forEach items="${OntData.getAllIndividuals(baseUri)}" var="ind">    
     <tr><td><a href="${ind.getURI()}">${OntData.ontAllMod.shortForm(ind.getURI())}</a></td><td><a href="${ind.getRDFType()}">${ind.getRDFType().getLocalName()}</a></td></tr>
 </c:forEach> 
 </table>
 
 <!-- ALL IMPORTS -->
 <a name="imports"></a>
-<c:if test = "${OntData.ontMod.listImportedOntologyURIs().size()>0}">
+<c:if test = "${OntData.getOntModelByBase(baseUri).listImportedOntologyURIs().size()>0}">
 <p style="text-align:center;font-size:20px;"><b>Ontology imports</b></p>
 <table style="width:55%;margin:auto">
-<c:forEach items="${OntData.ontMod.listImportedOntologyURIs()}" var="i">
+<c:forEach items="${OntData.getOntModelByBase(baseUri).listImportedOntologyURIs()}" var="i">
 <tr><td><a href="${i}">${i}</a></td></tr>
 </c:forEach>
 </table>

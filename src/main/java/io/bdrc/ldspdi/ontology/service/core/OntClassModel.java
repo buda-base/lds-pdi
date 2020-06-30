@@ -23,14 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
-import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -50,13 +46,9 @@ public class OntClassModel {
     protected String uri;
     protected OntClass clazz;
 
-    public OntClassModel(String uri, boolean global) {
+    public OntClassModel(String uri) {
         this.uri = uri;
-        if (global) {
-            clazz = OntData.ontAllMod.getOntClass(uri);
-        } else {
-            clazz = OntData.ontMod.getOntClass(uri);
-        }
+        clazz = OntData.ontAllMod.getOntClass(uri);
     }
 
     public OntClassModel(OntClass c) {
@@ -69,9 +61,10 @@ public class OntClassModel {
         return clazz != null;
     }
 
-    public boolean isRootClassModel() {
-        return OntData.getOntRootClasses().contains(this);
-    }
+    /*
+     * public boolean isRootClassModel() { return
+     * OntData.getOntRootClasses().contains(this); }
+     */
 
     public String getUri() {
         return uri;
@@ -89,9 +82,9 @@ public class OntClassModel {
         return clazz.getLocalName();
     }
 
-    public ArrayList<OntClassModel> getParent(boolean global) {
+    public ArrayList<OntClassModel> getParent() {
         if (clazz.getSuperClass() != null) {
-            return new OntClassParent(uri, global).getParents();
+            return new OntClassParent(uri).getParents();
         }
         return null;
     }
@@ -167,19 +160,16 @@ public class OntClassModel {
         return comments;
     }
 
-    public List<OntProperty> getAllClassProperties() {
-        ArrayList<OntProperty> list = new ArrayList<>();
-        Triple tp = new Triple(Node.ANY, ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain").asNode(),
-                ResourceFactory.createResource(uri).asNode());
-        ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp);
-        while (ext.hasNext()) {
-            Triple tpp = ext.next();
-            String st = tpp.getSubject().getURI();
-            OntProperty prop = OntData.ontMod.getOntProperty(st);
-            list.add(prop);
-        }
-        return list;
-    }
+    /*
+     * public List<OntProperty> getAllClassProperties() { ArrayList<OntProperty>
+     * list = new ArrayList<>(); Triple tp = new Triple(Node.ANY,
+     * ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#domain")
+     * .asNode(), ResourceFactory.createResource(uri).asNode());
+     * ExtendedIterator<Triple> ext = OntData.ontMod.getGraph().find(tp); while
+     * (ext.hasNext()) { Triple tpp = ext.next(); String st =
+     * tpp.getSubject().getURI(); OntProperty prop =
+     * OntData.ontMod.getOntProperty(st); list.add(prop); } return list; }
+     */
 
     public List<Property> getAdminAnnotProps() {
         ArrayList<Property> list = new ArrayList<>();

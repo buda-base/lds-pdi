@@ -3,10 +3,8 @@ package io.bdrc.ldspdi.ontology.service.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jena.ontology.InverseFunctionalProperty;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.OntResource;
-import org.apache.jena.ontology.SymmetricProperty;
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -45,15 +43,12 @@ public class OntPropModel {
     public List<String[]> commentsLang;
     public OntProperty prop;
 
-    public OntPropModel(String uri, boolean global) {
+    public OntPropModel(String uri) {
         this.uri = uri;
-        if (global) {
-            this.name = OntData.ontAllMod.shortForm(uri);
-            prop = OntData.ontAllMod.getOntProperty(uri);
-        } else {
-            this.name = OntData.ontMod.shortForm(uri);
-            prop = OntData.ontMod.getOntProperty(uri);
-        }
+
+        this.name = OntData.ontAllMod.shortForm(uri);
+        prop = OntData.ontAllMod.getOntProperty(uri);
+
         comments = new ArrayList<>();
         commentsLang = new ArrayList<>();
         if (prop != null) {
@@ -63,22 +58,18 @@ public class OntPropModel {
             }
         }
         StmtIterator it = null;
-        if (global) {
-            it = ((Model) OntData.ontAllMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
 
-        } else {
-            it = ((Model) OntData.ontMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
+        it = ((Model) OntData.ontAllMod).listStatements(ResourceFactory.createResource(uri), (Property) null, (RDFNode) null);
 
-        }
         while (it.hasNext()) {
             Statement st = it.next();
             String pred = st.getPredicate().getURI();
             switch (pred) {
             case DOMAIN:
-                domain = getRdfListElements(st, global);
+                domain = getRdfListElements(st);
                 break;
             case RANGE:
-                range = getRdfListElements(st, global);
+                range = getRdfListElements(st);
                 break;
             case LABEL:
                 this.label = st.getObject().asLiteral().getString();
@@ -96,7 +87,7 @@ public class OntPropModel {
         }
     }
 
-    public ArrayList<String> getRdfListElements(Statement st, boolean global) {
+    public ArrayList<String> getRdfListElements(Statement st) {
         ArrayList<String> elts = new ArrayList<>();
         if (st.getObject().isURIResource()) {
             this.domainUri = st.getObject().asNode().getURI();
@@ -105,11 +96,7 @@ public class OntPropModel {
         }
         Resource rs = null;
         if (st.getObject().isAnon()) {
-            if (global) {
-                rs = OntData.ontAllMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
-            } else {
-                rs = OntData.ontMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
-            }
+            rs = OntData.ontAllMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
             StmtIterator stmt = rs.listProperties(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#unionOf"));
             while (stmt.hasNext()) {
                 List<RDFNode> list = stmt.next().getObject().asResource().as(RDFList.class).asJavaList();
@@ -123,41 +110,37 @@ public class OntPropModel {
         return elts;
     }
 
-    public ArrayList<OntPropModel> getAllSubProps(boolean global) throws RestException {
-        ArrayList<OntResource> res = OntData.getSubProps(uri, global);
+    public ArrayList<OntPropModel> getAllSubProps() throws RestException {
+        ArrayList<OntResource> res = OntData.getSubProps(uri);
         ArrayList<OntPropModel> list = new ArrayList<>();
         for (OntResource r : res) {
-            list.add(new OntPropModel(r.getURI(), global));
+            list.add(new OntPropModel(r.getURI()));
         }
         return list;
     }
 
-    public ArrayList<OntPropModel> getParentProps(boolean global) throws RestException {
-        ArrayList<OntResource> res = OntData.getParentProps(uri, global);
+    public ArrayList<OntPropModel> getParentProps() throws RestException {
+        ArrayList<OntResource> res = OntData.getParentProps(uri);
         ArrayList<OntPropModel> list = new ArrayList<>();
         for (OntResource r : res) {
             if (r != null && r.isURIResource()) {
-                list.add(new OntPropModel(r.getURI(), global));
+                list.add(new OntPropModel(r.getURI()));
             }
         }
         return list;
     }
 
-    public String getSymmetricProp() {
-        SymmetricProperty prop = OntData.ontMod.getSymmetricProperty(getUri());
-        if (prop != null) {
-            return prop.asProperty().getRDFType().getURI();
-        }
-        return null;
-    }
+    /*
+     * public String getSymmetricProp() { SymmetricProperty prop =
+     * OntData.ontMod.getSymmetricProperty(getUri()); if (prop != null) { return
+     * prop.asProperty().getRDFType().getURI(); } return null; }
+     */
 
-    public String getInverseProp() {
-        InverseFunctionalProperty prop = OntData.ontMod.getInverseFunctionalProperty(getUri());
-        if (prop != null) {
-            return prop.asProperty().getRDFType().getURI();
-        }
-        return null;
-    }
+    /*
+     * public String getInverseProp() { InverseFunctionalProperty prop =
+     * OntData.ontMod.getInverseFunctionalProperty(getUri()); if (prop != null) {
+     * return prop.asProperty().getRDFType().getURI(); } return null; }
+     */
 
     public String getUri() {
         return uri;

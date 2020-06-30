@@ -22,14 +22,9 @@ public class OntClassParent {
 
     final static Logger log = LoggerFactory.getLogger(OntClassParent.class);
 
-    public OntClassParent(String uri, boolean global) {
+    public OntClassParent(String uri) {
         this.uri = uri;
-        this.global = global;
-        if (global) {
-            sup3r = OntData.ontAllMod.getOntClass(uri).getSuperClass();
-        } else {
-            sup3r = OntData.ontMod.getOntClass(uri).getSuperClass();
-        }
+        sup3r = OntData.ontAllMod.getOntClass(uri).getSuperClass();
         isAnonymous = sup3r.isAnon();
     }
 
@@ -39,7 +34,7 @@ public class OntClassParent {
             UnionClass uc = sup3r.asUnionClass();
             List<RDFNode> sups = uc.getOperands().asJavaList();
             for (RDFNode node : sups) {
-                list.add(new OntClassModel(node.asResource().getURI(), global));
+                list.add(new OntClassModel(node.asResource().getURI()));
             }
         } else {
             list.add(new OntClassModel(sup3r));

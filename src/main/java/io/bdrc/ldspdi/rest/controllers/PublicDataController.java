@@ -452,8 +452,8 @@ public class PublicDataController {
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
             return getOntologyResourceAsFile(request, parts[1]);
         }
-        // if (ServiceConfig.SERVER_ROOT.equals("localhost:8080")) {
-        if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
+        if (ServiceConfig.SERVER_ROOT.equals("localhost:8080")) {
+            // if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
             log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
             boolean isBase = false;
             String baseUri = "";
@@ -491,12 +491,11 @@ public class PublicDataController {
                         ResultsCache.addToCache(byteArr, url.hashCode());
                     }
                     OntModel om = OntData.getOntModelByBase(baseUri);
-                    OntData.setOntModel(om);
                     om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
                     // browser request : serving html page
                     if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                         ModelAndView model = new ModelAndView();
-                        model.addObject("path", path);
+                        model.addObject("path", baseUri);
                         model.setViewName("ontologyHome");
                         return (ModelAndView) model;
                     } else {
@@ -517,9 +516,9 @@ public class PublicDataController {
                     if (mediaType == null) {
                         return (ResponseEntity<String>) ResponseEntity.status(406).body("No acceptable Accept header");
                     }
-                    if (OntData.isClass(tmp, true)) {
+                    if (OntData.isClass(tmp)) {
                         log.info("CLASS>>" + tmp);
-                        OntClassModel ocm = new OntClassModel(tmp, true);
+                        OntClassModel ocm = new OntClassModel(tmp);
                         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                             ModelAndView model = new ModelAndView();
                             model.addObject("model", ocm);
@@ -529,7 +528,7 @@ public class PublicDataController {
 
                     } else {
                         log.info("PROP>>" + tmp);
-                        OntPropModel opm = new OntPropModel(tmp, true);
+                        OntPropModel opm = new OntPropModel(tmp);
                         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                             ModelAndView model = new ModelAndView();
                             model.addObject("model", opm);

@@ -65,7 +65,6 @@ import io.bdrc.ldspdi.utils.Helpers;
 public class OntData /* implements Runnable */ {
 
     public static InfModel infMod;
-    public static OntModel ontMod;
     public static OntModel ontAllMod;
     public static OntModel ontAuthMod;
     public static OWLPropsCharacteristics owlCharacteristics;
@@ -139,14 +138,6 @@ public class OntData /* implements Runnable */ {
         modelsBase.put(baseUri, om);
     }
 
-    public static void setOntModelWithBase(String baseUri) throws RestException {
-        ontMod = getOntModelByBase(baseUri);
-    }
-
-    public static void setOntModel(OntModel mod) throws RestException {
-        ontMod = mod;
-    }
-
     public static OntModel getOntModelByBase(String baseUri) throws RestException {
         return modelsBase.get(baseUri);
     }
@@ -171,10 +162,6 @@ public class OntData /* implements Runnable */ {
         lastUpdated = Calendar.getInstance().getTime();
         update = Long.toString(System.currentTimeMillis());
     }
-
-    /*
-     * public static EntityTag getEntityTag() { return update; }
-     */
 
     public static String getEntityTag() {
         return update;
@@ -206,13 +193,9 @@ public class OntData /* implements Runnable */ {
 
     }
 
-    public static OWLPropsCharacteristics getOwlCharacteristics(boolean global) throws IOException, RestException {
+    public static OWLPropsCharacteristics getOwlCharacteristics() throws IOException, RestException {
         if (owlCharacteristics == null) {
-            if (global) {
-                owlCharacteristics = new OWLPropsCharacteristics(ontAllMod);
-            } else {
-                owlCharacteristics = new OWLPropsCharacteristics(ontMod);
-            }
+            owlCharacteristics = new OWLPropsCharacteristics(ontAllMod);
         }
         return owlCharacteristics;
     }
@@ -223,126 +206,75 @@ public class OntData /* implements Runnable */ {
         return qexec.execDescribe();
     }
 
-    public static ArrayList<OntResource> getDomainUsages(final String uri, boolean global) throws RestException {
+    public static ArrayList<OntResource> getDomainUsages(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "    ?s rdfs:domain <" + uri
                 + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
-        if (global) {
-            qexec = QueryExecutionFactory.create(query, ontAllMod);
-        } else {
-            qexec = QueryExecutionFactory.create(query, ontMod);
-        }
+
+        qexec = QueryExecutionFactory.create(query, ontAllMod);
+
         final ResultSet res = qexec.execSelect();
         final ArrayList<OntResource> list = new ArrayList<>();
         while (res.hasNext()) {
             final QuerySolution qs = res.next();
             final RDFNode node = qs.get("?s");
-            if (global) {
-                list.add(ontAllMod.getOntResource(node.asResource().getURI()));
-            } else {
-                list.add(ontMod.getOntResource(node.asResource().getURI()));
-            }
+
+            list.add(ontAllMod.getOntResource(node.asResource().getURI()));
+
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getRangeUsages(final String uri, boolean global) throws RestException {
+    public static ArrayList<OntResource> getRangeUsages(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {" + "    ?s rdfs:range <"
                 + uri + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
-        if (global) {
-            qexec = QueryExecutionFactory.create(query, ontAllMod);
-        } else {
-            qexec = QueryExecutionFactory.create(query, ontMod);
-        }
+        qexec = QueryExecutionFactory.create(query, ontAllMod);
         final ResultSet res = qexec.execSelect();
         final ArrayList<OntResource> list = new ArrayList<>();
         while (res.hasNext()) {
             final QuerySolution qs = res.next();
             final RDFNode node = qs.get("?s");
-            if (global) {
-                list.add(ontAllMod.getOntResource(node.asResource().getURI()));
-            } else {
-                list.add(ontMod.getOntResource(node.asResource().getURI()));
-            }
+            list.add(ontAllMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getSubProps(final String uri, boolean global) throws RestException {
+    public static ArrayList<OntResource> getSubProps(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s ?p where {"
                 + "    ?s rdfs:subPropertyOf <" + uri + "> ." + "} order by ?p ?s";
         QueryExecution qexec = null;
-        if (global) {
-            qexec = QueryExecutionFactory.create(query, ontAllMod);
-        } else {
-            qexec = QueryExecutionFactory.create(query, ontMod);
-        }
+        qexec = QueryExecutionFactory.create(query, ontAllMod);
         final ResultSet res = qexec.execSelect();
         final ArrayList<OntResource> list = new ArrayList<>();
         while (res.hasNext()) {
             final QuerySolution qs = res.next();
             final RDFNode node = qs.get("?s");
-            if (global) {
-                list.add(ontAllMod.getOntResource(node.asResource().getURI()));
-            } else {
-                list.add(ontMod.getOntResource(node.asResource().getURI()));
-            }
+            list.add(ontAllMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getParentProps(final String uri, boolean global) throws RestException {
+    public static ArrayList<OntResource> getParentProps(final String uri) throws RestException {
         final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   <" + uri
                 + "> rdfs:subPropertyOf ?s ." + "} order by ?s";
         QueryExecution qexec = null;
-        if (global) {
-            qexec = QueryExecutionFactory.create(query, ontAllMod);
-        } else {
-            qexec = QueryExecutionFactory.create(query, ontMod);
-        }
+        qexec = QueryExecutionFactory.create(query, ontAllMod);
         final ResultSet res = qexec.execSelect();
         final ArrayList<OntResource> list = new ArrayList<>();
         while (res.hasNext()) {
             final QuerySolution qs = res.next();
             final RDFNode node = qs.get("?s");
-            if (global) {
-                list.add(ontAllMod.getOntResource(node.asResource().getURI()));
-            } else {
-                list.add(ontMod.getOntResource(node.asResource().getURI()));
-            }
+            list.add(ontAllMod.getOntResource(node.asResource().getURI()));
         }
         return list;
     }
 
-    public static ArrayList<OntResource> getSubClassesOf(final String uri, boolean global) throws RestException {
-        final String query = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + " select distinct ?s where {" + "   ?s rdfs:subClassOf <"
-                + uri + "> ." + "} order by ?s";
-        QueryExecution qexec = null;
-        if (global) {
-            qexec = QueryExecutionFactory.create(query, ontAllMod);
-        } else {
-            qexec = QueryExecutionFactory.create(query, ontMod);
-        }
-        final ResultSet res = qexec.execSelect();
-        final ArrayList<OntResource> list = new ArrayList<>();
-        while (res.hasNext()) {
-            final QuerySolution qs = res.next();
-            final RDFNode node = qs.get("?s");
-            if (global) {
-                list.add(ontAllMod.getOntResource(node.asResource().getURI()));
-            } else {
-                list.add(ontMod.getOntResource(node.asResource().getURI()));
-            }
-        }
-        return list;
-    }
-
-    public static HashMap<String, ArrayList<OntResource>> getAllSubProps(final String uri, boolean global) throws RestException {
-        final ArrayList<OntResource> props = OntData.getDomainUsages(uri, global);
+    public static HashMap<String, ArrayList<OntResource>> getAllSubProps(final String uri) throws RestException {
+        final ArrayList<OntResource> props = OntData.getDomainUsages(uri);
         final HashMap<String, ArrayList<OntResource>> map = new HashMap<>();
         for (final OntResource rs : props) {
-            final ArrayList<OntResource> l = OntData.getSubProps(rs.getURI(), global);
+            final ArrayList<OntResource> l = OntData.getSubProps(rs.getURI());
             if (l.size() > 1) {
                 map.put(rs.getURI(), l);
             }
@@ -350,13 +282,9 @@ public class OntData /* implements Runnable */ {
         return map;
     }
 
-    public static boolean isClass(final String uri, boolean global) {
+    public static boolean isClass(final String uri) {
         OntModel md = null;
-        if (global) {
-            md = ontAllMod;
-        } else {
-            md = ontMod;
-        }
+        md = ontAllMod;
         if (md.getOntResource(uri) != null) {
             return md.getOntResource(uri).isClass();
         } else {
@@ -364,25 +292,16 @@ public class OntData /* implements Runnable */ {
         }
     }
 
-    public static int getNumPrefixes(boolean global) {
-        if (global) {
-            return ontAllMod.numPrefixes();
-        } else {
-            return ontMod.numPrefixes();
-        }
-
+    public static int getNumPrefixes(String baseUri) throws RestException {
+        return OntData.getOntModelByBase(baseUri).numPrefixes();
     }
 
-    public static Map<String, String> getPrefixMap(boolean global) {
-        if (global) {
-            return ontAllMod.getNsPrefixMap();
-        } else {
-            return ontMod.getNsPrefixMap();
-        }
+    public static Map<String, String> getPrefixMap(String baseUri) throws RestException {
+        return OntData.getOntModelByBase(baseUri).getNsPrefixMap();
     }
 
-    public static int getNumRootClasses() {
-        return getSimpleRootClasses().size();
+    public static int getNumRootClasses(String baseuri) throws RestException {
+        return getSimpleRootClasses(baseuri).size();
     }
 
     /**
@@ -391,10 +310,11 @@ public class OntData /* implements Runnable */ {
      * traversal of classes defined in the ontology.
      *
      * @return list of simple root OntClass(es)
+     * @throws RestException
      */
-    public static List<OntClass> getSimpleRootClasses() {
+    public static List<OntClass> getSimpleRootClasses(String baseUri) throws RestException {
         // Iterator<OntClass> it = ontMod.listHierarchyRootClasses();
-        Iterator<OntClass> it = ontMod.listClasses();
+        Iterator<OntClass> it = OntData.getOntModelByBase(baseUri).listClasses();
         final List<OntClass> rez = new ArrayList<>();
         while (it.hasNext()) {
             try {
@@ -410,8 +330,8 @@ public class OntData /* implements Runnable */ {
         return rez;
     }
 
-    public static List<OntClassModel> getOntRootClasses() {
-        final List<OntClass> roots = getSimpleRootClasses();
+    public static List<OntClassModel> getOntRootClasses(String baseUri) throws RestException {
+        final List<OntClass> roots = getSimpleRootClasses(baseUri);
         final List<OntClassModel> models = new ArrayList<>();
         for (final OntClass root : roots) {
             if (!root.isAnon()) {
@@ -422,8 +342,8 @@ public class OntData /* implements Runnable */ {
         return models;
     }
 
-    public static ArrayList<OntClass> getAllClasses() {
-        final ExtendedIterator<OntClass> it = ontMod.listClasses();
+    public static ArrayList<OntClass> getAllClasses(String baseUri) throws RestException {
+        final ExtendedIterator<OntClass> it = OntData.getOntModelByBase(baseUri).listClasses();
         final ArrayList<OntClass> classes = new ArrayList<>();
         while (it.hasNext()) {
             final OntClass ocl = it.next();
@@ -435,8 +355,8 @@ public class OntData /* implements Runnable */ {
         return classes;
     }
 
-    public static ArrayList<OntProperty> getAllProps() {
-        final ExtendedIterator<OntProperty> it = ontMod.listAllOntProperties();
+    public static ArrayList<OntProperty> getAllProps(String baseUri) throws RestException {
+        final ExtendedIterator<OntProperty> it = OntData.getOntModelByBase(baseUri).listAllOntProperties();
         final ArrayList<OntProperty> list = new ArrayList<>();
         while (it.hasNext()) {
             final OntProperty pr = it.next();
@@ -448,8 +368,8 @@ public class OntData /* implements Runnable */ {
         return list;
     }
 
-    public static List<Individual> getAllIndividuals() {
-        final List<Individual> indv = ontMod.listIndividuals().toList();
+    public static List<Individual> getAllIndividuals(String baseUri) throws RestException {
+        final List<Individual> indv = OntData.getOntModelByBase(baseUri).listIndividuals().toList();
         Collections.sort(indv, individualComparator);
         return indv;
     }
