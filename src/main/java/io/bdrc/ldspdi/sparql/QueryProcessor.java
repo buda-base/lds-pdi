@@ -119,14 +119,18 @@ public class QueryProcessor {
         final int hash = Objects.hashCode(query);
         Model model = (Model) ResultsCache.getObjectFromCache(hash);
         if (model == null) {
-            log.trace("executing query: {}", query);
+            log.info("getGraph: executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
             RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
             // RDFConnection conn =
             // RDFConnectionRemote.create().destination(fusekiUrl).build();
             model = rvf.queryConstruct(q);
+            log.info("getGraph: got model from query, size: {}", model.size());
             ResultsCache.addToCache(model, hash);
             rvf.close();
+            log.info("getGraph: put model in cache, hash {}", hash);
+        } else {
+            log.info("getGraph: got model from cache, hash {}, size: {}", hash, model.size());
         }
         return model;
     }
