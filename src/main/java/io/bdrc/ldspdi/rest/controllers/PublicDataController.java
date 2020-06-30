@@ -452,8 +452,8 @@ public class PublicDataController {
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);
             return getOntologyResourceAsFile(request, parts[1]);
         }
-        if (ServiceConfig.SERVER_ROOT.equals("localhost:8080")) {
-            // if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
+        // if (ServiceConfig.SERVER_ROOT.equals("localhost:8080")) {
+        if (ServiceConfig.SERVER_ROOT.equals("purl.bdrc.io")) {
             log.info("getExtOntologyHomePage WAS CALLED WITH >> base : {}/ other:{} and format: {}", base, other, format);
             boolean isBase = false;
             String baseUri = "";
