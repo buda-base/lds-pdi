@@ -100,10 +100,10 @@ ${OntData.getOwlCharacteristics().getShortInverse(OntData.getOwlCharacteristics(
 </c:if>
 
 <!-- SUB PROPS -->
-    <c:if test = "${model.getAllSubProps(true).size()>0}">
+    <c:if test = "${model.getAllSubProps().size()>0}">
         <h3>Sub properties: </h3>
         
-        <c:forEach items="${model.getAllSubProps(true)}" var="prop"> 
+        <c:forEach items="${model.getAllSubProps()}" var="prop"> 
         <table id="specs" style="width:60%;"> 
         <tr><th></th><th>${prop.getName()}</th></tr>          
             <tr><td><b>Uri:</b></td><td> <a href="${prop.getUri()}">${prop.getUri()}</a></td></tr>            

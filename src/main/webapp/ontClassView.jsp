@@ -104,16 +104,16 @@
     </c:if>
     <br>
     <!-- DOMAIN SUB PROPERTIES -->
-    <c:if test = "${OntData.getAllSubProps(uri,true).keySet().size()>0}">
+    <c:if test = "${OntData.getAllSubProps(uri).keySet().size()>0}">
     <table id="specs">
         <tr><th>Sub properties applying to the ${model.getId()} domain:</th></tr>
         <tr><td style="font-size:16px;line-height: 1.6;">
-        <c:forEach items="${OntData.getAllSubProps(uri,true).keySet()}" var="key">
+        <c:forEach items="${OntData.getAllSubProps(uri).keySet()}" var="key">
         <c:set var="k" value="${key}"/>
         <table style="margin-left:50px;">
             <tr><td><i><b>Sub properties of ${key}</b></i></td></tr>
             <tr><td>
-            <c:forEach items="${OntData.getAllSubProps(uri,true).get(k)}" var="pr">
+            <c:forEach items="${OntData.getAllSubProps(uri).get(k)}" var="pr">
                 <a href="${pr.getURI()}">${pr.getLocalName()}</a> /
             </c:forEach>
             </td></tr>
