@@ -38,6 +38,8 @@ public class ShaclDataController {
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("getShaclOntGraph() for path {} ", request.getRequestURL());
+        Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", OntShapesData.getCommitId());
         return processShapeUrl(request.getRequestURL().toString(), false, response);
     }
 
@@ -46,6 +48,8 @@ public class ShaclDataController {
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("getShaclOntResGraph() for path {} ", request.getRequestURL());
+        Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", OntShapesData.getCommitId());
         return processShapeUrl(request.getRequestURL().toString(), true, response);
     }
 
@@ -53,6 +57,8 @@ public class ShaclDataController {
     public ResponseEntity<StreamingResponseBody> getShaclAllOntGraph(@RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
+        Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", OntShapesData.getCommitId());
         log.info("getShaclAllOntGraph {} ", request.getRequestURL());
         String url = request.getRequestURL().toString();
         Model m = OntShapesData.getFullModel();

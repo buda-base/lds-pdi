@@ -77,12 +77,12 @@ public class OntData /* implements Runnable */ {
     static String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     static List<AnnotationProperty> adminAnnotProps;
     private String payload;
-    private String commitId;
+    private static String commitId;
 
-    public OntData(String payload, String commitId) {
+    public OntData(String payload, String commit) {
         super();
         this.payload = payload;
-        this.commitId = commitId;
+        commitId = commit;
     }
 
     public void init() {
@@ -163,8 +163,12 @@ public class OntData /* implements Runnable */ {
         update = Long.toString(System.currentTimeMillis());
     }
 
-    public static String getEntityTag() {
-        return update;
+    /*
+     * public static String getEntityTag() { return update; }
+     */
+
+    public static String getOntCommitId() {
+        return commitId;
     }
 
     public static Date getLastUpdated() {

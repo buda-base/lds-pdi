@@ -144,7 +144,7 @@ public class PublicDataController {
         log.info("Call to getJsonContext()");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
         return ResponseEntity.ok().cacheControl(CacheControl.maxAge(86400, TimeUnit.SECONDS).cachePublic())
-                .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
+                .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getOntCommitId()).body(OntData.JSONLD_CONTEXT);
     }
 
     @GetMapping(value = "/admindata/{res:.+}")
@@ -444,6 +444,7 @@ public class PublicDataController {
     public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format,
             @PathVariable String base) throws RestException, IOException {
         Helpers.setCacheControl(resp, "public");
+        resp.setHeader("ETag", OntData.getOntCommitId());
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
