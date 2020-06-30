@@ -39,7 +39,6 @@ public class ShaclDataController {
             throws RestException, IOException {
         log.info("getShaclOntGraph() for path {} ", request.getRequestURL());
         Helpers.setCacheControl(response, "public");
-        response.setHeader("ETag", OntShapesData.getCommitId());
         return processShapeUrl(request.getRequestURL().toString(), false, response);
     }
 
@@ -49,7 +48,6 @@ public class ShaclDataController {
             throws RestException, IOException {
         log.info("getShaclOntResGraph() for path {} ", request.getRequestURL());
         Helpers.setCacheControl(response, "public");
-        response.setHeader("ETag", OntShapesData.getCommitId());
         return processShapeUrl(request.getRequestURL().toString(), true, response);
     }
 
@@ -75,7 +73,7 @@ public class ShaclDataController {
             mt = BudaMediaTypes.MT_TTL;
             extension = "ttl";
         }
-        return ResponseEntity.ok().contentType(mt)
+        return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
                 .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
@@ -108,7 +106,7 @@ public class ShaclDataController {
         }
         Helpers.setCacheControl(response, "public");
         if (m != null && m.size() > 0) {
-            return ResponseEntity.ok().contentType(mt)
+            return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
                     .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)

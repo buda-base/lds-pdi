@@ -444,7 +444,6 @@ public class PublicDataController {
     public Object getExtOntologyHomePage(HttpServletResponse resp, HttpServletRequest request, @RequestHeader("Accept") String format,
             @PathVariable String base) throws RestException, IOException {
         Helpers.setCacheControl(resp, "public");
-        resp.setHeader("ETag", OntData.getOntCommitId());
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path, request.getServletPath());
         String other = request.getServletPath().substring(base.length() + 2);
@@ -602,11 +601,11 @@ public class PublicDataController {
                 return ResponseEntity.status(404).body("No model found for " + params.getBaseUri());
             }
             if (reasoner != null) {
-                return ResponseEntity.ok().header("Profile", reasonerUri)
+                return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Profile", reasonerUri)
                         .header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
             }
-            return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
-                    .body(baos.toString());
+            return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
+                    .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
 
             res = res.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
@@ -632,8 +631,8 @@ public class PublicDataController {
                         wr.write(model, baos, null);
                     }
                 }
-                return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
-                        .body(baos.toString());
+                return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
+                        .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
             } else {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
                 return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
