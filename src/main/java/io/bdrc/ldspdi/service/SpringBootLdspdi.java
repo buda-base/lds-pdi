@@ -53,7 +53,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         // Pull lds-queries repo from git if not in china
         if (!ServiceConfig.isInChina()) {
             GitService gs = new GitService(0);
-            gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
+            String commit = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
+            ServiceConfig.setQueriesCommit(commit);
         }
         TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");

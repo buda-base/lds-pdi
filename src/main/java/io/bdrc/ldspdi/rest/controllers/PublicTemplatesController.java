@@ -81,6 +81,7 @@ public class PublicTemplatesController {
             @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl, @PathVariable("file") String file) throws RestException {
         log.info("Call to getQueryTemplateResults() {}, params: {}", file, request.getParameterMap()); // Settings
         Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", ServiceConfig.getQueriesCommit());
         ModelAndView model = new ModelAndView();
         try {
             HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
@@ -165,6 +166,7 @@ public class PublicTemplatesController {
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
             @RequestBody HashMap<String, String> map) throws RestException {
         Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", ServiceConfig.getQueriesCommit());
         try {
             log.info("Call to getQueryTemplateResultsJsonPost() with params : {}", map);
             if (map == null || map.size() == 0) {
@@ -210,6 +212,7 @@ public class PublicTemplatesController {
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
             @RequestParam(value = "format", defaultValue = "jsonld") final String format, @PathVariable("file") String file) throws RestException {
         Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", ServiceConfig.getQueriesCommit());
         MediaType mediaType = null;
         Model model = null;
         String ext = null;
@@ -267,6 +270,7 @@ public class PublicTemplatesController {
             @RequestHeader(value = "Accept", defaultValue = "application/ld+json") String accept, @PathVariable("file") String file,
             HttpServletResponse response, HttpServletRequest request, @RequestBody HashMap<String, String> map) throws RestException {
         Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", ServiceConfig.getQueriesCommit());
         if (accept.equals("*/*")) {
             accept = "application/ld+json";
         }

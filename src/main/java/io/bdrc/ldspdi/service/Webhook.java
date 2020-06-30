@@ -55,6 +55,7 @@ public class Webhook implements Runnable {
         if (GitService.QUERIES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
+                ServiceConfig.setQueriesCommit(commitId);
             } catch (RevisionSyntaxException | IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
