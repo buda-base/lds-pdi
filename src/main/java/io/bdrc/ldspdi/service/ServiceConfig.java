@@ -53,7 +53,9 @@ public class ServiceConfig {
     // the jar
     public static void init() throws JsonParseException, JsonMappingException, IOException {
         try {
+            log.info("user.dir = "+System.getProperty("user.dir"));
             LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            log.info("LOCAL_QUERIES_DIR = "+LOCAL_QUERIES_DIR);
             LOCAL_SHAPES_DIR = System.getProperty("user.dir") + "/editor-templates/";
             LOCAL_ONT_DIR = System.getProperty("user.dir") + "/owl-schema/";
             log.info("getting properties from packaged ldspdi.properties");
@@ -86,9 +88,10 @@ public class ServiceConfig {
             } else {
                 log.info("using default properties");
             }
+            prop.setProperty("jsonldContextFile", LOCAL_ONT_DIR+"context.jsonld");
             LibProps.init(prop);
             SERVER_ROOT = prop.getProperty("serverRoot");
-            PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
+            PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
             OntPolicies.init();
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
@@ -104,7 +107,7 @@ public class ServiceConfig {
     }
 
     public static void loadPrefixes() {
-        PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
+        PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {

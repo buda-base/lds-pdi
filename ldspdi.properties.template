@@ -85,23 +85,12 @@ qs_pageSize=100
 
 # Used by the io.bdrc.taxonomy package, for results of special queries in lib/
 
-# If you want to use a different taxonomy, you can put its root here:
-taxonomyRoot=http://purl.bdrc.io/resource/O9TAXTBRC201605
+# If you want to use a different taxonomy, you can put its root here. Default is not to use a taxonomy.
+#taxonomyRoot=http://purl.bdrc.io/resource/O9TAXTBRC201605
 
 # the path of the sparql query for fetching the taxonomy tree.
 # Do not change unless you know what you're doing
 taxtreeArqFile=Taxtree.arq
-
-#### Ontology ####
-
-# Ontology management policies 
-# defines all the properties of each ontology along with all imports
-# to be used by a OntDocumentManager. Do not change if you want to use the BDO
-ontPoliciesUrl=https://raw.githubusercontent.com/buda-base/owl-schema/master/ont-policy.rdf
-
-# Json context url : points to a url serving the jsonld context that will be served on /context.jsonld
-jsonContextURL=https://raw.githubusercontent.com/buda-base/owl-schema/master/context.jsonld
-
 
 #### Headers and cache ####
 
