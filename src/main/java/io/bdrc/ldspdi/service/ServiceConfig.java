@@ -53,7 +53,9 @@ public class ServiceConfig {
     // the jar
     public static void init() throws JsonParseException, JsonMappingException, IOException {
         try {
+            log.info("user.dir = "+System.getProperty("user.dir"));
             LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
+            log.info("LOCAL_QUERIES_DIR = "+LOCAL_QUERIES_DIR);
             LOCAL_SHAPES_DIR = System.getProperty("user.dir") + "/editor-templates/";
             LOCAL_ONT_DIR = System.getProperty("user.dir") + "/owl-schema/";
             log.info("getting properties from packaged ldspdi.properties");
