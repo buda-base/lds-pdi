@@ -88,6 +88,7 @@ public class ServiceConfig {
             } else {
                 log.info("using default properties");
             }
+            prop.setProperty("jsonldContextFile", LOCAL_ONT_DIR+"context.jsonld");
             LibProps.init(prop);
             SERVER_ROOT = prop.getProperty("serverRoot");
             PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
