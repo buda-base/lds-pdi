@@ -56,7 +56,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             String commit = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
             ServiceConfig.setQueriesCommit(commit);
         }
-        TaxModel.fetchModel();
+        if (ServiceConfig.getProperty("taxonomyRoot") != null)
+            TaxModel.fetchModel();
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication.run(SpringBootLdspdi.class, args);
     }
