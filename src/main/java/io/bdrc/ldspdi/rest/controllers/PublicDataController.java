@@ -664,9 +664,10 @@ public class PublicDataController {
     }
 
     @GetMapping(value = "/ontology/data/{ext}")
-    public Object getAllOntologyData(HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
+    public Object getAllOntologyData(HttpServletRequest request, HttpServletResponse resp, @PathVariable("ext") String ext) throws RestException {
         log.info("Call to getAllOntologyData(); with ext {}", ext);
         Model model = OntData.ontAllMod;
+        Helpers.setCacheControl(resp, "public");
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
         // Inference here if required
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

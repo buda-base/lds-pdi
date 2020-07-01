@@ -43,8 +43,11 @@ public class CorsFilter implements Filter {
         ((HttpServletResponse) response).addHeader("Access-Control-Allow-Credentials", "true");
         ((HttpServletResponse) response).addHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
         ((HttpServletResponse) response).addHeader("Access-Control-Allow-Headers",
-                "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Keep-Alive, User-Agent, If-Modified-Since, If-None-Match, Cache-Control");
-        ((HttpServletResponse) response).addHeader("Access-Control-Expose-Headers", "ETag, Last-Modified, Content-Type, Cache-Control, Vary, Access-Control-Max-Age");
+
+                "Origin, Accept, X-Requested-With, Content-Type, " + "Access-Control-Request-Method, Access-Control-Request-Headers, "
+                        + "Authorization, Keep-Alive, User-Agent, If-Modified-Since, If-None-Match, Cache-Control");
+        ((HttpServletResponse) response).addHeader("Access-Control-Expose-Headers",
+                "ETag, Last-Modified, Content-Type, Cache-Control, Vary, Access-Control-Max-Age");
         // ((HttpServletResponse) response).addHeader("Access-Control-Max-Age",
         // "private," + Integer.toString(ACCESS_CONTROL_MAX_AGE_IN_SECONDS));
         chain.doFilter(request, response);
