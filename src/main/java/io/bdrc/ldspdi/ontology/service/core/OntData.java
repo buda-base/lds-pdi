@@ -144,13 +144,7 @@ public class OntData /* implements Runnable */ {
 
     public static void readGithubJsonLDContext() throws MalformedURLException, IOException {
         InputStream stream = null;
-        if (!ServiceConfig.isInChina()) {
-            URL url = new URL(ServiceConfig.getProperty("jsonContextURL"));
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            stream = connection.getInputStream();
-        } else {
-            stream = new FileInputStream(ServiceConfig.getProperty("ontologyRootDir") + "owl-schema/context.jsonld");
-        }
+        stream = new FileInputStream(ServiceConfig.LOCAL_ONT_DIR + "context.jsonld");
         BufferedReader in = new BufferedReader(new InputStreamReader(stream));
         StringBuilder st = new StringBuilder();
         String line;
