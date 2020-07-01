@@ -83,7 +83,7 @@ public class Helpers {
     }
 
     public static void setCacheControl(HttpServletResponse resp, String pubpriv) {
-        resp.setHeader(HttpHeaders.CACHE_CONTROL, pubpriv + "," + MAX_AGE_VALUE);
+        resp.setHeader(HttpHeaders.CACHE_CONTROL, pubpriv + ",max-age=" + MAX_AGE_VALUE);
     }
 
     public static void createDirIfNotExists(String dir) {
