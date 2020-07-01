@@ -124,20 +124,22 @@ public class PublicTemplatesController {
             if ("json".equals(fmt)) {
                 Results r = new Results(res, hm);
                 byte[] buff = GlobalHelpers.getJsonBytes(r);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(MediaType.APPLICATION_JSON)
-                        .header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentLength(buff.length)
+                        .contentType(MediaType.APPLICATION_JSON).header("Content-Disposition", "attachment; filename=\"" + file + ".json\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
             if ("csv".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, true);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentLength(buff.length)
+                        .contentType(BudaMediaTypes.MT_CSV)
                         .header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
 
             }
             if ("csv_f".equals(fmt)) {
                 byte[] buff = res.getCsvAsBytes(hm, false);
-                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().contentLength(buff.length).contentType(BudaMediaTypes.MT_CSV)
+                return (ResponseEntity<InputStreamResource>) ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentLength(buff.length)
+                        .contentType(BudaMediaTypes.MT_CSV)
                         .header("Content-Disposition", "attachment; filename=\"" + file + "_p" + pageNumber + ".csv\"")
                         .body(new InputStreamResource(new ByteArrayInputStream(buff)));
             }
@@ -181,7 +183,8 @@ public class PublicTemplatesController {
             String fmt = map.get(QueryConstants.FORMAT);
             if ("xml".equals(fmt)) {
                 ResultSet res = QueryProcessor.getResults(query, fuseki);
-                return ResponseEntity.ok().contentType(MediaType.TEXT_XML).body(Helpers.getResultSetAsXml(res));
+                return ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentType(MediaType.TEXT_XML)
+                        .body(Helpers.getResultSetAsXml(res));
             } else {
                 ResultSetWrapper res = QueryProcessor.getResults(query, fuseki, map.get(QueryConstants.RESULT_HASH),
                         map.get(QueryConstants.PAGE_SIZE));
@@ -190,7 +193,7 @@ public class PublicTemplatesController {
                 map.put(QueryConstants.REQ_URI, request.getRequestURL().toString() + "?" + request.getQueryString());
                 Results r = new Results(res, map);
                 String json = new String(GlobalHelpers.getJsonBytes(r));
-                return ResponseEntity.ok().body(StreamingHelpers.getStream(json));
+                return ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).body(StreamingHelpers.getStream(json));
             }
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -257,7 +260,8 @@ public class PublicTemplatesController {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType).body(StreamingHelpers.getModelStream(model, ext, ServiceConfig.PREFIX.getPrefixMap()));
+        return ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentType(mediaType)
+                .body(StreamingHelpers.getModelStream(model, ext, ServiceConfig.PREFIX.getPrefixMap()));
 
     }
 
@@ -305,7 +309,7 @@ public class PublicTemplatesController {
             }
             throw re;
         }
-        return ResponseEntity.ok().contentType(mediaType)
+        return ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentType(mediaType)
                 .body(StreamingHelpers.getModelStream(model, BudaMediaTypes.getExtFromMime(mediaType), ServiceConfig.PREFIX.getPrefixMap()));
     }
 

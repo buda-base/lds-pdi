@@ -38,6 +38,7 @@ public class ShaclDataController {
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("getShaclOntGraph() for path {} ", request.getRequestURL());
+        Helpers.setCacheControl(response, "public");
         return processShapeUrl(request.getRequestURL().toString(), false, response);
     }
 
@@ -46,6 +47,7 @@ public class ShaclDataController {
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
         log.info("getShaclOntResGraph() for path {} ", request.getRequestURL());
+        Helpers.setCacheControl(response, "public");
         return processShapeUrl(request.getRequestURL().toString(), true, response);
     }
 
@@ -53,6 +55,8 @@ public class ShaclDataController {
     public ResponseEntity<StreamingResponseBody> getShaclAllOntGraph(@RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response, HttpServletRequest request)
             throws RestException, IOException {
+        Helpers.setCacheControl(response, "public");
+        response.setHeader("ETag", OntShapesData.getCommitId());
         log.info("getShaclAllOntGraph {} ", request.getRequestURL());
         String url = request.getRequestURL().toString();
         Model m = OntShapesData.getFullModel();
@@ -69,7 +73,7 @@ public class ShaclDataController {
             mt = BudaMediaTypes.MT_TTL;
             extension = "ttl";
         }
-        return ResponseEntity.ok().contentType(mt)
+        return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
                 .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
@@ -102,7 +106,7 @@ public class ShaclDataController {
         }
         Helpers.setCacheControl(response, "public");
         if (m != null && m.size() > 0) {
-            return ResponseEntity.ok().contentType(mt)
+            return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
                     .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)

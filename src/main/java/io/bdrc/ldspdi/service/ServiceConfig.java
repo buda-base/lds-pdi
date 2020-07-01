@@ -46,6 +46,7 @@ public class ServiceConfig {
     public static String LOCAL_ONT_DIR;
     public static String SERVER_ROOT;
     public static Prefix PREFIX;
+    public static String queriesCommit;
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged with
@@ -92,6 +93,14 @@ public class ServiceConfig {
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }
+    }
+
+    public static String getQueriesCommit() {
+        return queriesCommit;
+    }
+
+    public static void setQueriesCommit(String queriesCommit) {
+        ServiceConfig.queriesCommit = queriesCommit;
     }
 
     public static void loadPrefixes() {

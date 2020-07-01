@@ -31,12 +31,16 @@ public class OntShapesData {
     public static HashMap<String, Model> modelsBase = new HashMap<>();
     private static Model fullMod;
     private String payload;
-    private String commitId;
+    private static String commitId;
 
-    public OntShapesData(String payload, String commitId) {
+    public OntShapesData(String payload, String commit) {
         super();
         this.payload = payload;
-        this.commitId = commitId;
+        this.commitId = commit;
+    }
+
+    public static String getCommitId() {
+        return commitId;
     }
 
     public void update() {

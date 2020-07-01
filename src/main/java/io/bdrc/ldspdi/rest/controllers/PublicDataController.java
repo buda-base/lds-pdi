@@ -68,9 +68,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -144,7 +141,7 @@ public class PublicDataController {
         log.info("Call to getJsonContext()");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
         return ResponseEntity.ok().cacheControl(CacheControl.maxAge(86400, TimeUnit.SECONDS).cachePublic())
-                .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getEntityTag()).body(OntData.JSONLD_CONTEXT);
+                .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getOntCommitId()).body(OntData.JSONLD_CONTEXT);
     }
 
     @GetMapping(value = "/admindata/{res:.+}")
@@ -601,11 +598,11 @@ public class PublicDataController {
                 return ResponseEntity.status(404).body("No model found for " + params.getBaseUri());
             }
             if (reasoner != null) {
-                return ResponseEntity.ok().header("Profile", reasonerUri)
+                return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Profile", reasonerUri)
                         .header("Content-type", BudaMediaTypes.getMimeFromExtension(ext) + ";profile=\"" + reasonerUri + "\"").body(baos.toString());
             }
-            return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
-                    .body(baos.toString());
+            return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
+                    .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
 
             res = res.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
@@ -631,8 +628,8 @@ public class PublicDataController {
                         wr.write(model, baos, null);
                     }
                 }
-                return ResponseEntity.ok().header("Content-Disposition", "inline").contentType(BudaMediaTypes.getMimeFromExtension(ext))
-                        .body(baos.toString());
+                return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
+                        .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
             } else {
                 LdsError lds = new LdsError(LdsError.ONT_URI_ERR).setContext(request.getRequestURL().toString());
                 return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
@@ -643,8 +640,6 @@ public class PublicDataController {
 
     @PostMapping(value = "/callbacks/github/owl-schema", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateOntology(@RequestBody String payload) throws RestException, IOException {
-        JsonNode node = new ObjectMapper().readTree(payload);
-        String commitId = node.get("commits").elements().next().get("id").asText();
         log.info("updating Ontology models() >>");
         if (!ServiceConfig.isInChina()) {
             Webhook wh = new Webhook(payload, GitService.ONTOLOGIES);
@@ -666,6 +661,33 @@ public class PublicDataController {
         } else {
             return ResponseEntity.ok().body("Shapes Ontologies are not used in this configuration");
         }
+    }
+
+    @GetMapping(value = "/ontology/data/{ext}")
+    public Object getAllOntologyData(HttpServletRequest request, @PathVariable("ext") String ext) throws RestException {
+        log.info("Call to getAllOntologyData(); with ext {}", ext);
+        Model model = OntData.ontAllMod;
+        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
+        // Inference here if required
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if (model != null) {
+            if (JenaLangStr == "STTL") {
+                final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, "http://purl.bdrc.io/ontology/core/");
+                writer.output(baos);
+            } else {
+                if (JenaLangStr == RDFLanguages.strLangTurtle) {
+                    model.write(baos, "TURTLE");
+                } else {
+                    org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+
+                    wr.write(model, baos, "http://purl.bdrc.io/ontology/core/");
+                }
+            }
+        } else {
+            return ResponseEntity.status(404).body("No model found ");
+        }
+        return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
+                .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
     }
 
     private static HashMap<String, String> getResourceHeaders(String url, String ext, String tcn, String eTag) {
