@@ -87,7 +87,7 @@ public class ServiceConfig {
             }
             LibProps.init(prop);
             SERVER_ROOT = prop.getProperty("serverRoot");
-            PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
+            PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
             OntPolicies.init();
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
@@ -95,7 +95,7 @@ public class ServiceConfig {
     }
 
     public static void loadPrefixes() {
-        PREFIX = new Prefix(prop.getProperty("ldsqueriesPath") + "public/prefixes.txt");
+        PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
     }
 
     public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
