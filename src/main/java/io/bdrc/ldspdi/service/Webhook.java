@@ -6,6 +6,8 @@ import org.eclipse.jgit.errors.RevisionSyntaxException;
 
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
+import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
 
 public class Webhook implements Runnable {
 
@@ -32,6 +34,8 @@ public class Webhook implements Runnable {
     @Override
     public void run() {
         String commitId = null;
+        ResultsCache.clearCache();
+        LdsQueryService.clearCache();
         if (GitService.SHAPES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_SHAPES_PATH, GitService.GIT_SHAPES_REMOTE_URL);
