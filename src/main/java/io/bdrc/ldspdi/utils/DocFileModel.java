@@ -76,7 +76,7 @@ public class DocFileModel {
         log.info("Loaded query templates themselves in {} ms", (deb2 - deb1));
         ontos = OntPolicies.getValidBaseUri();
         long deb3 = System.currentTimeMillis();
-        log.info("Loaded ontologies baseuris in {} ms", (deb3 - deb2));
+        log.info("Loaded ontologies baseuris in {} ms, onts are {}", (deb3 - deb2), ontos);
         keys = templ.keySet();
     }
 
@@ -109,7 +109,8 @@ public class DocFileModel {
             files = walk.map(x -> x.toString()).filter(f -> f.endsWith(".arq")).collect(Collectors.toList());
         } catch (IOException e1) {
             log.error("Error while getting query templates", e1);
-            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
+            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR)
+                    .setContext(ServiceConfig.LOCAL_QUERIES_DIR + "public in DocFileModel.getQueryTemplates()"));
         }
         walk.close();
         return files;
@@ -117,7 +118,8 @@ public class DocFileModel {
 
     @Override
     public String toString() {
-        return "DocFileModel [files=" + files + ", keys=" + keys + ", ontos=" + ontos + ", brandName=" + brandName + ", ontName=" + ontName + ", templ=" + templ + "]";
+        return "DocFileModel [files=" + files + ", keys=" + keys + ", ontos=" + ontos + ", brandName=" + brandName + ", ontName=" + ontName
+                + ", templ=" + templ + "]";
     }
 
 }

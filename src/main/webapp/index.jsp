@@ -38,7 +38,7 @@ function onto(){
     window.location.assign(x);
 }
 function browse(){
-    var x = document.getElementById("uri").value+"/";
+    var x = document.getElementById("uri").value;
     x = x.substring(5);
     window.location.assign(x);
 }
