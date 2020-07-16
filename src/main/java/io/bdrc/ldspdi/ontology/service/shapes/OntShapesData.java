@@ -54,7 +54,7 @@ public class OntShapesData {
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf");
             odm.setProcessImports(true);
-            odm.setCacheModels(true);
+            odm.setCacheModels(false);
             odm.getFileManager().resetCache();
             oms.setDocumentManager(odm);
             Iterator<String> it = odm.listDocuments();
