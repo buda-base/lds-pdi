@@ -6,9 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -97,6 +95,7 @@ public class OntData /* implements Runnable */ {
             OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = null;
             odm = new OntDocumentManager(System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf");
+            odm.getFileManager().resetCache();
             odm.setProcessImports(false);
             oms.setDocumentManager(odm);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
