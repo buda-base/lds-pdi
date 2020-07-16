@@ -96,6 +96,7 @@ public class OntData /* implements Runnable */ {
             OntDocumentManager odm = null;
             odm = new OntDocumentManager(System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf");
             odm.getFileManager().resetCache();
+            odm.setCacheModels(false);
             odm.setProcessImports(false);
             oms.setDocumentManager(odm);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
