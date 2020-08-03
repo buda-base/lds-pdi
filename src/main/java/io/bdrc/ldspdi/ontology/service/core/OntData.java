@@ -60,7 +60,7 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.Helpers;
 
-public class OntData /* implements Runnable */ {
+public class OntData {
 
     public static InfModel infMod;
     public static OntModel ontAllMod;
