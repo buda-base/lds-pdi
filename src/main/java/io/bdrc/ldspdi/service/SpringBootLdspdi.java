@@ -80,9 +80,6 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
                 RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
             }
         }
-        Webhook wh_queries = new Webhook(null, GitService.QUERIES, 0);
-        Thread t_queries = new Thread(wh_queries);
-        t_queries.start();
         log.info("SERVER IS IN CHINA {}", ServiceConfig.isInChina());
 
     }
