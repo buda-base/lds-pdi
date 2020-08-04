@@ -167,11 +167,4 @@ public class ServiceConfig {
         return "User-agent: *" + System.lineSeparator() + "Disallow: /";
     }
 
-    public static void main(String... arg) throws JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.initForTests("");
-        System.out.println(LibProps.getProperty("jsonldContextFile"));
-        String tmp = LibProps.getProperty("jsonldContextFile");
-        FileInputStream in = new FileInputStream(tmp);
-    }
-
 }
