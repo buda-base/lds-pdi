@@ -50,7 +50,8 @@ public class TypeResults {
             if (isMain.getOrDefault(subject, false)) {
                 stlist = main.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
             } else {
-                stlist = aux.computeIfAbsent(subject.getURI(), x -> new ArrayList<Field>());
+                final String uri = subject.isAnon() ? "_:"+subject.asNode().getBlankNodeLabel() : subject.getURI();
+                stlist = aux.computeIfAbsent(uri, x -> new ArrayList<Field>());
             }
             stlist.add(Field.getField(st));
 
