@@ -358,6 +358,7 @@ public class PublicDataController {
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+            log.info("mediatype is html", res);
             res = filterResourceId(res);
             String type = getDilaResourceType(res);
             if (!type.equals("")) {
@@ -604,7 +605,6 @@ public class PublicDataController {
             return ResponseEntity.ok().eTag(OntData.getOntCommitId()).header("Content-Disposition", "inline")
                     .contentType(BudaMediaTypes.getMimeFromExtension(ext)).body(baos.toString());
         } else {
-
             res = res.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
             if (res.endsWith("/")) {
                 res = res.substring(0, res.length() - 1);
@@ -775,10 +775,14 @@ public class PublicDataController {
 
     private String filterResourceId(String resId) throws IOException {
         if (COLUMBIA_IDS == null) {
+            log.info("loading columbia-id.csv");
             InputStream resource = PublicDataController.class.getClassLoader().getResourceAsStream("columbia-id.csv");
             COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+            log.info("loaded {} Columbia IDs", COLUMBIA_IDS.size());
+            log.info("first entry: {}", COLUMBIA_IDS.get(0));
         }
         if (COLUMBIA_IDS.contains(resId)) {
+            log.info("mapping {} to its W counterpart", resId);
             resId = "W" + resId.substring(1);
         }
         return resId;
