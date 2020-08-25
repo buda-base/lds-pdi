@@ -103,6 +103,15 @@ public class PublicDataController {
     public static final String GRAPH_PREFIX_FULL = ServiceConfig.getProperty("endpoints.graph.fullprefix");
     private List<String> COLUMBIA_IDS = null;
 
+    public void ensureColumbiaIDsLoaded() {
+        if (COLUMBIA_IDS == null) {
+            log.info("loading columbia-id.csv");
+            InputStream resource = PublicDataController.class.getClassLoader().getResourceAsStream("columbia-id.csv");
+            COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+            log.info("loaded {} Columbia IDs", COLUMBIA_IDS.size());
+        }
+    }
+    
     @GetMapping("/")
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getHomePage()");
@@ -332,9 +341,9 @@ public class PublicDataController {
             String[] parts = res.split("\\.");
             return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, response, request);
         }
-        final String prefixedRes = RES_PREFIX_SHORT + res;
-        final String fullResURI = GRAPH_PREFIX_FULL + res;
-        log.info("Call to getResourceGraphGET() with URL: {}, accept: {}, res {}", request.getServletPath(), format, res);
+        String prefixedRes = RES_PREFIX_SHORT + res;
+        String fullResURI = GRAPH_PREFIX_FULL + res;
+        log.info("Call to getResourceGraphGET() with URL: {}, accept: {}, variant: {}, res {}", request.getServletPath(), format, mediaType, res);
         if (format == null) {
             final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
             HttpHeaders hh = new HttpHeaders();
@@ -351,6 +360,16 @@ public class PublicDataController {
                     .header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath())
                     .body(StreamingHelpers.getStream(html));
         }
+        if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
+            log.info("mediatype is html", res);
+            ensureColumbiaIDsLoaded();
+            if (COLUMBIA_IDS.contains(res)) {
+                log.info("mapping {} to its W counterpart for Columbia redirection", res);
+                res = "W" + res.substring(1);
+                prefixedRes = RES_PREFIX_SHORT + res;
+                fullResURI = GRAPH_PREFIX_FULL + res;
+            }
+        }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, computeGraphType(request));
         if (model.size() == 0) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
@@ -358,8 +377,6 @@ public class PublicDataController {
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
-            log.info("mediatype is html", res);
-            res = filterResourceId(res);
             String type = getDilaResourceType(res);
             if (!type.equals("")) {
                 type = type + "/?fromInner=";
@@ -771,21 +788,6 @@ public class PublicDataController {
             return "place";
         }
         return type;
-    }
-
-    private String filterResourceId(String resId) throws IOException {
-        if (COLUMBIA_IDS == null) {
-            log.info("loading columbia-id.csv");
-            InputStream resource = PublicDataController.class.getClassLoader().getResourceAsStream("columbia-id.csv");
-            COLUMBIA_IDS = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
-            log.info("loaded {} Columbia IDs", COLUMBIA_IDS.size());
-            log.info("first entry: {}", COLUMBIA_IDS.get(0));
-        }
-        if (COLUMBIA_IDS.contains(resId)) {
-            log.info("mapping {} to its W counterpart", resId);
-            resId = "W" + resId.substring(1);
-        }
-        return resId;
     }
 
 }
