@@ -30,7 +30,8 @@ public class RdfAuthFilter implements Filter {
     public final static Logger log = LoggerFactory.getLogger(RdfAuthFilter.class);
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         if (!ServiceConfig.isInChina()) {
             String method = ((HttpServletRequest) request).getMethod();
             if (ServiceConfig.useAuth() && !method.equalsIgnoreCase("OPTIONS")) {

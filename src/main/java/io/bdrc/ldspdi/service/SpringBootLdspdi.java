@@ -36,14 +36,15 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     // LoggerFactory.getLogger(SpringBootLdspdi.class);
     public final static Logger log = LoggerFactory.getLogger("default");
 
-    public static void main(String[] args)
-            throws RestException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException, InterruptedException {
+    public static void main(String[] args) throws RestException, RevisionSyntaxException, AmbiguousObjectException,
+            IncorrectObjectTypeException, IOException, InterruptedException {
         final String configPath = System.getProperty("ldspdi.configpath");
         try {
             ServiceConfig.init();
         } catch (IOException e1) {
             log.error("Primary config could not be load in ServiceConfig", e1);
-            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
+            throw new RestException(500,
+                    new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
         }
         if (ServiceConfig.useAuth()) {
             AuthProps.init(ServiceConfig.getProperties());

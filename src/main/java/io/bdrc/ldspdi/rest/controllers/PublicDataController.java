@@ -612,7 +612,7 @@ public class PublicDataController {
             Model model = OntData.getOntModelByBase(params.getBaseUri());
             // Inference here if required
             if (reasoner != null && model != null) {
-                // model = ModelFactory.createInfModel(reasoner, model);
+                model = ModelFactory.createInfModel(reasoner, model);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (model != null) {
