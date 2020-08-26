@@ -747,9 +747,7 @@ public class PublicDataController {
             final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
             writer.output(os);
         } else {
-            // org.apache.jena.rdf.model.RDFWriter wr = m.getWriter(lang);
             if (lang.equals(RDFLanguages.strLangRDFXML)) {
-                // wr.setProperty("xmlbase", "");
                 m.write(os, lang, "");
             } else {
                 m.write(os, lang);
