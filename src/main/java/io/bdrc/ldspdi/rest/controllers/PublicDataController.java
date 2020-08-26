@@ -518,7 +518,7 @@ public class PublicDataController {
                     } else {
                         final String JenaLangStr = BudaMediaTypes
                                 .getJenaFromExtension(BudaMediaTypes.getExtFromMime(mediaType));
-                        log.debug("getExtOntologyHomePage JenaLangStr is >> {}", JenaLangStr);
+                        log.info("getExtOntologyHomePage JenaLangStr is >> {}", JenaLangStr);
                         return (String) writeStream(om, JenaLangStr).toString();
                     }
                 }
