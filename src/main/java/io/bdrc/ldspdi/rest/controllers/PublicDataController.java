@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /*******************************************************************************
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -521,8 +519,9 @@ public class PublicDataController {
                         input.close();
                         ResultsCache.addToCache(byteArr, url.hashCode());
                     }
-                    OntModel om = OntData.getOntModelByBase(baseUri);
-                    om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
+                    // OntModel om = OntData.getOntModelByBase(baseUri);
+                    // om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
+                    Model om = OntData.getOntModelByBase(baseUri);
                     // browser request : serving html page
                     if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                         ModelAndView model = new ModelAndView();
