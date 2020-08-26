@@ -25,8 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -40,7 +38,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -76,7 +74,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
 import io.bdrc.ldspdi.results.CacheAccessModel;
-import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -511,17 +508,7 @@ public class PublicDataController {
                     String url = OntPolicies.getOntologyByBase(baseUri).getFile().replace("RDF", "owl-schema");
                     log.info("getExtOntologyHomePage FILE URI is >> {} and path is {}", url, baseUri);
                     // using cache if available
-                    byte[] byteArr = (byte[]) ResultsCache.getObjectFromCache(url.hashCode());
-                    if (byteArr == null) {
-                        URLConnection connection = (URLConnection) new URL(url).openConnection();
-                        InputStream input = connection.getInputStream();
-                        byteArr = IOUtils.toByteArray(input);
-                        input.close();
-                        ResultsCache.addToCache(byteArr, url.hashCode());
-                    }
-                    // OntModel om = OntData.getOntModelByBase(baseUri);
-                    // om.read(new ByteArrayInputStream(byteArr), baseUri, "TURTLE");
-                    Model om = OntData.getOntModelByBase(baseUri);
+                    OntModel om = OntData.getOntModelByBase(baseUri);
                     // browser request : serving html page
                     if (Helpers.equals(mediaType, MediaType.TEXT_HTML)) {
                         ModelAndView model = new ModelAndView();
