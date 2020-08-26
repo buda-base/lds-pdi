@@ -77,6 +77,7 @@ public class QueryConstants {
 
     // Query Params prefixes
     public final static String INT_ARGS_PARAMPREFIX = "I_";
+    public final static String DATE_ARGS_PARAMPREFIX = "D_";
     public final static String LITERAL_ARGS_PARAMPREFIX = "L_";
     public final static String LITERAL_LG_ARGS_PARAMPREFIX = "LG_";
     public final static String LITERAL_LIMITPREFIX = "LI_";

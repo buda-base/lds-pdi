@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.slf4j.Logger;
@@ -55,10 +56,11 @@ public class LdsQuery {
         final String fileBaseName = f.getName();
         queryName = fileBaseName.substring(0, fileBaseName.lastIndexOf("."));
         readTemplateData(f);
-        template = new QueryTemplate(getQueryName(), QueryConstants.QUERY_PUBLIC_DOMAIN, queryData.get(QueryConstants.QUERY_URL),
-                queryData.get(QueryConstants.QUERY_SCOPE), queryData.get(QueryConstants.QUERY_RESULTS),
-                queryData.get(QueryConstants.QUERY_RETURN_TYPE), queryData.get(QueryConstants.QUERY_PARAMS),
-                queryData.get(QueryConstants.QUERY_OPT_PARAMS), buildParams(), buildOutputs(), getQuery());
+        template = new QueryTemplate(getQueryName(), QueryConstants.QUERY_PUBLIC_DOMAIN,
+                queryData.get(QueryConstants.QUERY_URL), queryData.get(QueryConstants.QUERY_SCOPE),
+                queryData.get(QueryConstants.QUERY_RESULTS), queryData.get(QueryConstants.QUERY_RETURN_TYPE),
+                queryData.get(QueryConstants.QUERY_PARAMS), queryData.get(QueryConstants.QUERY_OPT_PARAMS),
+                buildParams(), buildOutputs(), getQuery());
     }
 
     private void readTemplateData(File file) throws RestException {
@@ -104,7 +106,8 @@ public class LdsQuery {
             }
         } catch (Exception e) {
             log.error("QueryFile parsing error", e);
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext("Query template parsing failed for: " + file.getName()));
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
+                    .setContext("Query template parsing failed for: " + file.getName()));
         } finally {
             try {
                 brd.close();
@@ -116,18 +119,25 @@ public class LdsQuery {
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
         String error = checkQueryArgsSyntax(converted);
         if (!error.trim().equals("")) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getQueryName() + "; ERROR: " + error));
+            throw new RestException(500,
+                    new LdsError(LdsError.PARSE_ERR).setContext(" in File->" + getQueryName() + "; ERROR: " + error));
         }
         HashMap<String, String> litParams = getLitLangParams();
         if (converted == null) {
             converted = new HashMap<>();
         }
-        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query, ServiceConfig.PREFIX.getPrefixMapping());
+        ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query,
+                ServiceConfig.PREFIX.getPrefixMapping());
 
         for (String st : getAllParams()) {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (converted.get(st) != null) {
                     queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
+                }
+            }
+            if (st.startsWith(QueryConstants.DATE_ARGS_PARAMPREFIX)) {
+                if (converted.get(st) != null) {
+                    queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDdateTime);
                 }
             }
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
@@ -146,13 +156,15 @@ public class LdsQuery {
                             if (fullUri != null) {
                                 queryStr.setIri(st, fullUri + parts[1]);
                             } else {
-                                throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
-                                        .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param + " Unknown prefix"));
+                                throw new RestException(500,
+                                        new LdsError(LdsError.PARSE_ERR).setContext(
+                                                " in QueryFileParser.getParametizedQuery() ParameterException :" + param
+                                                        + " Unknown prefix"));
                             }
                         }
                     } else {
-                        throw new RestException(500,
-                                new LdsError(LdsError.PARSE_ERR).setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
+                        throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
+                                .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
                                         + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
                     }
                 }
@@ -169,7 +181,8 @@ public class LdsQuery {
                         try {
                             new Locale.Builder().setLanguageTag(lang).build();
                         } catch (IllformedLocaleException ex) {
-                            return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag" + ex.getMessage();
+                            return "ERROR --> language param :" + lang + " is not a valid BCP 47 language tag"
+                                    + ex.getMessage();
                         }
                         if (limit) {
                             queryStr.setLiteral(st, converted.get(st), lang + " " + lim);
@@ -201,8 +214,8 @@ public class LdsQuery {
         }
 
         if (q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
-                    .setContext(" in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + query));
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(
+                    " in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + query));
         }
         return q.toString();
     }
@@ -225,10 +238,11 @@ public class LdsQuery {
                 }
                 // Param is a Lang param --> check if the corresponding lit param is present
                 if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
-                    String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX + arg.substring(arg.indexOf("_") + 1);
+                    String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX
+                            + arg.substring(arg.indexOf("_") + 1);
                     if (!getAllParams().contains(expectedLiteralParam)) {
-                        check = "Arg syntax is incorrect : query does not have a literal variable " + expectedLiteralParam + " corresponding to lang "
-                                + arg + " variable";
+                        check = "Arg syntax is incorrect : query does not have a literal variable "
+                                + expectedLiteralParam + " corresponding to lang " + arg + " variable";
                         return check;
                     }
                     litLangParams.put(expectedLiteralParam, arg);
@@ -354,15 +368,16 @@ public class LdsQuery {
         try {
             ServiceConfig.init();
             HashMap<String, String> map = new HashMap<>();
-            LdsQuery lds = new LdsQuery("lds-queries/public/OntologyUiStrings.arq");
+            LdsQuery lds = new LdsQuery("lds-queries/private/getCommitWithTimeTest.arq");
             // LdsQueryNew lds = new LdsQueryNew("lds-queries/public/Etexts_count.arq");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
             map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
-            map.put("L_LNG", "en");
-            map.put("LG_NAME", "bo-x-ewts");
+            // map.put("L_LNG", "en");
+            map.put("D_TIME", "08-26-2020");
+            map.put("D_TIME1", "2012-01-31 23:59:59");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
-            map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
+            // map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
             // map.put("R_RES", "bdr:W29329");
             System.out.println("Required Params >>" + lds.getRequiredParams());
