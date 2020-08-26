@@ -741,16 +741,19 @@ public class PublicDataController {
     }
 
     private ByteArrayOutputStream writeStream(Model m, String lang) {
+        log.info("Jena Lang for writer is {}", lang);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         if (lang == "STTL") {
             final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
             writer.output(os);
         } else {
-            org.apache.jena.rdf.model.RDFWriter wr = m.getWriter(lang);
+            // org.apache.jena.rdf.model.RDFWriter wr = m.getWriter(lang);
             if (lang.equals(RDFLanguages.strLangRDFXML)) {
-                wr.setProperty("xmlbase", "");
+                // wr.setProperty("xmlbase", "");
+                m.write(os, lang, "");
+            } else {
+                m.write(os, lang);
             }
-            m.write(os, "");
         }
         return os;
     }
