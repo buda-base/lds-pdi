@@ -86,6 +86,7 @@ public class QueryConstants {
     // Query Params types
     public static final String INT_PARAM = "int";
     public static final String RES_PARAM = "resource";
+    public static final String RES_PARAM_URI = "URI";
     public static final String STRING_PARAM = "string";
     public static final String DATETIME_PARAM = "datetime";
 

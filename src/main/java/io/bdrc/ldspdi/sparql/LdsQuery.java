@@ -316,13 +316,18 @@ public class LdsQuery {
                     rtp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
                     p.add(rtp);
                     break;
+                case QueryConstants.RES_PARAM_URI:
+                    ResParam rtp1 = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
+                    rtp1.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                    p.add(rtp1);
+                    break;
                 case QueryConstants.DATETIME_PARAM:
                     DateTimeParam datetimep = new DateTimeParam(s);
                     datetimep.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
                     p.add(datetimep);
                     break;
                 default:
-                    log.error("unknown type: "+type);
+                    log.error("unknown type: " + type);
                 }
             }
         }
