@@ -46,8 +46,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             throw new RestException(500,
                     new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
         }
+        AuthProps.init(ServiceConfig.getProperties());
         if (ServiceConfig.useAuth()) {
-            AuthProps.init(ServiceConfig.getProperties());
             RdfAuthModel.readAuthModel();
         }
         ResultsCache.init();
