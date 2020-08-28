@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.objects.json.DateTimeParam;
 import io.bdrc.ldspdi.objects.json.IntParam;
 import io.bdrc.ldspdi.objects.json.Output;
 import io.bdrc.ldspdi.objects.json.Param;
@@ -315,6 +316,13 @@ public class LdsQuery {
                     rtp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
                     p.add(rtp);
                     break;
+                case QueryConstants.DATETIME_PARAM:
+                    DateTimeParam datetimep = new DateTimeParam(s);
+                    datetimep.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                    p.add(datetimep);
+                    break;
+                default:
+                    log.error("unknown type: "+type);
                 }
             }
         }

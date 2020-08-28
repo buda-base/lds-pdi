@@ -87,6 +87,7 @@ public class QueryConstants {
     public static final String INT_PARAM = "int";
     public static final String RES_PARAM = "resource";
     public static final String STRING_PARAM = "string";
+    public static final String DATETIME_PARAM = "datetime";
 
     // Resources types
     public static final String WORK = "Work";
