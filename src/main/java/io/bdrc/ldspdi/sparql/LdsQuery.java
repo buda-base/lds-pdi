@@ -368,13 +368,13 @@ public class LdsQuery {
         try {
             ServiceConfig.init();
             HashMap<String, String> map = new HashMap<>();
-            LdsQuery lds = new LdsQuery("lds-queries/private/getCommitWithTimeTest.arq");
+            LdsQuery lds = new LdsQuery("lds-queries/public/latestsyncssince.arq");
             // LdsQueryNew lds = new LdsQueryNew("lds-queries/public/Etexts_count.arq");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
-            map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
+            // map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
             // map.put("L_LNG", "en");
-            map.put("D_TIME", "08-26-2020");
-            map.put("D_TIME1", "2012-01-31 23:59:59");
+            map.put("D_SINCE", "08-09-2020");
+            // map.put("D_TIME1", "2012-01-31 23:59:59");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
             // map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
