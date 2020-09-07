@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class ServiceConfig {
     public static String LOCAL_ONT_DIR;
     public static String SERVER_ROOT;
     public static Prefix PREFIX;
-    public static String queriesCommit;
+    public static String queriesCommit = RandomStringUtils.randomAlphanumeric(10);
     public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged with
