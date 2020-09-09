@@ -67,16 +67,23 @@ public class LibrarySearchController {
             return filteredChunkResponse(request, model, format);
         case "workFacetGraph":
         case "instanceFacetGraph":
+        case "iinstanceSyncedIn":
         case "associatedWorks":
+        case "associatedInstances":
+        case "instancesCreatedIn":
+        case "worksCreatedIn":
             res = WorkResults.getResultsMap(model);
             break;
         case "workInstancesGraph":
+        case "personsCreatedIn":
+        case "placesCreatedIn":
         case "personGraph":
         case "associatedPersons":
         case "associatedSimpleTypes":
         case "associatedPlaces":
         case "placeGraph":
         case "typeSimpleGraph":
+        case "typeCreatedIn":
         case "chunksFacetGraph":
         case "imLuckyAssociatedGraph":
         case "imLuckySearchGraph":
