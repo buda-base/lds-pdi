@@ -70,6 +70,7 @@ public class LibrarySearchController {
         case "iinstanceSyncedIn":
         case "associatedWorks":
         case "associatedInstances":
+        case "associatedIInstances":
         case "instancesCreatedIn":
         case "worksCreatedIn":
             res = WorkResults.getResultsMap(model);
