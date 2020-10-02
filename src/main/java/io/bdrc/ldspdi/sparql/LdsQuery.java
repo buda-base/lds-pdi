@@ -203,7 +203,13 @@ public class LdsQuery {
                 }
             }
         }
-        Query q = queryStr.asQuery();
+        Query q;
+        try {
+            q = queryStr.asQuery();            
+        } catch (Exception e) {
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(
+                    " in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + queryStr.toString()));
+        }
         if (!queryData.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
             if (q.hasLimit()) {
                 if (q.getLimit() > limit_max) {
