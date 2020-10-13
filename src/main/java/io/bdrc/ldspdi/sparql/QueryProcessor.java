@@ -49,28 +49,39 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class QueryProcessor {
 
-    public final static Logger log = LoggerFactory.getLogger(QueryProcessor.class);
+    public final static Logger log = LoggerFactory
+            .getLogger(QueryProcessor.class);
 
-    public static Model getCoreResourceGraph(final String URI, String fusekiUrl, String prefixes, String type) throws RestException {
-        log.info("Call to getResourceGraph with prefixedRes {}, fuseki {}, graphType {}", URI, fusekiUrl, type);
+    public static Model getCoreResourceGraph(final String URI, String fusekiUrl,
+            String prefixes, String type) throws RestException {
+        log.info(
+                "Call to getResourceGraph with prefixedRes {}, fuseki {}, graphType {}",
+                URI, fusekiUrl, type);
         switch (type) {
-        case "graph":
-            log.info("GRAPH TYPE getResourceGraph with prefixedRes {}, fuseki {}", URI, fusekiUrl);
-            return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl, prefixes);
-        case "describe":
-            return getDescribeModel(URI, fusekiUrl, prefixes);
-        case "":
-            return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl, prefixes);
-        default:
-            return getDescribeModel(URI, fusekiUrl, prefixes);
+            case "graph" :
+                log.info(
+                        "GRAPH TYPE getResourceGraph with prefixedRes {}, fuseki {}",
+                        URI, fusekiUrl);
+                return getSimpleResourceGraph(URI, "Resgraph.arq", fusekiUrl,
+                        prefixes);
+            case "describe" :
+                return getDescribeModel(URI, fusekiUrl, prefixes);
+            case "" :
+                return getSimpleResourceGraph(URI, "ResInfo.arq", fusekiUrl,
+                        prefixes);
+            default :
+                return getDescribeModel(URI, fusekiUrl, prefixes);
         }
     }
 
-    public static Model getSimpleResourceGraph(final String URI, final String queryName) throws RestException {
+    public static Model getSimpleResourceGraph(final String URI,
+            final String queryName) throws RestException {
         return getSimpleResourceGraph(URI, queryName, null, null);
     }
 
-    public static Model getSimpleResourceGraph(final String URI, final String queryName, String fusekiUrl, String prefixes) throws RestException {
+    public static Model getSimpleResourceGraph(final String URI,
+            final String queryName, String fusekiUrl, String prefixes)
+            throws RestException {
         if (prefixes == null) {
             prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
@@ -86,16 +97,20 @@ public class QueryProcessor {
             String query = qfp.getParametizedQuery(map, true);
             Query q = QueryFactory.create(query);
             log.info("QUERY >> {}", query);
-            RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
+            RDFConnection conn = RDFConnectionRemote.create()
+                    .destination(fusekiUrl).build();
             // model = conn.queryDescribe(q);
             model = conn.queryConstruct(q);
             ResultsCache.addToCache(model, hash);
         }
-        log.info("getSimpleResourceGraph() return model of size {} from fuseki {}", model.size(), fusekiUrl);
+        log.info(
+                "getSimpleResourceGraph() return model of size {} from fuseki {}",
+                model.size(), fusekiUrl);
         return model;
     }
 
-    public static Model getDescribeModel(final String URI, String fusekiUrl, String prefixes) throws RestException {
+    public static Model getDescribeModel(final String URI, String fusekiUrl,
+            String prefixes) throws RestException {
         if (prefixes == null) {
             prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
@@ -104,12 +119,14 @@ public class QueryProcessor {
         }
         Query q = QueryFactory.create(prefixes + " describe " + URI);
         log.debug("getDescribeModel() query : {}", q.toString());
-        RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
+        RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl)
+                .build();
         Model model = conn.queryDescribe(q);
         return model;
     }
 
-    public static Model getGraph(final String query, String fusekiUrl, String prefixes) throws RestException {
+    public static Model getGraph(final String query, String fusekiUrl,
+            String prefixes) throws RestException {
         if (prefixes == null) {
             prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
@@ -121,7 +138,8 @@ public class QueryProcessor {
         if (model == null) {
             log.info("getGraph: executing query: {}", query);
             final Query q = QueryFactory.create(prefixes + " " + query);
-            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            RDFConnectionFuseki rvf = RDFConnectionFactory
+                    .connectFuseki(fusekiUrl);
             // RDFConnection conn =
             // RDFConnectionRemote.create().destination(fusekiUrl).build();
             model = rvf.queryConstruct(q);
@@ -130,7 +148,8 @@ public class QueryProcessor {
             rvf.close();
             log.info("getGraph: put model in cache, hash {}", hash);
         } else {
-            log.info("getGraph: got model from cache, hash {}, size: {}", hash, model.size());
+            log.info("getGraph: got model from cache, hash {}, size: {}", hash,
+                    model.size());
         }
         return model;
     }
@@ -139,15 +158,17 @@ public class QueryProcessor {
         return getGraph(query, null, null);
     }
 
-    public static Model getAuthGraph(String fusekiUrl, String graph) throws RestException {
+    public static Model getAuthGraph(String fusekiUrl, String graph)
+            throws RestException {
         if (fusekiUrl == null) {
-            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+            fusekiUrl = ServiceConfig.getProperty("fusekiAuthData");
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         final int hash = Objects.hashCode("authModel");
         Model m = (Model) ResultsCache.getObjectFromCache(hash);
         if (m == null) {
-            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            RDFConnectionFuseki rvf = RDFConnectionFactory
+                    .connectFuseki(fusekiUrl);
             m = rvf.fetch(ServiceConfig.getProperty(graph));
             ResultsCache.addToCache(m, hash);
         }
@@ -162,25 +183,30 @@ public class QueryProcessor {
         QueryExecution qe = rvf.query(query);
         // QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,
         // QueryFactory.create(query));
-        qe.setTimeout(Long.parseLong(ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
+        qe.setTimeout(Long.parseLong(
+                ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;
     }
 
-    public static boolean updateOntology(Model mod, String fusekiUrl, String graph, String caller) {
+    public static boolean updateOntology(Model mod, String fusekiUrl,
+            String graph, String caller) {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         if (mod == null || graph == null) {
-            log.error("updateOntology() was called with null model or null graph");
+            log.error(
+                    "updateOntology() was called with null model or null graph");
             return false;
         }
-        log.info("Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
-                mod.listStatements().toSet().size());
+        log.info(
+                "Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}",
+                caller, fusekiUrl, graph, mod.listStatements().toSet().size());
         RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
         rvf.put(graph, mod);
         rvf.close();
-        log.info("updateOntology() is done updating for caller >> {} and {} Graph >> {} and InfModel Size >> {}", caller, fusekiUrl, graph,
-                mod.listStatements().toSet().size());
+        log.info(
+                "updateOntology() is done updating for caller >> {} and {} Graph >> {} and InfModel Size >> {}",
+                caller, fusekiUrl, graph, mod.listStatements().toSet().size());
         return true;
     }
 
@@ -196,8 +222,10 @@ public class QueryProcessor {
         return getAnyGraph(graph, null);
     }
 
-    public static void dropMultipleGraphs(ArrayList<String> graphUris, String fusekiEndpoint) {
-        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiEndpoint);
+    public static void dropMultipleGraphs(ArrayList<String> graphUris,
+            String fusekiEndpoint) {
+        RDFConnectionFuseki rvf = RDFConnectionFactory
+                .connectFuseki(fusekiEndpoint);
         for (String uri : graphUris) {
             rvf.delete(uri);
         }
@@ -205,24 +233,29 @@ public class QueryProcessor {
     }
 
     public static void dropSingleGraph(String graph, String fusekiEndpoint) {
-        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiEndpoint);
+        RDFConnectionFuseki rvf = RDFConnectionFactory
+                .connectFuseki(fusekiEndpoint);
         rvf.delete(graph);
         rvf.close();
     }
 
-    public static ResultSetWrapper getResults(final String query, String fusekiUrl, final String hash, final String pageSize) {
+    public static ResultSetWrapper getResults(final String query,
+            String fusekiUrl, final String hash, final String pageSize) {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         if (hash != null) {
-            return (ResultSetWrapper) ResultsCache.getObjectFromCache(Integer.parseInt(hash));
+            return (ResultSetWrapper) ResultsCache
+                    .getObjectFromCache(Integer.parseInt(hash));
         }
-        int psz = Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
+        int psz = Integer
+                .parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
         if (pageSize != null) {
             psz = Integer.parseInt(pageSize);
         }
         int new_hash = Objects.hashCode(query);
-        ResultSetWrapper res = (ResultSetWrapper) ResultsCache.getObjectFromCache(new_hash);
+        ResultSetWrapper res = (ResultSetWrapper) ResultsCache
+                .getObjectFromCache(new_hash);
         if (res == null) {
             long start = System.currentTimeMillis();
             final QueryExecution qe = getResultSet(query, fusekiUrl);
@@ -244,7 +277,8 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         int new_hash = Objects.hashCode(query + "RES");
-        // ResultSet res = (ResultSet) ResultsCache.getObjectFromCache(new_hash);
+        // ResultSet res = (ResultSet)
+        // ResultsCache.getObjectFromCache(new_hash);
         ResultSet res = null;
         if (res == null) {
             final QueryExecution qe = getResultSet(query, fusekiUrl);
@@ -254,22 +288,29 @@ public class QueryProcessor {
         return res;
     }
 
-    public static Model getGraphFromModel(String query, Model model) throws RestException {
+    public static Model getGraphFromModel(String query, Model model)
+            throws RestException {
         try {
             QueryExecution qexec = QueryExecutionFactory.create(query, model);
             Model m = qexec.execDescribe();
             return m;
         } catch (Exception ex) {
             throw new RestException(500,
-                    new LdsError(LdsError.SPARQL_ERR).setContext(" in QueryProcessor.getResultsFromModel(query, model)) \"" + query + "\"", ex));
+                    new LdsError(LdsError.SPARQL_ERR).setContext(
+                            " in QueryProcessor.getResultsFromModel(query, model)) \""
+                                    + query + "\"",
+                            ex));
         }
     }
 
-    public static void main(String[] args) throws RestException, JsonParseException, JsonMappingException, IOException {
-        ServiceConfig.initForTests("http://buda1.bdrc.io:13180/fuseki/corerw/query");
+    public static void main(String[] args) throws RestException,
+            JsonParseException, JsonMappingException, IOException {
+        ServiceConfig
+                .initForTests("http://buda1.bdrc.io:13180/fuseki/corerw/query");
         // System.out.println("FUSEKI >>" +
         // ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL));
-        Model m = QueryProcessor.getCoreResourceGraph("bdg:ontologySchema", null, null, "graph");
+        Model m = QueryProcessor.getCoreResourceGraph("bdg:ontologySchema",
+                null, null, "graph");
         m.write(System.out, "TURTLE");
     }
 }
