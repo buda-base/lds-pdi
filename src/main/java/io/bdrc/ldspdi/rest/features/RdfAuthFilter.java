@@ -27,21 +27,24 @@ import io.bdrc.ldspdi.service.ServiceConfig;
 @Order(4)
 public class RdfAuthFilter implements Filter {
 
-    public final static Logger log = LoggerFactory.getLogger(RdfAuthFilter.class);
+    public final static Logger log = LoggerFactory
+            .getLogger(RdfAuthFilter.class);
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
         if (!ServiceConfig.isInChina()) {
             String method = ((HttpServletRequest) request).getMethod();
-            if (ServiceConfig.useAuth() && !method.equalsIgnoreCase("OPTIONS")) {
+            if (ServiceConfig.useAuth()
+                    && !method.equalsIgnoreCase("OPTIONS")) {
                 HttpServletRequest req = (HttpServletRequest) request;
                 boolean isSecuredEndpoint = true;
                 request.setAttribute("access", new Access());
                 String token = getToken(req.getHeader("Authorization"));
                 TokenValidation validation = null;
                 String path = req.getServletPath();
-                log.debug("PATH in Auth filter is {} for HTTP method: {}", path, method);
+                log.debug("PATH in Auth filter is {} for HTTP method: {}", path,
+                        method);
                 Endpoint end = null;
                 try {
                     ArrayList<Endpoint> endpoints = RdfAuthModel.getEndpoints();
@@ -52,7 +55,8 @@ public class RdfAuthFilter implements Filter {
                         }
                     }
                     log.debug("ALL ENDPOINTS >> {}", endpoints);
-                    log.debug("for path {} ENDPOINT IN FILTER id {} ", path, end);
+                    log.debug("for path {} ENDPOINT IN FILTER id {} ", path,
+                            end);
                 } catch (Exception e) {
                     end = null;
                 }
@@ -79,9 +83,12 @@ public class RdfAuthFilter implements Filter {
                         return;
                     } else {
                         Access access = new Access(prof, end);
-                        log.debug("FILTER Access matchGroup >> {}", access.matchGroup());
-                        log.debug("FILTER Access matchRole >> {}", access.matchRole());
-                        log.debug("FILTER Access matchPerm >> {}", access.matchPermissions());
+                        log.debug("FILTER Access matchGroup >> {}",
+                                access.matchGroup());
+                        log.debug("FILTER Access matchRole >> {}",
+                                access.matchRole());
+                        log.debug("FILTER Access matchPerm >> {}",
+                                access.matchPermissions());
                         if (!access.hasEndpointAccess()) {
                             ((HttpServletResponse) response).setStatus(403);
                             return;
@@ -94,6 +101,7 @@ public class RdfAuthFilter implements Filter {
                         // token present since validation is not null
                         Access acc = new Access(prof, end);
                         request.setAttribute("access", acc);
+                        log.debug("FILTER Access is >> {}", acc);
                     }
                 }
             }

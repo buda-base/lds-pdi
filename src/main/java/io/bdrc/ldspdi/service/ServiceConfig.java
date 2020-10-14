@@ -47,49 +47,55 @@ public class ServiceConfig {
     public static String LOCAL_ONT_DIR;
     public static String SERVER_ROOT;
     public static Prefix PREFIX;
-    public static String queriesCommit = RandomStringUtils.randomAlphanumeric(10);
-    public final static Logger log = LoggerFactory.getLogger(ServiceConfig.class);
+    public static String queriesCommit = RandomStringUtils
+            .randomAlphanumeric(10);
+    public final static Logger log = LoggerFactory
+            .getLogger(ServiceConfig.class);
 
-    // getting the default properties from ldspdi.properties that is packaged with
+    // getting the default properties from ldspdi.properties that is packaged
+    // with
     // the jar
-    public static void init() throws JsonParseException, JsonMappingException, IOException {
+    public static void init()
+            throws JsonParseException, JsonMappingException, IOException {
         try {
-            log.info("user.dir = "+System.getProperty("user.dir"));
-            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/lds-queries/";
-            log.info("LOCAL_QUERIES_DIR = "+LOCAL_QUERIES_DIR);
-            LOCAL_SHAPES_DIR = System.getProperty("user.dir") + "/editor-templates/";
+            log.info("user.dir = " + System.getProperty("user.dir"));
+            LOCAL_QUERIES_DIR = System.getProperty("user.dir")
+                    + "/lds-queries/";
+            log.info("LOCAL_QUERIES_DIR = " + LOCAL_QUERIES_DIR);
+            LOCAL_SHAPES_DIR = System.getProperty("user.dir")
+                    + "/editor-templates/";
             LOCAL_ONT_DIR = System.getProperty("user.dir") + "/owl-schema/";
             log.info("getting properties from packaged ldspdi.properties");
-            InputStream input = ServiceConfig.class.getClassLoader().getResourceAsStream("ldspdi.properties");
+            InputStream input = ServiceConfig.class.getClassLoader()
+                    .getResourceAsStream("ldspdi.properties");
             prop.load(input);
             input.close();
-            input = ServiceConfig.class.getClassLoader().getResourceAsStream("edit.properties");
+            input = ServiceConfig.class.getClassLoader()
+                    .getResourceAsStream("edit.properties");
             prop.load(input);
             input.close();
             final String configPath = System.getProperty("ldspdi.configpath");
             if (configPath != null) {
-                log.info("getting properties from {}", configPath + "ldspdi.properties");
+                log.info("getting properties from {}",
+                        configPath + "ldspdi.properties");
                 try {
-                    InputStream is = new FileInputStream(configPath + "ldspdi.properties");
+                    InputStream is = new FileInputStream(
+                            configPath + "ldspdi.properties");
+                    prop.load(is);
+                    is = new FileInputStream(
+                            configPath + "ldspdi-private.properties");
                     prop.load(is);
                     is.close();
-                    if (useAuth()) {
-                        try {
-                            is = new FileInputStream(configPath + "ldspdi-private.properties");
-                            prop.load(is);
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            log.warn("No custom properties file could be found: using default props");
-                        }
-                    }
+
                 } catch (IOException e) {
-                    log.warn("No custom properties file could be found: using default props");
+                    log.warn(
+                            "No custom properties file could be found: using default props");
                 }
             } else {
                 log.info("using default properties");
             }
-            prop.setProperty("jsonldContextFile", LOCAL_ONT_DIR+"context.jsonld");
+            prop.setProperty("jsonldContextFile",
+                    LOCAL_ONT_DIR + "context.jsonld");
             LibProps.init(prop);
             SERVER_ROOT = prop.getProperty("serverRoot");
             PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
@@ -111,20 +117,24 @@ public class ServiceConfig {
         PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
     }
 
-    public static void initForTests(String fusekiUrl) throws JsonParseException, JsonMappingException, IOException {
+    public static void initForTests(String fusekiUrl)
+            throws JsonParseException, JsonMappingException, IOException {
         try {
-            LOCAL_QUERIES_DIR = System.getProperty("user.dir") + "/src/test/resources/arq/";
-            InputStream input = new FileInputStream(new File("src/test/resources/ldspdiTest.properties"));
+            LOCAL_QUERIES_DIR = System.getProperty("user.dir")
+                    + "/src/test/resources/arq/";
+            InputStream input = new FileInputStream(
+                    new File("src/test/resources/ldspdiTest.properties"));
             // load a properties file
             prop.load(input);
             input.close();
             ResultsCache.init();
             /*
              * if (ServiceConfig.useAuth()) { try { InputStream is = new
-             * FileInputStream("/etc/buda/share/shared-private.properties"); prop.load(is);
-             * is.close(); } catch (IOException e) { e.printStackTrace();
-             * log.warn("No custom properties file could be found: using default props"); }
-             * AuthProps.init(prop); }
+             * FileInputStream("/etc/buda/share/shared-private.properties");
+             * prop.load(is); is.close(); } catch (IOException e) {
+             * e.printStackTrace(); log.
+             * warn("No custom properties file could be found: using default props"
+             * ); } AuthProps.init(prop); }
              */
             AuthProps.init(prop);
             LibProps.init(prop);

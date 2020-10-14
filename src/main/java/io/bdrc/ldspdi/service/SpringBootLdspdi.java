@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -28,7 +29,7 @@ import io.bdrc.taxonomy.TaxModel;
 @Configuration
 @EnableAutoConfiguration
 @Primary
-@ComponentScan(basePackages = { "io.bdrc.ldspdi" })
+@ComponentScan(basePackages = {"io.bdrc.ldspdi"})
 
 public class SpringBootLdspdi extends SpringBootServletInitializer {
 
@@ -36,15 +37,16 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     // LoggerFactory.getLogger(SpringBootLdspdi.class);
     public final static Logger log = LoggerFactory.getLogger("default");
 
-    public static void main(String[] args) throws RestException, RevisionSyntaxException, AmbiguousObjectException,
+    public static void main(String[] args) throws RestException,
+            RevisionSyntaxException, AmbiguousObjectException,
             IncorrectObjectTypeException, IOException, InterruptedException {
         final String configPath = System.getProperty("ldspdi.configpath");
         try {
             ServiceConfig.init();
         } catch (IOException e1) {
             log.error("Primary config could not be load in ServiceConfig", e1);
-            throw new RestException(500,
-                    new LdsError(LdsError.MISSING_RES_ERR).setContext("Ldspdi startup and initialization", e1));
+            throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR)
+                    .setContext("Ldspdi startup and initialization", e1));
         }
         AuthProps.init(ServiceConfig.getProperties());
         if (ServiceConfig.useAuth()) {
@@ -54,11 +56,13 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         // Pull lds-queries repo from git if not in china
         if (!ServiceConfig.isInChina()) {
             GitService gs = new GitService(0);
-            String commit = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
+            String commit = gs.update(GitService.GIT_LOCAL_PATH,
+                    GitService.GIT_REMOTE_URL);
             ServiceConfig.setQueriesCommit(commit);
         }
         if (ServiceConfig.getProperty("taxonomyRoot") != null) {
-            log.info("initialize taxonomy with root {}", ServiceConfig.getProperty("taxonomyRoot"));
+            log.info("initialize taxonomy with root {}",
+                    ServiceConfig.getProperty("taxonomyRoot"));
             TaxModel.fetchModel();
         }
         log.info("SpringBootLdspdi has been properly initialized");
@@ -66,10 +70,13 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void doSomethingAfterStartup() {
+    public void doSomethingAfterStartup()
+            throws InterruptedException, ExecutionException {
+
         Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
         Thread t_ont = new Thread(wh_ont);
         t_ont.start();
+
         if (!ServiceConfig.isInChina()) {
             // OntShapesData.init();
             Webhook wh = new Webhook(null, GitService.SHAPES, 0);
@@ -78,7 +85,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             if ("true".equals(AuthProps.getProperty("useAuth"))) {
                 log.info("SpringBootLdspdi uses auth, updating auth data...");
                 RdfAuthModel.init();
-                RdfAuthModel.updateAuthData(AuthProps.getProperty("fusekiUrl"));
+                RdfAuthModel.updateAuthData(
+                        AuthProps.getProperty("fusekiAuthData"));
             }
         }
         log.info("SERVER IS IN CHINA {}", ServiceConfig.isInChina());
