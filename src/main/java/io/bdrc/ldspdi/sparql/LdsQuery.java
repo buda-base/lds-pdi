@@ -10,7 +10,6 @@ import java.util.IllformedLocaleException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType;
@@ -152,7 +151,8 @@ public class LdsQuery {
                             if (parts[0] == null) {
                                 parts[0] = "";
                             }
-                            // may be done automatically by parametrizedSparqlString, to be checked
+                            // may be done automatically by
+                            // parametrizedSparqlString, to be checked
                             final String fullUri = ServiceConfig.PREFIX.getFullIRI(parts[0]);
                             if (fullUri != null) {
                                 queryStr.setIri(st, fullUri + parts[1]);
@@ -205,10 +205,11 @@ public class LdsQuery {
         }
         Query q;
         try {
-            q = queryStr.asQuery();            
+            q = queryStr.asQuery();
         } catch (Exception e) {
-            throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(
-                    " in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + queryStr.toString()));
+            throw new RestException(500,
+                    new LdsError(LdsError.PARSE_ERR).setContext(" in LdsQuery.getParametizedQuery() template ->"
+                            + getQueryName() + ".arq" + "; ERROR: " + queryStr.toString()));
         }
         if (!queryData.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
             if (q.hasLimit()) {
@@ -229,7 +230,7 @@ public class LdsQuery {
 
     public String checkQueryArgsSyntax(Map<String, String> map) {
         String check = "";
-        Set<String> set = map.keySet();
+        System.out.println("PARAMS>> " + getRequiredParams() + " MAp >>" + map);
         for (String required : getRequiredParams()) {
             if (map.get(required) == null || "null".contentEquals(map.get(required))) {
                 check = "The request mandatory parameter " + required + " is missing : the query cannot be built";
@@ -238,12 +239,14 @@ public class LdsQuery {
         }
         for (String arg : getAllParams()) {
             if (!arg.equals(QueryConstants.QUERY_NO_ARGS) && !arg.startsWith(QueryConstants.LITERAL_LIMITPREFIX)) {
-                // Param is not a Lang param --> if it's not present in the query --> Send error
+                // Param is not a Lang param --> if it's not present in the
+                // query --> Send error
                 if (!arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX) && query.indexOf("?" + arg) == -1) {
                     check = "Arg syntax is incorrect : query does not have a ?" + arg + " variable";
                     return check;
                 }
-                // Param is a Lang param --> check if the corresponding lit param is present
+                // Param is a Lang param --> check if the corresponding lit
+                // param is present
                 if (arg.startsWith(QueryConstants.LITERAL_LG_ARGS_PARAMPREFIX)) {
                     String expectedLiteralParam = QueryConstants.LITERAL_ARGS_PARAMPREFIX
                             + arg.substring(arg.indexOf("_") + 1);
@@ -261,8 +264,9 @@ public class LdsQuery {
 
     private List<String> getRequiredParams() {
         if (requiredParams == null) {
-            if (queryData.get("QueryParams") != null) {
-                requiredParams = (Arrays.asList(queryData.get("QueryParams").split(",")));
+            String s = queryData.get("QueryParams");
+            if (s != null && !s.equalsIgnoreCase("NONE")) {
+                requiredParams = (Arrays.asList(s.split(",")));
             } else {
                 requiredParams = new ArrayList<>();
             }
@@ -305,35 +309,36 @@ public class LdsQuery {
             if (type != null) {
                 String prefix = "param.";
                 switch (type) {
-                case QueryConstants.STRING_PARAM:
-                    StringParam stp = new StringParam(s);
-                    stp.setLangTag(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LANGTAG));
-                    stp.setIsLuceneParam(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LUCENE));
-                    stp.setExample(paramsData.get(prefix + s + "." + QueryConstants.PARAM_EXAMPLE));
-                    p.add(stp);
-                    break;
-                case QueryConstants.INT_PARAM:
-                    IntParam intp = new IntParam(s);
-                    intp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
-                    p.add(intp);
-                    break;
-                case QueryConstants.RES_PARAM:
-                    ResParam rtp = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
-                    rtp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
-                    p.add(rtp);
-                    break;
-                case QueryConstants.RES_PARAM_URI:
-                    ResParam rtp1 = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
-                    rtp1.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
-                    p.add(rtp1);
-                    break;
-                case QueryConstants.DATETIME_PARAM:
-                    DateTimeParam datetimep = new DateTimeParam(s);
-                    datetimep.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
-                    p.add(datetimep);
-                    break;
-                default:
-                    log.error("unknown type: " + type);
+                    case QueryConstants.STRING_PARAM :
+                        StringParam stp = new StringParam(s);
+                        stp.setLangTag(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LANGTAG));
+                        stp.setIsLuceneParam(paramsData.get(prefix + s + "." + QueryConstants.PARAM_LUCENE));
+                        stp.setExample(paramsData.get(prefix + s + "." + QueryConstants.PARAM_EXAMPLE));
+                        p.add(stp);
+                        break;
+                    case QueryConstants.INT_PARAM :
+                        IntParam intp = new IntParam(s);
+                        intp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(intp);
+                        break;
+                    case QueryConstants.RES_PARAM :
+                        ResParam rtp = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
+                        rtp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(rtp);
+                        break;
+                    case QueryConstants.RES_PARAM_URI :
+                        ResParam rtp1 = new ResParam(s,
+                                paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));
+                        rtp1.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(rtp1);
+                        break;
+                    case QueryConstants.DATETIME_PARAM :
+                        DateTimeParam datetimep = new DateTimeParam(s);
+                        datetimep.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(datetimep);
+                        break;
+                    default :
+                        log.error("unknown type: " + type);
                 }
             }
         }
@@ -388,7 +393,8 @@ public class LdsQuery {
             ServiceConfig.init();
             HashMap<String, String> map = new HashMap<>();
             LdsQuery lds = new LdsQuery("lds-queries/public/latestsyncssince.arq");
-            // LdsQueryNew lds = new LdsQueryNew("lds-queries/public/Etexts_count.arq");
+            // LdsQueryNew lds = new
+            // LdsQueryNew("lds-queries/public/Etexts_count.arq");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
             // map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
             // map.put("L_LNG", "en");
@@ -397,7 +403,8 @@ public class LdsQuery {
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
             // map.put("R_g", "http://purl.bdrc.io/resource/GenderMale");
-            // LdsQuery lds = new LdsQuery("lds-queries/public/Work_ImgList.arq");
+            // LdsQuery lds = new
+            // LdsQuery("lds-queries/public/Work_ImgList.arq");
             // map.put("R_RES", "bdr:W29329");
             System.out.println("Required Params >>" + lds.getRequiredParams());
             System.out.println("Optional Params >>" + lds.getOptionalParams());
