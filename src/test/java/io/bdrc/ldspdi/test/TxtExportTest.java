@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -72,6 +73,8 @@ public class TxtExportTest {
         HttpResponse resp = client.execute(get);
         System.out.println(resp.getStatusLine());
         // resp.getEntity().writeTo(System.out);
+        //Header[] hs = resp.getHeaders("Content-Disposition");
+        //System.out.println(hs[0].toString());
         assertTrue(resp.getStatusLine().getStatusCode() == 200);
     }
 }

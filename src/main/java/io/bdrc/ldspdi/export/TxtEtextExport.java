@@ -109,9 +109,9 @@ public class TxtEtextExport {
             cc = cc.cachePublic();
         }
         String fName =  resName;
-        if (startChar != 0 || endChar != PublicDataController.defaultMaxValI) {
-            fName += startChar.toString() + "-";
-            if (endChar != PublicDataController.defaultMaxValI) {
+        if ((!startChar.equals(0)) || !endChar.equals(PublicDataController.defaultMaxValI)) {
+            fName += "-" + startChar.toString() + "-";
+            if (!endChar.equals(PublicDataController.defaultMaxValI)) {
                 fName += endChar.toString();
             } else {
                 fName += "end";
