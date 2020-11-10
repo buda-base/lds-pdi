@@ -412,9 +412,12 @@ public class PublicDataController {
                 StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
+    
+    public static final String defaultMaxVal = "999999999";
+    public static final Integer defaultMaxValI = 999999999;
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res,
             @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
-            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar,
+            @RequestParam(value = "endChar", defaultValue = defaultMaxVal) String endChar,
             @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response,
             HttpServletRequest request) throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
@@ -447,7 +450,7 @@ public class PublicDataController {
         }
         if (ext.equals("txt")) {
             return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar),
-                    Integer.parseInt(endChar));
+                    Integer.parseInt(endChar), res);
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null,
                 computeGraphType(request));

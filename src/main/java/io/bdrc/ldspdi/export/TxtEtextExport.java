@@ -19,6 +19,7 @@ import io.bdrc.auth.Access;
 import io.bdrc.auth.Access.AccessLevel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
 import io.bdrc.ldspdi.sparql.LdsQuery;
@@ -76,7 +77,7 @@ public class TxtEtextExport {
         return sb.toString();
     }
     
-    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar) throws RestException {
+    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar, final String resName) throws RestException {
         final ResultSetWrapper res = getResults(resUri, startChar, endChar);
         if (res.numResults < 2) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
@@ -107,9 +108,20 @@ public class TxtEtextExport {
         } else {
             cc = cc.cachePublic();
         }
+        String fName =  resName;
+        if (startChar != 0 || endChar != PublicDataController.defaultMaxValI) {
+            fName += startChar.toString() + "-";
+            if (endChar != PublicDataController.defaultMaxValI) {
+                fName += endChar.toString();
+            } else {
+                fName += "end";
+            }
+        }
+        fName += ".txt";
         final String resStr = getStringForTxt(res, startChar, endChar);
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD")
                 .header("Vary", "Negotiate, Accept")
+                .header("Content-Disposition", "attachment; filename=\""+fName+"\"")
                 .cacheControl(cc)
                 .body(StreamingHelpers.getStream(resStr));
     }
