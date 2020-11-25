@@ -89,6 +89,8 @@ public class LibrarySearchController {
         case "imLuckyAssociatedGraph":
         case "imLuckySearchGraph":
         case "etextContentFacetGraph":
+        case "etextContentFacetGraphInInstance":
+        case "etextContentFacetGraphInEtext":
             res = TypeResults.getResultsMap(model);
             break;
         default:
