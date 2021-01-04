@@ -68,6 +68,10 @@ public class LibrarySearchController {
         case "workFacetGraph":
         case "instanceFacetGraph":
         case "iinstanceSyncedIn":
+        case "dateWorks":
+        case "dateInstances":
+        case "idWorks":
+        case "idInstances":
         case "associatedWorks":
         case "associatedInstances":
         case "associatedIInstances":
@@ -82,6 +86,8 @@ public class LibrarySearchController {
         case "associatedPersons":
         case "associatedSimpleTypes":
         case "associatedPlaces":
+        case "datePlaces":
+        case "datePersons":
         case "placeGraph":
         case "typeSimpleGraph":
         case "typeCreatedIn":
