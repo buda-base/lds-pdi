@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.objects.json.DateTimeParam;
+import io.bdrc.ldspdi.objects.json.GYearParam;
 import io.bdrc.ldspdi.objects.json.IntParam;
 import io.bdrc.ldspdi.objects.json.Output;
 import io.bdrc.ldspdi.objects.json.Param;
@@ -138,6 +139,11 @@ public class LdsQuery {
             if (st.startsWith(QueryConstants.DATE_ARGS_PARAMPREFIX)) {
                 if (converted.get(st) != null) {
                     queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDdateTime);
+                }
+            }
+            if (st.startsWith(QueryConstants.GY_ARGS_PARAMPREFIX)) {
+                if (converted.get(st) != null) {
+                    queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDgYear);
                 }
             }
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
@@ -336,6 +342,11 @@ public class LdsQuery {
                         DateTimeParam datetimep = new DateTimeParam(s);
                         datetimep.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
                         p.add(datetimep);
+                        break;
+                    case QueryConstants.GY_PARAM :
+                        GYearParam gp = new GYearParam(s);
+                        gp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(gp);
                         break;
                     default :
                         log.error("unknown type: " + type);

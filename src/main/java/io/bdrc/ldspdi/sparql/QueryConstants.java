@@ -78,6 +78,8 @@ public class QueryConstants {
     // Query Params prefixes
     public final static String INT_ARGS_PARAMPREFIX = "I_";
     public final static String DATE_ARGS_PARAMPREFIX = "D_";
+    public final static String DATETIME_ARGS_PARAMPREFIX = "DT_";
+    public final static String GY_ARGS_PARAMPREFIX = "GY_";
     public final static String LITERAL_ARGS_PARAMPREFIX = "L_";
     public final static String LITERAL_LG_ARGS_PARAMPREFIX = "LG_";
     public final static String LITERAL_LIMITPREFIX = "LI_";
@@ -85,10 +87,12 @@ public class QueryConstants {
 
     // Query Params types
     public static final String INT_PARAM = "int";
+    public static final String GY_PARAM = "gYear";
     public static final String RES_PARAM = "resource";
     public static final String RES_PARAM_URI = "URI";
     public static final String STRING_PARAM = "string";
     public static final String DATETIME_PARAM = "datetime";
+    public static final String DATE_PARAM = "date";
 
     // Resources types
     public static final String WORK = "Work";
