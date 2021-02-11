@@ -69,7 +69,7 @@ public class MarcExportTest {
     @Test
     public void testSimpleRequestSimple() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/I23819.mrcx");
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/W23819.mrcx");
         HttpResponse response = client.execute(get);
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");

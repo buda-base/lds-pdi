@@ -91,22 +91,23 @@ public class MarcExport {
     public static final String BDR = "http://purl.bdrc.io/resource/";
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
-    public static final Property partOf = ResourceFactory.createProperty(BDO + "workPartOf");
-    public static final Property workHasPart = ResourceFactory.createProperty(BDO + "workHasPart");
-    public static final Property workPartTreeIndex = ResourceFactory.createProperty(BDO + "workPartTreeIndex");
-    public static final Property hasExpression = ResourceFactory.createProperty(BDO + "workHasExpression");
-    public static final Property workEditionStatement = ResourceFactory.createProperty(BDO + "workEditionStatement");
-    public static final Property workExtentStatement = ResourceFactory.createProperty(BDO + "workExtentStatement");
-    public static final Property workPublisherName = ResourceFactory.createProperty(BDO + "workPublisherName");
-    public static final Property workPublisherLocation = ResourceFactory.createProperty(BDO + "workPublisherLocation");
-    public static final Property workAuthorshipStatement = ResourceFactory.createProperty(BDO + "workAuthorshipStatement");
-    public static final Property workCatalogInfo = ResourceFactory.createProperty(BDO + "workCatalogInfo");
-    public static final Property workBiblioNote = ResourceFactory.createProperty(BDO + "workBiblioNote");
+    public static final Property partOf = ResourceFactory.createProperty(BDO + "partOf");
+    public static final Property hasPart = ResourceFactory.createProperty(BDO + "hasPart");
+    public static final Property partTreeIndex = ResourceFactory.createProperty(BDO + "partTreeIndex");
+    public static final Property hasInstance = ResourceFactory.createProperty(BDO + "workHasInstance");
+    public static final Property editionStatement = ResourceFactory.createProperty(BDO + "editionStatement");
+    public static final Property extentStatement = ResourceFactory.createProperty(BDO + "extentStatement");
+    public static final Property publisherName = ResourceFactory.createProperty(BDO + "publisherName");
+    public static final Property publisherLocation = ResourceFactory.createProperty(BDO + "publisherLocation");
+    public static final Property authorshipStatement = ResourceFactory.createProperty(BDO + "authorshipStatement");
+    public static final Property catalogInfo = ResourceFactory.createProperty(BDO + "catalogInfo");
+    public static final Property workBiblioNote = ResourceFactory.createProperty(BDO + "biblioNote");
     public static final Property creator = ResourceFactory.createProperty(BDO + "creator");
     public static final Property role = ResourceFactory.createProperty(BDO + "role");
     public static final Property agent = ResourceFactory.createProperty(BDO + "agent");
+    public static final Property instanceEvent = ResourceFactory.createProperty(BDO + "instanceEvent");
     public static final Property workEvent = ResourceFactory.createProperty(BDO + "workEvent");
-    public static final Property workTitle = ResourceFactory.createProperty(BDO + "workTitle");
+    public static final Property hasTitle = ResourceFactory.createProperty(BDO + "hasTitle");
     public static final Property workIsAbout = ResourceFactory.createProperty(BDO + "workIsAbout");
     public static final Property workGenre = ResourceFactory.createProperty(BDO + "workGenre");
     public static final Property workNumberOf = ResourceFactory.createProperty(BDO + "workNumberOf");
@@ -182,18 +183,18 @@ public class MarcExport {
         // from Columbia:
         // If you use first indicator 1 and subfield $i, then there is no second
         // indicator. It needs to be blank.
-        titleLocalNameToMarcInfo.put("WorkTitlePageTitle", new MarcInfo(0, '5', null));
-        titleLocalNameToMarcInfo.put("WorkBibliographicalTitle", new MarcInfo(1, ' ', "BDRC Bibliographical title:"));
-        titleLocalNameToMarcInfo.put("WorkCoverTitle", new MarcInfo(2, '4', null));
-        titleLocalNameToMarcInfo.put("WorkFullTitle", new MarcInfo(3, '3', null));
-        titleLocalNameToMarcInfo.put("WorkHalfTitle", new MarcInfo(4, '3', null)); // or 3?
-        titleLocalNameToMarcInfo.put("WorkColophonTitle", new MarcInfo(5, ' ', "Colophon title:"));
-        titleLocalNameToMarcInfo.put("WorkCopyrightPageTitle", new MarcInfo(6, '3', null));
-        titleLocalNameToMarcInfo.put("WorkDkarChagTitle", new MarcInfo(7, ' ', "Table of contents title:"));
-        titleLocalNameToMarcInfo.put("WorkOtherTitle", new MarcInfo(8, '3', null));
-        titleLocalNameToMarcInfo.put("WorkRunningTitle", new MarcInfo(9, '7', null));
-        titleLocalNameToMarcInfo.put("WorkSpineTitle", new MarcInfo(10, '8', null));
-        titleLocalNameToMarcInfo.put("WorkTitlePortion", new MarcInfo(11, '0', null));
+        titleLocalNameToMarcInfo.put("TitlePageTitle", new MarcInfo(0, '5', null));
+        titleLocalNameToMarcInfo.put("BibliographicalTitle", new MarcInfo(1, ' ', "BDRC Bibliographical title:"));
+        titleLocalNameToMarcInfo.put("CoverTitle", new MarcInfo(2, '4', null));
+        titleLocalNameToMarcInfo.put("FullTitle", new MarcInfo(3, '3', null));
+        titleLocalNameToMarcInfo.put("HalfTitle", new MarcInfo(4, '3', null)); // or 3?
+        titleLocalNameToMarcInfo.put("ColophonTitle", new MarcInfo(5, ' ', "Colophon title:"));
+        titleLocalNameToMarcInfo.put("CopyrightPageTitle", new MarcInfo(6, '3', null));
+        titleLocalNameToMarcInfo.put("DkarChagTitle", new MarcInfo(7, ' ', "Table of contents title:"));
+        titleLocalNameToMarcInfo.put("OtherTitle", new MarcInfo(8, '3', null));
+        titleLocalNameToMarcInfo.put("RunningTitle", new MarcInfo(9, '7', null));
+        titleLocalNameToMarcInfo.put("SpineTitle", new MarcInfo(10, '8', null));
+        titleLocalNameToMarcInfo.put("TitlePortion", new MarcInfo(11, '0', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
         // Columbia doesn't want RDA here
@@ -319,7 +320,7 @@ public class MarcExport {
 
     public static void addPubInfo(final Model m, final Resource main, final Record r) {
         final DataField f264 = factory.newDataField("264", ' ', '1');
-        StmtIterator si = main.listProperties(workPublisherLocation);
+        StmtIterator si = main.listProperties(publisherLocation);
         boolean hasPubLocation = false;
         while (si.hasNext()) {
             final Literal pubLocation = si.next().getLiteral();
@@ -333,7 +334,7 @@ public class MarcExport {
         if (!hasPubLocation) {
             f264.addSubfield(factory.newSubfield('a', "[Place of publication not identified] :"));
         }
-        si = main.listProperties(workPublisherName);
+        si = main.listProperties(publisherName);
         boolean hasPubName = false;
         while (si.hasNext()) {
             final Literal pubName = si.next().getLiteral();
@@ -377,7 +378,7 @@ public class MarcExport {
                 sb.append("    ");
             }
         }
-        final Statement publisherLocationS = main.getProperty(workPublisherLocation);
+        final Statement publisherLocationS = main.getProperty(publisherLocation);
         if (publisherLocationS == null) {
             sb.append(defaultCountryCode);
         } else {
@@ -396,7 +397,7 @@ public class MarcExport {
     }
 
     public static void add300(final Model m, final Resource main, final Record r) {
-        final Statement extentStatementS = main.getProperty(workExtentStatement);
+        final Statement extentStatementS = main.getProperty(extentStatement);
         if (extentStatementS == null) {
             return;
         }
@@ -655,7 +656,7 @@ public class MarcExport {
         Literal firstChinesePinyin = null;
         Literal firstChineseHanzi = null;
         List<Literal> highestPrioList = null;
-        StmtIterator si = main.listProperties(workTitle);
+        StmtIterator si = main.listProperties(hasTitle);
         while (si.hasNext()) {
             final Resource title = si.next().getResource();
             final Resource type = title.getPropertyResourceValue(RDF.type);
@@ -663,7 +664,7 @@ public class MarcExport {
             StmtIterator labelSi = title.listProperties(RDFS.label);
             while (labelSi.hasNext()) {
                 final Literal titleLit = labelSi.next().getLiteral();
-                if (typeLocalName.equals("WorkSubtitle")) {
+                if (typeLocalName.equals("Subtitle")) {
                     subtitleStr = getLangStr(titleLit);
                     subtitleStr880 = get880String(titleLit);
                     continue;
@@ -708,7 +709,7 @@ public class MarcExport {
             Collections.sort(highestPrioList, compbcp); // works for null
         }
         // authorship statement
-        si = main.listProperties(workAuthorshipStatement);
+        si = main.listProperties(authorshipStatement);
         String authorshipStatement = null;
         String authorshipStatement880 = null;
         while (si.hasNext()) {
@@ -965,7 +966,7 @@ public class MarcExport {
         final StringBuilder sb = new StringBuilder();
         int nbLangScripts = 0;
         String firstScriptLabel = null;
-        List<Resource> lsLeaves = getLangScriptLeaves(m, main, workLangScript);
+        List<Resource> lsLeaves = getLangScriptLeaves(m, main, language);
         for (Resource ls : lsLeaves) {
             final String plainEnglish = getLangLabel(m, ls);
             nbLangScripts += 1;
@@ -1021,7 +1022,7 @@ public class MarcExport {
     }
 
     private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang, final boolean limitSize) {
-        final Selector selector = new SimpleSelector(null, workHasPart, (RDFNode) null);
+        final Selector selector = new SimpleSelector(null, hasPart, (RDFNode) null);
         final StmtIterator si = m.listStatements(selector);
         StringBuilder sb = new StringBuilder();
         final Map<String, Literal> parts = new TreeMap<>();
@@ -1029,7 +1030,7 @@ public class MarcExport {
         // we keep the parts in order
         while (si.hasNext()) {
             final Resource part = si.next().getResource();
-            final Statement indexTreeS = part.getProperty(workPartTreeIndex);
+            final Statement indexTreeS = part.getProperty(partTreeIndex);
             if (indexTreeS == null)
                 continue;
             final Literal l = getPreferredLit(part, bcp47lang);
@@ -1110,7 +1111,7 @@ public class MarcExport {
 
     public static List<String> getLanguages(final Model m, final Resource main) {
         final List<String> res = new ArrayList<>();
-        final StmtIterator lsi = main.listProperties(workLangScript);
+        final StmtIterator lsi = main.listProperties(language);
         while (lsi.hasNext()) {
             final Resource ls = lsi.next().getResource();
             final StmtIterator li = ls.listProperties(language);
@@ -1265,7 +1266,7 @@ public class MarcExport {
             record.addVariableField(df245246);
         }
         // edition statement
-        si = workR.listProperties(workEditionStatement);
+        si = workR.listProperties(editionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
@@ -1301,7 +1302,7 @@ public class MarcExport {
         }
         addAccess(m, workR, record); // 506
         // catalog info (summary)
-        si = workR.listProperties(workCatalogInfo);
+        si = workR.listProperties(catalogInfo);
         while (si.hasNext()) {
             final Literal catalogInfo = si.next().getLiteral();
             final DataField f520 = factory.newDataField("520", ' ', ' ');
@@ -1378,7 +1379,7 @@ public class MarcExport {
         }
         // should be temporary
         if (main.getLocalName().startsWith("W1FPL")) {
-            model.add(main, workLangScript, model.createResource(BDR + "PiMymr"));
+            model.add(main, language, model.createResource(BDR + "PiMymr"));
         }
         // this should be correct but breaks W2DB4598 because of poorly encoded series
         // data
@@ -1402,8 +1403,8 @@ public class MarcExport {
         }
     }
 
-    public static final String ItemUriPrefix = BDR + "I";
-    public static final String WorkUriPrefix = BDR + "W";
+    public static final String ItemUriPrefix = BDR + "W";
+    public static final String WorkUriPrefix = BDR + "MW";
     public static final int ItemUriPrefixLen = ItemUriPrefix.length();
 
     public static ResponseEntity<StreamingResponseBody> getResponse(final MediaType mt, final String resUri) throws RestException {
