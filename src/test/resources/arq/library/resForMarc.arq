@@ -41,6 +41,10 @@ construct {
     ?mw ?p ?o .
   }
   union {
+    ?R_RES :instanceOf ?wa .
+    ?wa ?p ?o .
+  }
+  union {
     ?R_RES :instanceHasReproduction ?item .
     ?item a :ImageInstance ;
           ?p ?o .

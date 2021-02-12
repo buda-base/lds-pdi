@@ -35,6 +35,13 @@ bdr:ScriptTibt
   skos:prefLabel "bod yig"@bo-x-ewts ;
   rdfs:seeAlso <http://lexvo.org/id/script/Tibt> .
 
+bdr:ScriptDbuCan
+  a bdo:Script ;
+  skos:prefLabel "Uchen"@en ;
+  skos:prefLabel "dbu can/"@bo-x-ewts ;
+  skos:broader bdr:ScriptTibt ;
+.
+
 bdr:SaDeva  a    bdo:LangScript ;
    rdfs:label    "Sanskrit in Devanagari"@en ;
    bdo:language  bdr:LangSa ;

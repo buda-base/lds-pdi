@@ -82,6 +82,11 @@ import io.bdrc.libraries.formatters.TTLRDFWriter;
  *  - length of a record must be at most 99999 bytes
  *
  * This means splitting (or just removing) the 505 field, which is the easiest leverage.
+ * 
+ * Possible additions:
+ * https://www.loc.gov/marc/authority/ad375.html ?
+ * https://www.loc.gov/marc/bibliographic/ecbdcntf.html indicating the ISO script in subfield 6
+ * 
  */
 
 public class MarcExport {
@@ -129,7 +134,6 @@ public class MarcExport {
     public static final Property tmpLicense = ResourceFactory.createProperty(TMP + "license");
     public static final Property tmpStatus = ResourceFactory.createProperty(TMP + "status");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP + "publishedYear");
-    public static final Property subclassOfTax = ResourceFactory.createProperty(BDO + "taxSubClassOf");
     public static final Property langBCP47Lang = ResourceFactory.createProperty(BDO + "langBCP47Lang");
     public static final Property langMARCCode = ResourceFactory.createProperty(BDO + "langMARCCode");
 
@@ -916,53 +920,16 @@ public class MarcExport {
 
     private static CompareStringLiterals baseComp = new CompareStringLiterals(null);
 
-    private static String getLangLabel(final Model m, final Resource langScript) {
-        final Resource lang = langScript.getPropertyResourceValue(language);
-        if (lang == null) {
-            log.error("cannot find language for {}", langScript.getLocalName());
-            return null;
-        }
-        final Literal langL = getPreferredLit(lang, null);
-        if (langL == null)
-            return lang.getLocalName();
-        return langL.getString();
-    }
-
-    // returns the script or null if the script is deemed unnecessary
-    private static String getScriptLabel(final Model m, final Resource langScript) {
-        final Resource lang = langScript.getPropertyResourceValue(language);
-        if (lang == null) {
-            return null;
-        }
-        final String langLoc = lang.getLocalName();
-        if (langLoc.equals("LangPi") || langLoc.equals("LangSa")) {
-            final Resource scriptR = langScript.getPropertyResourceValue(script);
-            final Literal scriptL = getPreferredLit(scriptR, null);
-            if (scriptL == null)
-                return null;
-            return scriptL.getString();
-        }
-        return null;
-    }
-
-    private static List<Resource> getLangScriptLeaves(final Model m, final Resource main, final Property p) {
+    private static List<Resource> getScriptLeaves(final Model m, final Resource main, final Property p) {
         StmtIterator lsi = main.listProperties(p);
         final Map<Resource, Boolean> resHasSubClass = new HashMap<>();
         while (lsi.hasNext()) {
-            final Resource langScript = lsi.next().getObject().asResource();
-            // TODO: remove that crap from the data
-            if (langScript.getLocalName().equals("LanguageTaxonomy")) {
-                continue;
-            }
-            Resource superR = langScript.getPropertyResourceValue(subclassOfTax);
+            final Resource script = lsi.next().getObject().asResource();
+            Resource superR = script.getPropertyResourceValue(SKOS.broader);
             if (superR != null) {
                 resHasSubClass.put(superR, true);
             }
-            superR = langScript.getPropertyResourceValue(RDFS.subClassOf);
-            if (superR != null) {
-                resHasSubClass.put(superR, true);
-            }
-            resHasSubClass.putIfAbsent(langScript, false);
+            resHasSubClass.putIfAbsent(script, false);
         }
         final List<Resource> res = new ArrayList<>();
         for (Entry<Resource, Boolean> e : resHasSubClass.entrySet()) {
@@ -975,24 +942,38 @@ public class MarcExport {
 
     private static void addLanguages(final Model m, final Resource main, final Record record) {
         final StringBuilder sb = new StringBuilder();
-        int nbLangScripts = 0;
+        int nbLangs = 0;
         String firstScriptLabel = null;
-        List<Resource> lsLeaves = getLangScriptLeaves(m, main, language);
-        for (Resource ls : lsLeaves) {
-            final String plainEnglish = getLangLabel(m, ls);
-            nbLangScripts += 1;
-            if (nbLangScripts == 1) {
+        List<Resource> sLeaves = getScriptLeaves(m, main, script);
+        if (sLeaves.size() > 0) {
+            // just take the first script, not ideal but a reasonable approximation
+            Literal firstScriptLabelL = getPreferredLit(sLeaves.get(0), null);
+            if (firstScriptLabelL == null)
+                firstScriptLabel = sLeaves.get(0).getLocalName();
+            else
+                firstScriptLabel = firstScriptLabelL.getString();
+        }
+        StmtIterator lsi = main.listProperties(language);
+        while (lsi.hasNext()) {
+            final Resource lang = lsi.next().getObject().asResource();
+            final Literal langL = getPreferredLit(lang, null);
+            final String plainEnglish;
+            if (langL == null)
+                plainEnglish = lang.getLocalName();
+            else
+                plainEnglish = langL.getString();
+            nbLangs += 1;
+            if (nbLangs == 1) {
                 sb.append("In ");
-                firstScriptLabel = getScriptLabel(m, ls);
             } else {
                 sb.append(" and ");
             }
             sb.append(plainEnglish);
         }
-        if (nbLangScripts == 0)
+        if (nbLangs == 0)
             return;
         final DataField f546 = factory.newDataField("546", ' ', ' ');
-        if (nbLangScripts == 1 && firstScriptLabel != null) {
+        if (nbLangs == 1 && firstScriptLabel != null) {
             f546.addSubfield(factory.newSubfield('a', sb.toString() + ';'));
             f546.addSubfield(factory.newSubfield('b', firstScriptLabel + " script."));
         } else {
@@ -1113,14 +1094,8 @@ public class MarcExport {
         final List<String> res = new ArrayList<>();
         final StmtIterator lsi = main.listProperties(language);
         while (lsi.hasNext()) {
-            final Resource ls = lsi.next().getResource();
-            final StmtIterator li = ls.listProperties(language);
-            while (li.hasNext()) {
-                final String lurl = li.next().getResource().getURI();
-                if (!res.contains(lurl)) {
-                    res.add(lurl);
-                }
-            }
+            final String lurl = lsi.next().getResource().getURI();
+            res.add(lurl);
         }
         return res;
     }
