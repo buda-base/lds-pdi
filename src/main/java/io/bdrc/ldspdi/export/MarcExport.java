@@ -366,12 +366,15 @@ public class MarcExport {
         if (publishedYearS == null) {
             f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
         } else {
-            final int publishedYear = publishedYearS.getInt();
-            if (publishedYear > 9999 || publishedYear < 0) {
-                f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
-            } else {
-                f264.addSubfield(factory.newSubfield('c', String.valueOf(publishedYear) + "."));
-            }
+            final String publishedYearStr = publishedYearS.getLiteral().getLexicalForm();
+            try {
+                int publishedYear = Integer.parseInt(publishedYearStr);
+                if (publishedYear > 9999 || publishedYear < 0) {
+                    f264.addSubfield(factory.newSubfield('c', "[date of publication not identified]"));
+                } else {
+                    f264.addSubfield(factory.newSubfield('c', String.valueOf(publishedYear) + "."));
+                } 
+            } catch (NumberFormatException e) {  }
         }
         r.addVariableField(f264);
     }
@@ -383,15 +386,18 @@ public class MarcExport {
         if (publishedYearS == null) {
             sb.append("nuuuuuuuu");
         } else {
-            final int publishedYear = publishedYearS.getInt();
-            if (publishedYear > 9999 || publishedYear < 0) {
-                sb.append("nuuuuuuuu");
-            } else {
-                final String date = String.format("%04d", publishedYear);
-                sb.append('s');
-                sb.append(date);
-                sb.append("    ");
-            }
+            final String publishedYearStr = publishedYearS.getLiteral().getLexicalForm();
+            try {
+                int publishedYear = Integer.parseInt(publishedYearStr);
+                if (publishedYear > 9999 || publishedYear < 0) {
+                    sb.append("nuuuuuuuu");
+                } else {
+                    final String date = String.format("%04d", publishedYear);
+                    sb.append('s');
+                    sb.append(date);
+                    sb.append("    ");
+                } 
+            } catch (NumberFormatException e) {  }
         }
         final Statement publisherLocationS = main.getProperty(publisherLocation);
         if (publisherLocationS == null) {
@@ -496,12 +502,18 @@ public class MarcExport {
                 final Resource eventType = event.getPropertyResourceValue(RDF.type);
                 if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
                     if (event.hasProperty(onYear)) {
-                        birthYear = event.getProperty(onYear).getInt();
+                        final String birthYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
+                        try {
+                            birthYear = Integer.parseInt(birthYearStr);
+                        } catch (NumberFormatException e) {  }
                     }
                 }
                 if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
                     if (event.hasProperty(onYear)) {
-                        deathYear = event.getProperty(onYear).getInt();
+                        final String deathYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
+                        try {
+                            deathYear = Integer.parseInt(deathYearStr);
+                        } catch (NumberFormatException e) {  }
                     }
                 }
             }

@@ -186,7 +186,7 @@ bdr:MW23819  a   bdo:Work ;
    bdo:authorshipStatement  "snga 'gyur rig mdzod rtsom sgrig lhan tshogs/"@bo-x-ewts ;
    bdo:biblioNote  "reproduced from the rare but incomplet manuscript set of mtshams-brag..."@en ;
    bdo:instanceEvent  [ a             bdo:PublishedEvent ;
-                    bdo:onYear    1979
+                    bdo:onYear    "1979"^^xsd:gYear
                   ] ;
    bdo:editionStatement  "par gzhi1., par thengs 2."@bo-x-ewts ;
    bdo:instanceExtentStatement  "1 v." ;
@@ -253,10 +253,10 @@ bdr:P326  a      bdo:Person ;
            bdo:noteSource  bdr:MW19804
          ] ;
    bdo:personEvent  [ a             bdo:PersonBirth ;
-                      bdo:onYear    1212
+                      bdo:onYear    "1212"^^xsd:gYear
                     ] ,
          [ a             bdo:PersonDeath ;
-           bdo:onYear    1270
+           bdo:onYear    "1270"^^xsd:gYear
          ] ,
          [ a             bdo:PersonOccupiesSeat ;
            bdo:eventWhere  bdr:G388
