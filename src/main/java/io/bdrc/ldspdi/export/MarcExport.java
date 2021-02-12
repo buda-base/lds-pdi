@@ -1,6 +1,8 @@
 package io.bdrc.ldspdi.export;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +30,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Selector;
@@ -91,6 +94,7 @@ public class MarcExport {
     public static final String BDR = "http://purl.bdrc.io/resource/";
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
+    public static final String BF = "http://id.loc.gov/ontologies/bibframe/";
     public static final Property partOf = ResourceFactory.createProperty(BDO + "partOf");
     public static final Property hasPart = ResourceFactory.createProperty(BDO + "hasPart");
     public static final Property partTreeIndex = ResourceFactory.createProperty(BDO + "partTreeIndex");
@@ -115,15 +119,11 @@ public class MarcExport {
     public static final Property workSeriesNumber = ResourceFactory.createProperty(BDO + "workSeriesNumber");
     public static final Property personEvent = ResourceFactory.createProperty(BDO + "personEvent");
     public static final Property personName = ResourceFactory.createProperty(BDO + "personName");
-    public static final Property workLangScript = ResourceFactory.createProperty(BDO + "workLangScript");
-    public static final Property workOtherLangScript = ResourceFactory.createProperty(BDO + "workOtherLangScript");
     public static final Property language = ResourceFactory.createProperty(BDO + "language");
     public static final Property script = ResourceFactory.createProperty(BDO + "script");
     public static final Property onYear = ResourceFactory.createProperty(BDO + "onYear");
     public static final Property notBefore = ResourceFactory.createProperty(BDO + "notBefore");
     public static final Property notAfter = ResourceFactory.createProperty(BDO + "notAfter");
-    public static final Property workIsbn = ResourceFactory.createProperty(BDO + "workIsbn");
-    public static final Property workLccn = ResourceFactory.createProperty(BDO + "workLccn");
     public static final Property workLcCallNumber = ResourceFactory.createProperty(BDO + "workLcCallNumber");
     public static final Property tmpAccess = ResourceFactory.createProperty(TMP + "access");
     public static final Property tmpLicense = ResourceFactory.createProperty(TMP + "license");
@@ -279,12 +279,23 @@ public class MarcExport {
         }
         return res;
     }
-
-    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean itemMode) {
-        final StmtIterator si = main.listProperties(workIsbn);
+    
+    public static List<String> getId(final Model m, final Resource main, final Resource type) {
+        final ResIterator si = m.listResourcesWithProperty(RDF.type, type);
+        final List<String> res = new ArrayList<>();
         while (si.hasNext()) {
-            final Statement s = si.next();
-            final String isbn = s.getLiteral().getString();
+            final Resource id = si.next();
+            final Statement value = id.getProperty(RDF.value);
+            if (value == null) continue;
+            res.add(value.getString());
+        }
+        return res;
+    }
+
+    // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
+    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean itemMode) {
+        final List<String> isbnList = getId(m, main, m.createResource(BDR+"HollisId"));
+        for (final String isbn : isbnList) {
             final String validIsbn = isbnvalidator.validate(isbn);
             final DataField df = factory.newDataField("020", ' ', ' ');
             if (!itemMode && validIsbn != null) {
@@ -978,17 +989,6 @@ public class MarcExport {
             }
             sb.append(plainEnglish);
         }
-        lsLeaves = getLangScriptLeaves(m, main, workOtherLangScript);
-        for (Resource ls : lsLeaves) {
-            final String plainEnglish = getLangLabel(m, ls);
-            nbLangScripts += 1;
-            if (nbLangScripts == 1) {
-                sb.append("In ");
-            } else {
-                sb.append(" and ");
-            }
-            sb.append(plainEnglish);
-        }
         if (nbLangScripts == 0)
             return;
         final DataField f546 = factory.newDataField("546", ' ', ' ');
@@ -1193,6 +1193,8 @@ public class MarcExport {
         record.addVariableField(f006);
         record.addVariableField(f007);
         final List<String> langUrls = getLanguages(m, workR);
+        System.out.println("XXXXXXXXXXXXXXXX");
+        System.out.println(langUrls);
         String bcp47lang = null;
         String langMarcCode = null;
         // request from Columbia, when we have multiple languages recorded, we should
@@ -1238,17 +1240,15 @@ public class MarcExport {
         }
         record.addVariableField(f040);
         add041(m, record, langUrls, langMarcCode);
-        StmtIterator si = workR.listProperties(workLcCallNumber);
-        while (si.hasNext()) {
-            String lccn = si.next().getLiteral().getString();
-            // see
+        List<String> lcCallNumberList = getId(m, workR, m.getResource(BF+"ShelfMarkLcc"));
+        for (String lcCallNumber : lcCallNumberList) {
             // https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
-            lccn = lccn.toUpperCase();
-            final int firstSpaceIdx = lccn.indexOf(' ');
+            lcCallNumber = lcCallNumber.toUpperCase();
+            final int firstSpaceIdx = lcCallNumber.indexOf(' ');
             if (firstSpaceIdx == -1)
                 continue;
-            final String classNumber = lccn.substring(0, firstSpaceIdx);
-            final String cutterNumber = lccn.substring(firstSpaceIdx + 1);
+            final String classNumber = lcCallNumber.substring(0, firstSpaceIdx);
+            final String cutterNumber = lcCallNumber.substring(firstSpaceIdx + 1);
             final DataField f050__4 = factory.newDataField("050", ' ', '4');
             f050__4.addSubfield(factory.newSubfield('a', classNumber));
             f050__4.addSubfield(factory.newSubfield('b', cutterNumber));
@@ -1266,7 +1266,7 @@ public class MarcExport {
             record.addVariableField(df245246);
         }
         // edition statement
-        si = workR.listProperties(editionStatement);
+        StmtIterator si = workR.listProperties(editionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
@@ -1325,9 +1325,8 @@ public class MarcExport {
             record.addVariableField(df720);
         }
         // lccn
-        si = workR.listProperties(workLccn);
-        while (si.hasNext()) {
-            String lccn = si.next().getLiteral().getString();
+        List<String> lccnList = getId(m, workR, m.getResource(BF+"Lccn"));
+        for (String lccn : lccnList) {
             // from Columbia: spaces should be added at the end of the lccn string so that
             // it spans
             // 12 characters exactly, counting the 3 first spaces (so 9 for our lccn string)
@@ -1363,19 +1362,19 @@ public class MarcExport {
         }
         final Resource main = model.getResource(resUri);
         final StmtIterator stmti = main.listProperties(RDF.type);
-        boolean isWork = false;
+        boolean isInstance = false;
         while (stmti.hasNext()) {
             final Resource type = stmti.next().getObject().asResource();
-            if (type.getLocalName().contains("Work")) {
-                isWork = true;
+            if (type.getLocalName().contains("Instance")) {
+                isInstance = true;
                 break;
             }
         }
-        if (!isWork) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is not a Work"));
+        if (!isInstance) {
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is not an Instance"));
         }
         if (main.hasProperty(partOf)) {
-            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is part of another Work"));
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is part of another Instance"));
         }
         // should be temporary
         if (main.getLocalName().startsWith("W1FPL")) {
@@ -1420,16 +1419,18 @@ public class MarcExport {
         // we could also imagine rendering mrc with longer fields / records
         // but currently this doesn't play well with Columbia system
         final boolean limitSize = mt.equals(BudaMediaTypes.MT_MRC);
-        if (resUri.startsWith(ItemUriPrefix)) {
-            itemMode = true;
-            final String workUri = WorkUriPrefix + resUri.substring(ItemUriPrefixLen);
-            m = getModelForMarc(workUri);
-            main = m.getResource(workUri);
-        } else {
-            m = getModelForMarc(resUri);
-            main = m.getResource(resUri);
+        m = getModelForMarc(resUri);
+        main = m.getResource(resUri);
+        try (FileOutputStream fos = new FileOutputStream("/tmp/marc.ttl")) {
+            m.write(fos, "TURTLE");
+        } catch (FileNotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
-        // m.write(System.out, "TURTLE");
+        
         final Resource origMain = m.getResource(resUri);
         final Record r = marcFromModel(m, main, origMain, itemMode, limitSize);
         final StreamingResponseBody stream = new StreamingResponseBody() {

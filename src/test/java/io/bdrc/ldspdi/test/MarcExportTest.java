@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.test;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.http.HttpResponse;
@@ -73,7 +74,10 @@ public class MarcExportTest {
         HttpResponse response = client.execute(get);
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
-        response.getEntity().writeTo(System.out);
+        //response.getEntity().writeTo(System.out);
+        try (FileOutputStream fos = new FileOutputStream("/tmp/marc.xml")) {
+            response.getEntity().writeTo(fos);
+        }
     }
 
 }

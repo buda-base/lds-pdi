@@ -31,18 +31,27 @@ construct {
   ?lango ?langop ?langoo .
   ?scripto ?scriptop ?scriptoo .
   ?ools ?oolsp ?oolso .
-  ?olango ?olangop ?olangoo .
+  ?id ?idp ?ido .
 } where {
   {
     ?R_RES ?p ?o .
   }
   union {
-    ?R_RES bdo:workIsAbout ?t .
+    ?R_RES :instanceReproductionOf ?mw .
+    ?mw ?p ?o .
+  }
+  union {
+    ?R_RES :instanceHasReproduction ?item .
+    ?item a :ImageInstance ;
+          ?p ?o .
+  }
+  union {
+    ?R_RES bdo:instanceOf/bdo:workIsAbout ?t .
     ?t skos:prefLabel ?to .
   }
   union {
-    ?R_RES :workHasItem ?item .
-    ?item a :ItemImageAsset .
+    ?R_RES :workHasReproduction? ?item .
+    ?item a :ImageInstance .
     ?admItem adm:adminAbout ?item .
     ?admItem adm:access ?access .
     ?admItem adm:restrictedInChina ?ric .
@@ -51,51 +60,46 @@ construct {
     ?admWork adm:status ?status .
   }
   union {
-    ?R_RES bdo:workHasPart+ ?part .
+    ?R_RES :instanceReproductionOf?/bdo:hasPart+ ?part .
     ?part ?partp ?parto .
-    FILTER (?partp = skos:prefLabel || ?partp = bdo:workHasPart || ?partp = bdo:workPartTreeIndex)
+    FILTER (?partp = skos:prefLabel || ?partp = bdo:hasPart || ?partp = bdo:partTreeIndex)
   }
   union {
-    ?R_RES bdo:workNumberOf ?series .
+    ?R_RES bdo:instanceOf/bdo:workNumberOf ?series .
     ?series skos:prefLabel ?seriesl .
   }
   union {
-    ?R_RES bdo:creator ?aac .
+    ?R_RES bdo:instanceOf/bdo:creator ?aac .
     ?aac ?aacp ?aaco .
     ?aac bdo:agent ?o .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
   }
   union {
-    ?R_RES bdo:creator ?aac .
+    ?R_RES bdo:instanceOf/bdo:creator ?aac .
     ?aac bdo:agent ?o .
     ?o bdo:personEvent ?pevent .
     ?pevent ?peventp ?pevento .
   }
   union {
-    ?R_RES :workLangScript ?ols .
-    ?ols ?olsp ?olso .
-    ?ols :language ?lango .
+    ?R_RES :instanceOf/:language ?lango .
     ?lango ?langop ?langoo .
   }
   union {
-    ?R_RES :workLangScript ?ols .
-    ?ols :script ?scripto .
+    ?R_RES :instanceReproductionOf?/bf:identifiedBy ?id .
+    ?id ?idp ?ido .
+  }
+  union {
+    ?R_RES :instanceReproductionOf?/:script ?scripto .
     ?scripto ?scriptop ?scriptoo .
   }
   union {
-    ?R_RES :workOtherLangScript ?ools .
-    ?ools ?oolsp ?oolso .
-    ?ools :language ?olango .
-    ?olango ?olangop ?olangoo .
-  }
-  union {
-    ?R_RES :workEvent ?we .
+    ?R_RES :instanceReproductionOf?/:instanceEvent ?we .
     ?we a :PublishedEvent ;
       :onYear ?publishedYear .
   }
   union {
-      ?R_RES :workTitle ?o .
+      ?R_RES :instanceReproductionOf?/:hasTitle ?o .
       ?o ?op ?oo .
   }
 }
