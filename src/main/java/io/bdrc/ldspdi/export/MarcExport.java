@@ -1396,15 +1396,6 @@ public class MarcExport {
         final boolean limitSize = mt.equals(BudaMediaTypes.MT_MRC);
         m = getModelForMarc(resUri);
         main = m.getResource(resUri);
-        try (FileOutputStream fos = new FileOutputStream("/tmp/marc.ttl")) {
-            m.write(fos, "TURTLE");
-        } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
         
         final Resource origMain = m.getResource(resUri);
         final Record r = marcFromModel(m, main, origMain, itemMode, limitSize);

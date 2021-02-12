@@ -75,9 +75,9 @@ public class MarcExportTest {
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
         //response.getEntity().writeTo(System.out);
-        try (FileOutputStream fos = new FileOutputStream("/tmp/marc.xml")) {
-            response.getEntity().writeTo(fos);
-        }
+        //try (FileOutputStream fos = new FileOutputStream("/tmp/marc.xml")) {
+        //    response.getEntity().writeTo(fos);
+        //}
     }
 
 }
