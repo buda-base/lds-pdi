@@ -86,6 +86,7 @@ import io.bdrc.libraries.formatters.TTLRDFWriter;
  * Possible additions:
  * https://www.loc.gov/marc/authority/ad375.html ?
  * https://www.loc.gov/marc/bibliographic/ecbdcntf.html indicating the ISO script in subfield 6
+ * https://www.loc.gov/marc/mac/2019/2019-02.html
  * 
  */
 
