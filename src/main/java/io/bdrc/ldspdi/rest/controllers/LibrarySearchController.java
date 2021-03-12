@@ -83,6 +83,7 @@ public class LibrarySearchController {
         case "personsCreatedIn":
         case "placesCreatedIn":
         case "personGraph":
+        case "personGraph-sameAs":
         case "associatedPersons":
         case "associatedLineages":
         case "associatedSimpleTypes":
