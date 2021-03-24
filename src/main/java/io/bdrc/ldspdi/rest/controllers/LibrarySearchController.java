@@ -67,6 +67,8 @@ public class LibrarySearchController {
             return filteredChunkResponse(request, model, format);
         case "workFacetGraph":
         case "instanceFacetGraph":
+        case "iinstanceFacetGraph":
+        case "einstanceFacetGraph":
         case "iinstanceSyncedIn":
         case "dateWorks":
         case "dateInstances":
