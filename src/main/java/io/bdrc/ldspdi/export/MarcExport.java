@@ -137,7 +137,8 @@ public class MarcExport {
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP + "publishedYear");
     public static final Property langBCP47Lang = ResourceFactory.createProperty(BDO + "langBCP47Lang");
     public static final Property langMARCCode = ResourceFactory.createProperty(BDO + "langMARCCode");
-
+    public static final Property restrictedInChina = ResourceFactory.createProperty(TMP + "restrictedInChina");
+    
     public static final class MarcInfo {
         public final Integer prio;
         public final Character subindex2;
@@ -174,7 +175,8 @@ public class MarcExport {
     static final DataField f506_restricted = factory.newDataField("506", '1', ' ');
     static final DataField f506_open = factory.newDataField("506", '0', ' ');
     static final DataField f506_fairUse = factory.newDataField("506", '1', ' ');
-    static final DataField f506_restrictedInChina = factory.newDataField("506", '1', ' ');
+    static final DataField f506_open_ric = factory.newDataField("506", '1', ' ');
+    static final DataField f506_fairUse_ric = factory.newDataField("506", '1', ' ');
 
     static final DataField f542_PD = factory.newDataField("542", '1', ' ');
 
@@ -229,7 +231,8 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages."));
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
-        f506_restrictedInChina.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
+        f506_open_ric.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
+        f506_fairUse_ric.addSubfield(factory.newSubfield('a', "Preview only, access restricted in some countries."));
         f542_PD.addSubfield(factory.newSubfield('l', "Public domain"));
         f542_PD.addSubfield(factory.newSubfield('u', "http://creativecommons.org/publicdomain/mark/1.0/"));
     }
@@ -316,21 +319,22 @@ public class MarcExport {
         final Resource access = main.getPropertyResourceValue(tmpAccess);
         if (access == null) {
             return; // maybe there should be a f506_unknown?
-        } else {
-            switch (access.getLocalName()) {
-            case "AccessOpen":
-                r.addVariableField(f506_open);
-                break;
-            case "AccessFairUse":
-                r.addVariableField(f506_fairUse);
-                break;
-            case "AccessRestrictedInChina":
-                r.addVariableField(f506_restrictedInChina);
-                break;
-            default:
-                r.addVariableField(f506_restricted);
-                break;
-            }
+        }
+        boolean ric = false;
+        final Statement ricS = main.getProperty(restrictedInChina);
+        if (ricS != null) {
+            ric = ricS.getBoolean();
+        }
+        switch (access.getLocalName()) {
+        case "AccessOpen":
+            r.addVariableField(ric ? f506_open_ric : f506_open);
+            break;
+        case "AccessFairUse":
+            r.addVariableField(ric ? f506_fairUse_ric : f506_fairUse);
+            break;
+        default:
+            r.addVariableField(f506_restricted);
+            break;
         }
     }
 
