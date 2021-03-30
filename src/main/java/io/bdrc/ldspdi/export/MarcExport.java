@@ -232,7 +232,7 @@ public class MarcExport {
         f506_fairUse.addSubfield(factory.newSubfield('f', "Preview only"));
         f506_fairUse.addSubfield(factory.newSubfield('2', "star"));
         f506_open_ric.addSubfield(factory.newSubfield('a', "Access restricted in some countries."));
-        f506_fairUse_ric.addSubfield(factory.newSubfield('a', "Preview only, access restricted in some countries."));
+        f506_fairUse_ric.addSubfield(factory.newSubfield('a', "Access restricted to a few sample pages, access restricted in some countries."));
         f542_PD.addSubfield(factory.newSubfield('l', "Public domain"));
         f542_PD.addSubfield(factory.newSubfield('u', "http://creativecommons.org/publicdomain/mark/1.0/"));
     }
