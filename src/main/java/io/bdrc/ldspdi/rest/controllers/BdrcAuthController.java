@@ -100,7 +100,7 @@ public class BdrcAuthController {
                 // variable
                 String n = getAuth0IdFromUserId(res).asResource().getURI();
                 n = n.substring(n.lastIndexOf("/") + 1);
-                if (acc.getUser().isAdmin() || auth0Id.equals(n)) {
+                if (acc.getUserProfile().isAdmin() || auth0Id.equals(n)) {
                     return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(
                             getUserModel(true, getRdfProfile(n)), "jsonld", ServiceConfig.PREFIX.getPrefixMap()));
                 }
