@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.service;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -40,7 +41,6 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     public static void main(String[] args) throws RestException,
             RevisionSyntaxException, AmbiguousObjectException,
             IncorrectObjectTypeException, IOException, InterruptedException {
-        final String configPath = System.getProperty("ldspdi.configpath");
         try {
             ServiceConfig.init();
         } catch (IOException e1) {
@@ -48,7 +48,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             throw new RestException(500, new LdsError(LdsError.MISSING_RES_ERR)
                     .setContext("Ldspdi startup and initialization", e1));
         }
-        AuthProps.init(ServiceConfig.getProperties());
+        final Properties props = ServiceConfig.getProperties();
+        AuthProps.init(props);
         if (ServiceConfig.useAuth()) {
             RdfAuthModel.readAuthModel();
         }
@@ -66,7 +67,9 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             TaxModel.fetchModel();
         }
         log.info("SpringBootLdspdi has been properly initialized");
-        SpringApplication.run(SpringBootLdspdi.class, args);
+        SpringApplication app = new SpringApplication(SpringBootLdspdi.class);
+        app.setDefaultProperties(props);
+        app.run(args);
     }
 
     @EventListener(ApplicationReadyEvent.class)

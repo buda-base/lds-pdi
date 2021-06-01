@@ -104,6 +104,11 @@ Expose-Headers=Cache-Control,ETag,Last-Modified,Content-Type,Cache-Control,Vary,
 #cache settings
 Max-Age=86400
 
+#### Content Encoding #####
+
+server.compression.enabled=true
+server.compression.mime-types=text/html,application/xml,application/json,text/turtle,text/csv,text/plain,application/ld+json,application/trig
+server.compression.min-response-size=10240
 
 ###### AUTH SECTION ########
 
