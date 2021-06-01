@@ -95,6 +95,9 @@ public class ShaclDataController {
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
         }
+        if (url.startsWith("https")) {
+            url = "http"+url.substring(5, url.length());
+        }
         if (OntPolicies.isBaseUri(url)) {
             m = OntShapesData.getOntModelByBase(url);
         } else {
