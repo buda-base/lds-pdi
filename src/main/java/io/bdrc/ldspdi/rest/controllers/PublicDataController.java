@@ -241,7 +241,9 @@ public class PublicDataController {
     public ResponseEntity<StreamingResponseBody> getGrResourceGraphExt(String res, String ext, String fusekiUrl,
             String format, HttpServletRequest request) throws RestException {
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
-        final String fullResURI = GRAPH_PREFIX_FULL + res;
+        //final String fullGraphURI = GRAPH_PREFIX_FULL + res;
+        // useful approximation
+        final String fullResURI = RES_PREFIX + res;
         final String graphType = "graph";
         final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         if (media == null) {
@@ -279,7 +281,8 @@ public class PublicDataController {
                     res.substring(res.lastIndexOf(".") + 1), fusekiUrl, format, request);
         }
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
-        final String fullResURI = GRAPH_PREFIX_FULL + res;
+        // useful approximation
+        final String fullResURI = RES_PREFIX + res;
         final String graphType = "graph";
         final MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (format == null) {

@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -366,10 +367,9 @@ public class BdrcAuthController {
     }
 
     @PostMapping(value = "/callbacks/github/bdrc-auth")
-    public ResponseEntity<String> updateAuthModel() throws RestException {
+    public ResponseEntity<String> updateAuthModel() throws RestException, InterruptedException, ExecutionException {
         log.info("updating Auth data model() >>");
-        Thread t = new Thread(new RdfAuthModel());
-        t.start();
+        RdfAuthModel.updateAuthData(null);
         return ResponseEntity.ok("Auth Model is updating");
     }
 
