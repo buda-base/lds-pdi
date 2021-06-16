@@ -20,7 +20,7 @@ public class unAPIController {
         if (id.startsWith("http://purl.bdrc.io/resource/")) {
             shortId = "bdr:"+id.substring(29);
         }
-        if (!shortId.startsWith("bdr:M") || !shortId.startsWith("bdr:W") || shortId.startsWith("bdr:WA")) {
+        if (!shortId.startsWith("bdr:MW") && (!shortId.startsWith("bdr:W") || shortId.startsWith("bdr:WA"))) {
             return ResponseEntity.status(404).body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><formats id=\""+id+"\"></formats>");
         }
         if (format == null || format.isEmpty()) {
