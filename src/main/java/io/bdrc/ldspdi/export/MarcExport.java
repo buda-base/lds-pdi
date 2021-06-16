@@ -1175,7 +1175,7 @@ public class MarcExport {
 
     public static final String langTibetan = BDR + "LangBo";
 
-    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean itemMode, final boolean limitSize) {
+    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean scansMode, final boolean limitSize) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         record.addVariableField(factory.newControlField("001", "(BDRC)bdr:" + originalR.getLocalName()));
@@ -1222,11 +1222,11 @@ public class MarcExport {
             }
         }
         add008(m, workR, record, langMarcCode, now);
-        addIsbn(m, workR, record, itemMode); // 020
+        addIsbn(m, workR, record, scansMode); // 020
         final DataField f035 = factory.newDataField("035", ' ', ' ');
         f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + originalR.getLocalName()));
         record.addVariableField(f035);
-        if (itemMode) {
+        if (scansMode) {
             DataField f035_2 = factory.newDataField("035", ' ', ' ');
             f035_2.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + workR.getLocalName()));
             record.addVariableField(f035_2);
@@ -1293,7 +1293,8 @@ public class MarcExport {
         if (!isJournal(m, workR)) {
             addOutline(m, workR, record, bcp47lang, limitSize); // 505
         }
-        addAccess(m, workR, record); // 506
+        if (scansMode)
+            addAccess(m, workR, record); // 506
         // catalog info (summary)
         si = workR.listProperties(catalogInfo);
         while (si.hasNext()) {
@@ -1302,7 +1303,8 @@ public class MarcExport {
             f520.addSubfield(factory.newSubfield('a', getLangStrNoConv(catalogInfo)));
             record.addVariableField(f520);
         }
-        record.addVariableField(f533);
+        if (scansMode)
+            record.addVariableField(f533);
         final Resource license = workR.getPropertyResourceValue(tmpLicense);
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
@@ -1329,12 +1331,16 @@ public class MarcExport {
             final DataField f776_08 = factory.newDataField("776", '0', '8');
             f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
             f776_08.addSubfield(factory.newSubfield('w', "(DLC)   " + lccn));
-            record.addVariableField(f776_08);
+            if (scansMode)
+                record.addVariableField(f776_08);
+            // TODO: in normal mode, I'm not sure what this should be
         }
-        final DataField f856 = factory.newDataField("856", '4', '0');
-        f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
-        f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
-        record.addVariableField(f856);
+        if (scansMode) {
+            final DataField f856 = factory.newDataField("856", '4', '0');
+            f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
+            f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
+            record.addVariableField(f856);
+        }
         for (DataField df880 : list880) {
             record.addVariableField(df880);
         }
@@ -1369,10 +1375,6 @@ public class MarcExport {
         if (main.hasProperty(partOf)) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource is part of another Instance"));
         }
-        // should be temporary
-        if (main.getLocalName().startsWith("W1FPL")) {
-            model.add(main, language, model.createResource(BDR + "PiMymr"));
-        }
         // this should be correct but breaks W2DB4598 because of poorly encoded series
         // data
         // if (main.hasProperty(hasExpression)) {
@@ -1395,9 +1397,8 @@ public class MarcExport {
         }
     }
 
-    public static final String ItemUriPrefix = BDR + "W";
-    public static final String WorkUriPrefix = BDR + "MW";
-    public static final int ItemUriPrefixLen = ItemUriPrefix.length();
+    public static final String ScanUriPrefix = BDR + "W";
+    public static final String InstanceUriPrefix = BDR + "MW";
 
     public static ResponseEntity<StreamingResponseBody> getResponse(final MediaType mt, final String resUri) throws RestException {
         // I really don't like that but making that better would mean either:
@@ -1405,8 +1406,8 @@ public class MarcExport {
         // - two queries
         // The idea is that we're sending MARC records for items to Columbia,
         // as they only want "electronic resources" records, and electronic
-        // resources are items in our system, not works.
-        boolean itemMode = false;
+        // resources are imageinstances (scans) in our system, not regular instances.
+        boolean scansMode = resUri.startsWith(ScanUriPrefix);
         final Model m;
         final Resource main;
         // we could also imagine rendering mrc with longer fields / records
@@ -1416,7 +1417,7 @@ public class MarcExport {
         main = m.getResource(resUri);
         
         final Resource origMain = m.getResource(resUri);
-        final Record r = marcFromModel(m, main, origMain, itemMode, limitSize);
+        final Record r = marcFromModel(m, main, origMain, scansMode, limitSize);
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
             public void writeTo(final OutputStream os) throws IOException {
