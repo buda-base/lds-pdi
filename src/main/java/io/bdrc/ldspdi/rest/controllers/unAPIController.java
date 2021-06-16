@@ -24,7 +24,9 @@ public class unAPIController {
             return ResponseEntity.status(404).body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><formats id=\""+id+"\"></formats>");
         }
         if (format == null || format.isEmpty()) {
-            return ResponseEntity.status(300).body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><formats id=\""+id+"\"><format name=\"marcxml\" type=\"application/marcxml+xml\" /></formats>");
+            // specs says HTTP status 300 but:
+            // https://github.com/zotero/translators/issues/2459
+            return ResponseEntity.status(200).body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><formats id=\""+id+"\"><format name=\"marcxml\" type=\"application/marcxml+xml\" /></formats>");
         }
         if (!format.equals("marcxml"))
             return ResponseEntity.status(406).body("format not available");
