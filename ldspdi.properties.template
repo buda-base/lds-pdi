@@ -25,6 +25,10 @@ showUrl=https://library.bdrc.io/show/
 # change this to the query url of your triple store dataset endpoint
 fusekiUrl=http://localhost:13180/fuseki/corerw/query
 
+fusekiAuthData=http://buda1.bdrc.io:13180/fuseki/authrw/
+
+#activate/desactivate auth0
+useAuth=false
 
 #### Home page info ####
 
@@ -131,3 +135,5 @@ authUpdatePath=http://purl.bdrc.io/authmodel/updated
 
 # the custom auth policies definition
 policiesUrl=https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl
+
+queryPath=local-queries
