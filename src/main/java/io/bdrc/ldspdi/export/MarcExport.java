@@ -121,9 +121,8 @@ public class MarcExport {
     public static final Property hasTitle = ResourceFactory.createProperty(BDO + "hasTitle");
     public static final Property workIsAbout = ResourceFactory.createProperty(BDO + "workIsAbout");
     public static final Property workGenre = ResourceFactory.createProperty(BDO + "workGenre");
-    public static final Property workNumberOf = ResourceFactory.createProperty(BDO + "workNumberOf");
-    public static final Property workSeriesName = ResourceFactory.createProperty(BDO + "workSeriesName");
-    public static final Property workSeriesNumber = ResourceFactory.createProperty(BDO + "workSeriesNumber");
+    public static final Property serialInstanceOf = ResourceFactory.createProperty(BDO + "serialInstanceOf");
+    public static final Property seriesNumber = ResourceFactory.createProperty(BDO + "seriesNumber");
     public static final Property personEvent = ResourceFactory.createProperty(BDO + "personEvent");
     public static final Property personName = ResourceFactory.createProperty(BDO + "personName");
     public static final Property language = ResourceFactory.createProperty(BDO + "language");
@@ -879,7 +878,7 @@ public class MarcExport {
     }
 
     private static void addSeries(final Model m, final Resource main, final Record record, final String bcp47lang) {
-        StmtIterator si = main.listProperties(workNumberOf);
+        StmtIterator si = main.listProperties(serialInstanceOf);
         boolean hasSeries = false;
         final DataField f490 = factory.newDataField("490", '0', ' ');
         while (si.hasNext()) {
@@ -890,13 +889,7 @@ public class MarcExport {
             hasSeries = true;
             f490.addSubfield(factory.newSubfield('a', getLangStr(l) + " ;"));
         }
-        si = main.listProperties(workSeriesName);
-        while (si.hasNext()) {
-            final Literal series = si.next().getLiteral();
-            hasSeries = true;
-            f490.addSubfield(factory.newSubfield('a', getLangStr(series) + " ;"));
-        }
-        si = main.listProperties(workSeriesNumber);
+        si = main.listProperties(seriesNumber);
         while (si.hasNext()) {
             final Literal series = si.next().getLiteral();
             hasSeries = true;
@@ -933,6 +926,8 @@ public class MarcExport {
             }
         }
         Collections.sort(interestingLiterals, new CompareStringLiterals(bcp47lang));
+        if (interestingLiterals.size() == 0)
+            return null;
         return interestingLiterals.get(0);
     }
 
@@ -1186,8 +1181,6 @@ public class MarcExport {
         record.addVariableField(f006);
         record.addVariableField(f007);
         final List<String> langUrls = getLanguages(m, workR);
-        System.out.println("XXXXXXXXXXXXXXXX");
-        System.out.println(langUrls);
         String bcp47lang = null;
         String langMarcCode = null;
         // request from Columbia, when we have multiple languages recorded, we should

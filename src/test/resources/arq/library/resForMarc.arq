@@ -54,7 +54,7 @@ construct {
     ?t skos:prefLabel ?to .
   }
   union {
-    ?R_RES :workHasReproduction? ?item .
+    ?R_RES :instanceHasReproduction? ?item .
     ?item a :ImageInstance .
     ?admItem adm:adminAbout ?item .
     ?admItem adm:access ?access .
@@ -69,7 +69,7 @@ construct {
     FILTER (?partp = skos:prefLabel || ?partp = bdo:hasPart || ?partp = bdo:partTreeIndex)
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:workNumberOf ?series .
+    ?R_RES :instanceReproductionOf?/bdo:serialInstanceOf ?series .
     ?series skos:prefLabel ?seriesl .
   }
   union {
