@@ -302,7 +302,7 @@ public class MarcExport {
 
     // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
     public static void addIsbn(final Model m, final Resource main, final Record r, final boolean itemMode) {
-        final List<String> isbnList = getId(m, main, m.createResource(BDR+"HollisId"));
+        final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
         for (final String isbn : isbnList) {
             final String validIsbn = isbnvalidator.validate(isbn);
             final DataField df = factory.newDataField("020", ' ', ' ');
