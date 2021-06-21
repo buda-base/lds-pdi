@@ -202,6 +202,7 @@ public class MarcExport {
         titleLocalNameToMarcInfo.put("RunningTitle", new MarcInfo(9, '7', null));
         titleLocalNameToMarcInfo.put("SpineTitle", new MarcInfo(10, '8', null));
         titleLocalNameToMarcInfo.put("TitlePortion", new MarcInfo(11, '0', null));
+        titleLocalNameToMarcInfo.put("Title", new MarcInfo(99, '3', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
         // Columbia doesn't want RDA here
@@ -691,8 +692,16 @@ public class MarcExport {
         StmtIterator si = main.listProperties(hasTitle);
         while (si.hasNext()) {
             final Resource title = si.next().getResource();
-            final Resource type = title.getPropertyResourceValue(RDF.type);
-            final String typeLocalName = type.getLocalName();
+            // get type, if bdo:Title only consider it if it's the only type, otherwise discard it:
+            StmtIterator typeSi = title.listProperties(RDF.type);
+            String typeLocalName = null;
+            while (typeSi.hasNext()) {
+                Statement s = typeSi.next();
+                if (s.getObject().asResource().getLocalName().equals("Title") && typeSi.hasNext())
+                    continue;
+                typeLocalName = s.getObject().asResource().getLocalName();
+                break;
+            }
             StmtIterator labelSi = title.listProperties(RDFS.label);
             while (labelSi.hasNext()) {
                 final Literal titleLit = labelSi.next().getLiteral();
