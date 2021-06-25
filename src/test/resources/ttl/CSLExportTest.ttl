@@ -1,0 +1,168 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix bdan:  <http://purl.bdrc.io/annotation/> .
+@prefix bd:    <http://www.bigdata.com/rdf#> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix rsh:   <http://purl.bdrc.io/shacl/core/shape/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix admin: <http://webns.net/mvcb/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix bdac:  <http://purl.bdrc.io/anncollection/> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix oa:    <http://www.w3.org/ns/oa#> .
+@prefix dila:  <http://purl.dila.edu.tw/resource/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix ad:    <http://schemas.talis.com/2005/address/schema#> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix f:     <java:io.bdrc.libraries.sparql.functions.> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+@prefix viaf:  <http://viaf.org/viaf/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix eftr:  <http://purl.84000.co/resource/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> .
+@prefix as:    <http://www.w3.org/ns/activitystreams#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+bdr:EV27A5BCAD90672A6F
+        a              bdo:PublishedEvent ;
+        bdo:notAfter   "1979"^^xsd:gYear ;
+        bdo:notBefore  "1976"^^xsd:gYear .
+
+bdr:IDFE0637396E66E205
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010898038-3" .
+
+bdr:ID672146379EFBE44D
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896046-3" .
+
+bdr:ID968735DA001F297F
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010898037-5" .
+
+bdr:MW22084_0044-31  a          bdo:Work , bdo:Instance ;
+        bf:identifiedBy         bdr:IDB16F04_WA0RK0044-31 , bdr:IDD93F67_MW22084_0044-31 ;
+        adm:sameAsrKTs          <http://purl.rkts.eu/resource/WKT0044-31> ;
+        bdo:contentLocation     bdr:WLFC73A8_MW22084_0044-31 ;
+        bdo:hasTitle            bdr:TTCFD588_MW22084_0044-31 ;
+        bdo:inRootInstance      bdr:MW22084 ;
+        bdo:instanceOf          bdr:WA0RK0044-31 ;
+        bdo:isRoot              true ;
+        bdo:language            bdr:LangBo ;
+        bdo:note                bdr:NT318BC3_WA0RK0044-31 ;
+        bdo:partIndex           31 ;
+        bdo:partOf              bdr:WA0RK0044 , bdr:MW22084_0044 ;
+        bdo:partTreeIndex       "08.01.31" ;
+        bdo:partType            bdr:PartTypeText ;
+        bdo:workHasInstance     bdr:MW3CN20612_0044-31 , bdr:MW4CZ5369_0044-31 , bdr:MW22084_0044-31 ;
+        bdo:workHasParallelsIn  bdr:WA0TTET0286 , bdr:WA4CZ16779 , bdr:WA0TTET0285 , bdr:WA0TTET0287 ;
+        bdo:instanceEvent       bdr:EV27A5BCAD90672A6F ;
+        owl:sameAs              <http://purl.rkts.eu/resource/WKT0044-31> , eftr:WATTOH44-31 , eftr:WEKDTOH44-31 ;
+        skos:altLabel           "daśabhūmika"@sa-x-iast , "daśabhūmika sūtra"@sa-x-iast ;
+        skos:prefLabel          "sa bcu'i le'u ste sum cu gcig pa/"@bo-x-ewts , "sa bcu'i le'u/"@bo-x-ewts ;
+        bf:identifiedBy         bdr:IDF75C87E9AA4D3404 , bdr:ID6E65C66CA7067EBE , bdr:IDAD4FF5DB7A5C2124 , bdr:ID2748C27BAA20212D , bdr:ID645DC1AF3040C962 , bdr:IDFE0637396E66E205 , bdr:ID968735DA001F297F , bdr:ID03D076B8B8DE65A4 , bdr:ID8CC9F8DC4AC66ABC , bdr:IDC0D4FFB7207A7C84 , bdr:IDB16F04_WA0RK0044-31 , bdr:ID6A8E3613CB0445A9 , bdr:IDE4702234FC5A8FCB , bdr:ID61F121F8E57B9EBA , bdr:ID94C13C60CBF4946D , bdr:IDD93F67_MW22084_0044-31 , bdr:IDFD0A48BFDD67930C , bdr:ID672146379EFBE44D , bdr:ID6242A307F139F41E ;
+        .
+
+bdr:IDD93F67_MW22084_0044-31
+        a          bdr:KaTenSiglaD ;
+        rdf:value  "D44-31" .
+
+bdr:ID8CC9F8DC4AC66ABC
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896048-X" .
+
+<http://api.treasuryoflives.org/resource/TOLP12371>
+        skos:prefLabel  "Chokyi Jungne"@en .
+
+bdr:IDFD0A48BFDD67930C
+        a          bf:ShelfMarkLcc ;
+        rdf:value  "BQ1260 1976" .
+
+bdr:IDAD4FF5DB7A5C2124
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010897185-6" .
+
+bdr:ID6E65C66CA7067EBE
+        a          bf:Lccn ;
+        rdf:value  "76902420" .
+
+bdr:IDC0D4FFB7207A7C84
+        a          bdr:HollisId ;
+        rdf:value  "014258613" .
+
+bdr:ID645DC1AF3040C962
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896012-9" .
+
+bdr:ID6A8E3613CB0445A9
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896013-7" .
+
+bdr:MW22084_S0008  bdo:partOf  bdr:MW22084 ;
+        bdo:partType    bdr:PartTypeSection ;
+        skos:prefLabel  "phal chen/"@bo-x-ewts .
+
+bdr:IDE4702234FC5A8FCB
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010897920-2" .
+
+bdr:IDF75C87E9AA4D3404
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896047-1" .
+
+bdr:MW22084  skos:prefLabel  "bka' 'gyur (sde dge par phud)"@bo-x-ewts ;
+             bf:identifiedBy bdr:IDF75C87E9AA4D3404 .
+
+bdr:ID03D076B8B8DE65A4
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896010-2" .
+
+bdr:MW22084_0044  bdo:partOf  bdr:MW22084_S0008 ;
+        bdo:partType    bdr:PartTypeText ;
+        skos:prefLabel  "sangs rgyas phal po che zhes bya ba shin tu rgyas pa chen po'i mdo/"@bo-x-ewts .
+
+bdr:ID2748C27BAA20212D
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896101-X" .
+
+bdr:P956  skos:prefLabel  "司徒·曲吉穹勒"@zh-hans , "si tu chos kyi 'byung gnas/"@bo-x-ewts , "Tai Situ 08"@en ;
+          owl:sameAs wd:Q1091010 , <https://sakyaresearch.org/persons/266> , <http://api.treasuryoflives.org/resource/TOLP12371> .
+
+bdr:ID61F121F8E57B9EBA
+        a          bdr:HarvardShelfId ;
+        rdf:value  "007194410-9" .
+
+bdr:ID6242A307F139F41E
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896050-1" .
+
+wd:Q1091010  skos:prefLabel  "司徒·曲吉穷乃"@zh-hani , "Situ Panchen"@en .
+
+bdr:ID94C13C60CBF4946D
+        a          bdr:HarvardShelfId ;
+        rdf:value  "010896322-5" .
+
+<https://sakyaresearch.org/persons/266>
+        skos:prefLabel  "si tu paN chen chos kyi 'byung gnas/"@bo-x-ewts .
+
+bdr:CRA5A1D1110DAB4B7A
+        a                bdo:AgentAsCreator ;
+        bdo:agent        bdr:P956 ;
+        bdo:role         bdr:R0ER0015 .
