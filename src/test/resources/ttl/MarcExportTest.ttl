@@ -221,7 +221,7 @@ bdr:MW23819  a   bdo:Instance ;
                   [ a             bdo:ColophonTitle ;
                     rdfs:label    "this is a colophon title"@en
                   ] ,
-                  [ a             bdo:RunningTitle ;
+                  [ a             bdo:RunningTitle , bdo:Title ;
                     rdfs:label    "si khron bod rig pa'i zhib 'jug; si chuan zang xue/"@bo-x-ewts
                   ] ,
                   [ a             bdo:Subtitle ;
