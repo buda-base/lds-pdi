@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.test;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -13,6 +14,8 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +31,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.bdrc.ldspdi.export.CSLJsonExport;
+import io.bdrc.ldspdi.export.CSLJsonExport.CSLResObj;
 import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
@@ -48,7 +53,7 @@ public class CSLExportTest {
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
         fusekiUrl = "http://localhost:2251/bdrcrw";
-        ServiceConfig.initForTests(fusekiUrl);
+        //ServiceConfig.initForTests(fusekiUrl);
         Utils.loadDataInModel(model);
         srvds.setDefaultModel(model);
         // try {
@@ -67,17 +72,28 @@ public class CSLExportTest {
         server.join();
     }
 
-    @Test
+    //@Test
     public void testSimpleRequestSimple() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/resource/W23819.mrcx");
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/CSLObj/bdr:MW22084_0044-31");
         HttpResponse response = client.execute(get);
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
         //response.getEntity().writeTo(System.out);
-        try (FileOutputStream fos = new FileOutputStream("/tmp/marc.xml")) {
+        try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
             response.getEntity().writeTo(fos);
-         }
+        }
+    }
+    
+    @Test
+    public void testDirectCall() throws FileNotFoundException, IOException {
+        final Model m = Utils.getModelFromFileName(Utils.TESTDIR + "CSLExportTest-afterRequest.ttl", Lang.TURTLE);
+        final Resource main = m.getResource("http://purl.bdrc.io/resource/MW22084_0044-31");
+        CSLResObj res = CSLJsonExport.getObject(m, main);
+        try (FileOutputStream fos = new FileOutputStream("/tmp/csl-direct.json")) {
+            final String s = res.mapper.writeValueAsString(res);
+            fos.write(s.getBytes());
+        }
     }
 
 }

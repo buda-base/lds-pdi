@@ -23,6 +23,8 @@ construct {
   ?id ?idp ?ido .
   ?o skos:prefLabel ?ol .
   ?R_RES bf:identifiedBy ?id .
+  ?root ?rootp ?rooto .
+  ?cl ?clp ?clo .
 } where {
   {
     ?R_RES ?p ?o .
@@ -48,6 +50,14 @@ construct {
   union {
     ?R_RES :instanceReproductionOf?/bdo:serialInstanceOf ?series .
     ?series skos:prefLabel ?seriesl .
+  }
+  union {
+    ?R_RES bdo:inRootInstance ?root .
+    ?root ?rootp ?rooto .
+  }
+  union {
+    ?R_RES bdo:contentLocation ?cl .
+    ?cl ?clp ?clo .
   }
   union {
     ?R_RES bdo:inRootInstance?/bdo:instanceOf?/bdo:creator ?aac .

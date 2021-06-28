@@ -7,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -51,6 +53,7 @@ public class CSLJsonExport {
     public final static Logger log = LoggerFactory.getLogger(CSLJsonExport.class);
     
     public static final EwtsConverter ewtsConverter = new EwtsConverter();
+    public static final Property inRootInstance = ResourceFactory.createProperty(MarcExport.BDO + "inRootInstance");
     
     public static final String ewtsToBo(String ewts) {
         if (ewts.startsWith("*"))
@@ -287,11 +290,11 @@ public class CSLJsonExport {
     
     public static class CSLResObj {
         @JsonIgnore
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode bo;
-        ObjectNode latn;
-        ObjectNode en;
-        ObjectNode zh;
+        public ObjectMapper mapper = new ObjectMapper();
+        public ObjectNode bo;
+        public ObjectNode latn;
+        public ObjectNode en;
+        public ObjectNode zh;
         
         CSLResObj() {
             this.bo = mapper.createObjectNode();
@@ -299,6 +302,34 @@ public class CSLJsonExport {
             this.en = mapper.createObjectNode();
             this.zh = mapper.createObjectNode();
         }
+    }
+    
+    public static void addDirectLangField(final CSLResObj res, final String fieldName, final Model m, final Resource r, final Property p) {
+        final NodeIterator si = m.listObjectsOfProperty(r, p);
+        final FieldInfo fi = new FieldInfo();
+        while (si.hasNext()) {
+            System.out.println("test0.5");
+            fi.addFromLiteral(si.next().asLiteral(), false);
+        }
+        System.out.println("test0");
+        fi.fill_missing();
+        if (fi.label_bo == null)
+            return;
+        System.out.println("test1");
+        res.bo.put(fieldName, fi.label_bo);
+        res.zh.put(fieldName, fi.label_zh);
+        res.en.put(fieldName, fi.label_en);
+        res.latn.put(fieldName, fi.label_latn);
+    }
+    
+    public static CSLResObj getObject(final Model m, final Resource r) {
+        CSLResObj res = new CSLResObj();
+        Resource root = r.getPropertyResourceValue(inRootInstance);
+        if (root == null)
+            root = r;
+        // publisher name
+        addDirectLangField(res, "publisher", m, root, MarcExport.publisherName);
+        return res;
     }
     
     public static ResponseEntity<CSLResObj> getResponse(final String resUri) throws RestException, JsonProcessingException {
@@ -315,7 +346,7 @@ public class CSLJsonExport {
         m = getModelForCSL(resUri);
         main = m.getResource(resUri);
         
-        CSLResObj res = new CSLResObj();
+        CSLResObj res = getObject(m, main);
         
         // add stuff
         

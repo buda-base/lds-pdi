@@ -92,6 +92,7 @@ public class Utils {
         res.add("etext");
         res.add("UT11577_004_0000");
         res.add("MarcExportTest");
+        res.add("CSLExportTest");
         return res;
     }
 
