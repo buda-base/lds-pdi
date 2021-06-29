@@ -91,8 +91,9 @@ public class CSLJsonExport {
                 break;
             case "bo-x-ewts":
             case "dz-x-ewts":
-                if (replaceIfPresent || this.label_bo_latn == null)
+                if (replaceIfPresent || this.label_bo_latn == null) {
                     this.label_bo_latn = ewtsToLatn(l.getString());
+                }
                 if (replaceIfPresent || this.label_bo == null)
                     this.label_bo = ewtsToBo(l.getString());
                 break;
@@ -105,24 +106,32 @@ public class CSLJsonExport {
             case "bo-alalc97":
                 if (replaceIfPresent || this.label_bo_latn == null)
                     this.label_bo_latn = StringUtils.capitalize(l.getString());
+                break;
             case "sa-alalc97":
                 if (replaceIfPresent || this.label_sa_latn == null)
                     this.label_sa_latn = StringUtils.capitalize(l.getString());
+                break;
             case "sa-x-iast":
                 if (replaceIfPresent || this.label_sa_latn == null)
                     this.label_sa_latn = StringUtils.capitalize(l.getString());
+                break;
             case "sa-x-ndia":
                 if (replaceIfPresent || this.label_sa_latn_ndia == null)
                     this.label_sa_latn_ndia = StringUtils.capitalize(l.getString());
+                break;
             case "zh-hans":
                 if (replaceIfPresent || this.label_zh == null)
                     this.label_zh = StringUtils.capitalize(l.getString());
+                break;
             case "zh-latn-pinyin":
                 if (replaceIfPresent || this.label_zh_pinyin == null)
                     this.label_zh_pinyin = StringUtils.capitalize(l.getString());
+                break;
             case "en":
+            case "en-x-mixed":
                 if (replaceIfPresent || this.label_en == null)
                     this.label_en = StringUtils.capitalize(l.getString());
+                break;
             default:
                 log.debug("ignoring lang tag "+lang);
             }
@@ -236,21 +245,29 @@ public class CSLJsonExport {
         
     }
     
-    public static final FieldInfo getEntityLabelField(Model m, Resource r, final boolean followSameAs) {
+    public static final FieldInfo getEntityLabelField(Model m, Resource r, final boolean followSameAs, final boolean lookAtAltLabels) {
         FieldInfo fi = new FieldInfo();
-        addEntityLabels(m, r, fi);
+        addEntityLabels(m, r, fi, lookAtAltLabels);
         if (followSameAs) {
             NodeIterator si = m.listObjectsOfProperty(r, OWL.sameAs);
             while (si.hasNext()) {
                 Resource sa = si.next().asResource();
-                addEntityLabels(m, sa, fi);
+                addEntityLabels(m, sa, fi, lookAtAltLabels);
             }
         }
+        fi.fill_missing();
         return fi;
     }
     
-    public static final void addEntityLabels(Model m, Resource r, final FieldInfo fi) {
+    public static final void addEntityLabels(Model m, Resource r, final FieldInfo fi, final boolean lookAtAltLabels) {
         NodeIterator si = m.listObjectsOfProperty(r, SKOS.prefLabel);
+        while (si.hasNext()) {
+            Literal l = si.next().asLiteral();
+            fi.addFromLiteral(l, false);
+        }
+        if (!lookAtAltLabels)
+            return;
+        si = m.listObjectsOfProperty(r, SKOS.altLabel);
         while (si.hasNext()) {
             Literal l = si.next().asLiteral();
             fi.addFromLiteral(l, false);
@@ -363,7 +380,7 @@ public class CSLJsonExport {
         while (parent != null) {
             Resource partTypeR = parent.getPropertyResourceValue(partType);
             if (partTypeR != null && partTypeR.getLocalName().equals("PartTypeSection")) {
-                FieldInfo fi = getEntityLabelField(m, parent, false);
+                FieldInfo fi = getEntityLabelField(m, parent, false, true);
                 res.addSimpleFieldInfo("section", fi);
                 break;
             }
@@ -386,7 +403,7 @@ public class CSLJsonExport {
         res.addCommonField("url", r.getURI());
         res.addCommonField("id", "bdr:"+r.getLocalName());
         res.addSimpleFieldInfo("source", fiBDRC);
-        FieldInfo fi = getEntityLabelField(m, r, false);
+        FieldInfo fi = getEntityLabelField(m, r, false, true);
         res.addSimpleFieldInfo("title", fi);
         if (root == null) {
             Resource repOf = r.getPropertyResourceValue(instanceReproductionOf);
@@ -398,7 +415,7 @@ public class CSLJsonExport {
         } else {
             res.addCommonField("type", "chapter");
             addSection(res, m, r);
-            fi = getEntityLabelField(m, root, false);
+            fi = getEntityLabelField(m, root, false, true);
             res.addSimpleFieldInfo("container-title", fi);
         }
 
