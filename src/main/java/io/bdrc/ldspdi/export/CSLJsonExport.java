@@ -1,7 +1,6 @@
 package io.bdrc.ldspdi.export;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.time.LocalDate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
@@ -10,25 +9,20 @@ import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
-import org.marc4j.MarcException;
-import org.marc4j.MarcStreamWriter;
-import org.marc4j.MarcWriter;
-import org.marc4j.MarcXmlWriter;
-import org.marc4j.marc.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.bdrc.ewtsconverter.EwtsConverter;
@@ -36,7 +30,6 @@ import io.bdrc.ewtsconverter.TransConverter;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.libraries.BudaMediaTypes;
 
 /*
  * Here's some knowledge that can be useful when dealing with libraries:
@@ -54,6 +47,10 @@ public class CSLJsonExport {
     
     public static final EwtsConverter ewtsConverter = new EwtsConverter();
     public static final Property inRootInstance = ResourceFactory.createProperty(MarcExport.BDO + "inRootInstance");
+    public static final Property numberOfVolumes = ResourceFactory.createProperty(MarcExport.BDO + "numberOfVolumes");
+    public static final Property instanceHasVolume = ResourceFactory.createProperty(MarcExport.BDO + "instanceHasVolume");
+    public static final Property instanceReproductionOf = ResourceFactory.createProperty(MarcExport.BDO + "instanceReproductionOf");
+    public static final Property partType = ResourceFactory.createProperty(MarcExport.BDO + "partType");
     
     public static final String ewtsToBo(String ewts) {
         if (ewts.startsWith("*"))
@@ -301,6 +298,37 @@ public class CSLJsonExport {
             this.latn = mapper.createObjectNode();
             this.en = mapper.createObjectNode();
             this.zh = mapper.createObjectNode();
+            final LocalDate now = LocalDate.now();
+            final ArrayNode components = mapper.createArrayNode();
+            components.add(now.getYear());
+            components.add(now.getMonthValue());
+            components.add(now.getDayOfMonth());
+            ObjectNode acc = this.bo.putObject("accessed");
+            ArrayNode dateparts = acc.putArray("date-parts");
+            dateparts.add(components);
+            acc = this.zh.putObject("accessed");
+            dateparts = acc.putArray("date-parts");
+            dateparts.add(components);
+            acc = this.en.putObject("accessed");
+            dateparts = acc.putArray("date-parts");
+            dateparts.add(components);
+            acc = this.latn.putObject("accessed");
+            dateparts = acc.putArray("date-parts");
+            dateparts.add(components);
+        }
+        
+        public void addCommonField(final String fieldName, final String value) {
+            this.bo.put(fieldName, value);
+            this.zh.put(fieldName, value);
+            this.en.put(fieldName, value);
+            this.latn.put(fieldName, value);
+        }
+        
+        public void addSimpleFieldInfo(final String fieldName, final FieldInfo fi) {
+            this.bo.put(fieldName, fi.label_bo);
+            this.zh.put(fieldName, fi.label_zh);
+            this.en.put(fieldName, fi.label_en);
+            this.latn.put(fieldName, fi.label_latn);
         }
     }
     
@@ -308,27 +336,91 @@ public class CSLJsonExport {
         final NodeIterator si = m.listObjectsOfProperty(r, p);
         final FieldInfo fi = new FieldInfo();
         while (si.hasNext()) {
-            System.out.println("test0.5");
             fi.addFromLiteral(si.next().asLiteral(), false);
         }
-        System.out.println("test0");
         fi.fill_missing();
         if (fi.label_bo == null)
             return;
-        System.out.println("test1");
-        res.bo.put(fieldName, fi.label_bo);
-        res.zh.put(fieldName, fi.label_zh);
-        res.en.put(fieldName, fi.label_en);
-        res.latn.put(fieldName, fi.label_latn);
+        res.addSimpleFieldInfo(fieldName, fi);
+    }
+    
+    public static Resource getImageReproduction(final Model m, final Resource root) {
+        final StmtIterator si = root.listProperties(instanceHasVolume);
+        while (si.hasNext()) {
+            Resource potentialIinstance = si.next().getResource();
+            final StmtIterator typeIt = potentialIinstance.listProperties(RDF.type);
+            while (typeIt.hasNext()) {
+                Resource type = si.next().getResource();
+                if (type.getURI().equals(MarcExport.BDO+"ImageInstance"))
+                    return potentialIinstance;
+            }
+        }
+        return null;
+    }
+    
+    public static void addSection(final CSLResObj res, final Model m, final Resource r) {
+        Resource parent = r.getPropertyResourceValue(MarcExport.partOf);
+        while (parent != null) {
+            Resource partTypeR = parent.getPropertyResourceValue(partType);
+            if (partTypeR != null && partTypeR.getLocalName().equals("PartTypeSection")) {
+                FieldInfo fi = getEntityLabelField(m, parent, false);
+                res.addSimpleFieldInfo("section", fi);
+                break;
+            }
+            parent = parent.getPropertyResourceValue(MarcExport.partOf);
+        }
+    }
+    
+    public static FieldInfo fiBDRC = new FieldInfo();
+    static {
+        fiBDRC.label_bo = "ནང་བསྟན་དཔེ་ཚོགས་ལྟེ་གནས།（BDRC）";
+        fiBDRC.label_en = "Buddhist Digital Resource Center (BDRC)";
+        fiBDRC.label_latn = "Buddhist Digital Resource Center (BDRC)";
+        fiBDRC.label_zh = "佛教数字资源中心（BDRC）";
     }
     
     public static CSLResObj getObject(final Model m, final Resource r) {
         CSLResObj res = new CSLResObj();
         Resource root = r.getPropertyResourceValue(inRootInstance);
-        if (root == null)
-            root = r;
+        
+        res.addCommonField("url", r.getURI());
+        res.addCommonField("id", "bdr:"+r.getLocalName());
+        res.addSimpleFieldInfo("source", fiBDRC);
+        FieldInfo fi = getEntityLabelField(m, r, false);
+        res.addSimpleFieldInfo("title", fi);
+        if (root == null) {
+            Resource repOf = r.getPropertyResourceValue(instanceReproductionOf);
+            if (repOf != null)
+                root = repOf;
+            res.addCommonField("type", "book");
+            // getting title:
+            
+        } else {
+            res.addCommonField("type", "chapter");
+            addSection(res, m, r);
+            fi = getEntityLabelField(m, root, false);
+            res.addSimpleFieldInfo("container-title", fi);
+        }
+
+        int volnum = 0;
+        Statement nbvolLitSt = root.getProperty(numberOfVolumes);
+        if (nbvolLitSt != null) {
+            volnum = nbvolLitSt.getInt();
+        }
+        if (volnum == 0) {
+            Resource iinstance = getImageReproduction(m, root);
+            StmtIterator ni = iinstance.listProperties(instanceHasVolume);
+            for ( ; ni.hasNext() ; ++volnum ) ni.next();
+        }
+        if (volnum != 0) {
+            res.addCommonField("number-of-volumes", String.valueOf(volnum));
+        }
+            
         // publisher name
         addDirectLangField(res, "publisher", m, root, MarcExport.publisherName);
+        addDirectLangField(res, "publisher-place", m, root, MarcExport.publisherLocation);
+        addDirectLangField(res, "edition", m, root, MarcExport.editionStatement);
+        
         return res;
     }
     

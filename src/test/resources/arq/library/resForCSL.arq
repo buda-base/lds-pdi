@@ -25,22 +25,25 @@ construct {
   ?R_RES bf:identifiedBy ?id .
   ?root ?rootp ?rooto .
   ?cl ?clp ?clo .
+  ?iinstance ?iinstancep ?iinstanceo .
+  ?wa ?wap ?wao .
+  ?mw ?mwp ?mwo .
 } where {
   {
     ?R_RES ?p ?o .
   }
   union {
     ?R_RES :instanceReproductionOf ?mw .
-    ?mw ?p ?o .
+    ?mw ?mwp ?mwo .
   }
   union {
     ?R_RES :instanceOf ?wa .
-    ?wa ?p ?o .
+    ?wa ?wap ?wao .
   }
   union {
-    ?R_RES :instanceHasReproduction ?item .
-    ?item a :ImageInstance ;
-          ?p ?o .
+    ?R_RES bdo:inRootInstance?/:instanceHasReproduction? ?iinstance .
+    ?iinstance a :ImageInstance ;
+          ?iinstancep ?iinstanceo .
   }
   union {
     ?R_RES :instanceReproductionOf?/bdo:partOf+ ?part .

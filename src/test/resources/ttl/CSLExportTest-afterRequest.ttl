@@ -40,6 +40,17 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
+bdr:W22084  a                        bdo:DigitalInstance , bdo:ImageInstance , bdo:Instance ;
+        bdo:inCollection             bdr:PR01DOR0 , bdr:PRHD01 ;
+        bdo:instanceHasReproduction  bdr:IE0OPP007112 ;
+        bdo:instanceHasVolume        bdr:I0889 , bdr:I0913 , bdr:I0938 , bdr:I0906 , bdr:I0925 , bdr:I0963 , bdr:I0970 , bdr:I0961 , bdr:I0893 , bdr:I0931 , bdr:I0927 , bdr:I0918 , bdr:I0975 , bdr:I0983 , bdr:I0973 , bdr:I0898 , bdr:I0942 , bdr:I0912 , bdr:I0896 , bdr:I0910 , bdr:I0956 , bdr:I0887 , bdr:I0947 , bdr:I0954 , bdr:I0924 , bdr:I0922 , bdr:I0968 , bdr:I0949 , bdr:I0959 , bdr:I0966 , bdr:I0936 , bdr:I0988 , bdr:I0985 , bdr:I0916 , bdr:I0902 , bdr:I0971 , bdr:I0894 , bdr:I0892 , bdr:I0928 , bdr:I0937 , bdr:I0914 , bdr:I0952 , bdr:I0943 , bdr:I0950 , bdr:I0920 , bdr:I0939 , bdr:I0911 , bdr:I0909 , bdr:I0907 , bdr:I0926 , bdr:I0964 , bdr:I0955 , bdr:I0962 , bdr:I0932 , bdr:I0919 , bdr:I0976 , bdr:I0984 , bdr:I0899 , bdr:I0981 , bdr:I0948 , bdr:I0890 , bdr:I0945 , bdr:I0903 , bdr:I0957 , bdr:I0905 , bdr:I0934 , bdr:I0888 , bdr:I0915 , bdr:I0960 , bdr:I0951 , bdr:I0978 , bdr:I0986 , bdr:I0969 , bdr:I0917 , bdr:I0908 , bdr:I0972 , bdr:I0980 , bdr:I0895 , bdr:I0929 , bdr:I0900 , bdr:I0944 , bdr:I0941 , bdr:I0953 , bdr:I0886 , bdr:I0923 , bdr:I0930 , bdr:I0921 , bdr:I0967 , bdr:I0974 , bdr:I0982 , bdr:I0897 , bdr:I0965 , bdr:I0935 , bdr:I0933 , bdr:I0891 , bdr:I0979 , bdr:I0987 , bdr:I0977 , bdr:I0946 , bdr:I0904 , bdr:I0940 , bdr:I0958 , bdr:I0901 ;
+        bdo:instanceOf               bdr:WA22084 ;
+        bdo:instanceReproductionOf   bdr:MW22084 ;
+        bdo:isRoot                   true ;
+        bdo:itemVolumes              103 ;
+        bdo:scanInfo                 "Satluj Siti Enterprises"@en ;
+        tmp:thumbnailIIIFService     <https://iiif.bdrc.io/bdr:I0886::08860003.tif> .
+
 bdr:EV27A5BCAD90672A6F
         a              bdo:PublishedEvent ;
         bdo:notAfter   "1979"^^xsd:gYear ;
@@ -57,27 +68,19 @@ bdr:ID968735DA001F297F
         a          bdr:HarvardShelfId ;
         rdf:value  "010898037-5" .
 
-bdr:MW22084_0044-31  a          bdo:Work , bdo:Instance ;
-        bf:identifiedBy         bdr:IDF75C87E9AA4D3404 , bdr:ID6E65C66CA7067EBE , bdr:IDAD4FF5DB7A5C2124 , bdr:ID2748C27BAA20212D , bdr:ID645DC1AF3040C962 , bdr:IDFE0637396E66E205 , bdr:ID968735DA001F297F , bdr:ID03D076B8B8DE65A4 , bdr:ID8CC9F8DC4AC66ABC , bdr:IDC0D4FFB7207A7C84 , bdr:IDB16F04_WA0RK0044-31 , bdr:ID6A8E3613CB0445A9 , bdr:IDE4702234FC5A8FCB , bdr:ID61F121F8E57B9EBA , bdr:ID94C13C60CBF4946D , bdr:IDD93F67_MW22084_0044-31 , bdr:IDFD0A48BFDD67930C , bdr:ID672146379EFBE44D , bdr:ID6242A307F139F41E ;
-        adm:sameAsrKTs          <http://purl.rkts.eu/resource/WKT0044-31> ;
-        bdo:contentLocation     bdr:WLFC73A8_MW22084_0044-31 ;
-        bdo:hasTitle            bdr:TTCFD588_MW22084_0044-31 ;
-        bdo:inRootInstance      bdr:MW22084 ;
-        bdo:instanceOf          bdr:WA0RK0044-31 ;
-        bdo:isRoot              true ;
-        bdo:language            bdr:LangBo ;
-        bdo:note                bdr:NT318BC3_WA0RK0044-31 ;
-        bdo:partIndex           31 ;
-        bdo:partOf              bdr:WA0RK0044 , bdr:MW22084_0044 ;
-        bdo:partTreeIndex       "08.01.31" ;
-        bdo:partType            bdr:PartTypeText ;
-        bdo:workHasInstance     bdr:MW3CN20612_0044-31 , bdr:MW22084_0044-31 , bdr:MW4CZ5369_0044-31 ;
-        bdo:workHasParallelsIn  bdr:WA0TTET0286 , bdr:WA0TTET0285 , bdr:WA4CZ16779 , bdr:WA0TTET0287 ;
-        tmp:entityScore         3 ;
-        tmp:pubEvent            bdr:EV27A5BCAD90672A6F ;
-        owl:sameAs              eftr:WEKDTOH44-31 , eftr:WATTOH44-31 , <http://purl.rkts.eu/resource/WKT0044-31> ;
-        skos:altLabel           "daśabhūmika"@sa-x-iast , "daśabhūmika sūtra"@sa-x-iast ;
-        skos:prefLabel          "sa bcu'i le'u/"@bo-x-ewts , "sa bcu'i le'u ste sum cu gcig pa/"@bo-x-ewts .
+bdr:MW22084_0044-31  a       bdo:Instance ;
+        bf:identifiedBy      bdr:ID645DC1AF3040C962 , bdr:ID61F121F8E57B9EBA , bdr:ID968735DA001F297F , bdr:IDFD0A48BFDD67930C , bdr:IDE4702234FC5A8FCB , bdr:ID6A8E3613CB0445A9 , bdr:IDFE0637396E66E205 , bdr:IDF75C87E9AA4D3404 , bdr:ID6242A307F139F41E , bdr:ID6E65C66CA7067EBE , bdr:ID94C13C60CBF4946D , bdr:ID8CC9F8DC4AC66ABC , bdr:IDAD4FF5DB7A5C2124 , bdr:IDD93F67_MW22084_0044-31 , bdr:ID672146379EFBE44D , bdr:IDC0D4FFB7207A7C84 , bdr:ID2748C27BAA20212D , bdr:ID03D076B8B8DE65A4 ;
+        bdo:contentLocation  bdr:WLFC73A8_MW22084_0044-31 ;
+        bdo:hasTitle         bdr:TTCFD588_MW22084_0044-31 ;
+        bdo:inRootInstance   bdr:MW22084 ;
+        bdo:instanceOf       bdr:WA0RK0044-31 ;
+        bdo:partIndex        31 ;
+        bdo:partOf           bdr:MW22084_0044 ;
+        bdo:partTreeIndex    "08.01.31" ;
+        bdo:partType         bdr:PartTypeText ;
+        tmp:pubEvent         bdr:EV27A5BCAD90672A6F ;
+        owl:sameAs           eftr:WEKDTOH44-31 ;
+        skos:prefLabel       "sa bcu'i le'u ste sum cu gcig pa/"@bo-x-ewts .
 
 bdr:IDD93F67_MW22084_0044-31
         a          bdr:KaTenSiglaD ;
@@ -172,11 +175,25 @@ bdr:ID6242A307F139F41E
         a          bdr:HarvardShelfId ;
         rdf:value  "010896050-1" .
 
-wd:Q1091010  skos:prefLabel  "司徒·曲吉穷乃"@zh-hani , "Situ Panchen"@en .
-
 bdr:ID94C13C60CBF4946D
         a          bdr:HarvardShelfId ;
         rdf:value  "010896322-5" .
+
+wd:Q1091010  skos:prefLabel  "司徒·曲吉穷乃"@zh-hani , "Situ Panchen"@en .
+
+bdr:WA0RK0044-31  a             bdo:Work ;
+        bf:identifiedBy         bdr:IDB16F04_WA0RK0044-31 ;
+        adm:sameAsrKTs          <http://purl.rkts.eu/resource/WKT0044-31> ;
+        bdo:isRoot              true ;
+        bdo:language            bdr:LangBo ;
+        bdo:note                bdr:NT318BC3_WA0RK0044-31 ;
+        bdo:partOf              bdr:WA0RK0044 ;
+        bdo:workHasInstance     bdr:MW22084_0044-31 , bdr:MW3CN20612_0044-31 , bdr:MW4CZ5369_0044-31 ;
+        bdo:workHasParallelsIn  bdr:WA4CZ16779 , bdr:WA0TTET0286 , bdr:WA0TTET0285 , bdr:WA0TTET0287 ;
+        tmp:entityScore         3 ;
+        owl:sameAs              eftr:WATTOH44-31 , <http://purl.rkts.eu/resource/WKT0044-31> ;
+        skos:altLabel           "daśabhūmika"@sa-x-iast , "daśabhūmika sūtra"@sa-x-iast ;
+        skos:prefLabel          "sa bcu'i le'u/"@bo-x-ewts .
 
 <https://sakyaresearch.org/persons/266>
         skos:prefLabel  "si tu paN chen chos kyi 'byung gnas/"@bo-x-ewts .
