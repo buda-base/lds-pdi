@@ -51,6 +51,12 @@ public class CSLJsonExport {
     public static final Property instanceHasVolume = ResourceFactory.createProperty(MarcExport.BDO + "instanceHasVolume");
     public static final Property instanceReproductionOf = ResourceFactory.createProperty(MarcExport.BDO + "instanceReproductionOf");
     public static final Property partType = ResourceFactory.createProperty(MarcExport.BDO + "partType");
+    public static final Property contentLocation = ResourceFactory.createProperty(MarcExport.BDO + "contentLocation");
+    public static final Property contentLocationPage = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationPage");
+    public static final Property contentLocationVolume = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationVolume");
+    public static final Property contentLocationEndPage = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationEndPage");
+    public static final Property contentLocationEndVolume = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationEndVolume");
+    
     
     public static final String ewtsToBo(String ewts) {
         if (ewts.startsWith("*"))
@@ -388,6 +394,44 @@ public class CSLJsonExport {
         }
     }
     
+    public static void addContentLocation(final CSLResObj res, final Model m, final Resource r, final int nbVols) {
+        Resource cl = r.getPropertyResourceValue(contentLocation);
+        if (cl == null)
+            return;
+        int beginVolume = 0;
+        int endVolume = 0;
+        int beginPage = 0;
+        int endPage = 0;
+        Statement st = cl.getProperty(contentLocationVolume);
+        if (st != null)
+            beginVolume = st.getInt();
+        st = cl.getProperty(contentLocationEndVolume);
+        if (st != null)
+            endVolume = st.getInt();
+        st = cl.getProperty(contentLocationPage);
+        if (st != null)
+            beginPage = st.getInt();
+        st = cl.getProperty(contentLocationEndPage);
+        if (st != null)
+            endPage = st.getInt();
+        if (beginVolume > 1 || endVolume > 1 || nbVols > 1) {
+            res.addCommonField("volume", String.valueOf(beginVolume));
+        }
+        String pageStr = "";
+        if (beginPage > 0)
+            pageStr = String.valueOf(beginPage);
+        if (endPage > 0 && (endVolume == 0 || endVolume != beginVolume)) {
+            pageStr += "-"+String.valueOf(endPage);
+        }
+        if (!pageStr.isEmpty()) {
+            res.addCommonField("page", String.valueOf(pageStr));
+        }
+    }
+    
+    public static void addCreators(final CSLResObj res, final Model m, final Resource r, final Resource root) {
+        
+    }
+    
     public static FieldInfo fiBDRC = new FieldInfo();
     static {
         fiBDRC.label_bo = "ནང་བསྟན་དཔེ་ཚོགས་ལྟེ་གནས།（BDRC）";
@@ -418,7 +462,6 @@ public class CSLJsonExport {
             fi = getEntityLabelField(m, root, false, true);
             res.addSimpleFieldInfo("container-title", fi);
         }
-
         int volnum = 0;
         Statement nbvolLitSt = root.getProperty(numberOfVolumes);
         if (nbvolLitSt != null) {
@@ -432,6 +475,8 @@ public class CSLJsonExport {
         if (volnum != 0) {
             res.addCommonField("number-of-volumes", String.valueOf(volnum));
         }
+        addContentLocation(res, m, r, volnum);
+        addCreators(res, m, r, root);
             
         // publisher name
         addDirectLangField(res, "publisher", m, root, MarcExport.publisherName);
