@@ -648,13 +648,6 @@ public class CSLJsonExport {
     }
     
     public static ResponseEntity<CSLResObj> getResponse(final String resUri) throws RestException, JsonProcessingException {
-        // I really don't like that but making that better would mean either:
-        // - a very weird and probably slower SPARQL query
-        // - two queries
-        // The idea is that we're sending MARC records for items to Columbia,
-        // as they only want "electronic resources" records, and electronic
-        // resources are imageinstances (scans) in our system, not regular instances.
-        boolean scansMode = resUri.startsWith(MarcExport.ScanUriPrefix);
         final Model m;
         final Resource main;
 
@@ -662,11 +655,7 @@ public class CSLJsonExport {
         main = m.getResource(resUri);
         
         CSLResObj res = getObject(m, main);
-        
-        // add stuff
-        
         return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").contentType(MediaType.APPLICATION_JSON).body(res);
-
     }
     
 }
