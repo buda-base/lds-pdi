@@ -630,6 +630,9 @@ public class CSLJsonExport {
         }
         if (volnum == 0) {
             Resource iinstance = getImageReproduction(m, root);
+            if (iinstance == null) {
+                iinstance = r;
+            }
             StmtIterator ni = iinstance.listProperties(instanceHasVolume);
             for ( ; ni.hasNext() ; ++volnum ) ni.next();
         }
