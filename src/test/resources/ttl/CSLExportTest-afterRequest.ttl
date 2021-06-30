@@ -259,7 +259,7 @@ bdr:CRB7C903677201073C
         bdo:role   bdr:R0ER0019 .
 
 bdr:ID9E47B49C7A62A605
-        a          bdr:HollisId ;
+        a          bf:Isbn ;
         rdf:value  "014254519" .
 
 bdr:P303  owl:sameAs    viaf:40972218 , wd:Q15911904 , <http://api.treasuryoflives.org/resource/TOLP5338> ;

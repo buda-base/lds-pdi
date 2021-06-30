@@ -586,8 +586,18 @@ public class CSLJsonExport {
     }
 
     public static void addSeries(final CSLResObj res, final Model m, final Resource r) {
-        //final StmtIterator si = r.getProperty(p)
+        StmtIterator si = r.listProperties(MarcExport.seriesNumber);
+        if (si.hasNext()) {
+            res.addCommonField("collection-number", si.next().getObject().asLiteral().getString());
+        }
+        si = r.listProperties(MarcExport.serialInstanceOf);
+        if (!si.hasNext())
+            return;
+        Resource was = si.next().getResource();
+        FieldInfo fi = getEntityLabelField(m, was, false, true);
+        res.addSimpleFieldInfo("collection-title", fi);
     }
+
     public static CSLResObj getObject(final Model m, final Resource r) {
         CSLResObj res = new CSLResObj();
         Resource root = r.getPropertyResourceValue(inRootInstance);
@@ -627,6 +637,7 @@ public class CSLJsonExport {
             res.addCommonField("number-of-volumes", String.valueOf(volnum));
         }
         addContentLocation(res, m, r, volnum);
+        addSeries(res, m, root);
         addIdentifiers(res, m, root);
         // publisher name
         addDirectLangField(res, "publisher", m, root, MarcExport.publisherName);
