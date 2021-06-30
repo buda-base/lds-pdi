@@ -1,6 +1,8 @@
 package io.bdrc.ldspdi.export;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
@@ -51,6 +53,11 @@ public class CSLJsonExport {
     public static final Property instanceHasVolume = ResourceFactory.createProperty(MarcExport.BDO + "instanceHasVolume");
     public static final Property instanceReproductionOf = ResourceFactory.createProperty(MarcExport.BDO + "instanceReproductionOf");
     public static final Property partType = ResourceFactory.createProperty(MarcExport.BDO + "partType");
+    public static final Property identifiedBy = ResourceFactory.createProperty(MarcExport.BF + "identifiedBy");
+    public static final Property isbn = ResourceFactory.createProperty(MarcExport.BF + "Isbn");
+    public static final Property issn = ResourceFactory.createProperty(MarcExport.BF + "Issn");
+    public static final Property pubEvent = ResourceFactory.createProperty(MarcExport.TMP + "pubEvent");
+    public static final Property instanceOf = ResourceFactory.createProperty(MarcExport.BDO + "instanceOf");
     public static final Property contentLocation = ResourceFactory.createProperty(MarcExport.BDO + "contentLocation");
     public static final Property contentLocationPage = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationPage");
     public static final Property contentLocationVolume = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationVolume");
@@ -321,6 +328,10 @@ public class CSLJsonExport {
             this.latn = mapper.createObjectNode();
             this.en = mapper.createObjectNode();
             this.zh = mapper.createObjectNode();
+            this.en.put("language", "en_US");
+            this.latn.put("language", "en_US");
+            this.bo.put("language", "zh_CN");
+            this.zh.put("language", "zh_CN");
             final LocalDate now = LocalDate.now();
             final ArrayNode components = mapper.createArrayNode();
             components.add(now.getYear());
@@ -346,12 +357,53 @@ public class CSLJsonExport {
             this.en.put(fieldName, value);
             this.latn.put(fieldName, value);
         }
+
+        public void addIssued(final ObjectNode on, final ArrayNode firstYearAn, final ArrayNode secondYearAn) {
+            ObjectNode issued = on.putObject("issued");
+            ArrayNode an = issued.putArray("date-parts");
+            an.add(firstYearAn);
+            if (secondYearAn != null)
+                an.add(secondYearAn);
+        }
+        
+        public void addIssued(final int firstYear, final int secondYear) {
+            ArrayNode firstYearAn = this.mapper.createArrayNode();
+            firstYearAn.add(firstYear);
+            ArrayNode secondYearAn = null;
+            if (secondYear != 0) {
+                secondYearAn = this.mapper.createArrayNode();
+                secondYearAn.add(secondYear);
+            }
+            this.addIssued(this.bo, firstYearAn, secondYearAn);
+            this.addIssued(this.zh, firstYearAn, secondYearAn);
+            this.addIssued(this.en, firstYearAn, secondYearAn);
+            this.addIssued(this.latn, firstYearAn, secondYearAn);
+        }
         
         public void addSimpleFieldInfo(final String fieldName, final FieldInfo fi) {
             this.bo.put(fieldName, fi.label_bo);
             this.zh.put(fieldName, fi.label_zh);
             this.en.put(fieldName, fi.label_en);
             this.latn.put(fieldName, fi.label_latn);
+        }
+
+        public void addPerson(final String roleName, final FieldInfo fiAgent) {
+            this.addPerson(this.bo, roleName, fiAgent.label_bo);
+            this.addPerson(this.zh, roleName, fiAgent.label_zh);
+            this.addPerson(this.latn, roleName, fiAgent.label_latn);
+            this.addPerson(this.en, roleName, fiAgent.label_en);
+        }
+        
+        private void addPerson(ObjectNode on, final String roleName, final String family) {
+            final ArrayNode an;
+            if (on.has(roleName)) {
+                an = (ArrayNode) on.get(roleName);
+            } else {
+                an = on.putArray(roleName);
+            }
+            ObjectNode person = this.mapper.createObjectNode();
+            an.add(person);
+            person.put("family", family);
         }
     }
     
@@ -428,8 +480,53 @@ public class CSLJsonExport {
         }
     }
     
-    public static void addCreators(final CSLResObj res, final Model m, final Resource r, final Resource root) {
-        
+    public static Map<String,String> roleLnameToCSLKey = new HashMap<>();
+    static {
+        roleLnameToCSLKey.put("R0ER0009", "translator");
+        roleLnameToCSLKey.put("R0ER0010", "illustrator");
+        roleLnameToCSLKey.put("R0ER0011", "author");
+        roleLnameToCSLKey.put("R0ER0012", "author");
+        roleLnameToCSLKey.put("R0ER0014", "author");
+        roleLnameToCSLKey.put("R0ER0015", "editor");
+        roleLnameToCSLKey.put("R0ER0016", "author");
+        roleLnameToCSLKey.put("R0ER0017", "translator");
+        roleLnameToCSLKey.put("R0ER0018", "translator");
+        roleLnameToCSLKey.put("R0ER0019", "author");
+        roleLnameToCSLKey.put("R0ER0020", "translator");
+        roleLnameToCSLKey.put("R0ER0021", "recipient");
+        roleLnameToCSLKey.put("R0ER0025", "author");
+        roleLnameToCSLKey.put("R0ER0026", "translator");
+        roleLnameToCSLKey.put("R0ER0032", "author");
+    }
+    
+    public static void addCreators(final CSLResObj res, final Model m, final Resource r, final boolean rootMode) {
+        StmtIterator aacIt = r.listProperties(MarcExport.creator);
+        while (aacIt.hasNext()) {
+            Resource aac = aacIt.next().getResource();
+            Resource role = aac.getPropertyResourceValue(MarcExport.role);
+            if (role == null)
+                continue;
+            String cslkey = roleLnameToCSLKey.get(role.getLocalName());
+            if (cslkey == null)
+                continue;
+            if (rootMode && cslkey.equals("author"))
+                cslkey = "container-author";
+            Resource agent = aac.getPropertyResourceValue(MarcExport.agent);
+            if (agent == null)
+                continue;
+            FieldInfo fiAgent = getEntityLabelField(m, agent, true, true);
+            res.addPerson(cslkey, fiAgent);
+        }
+    }
+    
+    public static void addCreators(final CSLResObj res, final Model m, final Resource r, boolean rootMode, boolean followToWorks) {
+        addCreators(res, m, r, rootMode);
+        if (followToWorks) {
+            Resource work = r.getPropertyResourceValue(instanceOf);
+            if (work != null) {
+                addCreators(res, m, work, false);
+            }
+        }
     }
     
     public static FieldInfo fiBDRC = new FieldInfo();
@@ -438,6 +535,52 @@ public class CSLJsonExport {
         fiBDRC.label_en = "Buddhist Digital Resource Center (BDRC)";
         fiBDRC.label_latn = "Buddhist Digital Resource Center (BDRC)";
         fiBDRC.label_zh = "佛教数字资源中心（BDRC）";
+    }
+    
+    public static void addIdentifiers(final CSLResObj res, final Model m, final Resource root) {
+        StmtIterator si = root.listProperties(identifiedBy);
+        while (si.hasNext()) {
+            final Resource id = si.next().getResource();
+            if (id.hasProperty(RDF.type, isbn)) {
+                final Statement valueS = id.getProperty(RDF.value);
+                if (valueS != null) {
+                    final String value = valueS.getString();
+                    res.addCommonField("ISBN", value);
+                }
+            }
+        }
+    }
+    
+    public static void addPublishedEvent(final CSLResObj res, final Model m, final Resource r) {
+        Resource pubEventR = r.getPropertyResourceValue(pubEvent);
+        if (pubEventR == null)
+            return;
+        int firstYear = 0;
+        int lastYear = 0;
+        Statement onYearS = pubEventR.getProperty(MarcExport.onYear);
+        if (onYearS != null) {
+            final String firstYearStr = onYearS.getLiteral().getLexicalForm();
+            try {
+                firstYear = Integer.parseInt(firstYearStr);
+            } catch (NumberFormatException e) {  }
+        }
+        Statement notBeforeS = pubEventR.getProperty(MarcExport.notBefore);
+        if (notBeforeS != null) {
+            final String firstYearStr = notBeforeS.getLiteral().getLexicalForm();
+            try {
+                firstYear = Integer.parseInt(firstYearStr);
+            } catch (NumberFormatException e) {  }
+        }
+        Statement notAfterS = pubEventR.getProperty(MarcExport.notAfter);
+        if (notAfterS != null) {
+            final String lastYearStr = notAfterS.getLiteral().getLexicalForm();
+            try {
+                lastYear = Integer.parseInt(lastYearStr);
+            } catch (NumberFormatException e) {  }
+        }
+        if (firstYear != 0) {
+            res.addIssued(firstYear, lastYear);
+        }
     }
     
     public static CSLResObj getObject(final Model m, final Resource r) {
@@ -453,14 +596,17 @@ public class CSLJsonExport {
             Resource repOf = r.getPropertyResourceValue(instanceReproductionOf);
             if (repOf != null)
                 root = repOf;
+            root = r;
             res.addCommonField("type", "book");
             // getting title:
-            
+            addCreators(res, m, root, false, true);
         } else {
             res.addCommonField("type", "chapter");
             addSection(res, m, r);
             fi = getEntityLabelField(m, root, false, true);
             res.addSimpleFieldInfo("container-title", fi);
+            addCreators(res, m, r, false, true);
+            addCreators(res, m, root, true, true);
         }
         int volnum = 0;
         Statement nbvolLitSt = root.getProperty(numberOfVolumes);
@@ -476,13 +622,12 @@ public class CSLJsonExport {
             res.addCommonField("number-of-volumes", String.valueOf(volnum));
         }
         addContentLocation(res, m, r, volnum);
-        addCreators(res, m, r, root);
-            
+        addIdentifiers(res, m, root);
         // publisher name
         addDirectLangField(res, "publisher", m, root, MarcExport.publisherName);
         addDirectLangField(res, "publisher-place", m, root, MarcExport.publisherLocation);
         addDirectLangField(res, "edition", m, root, MarcExport.editionStatement);
-        
+        addPublishedEvent(res, m, r);
         return res;
     }
     
