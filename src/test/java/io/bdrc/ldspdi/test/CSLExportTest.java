@@ -88,9 +88,15 @@ public class CSLExportTest {
     @Test
     public void testDirectCall() throws FileNotFoundException, IOException {
         final Model m = Utils.getModelFromFileName(Utils.TESTDIR + "CSLExportTest-afterRequest.ttl", Lang.TURTLE);
-        final Resource main = m.getResource("http://purl.bdrc.io/resource/MW22084_0044-31");
+        Resource main = m.getResource("http://purl.bdrc.io/resource/MW22084_0044-31");
         CSLResObj res = CSLJsonExport.getObject(m, main);
         try (FileOutputStream fos = new FileOutputStream("/tmp/csl-direct.json")) {
+            final String s = res.mapper.writeValueAsString(res);
+            fos.write(s.getBytes());
+        }
+        main = m.getResource("http://purl.bdrc.io/resource/MW00KG09211");
+        res = CSLJsonExport.getObject(m, main);
+        try (FileOutputStream fos = new FileOutputStream("/tmp/csl-direct-2.json")) {
             final String s = res.mapper.writeValueAsString(res);
             fos.write(s.getBytes());
         }

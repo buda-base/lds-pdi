@@ -212,3 +212,101 @@ bdr:WLFC73A8_MW22084_0044-31
         bdo:contentLocationLine      5 ;
         bdo:contentLocationPage      333 ;
         bdo:contentLocationVolume    36 .
+
+# MW00KG09211
+
+bdr:P5211  owl:sameAs   wd:Q106790133 , <http://api.treasuryoflives.org/resource/TOLP7721> ;
+        skos:prefLabel  "mus chen kun dga' rgya mtsho/"@bo-x-ewts .
+
+<http://api.treasuryoflives.org/resource/TOLP5338>
+        owl:sameAs      bdr:P303 ;
+        skos:prefLabel  "Ngawang Tendar"@en .
+
+wd:Q106790133  owl:sameAs  bdr:P5211 ;
+        skos:prefLabel  "Mü Chen Kün Ga Gyatso"@en , "མུས་ཆེན་ཀུན་དགའ་རྒྱ་མཚོ།"@bo .
+
+bdr:W00KG09211  a                    bdo:ImageInstance , bdo:DigitalInstance , bdo:Instance ;
+        bdo:inCollection             bdr:PR3JW7543 ;
+        bdo:instanceHasReproduction  bdr:IE0OPP010475 ;
+        bdo:instanceHasVolume        bdr:I00KG09359 , bdr:I00KG09360 ;
+        bdo:instanceOf               bdr:WA00KG09211 ;
+        bdo:instanceReproductionOf   bdr:MW00KG09211 ;
+        bdo:isRoot                   true ;
+        bdo:itemVolumes              2 ;
+        bdo:scanInfo                 "Scanned at M/S Satluj Infotech Images, E-45, Sector 27 Noida, District Gautam Buddha Nagar, U.P. 201301 via New Delhi, India for the Buddhist Digital Resource Center. Comments: 2008"@en ;
+        tmp:thumbnailIIIFService     <https://iiif.bdrc.io/bdr:I00KG09359::I00KG093590003.TIF> .
+
+bdr:CR29139DC92D9636B9
+        a          bdo:AgentAsCreator ;
+        bdo:agent  bdr:P303 ;
+        bdo:role   bdr:R0ER0019 .
+
+bdr:ID2629F8A48C513666
+        a          bdr:HarvardShelfId ;
+        rdf:value  "001149630-4" .
+
+bdr:EVE747B5E53F32523F
+        a           bdo:PublishedEvent ;
+        bdo:onYear  "1982"^^xsd:gYear .
+
+bdr:ID20796021907A89A2
+        a          bf:Lccn ;
+        rdf:value  "82903724" .
+
+bdr:CRB7C903677201073C
+        a          bdo:AgentAsCreator ;
+        bdo:agent  bdr:P5211 ;
+        bdo:role   bdr:R0ER0019 .
+
+bdr:ID9E47B49C7A62A605
+        a          bdr:HollisId ;
+        rdf:value  "014254519" .
+
+bdr:P303  owl:sameAs    viaf:40972218 , wd:Q15911904 , <http://api.treasuryoflives.org/resource/TOLP5338> ;
+        skos:prefLabel  "a lag sha bstan dar/"@bo-x-ewts .
+
+bdr:MW00KG09211  a                   bdo:SerialInstance , bdo:Instance ;
+        bf:identifiedBy              bdr:ID9E47B49C7A62A605 , bdr:ID2629F8A48C513666 , bdr:ID20796021907A89A2 , bdr:ID301834F16F0961F5 ;
+        bdo:biblioNote               "Reproduced in original scripts and languages"@en ;
+        bdo:hasSourcePrintery        bdr:G3JT12500 ;
+        bdo:hasTitle                 bdr:TTD873C4DE1133A1EB , bdr:TT4C73FD194EEFDBE5 , bdr:TT9ACE30CC70CB05DF , bdr:TT2DF8465BAB2BE29E ;
+        bdo:instanceEvent            bdr:EVE747B5E53F32523F ;
+        bdo:instanceHasReproduction  bdr:IE0OPP010475 , bdr:W00KG09211 ;
+        bdo:instanceOf               bdr:WA00KG09211 ;
+        bdo:isRoot                   true ;
+        bdo:numberOfVolumes          2 ;
+        bdo:printMethod              bdr:PrintMethod_Relief_WoodBlock ;
+        bdo:publisherLocation        "New Delhi"@en ;
+        bdo:publisherName            "Sharada Rani"@en ;
+        bdo:script                   bdr:ScriptMong , bdr:ScriptTibt ;
+        bdo:serialInstanceOf         bdr:WAS00KG09211 ;
+        bdo:seriesNumber             "v. 289-290" ;
+        bdo:workExtentStatement      "2 v." ;
+        tmp:pubEvent                 bdr:EVE747B5E53F32523F ;
+        tmp:thumbnailIIIFService     <https://iiif.bdrc.io/bdr:I00KG09359::I00KG093590003.TIF> ;
+        skos:prefLabel               "dag yig phyogs bsgrigs/"@bo-x-ewts , "four tibetan-mongolian lexicons"@en .
+
+wd:Q15911904  owl:sameAs  viaf:40972218 , bdr:P303 ;
+        skos:prefLabel  "阿旺丹德尔"@zh-hani , "Ngag-dbang-bstan-dar"@en .
+
+bdr:WAS00KG09211  skos:prefLabel  "Sata-Pitaka Series"@en .
+
+bdr:ID301834F16F0961F5
+        a          bf:ShelfMarkLcc ;
+        rdf:value  "PL3637.M66 F68 1982" .
+
+bdr:WA00KG09211  a           bdo:Work ;
+        bdo:catalogInfo      "Tibetan-Mongolian lexicon reproduced by Lokesh Chandra from the collection of Acharya Raghuvira."@en ;
+        bdo:creator          bdr:CRB7C903677201073C , bdr:CR29139DC92D9636B9 ;
+        bdo:isRoot           true ;
+        bdo:language         bdr:LangMn , bdr:LangBo ;
+        bdo:workGenre        bdr:T218 , bdr:T240 ;
+        bdo:workHasInstance  bdr:W00KG09211 , bdr:MW00KG09211 ;
+        bdo:workIsAbout      bdr:T265 ;
+        tmp:entityScore      2 ;
+        skos:altLabel        "bod hor skad gnyis shan sbyar/"@bo-x-ewts , "Four Tibetan-Mongolian lexicons."@en-x-mixed ;
+        skos:prefLabel       "four tibetan-mongolian lexicons"@en , "dag yig phyogs bsgrigs/"@bo-x-ewts .
+
+<http://api.treasuryoflives.org/resource/TOLP7721>
+        owl:sameAs      bdr:P5211 ;
+        skos:prefLabel  "kun dga' rgya mtsho"@bo-x-ewts .

@@ -133,6 +133,8 @@ public class CSLJsonExport {
                     this.label_sa_latn_ndia = StringUtils.capitalize(l.getString());
                 break;
             case "zh-hans":
+            case "zh-hani":
+            case "zh-hant":
                 if (replaceIfPresent || this.label_zh == null)
                     this.label_zh = StringUtils.capitalize(l.getString());
                 break;
@@ -582,7 +584,10 @@ public class CSLJsonExport {
             res.addIssued(firstYear, lastYear);
         }
     }
-    
+
+    public static void addSeries(final CSLResObj res, final Model m, final Resource r) {
+        //final StmtIterator si = r.getProperty(p)
+    }
     public static CSLResObj getObject(final Model m, final Resource r) {
         CSLResObj res = new CSLResObj();
         Resource root = r.getPropertyResourceValue(inRootInstance);

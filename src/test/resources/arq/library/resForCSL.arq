@@ -19,9 +19,8 @@ construct {
   ?R_RES tmp:pubEvent ?we .
   ?we ?wep ?weo .
   ?aac ?aacp ?aaco .
-  ?aac tmp:agentSameAs ?o .
   ?id ?idp ?ido .
-  ?o skos:prefLabel ?ol .
+  ?agentSa ?agentp ?oo .
   ?R_RES bf:identifiedBy ?id .
   ?root ?rootp ?rooto .
   ?cl ?clp ?clo .
@@ -65,8 +64,9 @@ construct {
   union {
     ?R_RES bdo:inRootInstance?/bdo:instanceOf?/bdo:creator ?aac .
     ?aac ?aacp ?aaco .
-    ?aac bdo:agent/owl:sameAs? ?o .
-    ?o skos:prefLabel ?ol .
+    ?aac bdo:agent/owl:sameAs? ?agentSa .
+    VALUES ?agentp { skos:prefLabel skos:altLabel owl:sameAs }
+    ?agentSa ?agentp ?oo .
   }
   union {
     ?R_RES :instanceReproductionOf?/bdo:inRootInstance?/bf:identifiedBy ?id .
