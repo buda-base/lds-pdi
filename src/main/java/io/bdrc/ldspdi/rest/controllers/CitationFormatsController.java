@@ -1,9 +1,9 @@
 package io.bdrc.ldspdi.rest.controllers;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +18,8 @@ import io.bdrc.ldspdi.export.CSLJsonExport.CSLResObj;
 @RequestMapping("/")
 public class CitationFormatsController {
     
-    @GetMapping(value = "CSLObj/{qname}")
-    public ResponseEntity<CSLResObj> CSLExport(@RequestParam(value="qname") String qname) throws JsonProcessingException, RestException {
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx");
+    @GetMapping(value = "CSLObj/{qname}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CSLResObj> CSLExport(@PathVariable(value="qname") String qname) throws JsonProcessingException, RestException {
         String uri = qname;
         if (uri.startsWith("bdr:")) {
             uri = "http://purl.bdrc.io/resource/"+qname.substring(4);

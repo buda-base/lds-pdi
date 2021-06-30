@@ -63,7 +63,7 @@ public class BdrcAuthController {
     public static final String BDU_PFX = "http://purl.bdrc.io/resource-nc/user/";
     public static final String PRIVATE_PFX = "http://purl.bdrc.io/graph-nc/user-private/";
     public static final String PUBLIC_PFX = "http://purl.bdrc.io/graph-nc/user/";
-    public static boolean adminView = ServiceConfig.getProperty("exposeAuthAdminAPI").equalsIgnoreCase("true");
+    public static boolean adminView = "true".equalsIgnoreCase(ServiceConfig.getProperty("exposeAuthAdminAPI"));
 
     @GetMapping(value = "/auth/details", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView getUsers() {

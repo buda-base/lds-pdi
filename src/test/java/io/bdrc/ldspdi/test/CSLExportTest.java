@@ -33,11 +33,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.export.CSLJsonExport;
 import io.bdrc.ldspdi.export.CSLJsonExport.CSLResObj;
+import io.bdrc.ldspdi.rest.controllers.CitationFormatsController;
 import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.service.ServiceConfig;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { PublicDataController.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { CitationFormatsController.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class CSLExportTest {
 
@@ -71,18 +72,18 @@ public class CSLExportTest {
         server.stop();
         server.join();
     }
-
-    //@Test
+    
+    @Test
     public void testSimpleRequestSimple() throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/CSLObj/bdr:MW22084_0044-31");
         HttpResponse response = client.execute(get);
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
-        //response.getEntity().writeTo(System.out);
-        try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
-            response.getEntity().writeTo(fos);
-        }
+        response.getEntity().writeTo(System.out);
+        //try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
+        //    response.getEntity().writeTo(fos);
+        //}
     }
     
     @Test

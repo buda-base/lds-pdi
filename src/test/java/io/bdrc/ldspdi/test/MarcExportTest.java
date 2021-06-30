@@ -43,7 +43,6 @@ public class MarcExportTest {
     private static Dataset srvds = DatasetFactory.createTxnMem();
     private static Model model = ModelFactory.createDefaultModel();
     public static String fusekiUrl;
-    public final static Logger log = LoggerFactory.getLogger(MarcExportTest.class.getName());
 
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {

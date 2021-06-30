@@ -655,7 +655,7 @@ public class CSLJsonExport {
         main = m.getResource(resUri);
         
         CSLResObj res = getObject(m, main);
-        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").contentType(MediaType.APPLICATION_JSON).body(res);
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(res);
     }
     
 }
