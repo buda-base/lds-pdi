@@ -325,6 +325,21 @@ public class CSLJsonExport {
         public ObjectNode en;
         public ObjectNode zh;
         
+        public ObjectNode getObjectNode(final String language) {
+            switch(language) {
+            case "bo":
+                return this.bo;
+            case "en":
+                return this.en;
+            case "latn":
+                return this.latn;
+            case "zh":
+                return this.zh;
+            default:
+                return null;
+            }
+        }
+        
         CSLResObj() {
             this.bo = mapper.createObjectNode();
             this.latn = mapper.createObjectNode();
