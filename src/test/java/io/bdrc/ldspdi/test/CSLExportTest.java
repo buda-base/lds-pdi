@@ -102,5 +102,18 @@ public class CSLExportTest {
             fos.write(s.getBytes());
         }
     }
+    
+    @Test
+    public void testRISSimpleRequestSimple() throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + environment.getProperty("local.server.port") + "/RIS/bdr:MW22084_0044-31/latn");
+        HttpResponse response = client.execute(get);
+        System.out.println(response.getStatusLine().getStatusCode());
+        System.out.println("result:");
+        response.getEntity().writeTo(System.out);
+        //try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
+        //    response.getEntity().writeTo(fos);
+        //}
+    }
 
 }

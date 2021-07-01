@@ -1,15 +1,22 @@
 package io.bdrc.ldspdi.export;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.export.CSLJsonExport.CSLResObj;
 
 public class RISExport {
@@ -26,7 +33,7 @@ public class RISExport {
             values.add(value);
         }
         
-        public void writeTo(OutputStream out) throws IOException {
+        public String toString() {
             StringBuilder builder = new StringBuilder();
             builder.append("TY  - ");
             builder.append(this.type);
@@ -40,12 +47,12 @@ public class RISExport {
                     builder.append(value);
                     builder.append(LINE_SEPARATOR);
                 }
-                builder.append("ER");
-                builder.append(TAG_SEPARATOR);
-                builder.append(LINE_SEPARATOR);
-                builder.append(LINE_SEPARATOR);
             }
-            out.write(builder.toString().getBytes());
+            builder.append("ER");
+            builder.append(TAG_SEPARATOR);
+            builder.append(LINE_SEPARATOR);
+            builder.append(LINE_SEPARATOR);
+            return builder.toString();
         }
     }
     
@@ -58,11 +65,37 @@ public class RISExport {
     }
     
     public static void dateMapping(final RISObject ris, final CSLResObj csl, final String lang, final String risField, final String cslField) {
-        
+        final ObjectNode on = csl.getObjectNode(lang);
+        if (on.has(cslField)) {
+            final JsonNode val = on.get(cslField);
+            if (val.isArray()) {
+                for (final JsonNode date : val) {
+                    // going through the 3 or less elements:
+                    int i = 0;
+                    StringBuilder sb = new StringBuilder();
+                    for (final JsonNode dateel : date) {
+                        if (i > 0)
+                            sb.append("/");
+                        sb.append(dateel.asText());
+                        i += 1;
+                    }
+                    ris.addFieldValue(risField, sb.toString());
+                }
+            }
+        }
     }
     
     public static void nameMapping(final RISObject ris, final CSLResObj csl, final String lang, final String risField, final String cslField) {
-
+        final ObjectNode on = csl.getObjectNode(lang);
+        if (on.has(cslField)) {
+            final JsonNode val = on.get(cslField);
+            if (val.isArray()) {
+                for (final JsonNode el : val) {
+                    final String family = el.get("family").asText();
+                    ris.addFieldValue(risField, family);
+                }
+            }
+        }
     }
     
     public static RISObject RISFromCSL(final CSLResObj csl, final String lang) {
@@ -88,6 +121,20 @@ public class RISExport {
         nameMapping(ris, csl, lang, "ED", "editor");
         nameMapping(ris, csl, lang, "C2", "container-author");
         return ris;
+    }
+    
+    public static MediaType RISMD = new MediaType("application", "x-research-info-systems", Charset.forName("utf-8"));
+    
+    public static ResponseEntity<String> getResponse(final String resUri, final String lang) throws RestException, JsonProcessingException {
+        final Model m;
+        final Resource main;
+
+        m = CSLJsonExport.getModelForCSL(resUri);
+        main = m.getResource(resUri);
+        
+        CSLResObj csl = CSLJsonExport.getObject(m, main);
+        RISObject ris = RISFromCSL(csl, lang);
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(RISMD).body(ris.toString());
     }
     
 }
