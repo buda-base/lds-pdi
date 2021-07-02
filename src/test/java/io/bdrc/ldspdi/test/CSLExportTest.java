@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.ldspdi.export.CSLJsonExport;
 import io.bdrc.ldspdi.export.CSLJsonExport.CSLResObj;
+import io.bdrc.ldspdi.export.RISExport;
+import io.bdrc.ldspdi.export.RISExport.RISObject;
 import io.bdrc.ldspdi.rest.controllers.CitationFormatsController;
 import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -65,6 +67,7 @@ public class CSLExportTest {
         // Creating a fuseki server
         server = FusekiServer.create().port(2251).add("/bdrcrw", srvds).build();
         server.start();
+        ServiceConfig.initForTests(fusekiUrl);
     }
 
     @AfterClass
@@ -101,6 +104,20 @@ public class CSLExportTest {
             final String s = res.mapper.writeValueAsString(res);
             fos.write(s.getBytes());
         }
+    }
+    
+    
+    @Test
+    public void testRISDirect() throws ClientProtocolException, IOException {
+        final Model m = Utils.getModelFromFileName(Utils.TESTDIR + "CSLExportTest-afterRequest.ttl", Lang.TURTLE);
+        Resource main = m.getResource("http://purl.bdrc.io/resource/MW22084_0044-31");
+        CSLResObj csl = CSLJsonExport.getObject(m, main);
+        RISObject ris = RISExport.RISFromCSL(csl, "latn");
+        System.out.println("result:");
+        System.out.println(ris.toString());
+        //try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
+        //    response.getEntity().writeTo(fos);
+        //}
     }
     
     @Test
