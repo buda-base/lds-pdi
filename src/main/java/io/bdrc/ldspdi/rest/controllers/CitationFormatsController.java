@@ -54,7 +54,7 @@ public class CitationFormatsController {
             // https://github.com/zotero/translators/issues/2459
             return ResponseEntity.status(200).body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><formats id=\""+id+"\"><format name=\"marcxml\" type=\"application/marcxml+xml\" /><format name=\"ris\" type=\"application/x-research-info-systems\" /></formats>");
         }
-        if (!format.equals("marcxml") && format.equals("ris"))
+        if (!format.equals("marcxml") && !format.equals("ris"))
             return ResponseEntity.status(406).body("format not available");
         String redirect;
         if (format.contentEquals("marcxml")) {
