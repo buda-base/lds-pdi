@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.export;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.Map.Entry;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
@@ -134,7 +137,11 @@ public class RISExport {
         
         CSLResObj csl = CSLJsonExport.getObject(m, main);
         RISObject ris = RISFromCSL(csl, lang);
-        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(RISMD).body(ris.toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(RISMD);
+        headers.setContentDispositionFormData("attachment", main.getLocalName() + "-" + lang + ".ris");
+        headers.setAllow(EnumSet.of(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS));
+        return ResponseEntity.ok().headers(headers).body(ris.toString());
     }
     
 }
