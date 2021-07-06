@@ -616,16 +616,21 @@ public class CSLJsonExport {
     public static CSLResObj getObject(final Model m, final Resource r) {
         CSLResObj res = new CSLResObj();
         Resource root = r.getPropertyResourceValue(inRootInstance);
-        
+        FieldInfo fi;
         res.addCommonField("url", r.getURI());
         res.addCommonField("id", "bdr:"+r.getLocalName());
         res.addSimpleFieldInfo("source", fiBDRC);
-        FieldInfo fi = getEntityLabelField(m, r, false, true);
-        res.addSimpleFieldInfo("title", fi);
+        
         if (root == null) {
             Resource repOf = r.getPropertyResourceValue(instanceReproductionOf);
-            if (repOf != null)
+            if (repOf != null) {
                 root = repOf;
+                fi = getEntityLabelField(m, repOf, false, true);
+                res.addSimpleFieldInfo("title", fi);
+            } else {
+                fi = getEntityLabelField(m, r, false, true);
+                res.addSimpleFieldInfo("title", fi);
+            }
             root = r;
             res.addCommonField("type", "book");
             // getting title:
@@ -637,6 +642,8 @@ public class CSLJsonExport {
             res.addSimpleFieldInfo("container-title", fi);
             addCreators(res, m, r, false, true);
             addCreators(res, m, root, true, true);
+            fi = getEntityLabelField(m, r, false, true);
+            res.addSimpleFieldInfo("title", fi);
         }
         int volnum = 0;
         Statement nbvolLitSt = root.getProperty(numberOfVolumes);
