@@ -617,7 +617,7 @@ public class CSLJsonExport {
         CSLResObj res = new CSLResObj();
         Resource root = r.getPropertyResourceValue(inRootInstance);
         FieldInfo fi;
-        res.addCommonField("url", r.getURI());
+        res.addCommonField("URL", r.getURI());
         res.addCommonField("id", "bdr:"+r.getLocalName());
         res.addSimpleFieldInfo("source", fiBDRC);
         
@@ -628,10 +628,10 @@ public class CSLJsonExport {
                 fi = getEntityLabelField(m, repOf, false, true);
                 res.addSimpleFieldInfo("title", fi);
             } else {
+                root = r;
                 fi = getEntityLabelField(m, r, false, true);
                 res.addSimpleFieldInfo("title", fi);
             }
-            root = r;
             res.addCommonField("type", "book");
             // getting title:
             addCreators(res, m, root, false, true);
