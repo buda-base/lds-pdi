@@ -62,7 +62,7 @@ construct {
     ?cl ?clp ?clo .
   }
   union {
-    ?R_RES bdo:inRootInstance?/bdo:instanceOf?/bdo:creator ?aac .
+    ?R_RES :instanceReproductionOf?/bdo:inRootInstance?/bdo:instanceOf?/bdo:creator ?aac .
     ?aac ?aacp ?aaco .
     ?aac bdo:agent/owl:sameAs? ?agentSa .
     VALUES ?agentp { skos:prefLabel skos:altLabel owl:sameAs }
