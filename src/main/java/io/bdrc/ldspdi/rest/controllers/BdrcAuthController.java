@@ -369,7 +369,7 @@ public class BdrcAuthController {
     @PostMapping(value = "/callbacks/github/bdrc-auth")
     public ResponseEntity<String> updateAuthModel() throws RestException, InterruptedException, ExecutionException {
         log.info("updating Auth data model() >>");
-        RdfAuthModel.updateAuthData(null);
+        //RdfAuthModel.updateAuthData(null);
         return ResponseEntity.ok("Auth Model is updating");
     }
 
