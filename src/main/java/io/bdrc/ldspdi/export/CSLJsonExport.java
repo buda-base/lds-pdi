@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
@@ -73,11 +74,18 @@ public class CSLJsonExport {
     }
     
     public static final String ewtsToLatn(String ewts) {
-        if (ewts.startsWith("*"))
+        boolean addBrackets = false;
+        if (ewts.startsWith("*")) {
             ewts = ewts.substring(1);
+            addBrackets = true;
+        }
         String alalc = TransConverter.ewtsToAlalc(ewts, true);
         alalc = alalc.replace("u0fbe", "x");
-        return StringUtils.capitalize(alalc.replace('-', ' ').trim());
+        String res = StringUtils.capitalize(alalc.replace('-', ' ').trim());
+        if (addBrackets) {
+            res = '['+res+']';      
+        }
+        return res;
     }
     
     public static final class FieldInfo {
@@ -122,30 +130,30 @@ public class CSLJsonExport {
                 break;
             case "sa-alalc97":
                 if (replaceIfPresent || this.label_sa_latn == null)
-                    this.label_sa_latn = StringUtils.capitalize(l.getString());
+                    this.label_sa_latn = WordUtils.capitalize(l.getString());
                 break;
             case "sa-x-iast":
                 if (replaceIfPresent || this.label_sa_latn == null)
-                    this.label_sa_latn = StringUtils.capitalize(l.getString());
+                    this.label_sa_latn = WordUtils.capitalize(l.getString());
                 break;
             case "sa-x-ndia":
                 if (replaceIfPresent || this.label_sa_latn_ndia == null)
-                    this.label_sa_latn_ndia = StringUtils.capitalize(l.getString());
+                    this.label_sa_latn_ndia = WordUtils.capitalize(l.getString());
                 break;
             case "zh-hans":
             case "zh-hani":
             case "zh-hant":
                 if (replaceIfPresent || this.label_zh == null)
-                    this.label_zh = StringUtils.capitalize(l.getString());
+                    this.label_zh = l.getString();
                 break;
             case "zh-latn-pinyin":
                 if (replaceIfPresent || this.label_zh_pinyin == null)
-                    this.label_zh_pinyin = StringUtils.capitalize(l.getString());
+                    this.label_zh_pinyin = WordUtils.capitalize(l.getString());
                 break;
             case "en":
             case "en-x-mixed":
                 if (replaceIfPresent || this.label_en == null)
-                    this.label_en = StringUtils.capitalize(l.getString());
+                    this.label_en = WordUtils.capitalize(l.getString());
                 break;
             default:
                 log.debug("ignoring lang tag "+lang);
