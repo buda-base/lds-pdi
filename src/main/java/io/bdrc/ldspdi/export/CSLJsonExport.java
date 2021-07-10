@@ -67,9 +67,14 @@ public class CSLJsonExport {
     
     
     public static final String ewtsToBo(String ewts) {
-        if (ewts.startsWith("*"))
+        boolean addBrackets = false;
+        if (ewts.startsWith("*")){
             ewts = ewts.substring(1);
+            addBrackets = true;
+        }
         String unicode = ewtsConverter.toUnicode(ewts);
+        if (addBrackets)
+            unicode = '['+unicode+']';
         return unicode;
     }
     
@@ -82,9 +87,8 @@ public class CSLJsonExport {
         String alalc = TransConverter.ewtsToAlalc(ewts, true);
         alalc = alalc.replace("u0fbe", "x");
         String res = StringUtils.capitalize(alalc.replace('-', ' ').trim());
-        if (addBrackets) {
-            res = '['+res+']';      
-        }
+        if (addBrackets)
+            res = '['+res+']';
         return res;
     }
     
