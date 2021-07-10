@@ -78,6 +78,17 @@ public class CSLJsonExport {
         return unicode;
     }
     
+    public static final String capitalize(String s, final boolean wordmode) {
+        if (s.startsWith("[")) {
+            if (wordmode)
+                return '['+WordUtils.capitalize(s.substring(1));
+            return '['+StringUtils.capitalize(s.substring(1));
+        }
+        if (wordmode)
+            return WordUtils.capitalize(s);
+        return StringUtils.capitalize(s);
+    }
+    
     public static final String ewtsToLatn(String ewts) {
         boolean addBrackets = false;
         if (ewts.startsWith("*")) {
@@ -86,7 +97,7 @@ public class CSLJsonExport {
         }
         String alalc = TransConverter.ewtsToAlalc(ewts, true);
         alalc = alalc.replace("u0fbe", "x");
-        String res = StringUtils.capitalize(alalc.replace('-', ' ').trim());
+        String res = capitalize(alalc.replace('-', ' ').trim(), false);
         if (addBrackets)
             res = '['+res+']';
         return res;
@@ -130,19 +141,19 @@ public class CSLJsonExport {
                 break;
             case "bo-alalc97":
                 if (replaceIfPresent || this.label_bo_latn == null)
-                    this.label_bo_latn = StringUtils.capitalize(l.getString());
+                    this.label_bo_latn = capitalize(l.getString(), false);
                 break;
             case "sa-alalc97":
                 if (replaceIfPresent || this.label_sa_latn == null)
-                    this.label_sa_latn = WordUtils.capitalize(l.getString());
+                    this.label_sa_latn = capitalize(l.getString(), true);
                 break;
             case "sa-x-iast":
                 if (replaceIfPresent || this.label_sa_latn == null)
-                    this.label_sa_latn = WordUtils.capitalize(l.getString());
+                    this.label_sa_latn = capitalize(l.getString(), true);
                 break;
             case "sa-x-ndia":
                 if (replaceIfPresent || this.label_sa_latn_ndia == null)
-                    this.label_sa_latn_ndia = WordUtils.capitalize(l.getString());
+                    this.label_sa_latn_ndia = capitalize(l.getString(), true);
                 break;
             case "zh-hans":
             case "zh-hani":
@@ -152,12 +163,12 @@ public class CSLJsonExport {
                 break;
             case "zh-latn-pinyin":
                 if (replaceIfPresent || this.label_zh_pinyin == null)
-                    this.label_zh_pinyin = WordUtils.capitalize(l.getString());
+                    this.label_zh_pinyin = capitalize(l.getString(), true);
                 break;
             case "en":
             case "en-x-mixed":
                 if (replaceIfPresent || this.label_en == null)
-                    this.label_en = WordUtils.capitalize(l.getString());
+                    this.label_en = capitalize(l.getString(), true);
                 break;
             default:
                 log.debug("ignoring lang tag "+lang);

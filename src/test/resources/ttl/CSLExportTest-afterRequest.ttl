@@ -144,7 +144,7 @@ bdr:MW22084  a                       bdo:Instance ;
         bdo:note                     bdr:NTA01489DBC2496944 , bdr:NT09137E4413306D2F , bdr:NT6C0E89E99EBDB3C9 ;
         bdo:numberOfVolumes          103 ;
         bdo:printMethod              bdr:PrintMethod_Relief_WoodBlock ;
-        bdo:publisherLocation        "delhi/"@bo-x-ewts ;
+        bdo:publisherLocation        "[delhi]"@en ;
         bdo:publisherName            "delhi karmapae chodhey gyalwae sungrab partun khang /"@bo-x-ewts ;
         bdo:script                   bdr:ScriptTibt , bdr:ScriptDbuCan ;
         bdo:workExtentStatement      "103 v." ;

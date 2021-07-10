@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -75,6 +76,7 @@ public class CSLExportTest {
     public static void close() {
         server.stop();
         server.join();
+        System.out.println(StringUtils.capitalize("[delhi]"));
     }
     
     @Test
