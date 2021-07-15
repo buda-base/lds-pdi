@@ -1,8 +1,11 @@
 package io.bdrc.ldspdi.export;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
@@ -66,6 +69,38 @@ public class CSLJsonExport {
     public static final Property contentLocationEndVolume = ResourceFactory.createProperty(MarcExport.BDO + "contentLocationEndVolume");
     
     
+    public static final List<String> firstTwoRule1 = Arrays.asList("rl", "zl", "bl", "sl", "gl", "kl");
+    public static final List<String> firstThreeRule1 = Arrays.asList("bzl", "bgl", "bkl", "g.y", "gʹy");
+    public static final List<String> firstTwoRule3 = Arrays.asList("dz", "sh");
+    public static final Pattern rule2 = Pattern.compile("^b[rls][bcdfgjklmnprstwyz]");
+    public static final Pattern rule4 = Pattern.compile("^[rg'ʼdmlsbḥ][bcdfgjklmnpstz]");
+    public static String upperCaseBoLatn(final String s) {
+        if (s.length() < 3)
+            return StringUtils.capitalize(s);
+        // rule 1, exceptions: bzL, bgL, bkL, g.Y
+        final String firstTwo = s.substring(0, 2);
+        final String firstThree = s.substring(0, 3);
+        if (firstThreeRule1.contains(firstThree))
+            return s.substring(0,2)+s.substring(2,3).toUpperCase()+s.substring(3);
+        // rule 2: rule 2: if starts with b(r|l|s)+consonnant(not h) , upper case 3rd letter:
+        // brTs, bsTs, brN, bsN, blD, bsD, brNy, bsNy, brNg, bsNg, brDz, brG, bsG, brD, brT, blT, bsT, brK, bsK, bsL, brL
+        if (rule2.matcher(s).find())
+            return s.substring(0,2)+s.substring(2,3).toUpperCase()+s.substring(3);
+        // rule 3: rL, zL, bL, sL, gL, kL,
+        if (firstTwoRule1.contains(firstTwo))
+            return s.substring(0,1)+s.substring(1,2).toUpperCase()+s.substring(2);
+        // rule 3: if starts with dz or sh, upper case first letter
+        if (firstTwoRule3.contains(firstTwo))
+            return StringUtils.capitalize(s);
+        // rule 4: if start with ([rg'dmlsb]) + consonnant (not [ryw]), upper case second letter
+        // mDr, sMr, sNr, rG, bS, sG, gC, rNg, sNg, sC, lC, rDz, sNy, rNy, gT, rT, sT, mTh, rD, lD, sD, sN, dP, sP, sB, rM, sM, gTs, rTs, mTsh, gZh, gS, dK, bK, rK, lK, sK, mKh, dG, bG, mG, lG, dNg, mNg, lNg, bC, mCh, mDz, lDz, gNy, mNy, bT, lT, gD, bD, mD, gN, mN, rN, lP, dB, rB, lB, dM, bTs, sTs, bZh, gZ, bZ, gSh, bSh
+        if (rule4.matcher(s).find())
+            return s.substring(0,1)+s.substring(1,2).toUpperCase()+s.substring(2);
+        // otherwise, just capitalize the first letter:
+        return StringUtils.capitalize(s);
+    }
+    
+    
     public static final String ewtsToBo(String ewts) {
         boolean addBrackets = false;
         if (ewts.startsWith("*")){
@@ -97,7 +132,7 @@ public class CSLJsonExport {
         }
         String alalc = TransConverter.ewtsToAlalc(ewts, true);
         alalc = alalc.replace("u0fbe", "x");
-        String res = capitalize(alalc.replace('-', ' ').trim(), false);
+        String res = upperCaseBoLatn(alalc.replace('-', ' ').trim());
         if (addBrackets)
             res = '['+res+']';
         return res;
@@ -141,7 +176,7 @@ public class CSLJsonExport {
                 break;
             case "bo-alalc97":
                 if (replaceIfPresent || this.label_bo_latn == null)
-                    this.label_bo_latn = capitalize(l.getString(), false);
+                    this.label_bo_latn = upperCaseBoLatn(l.getString());
                 break;
             case "sa-alalc97":
                 if (replaceIfPresent || this.label_sa_latn == null)

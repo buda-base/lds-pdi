@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -134,6 +136,28 @@ public class CSLExportTest {
         //try (FileOutputStream fos = new FileOutputStream("/tmp/csl.json")) {
         //    response.getEntity().writeTo(fos);
         //}
+    }
+    
+    @Test
+    public void testEwtsCase() {
+        assertTrue(CSLJsonExport.upperCaseBoLatn("sgam").equals("sGam"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("sgam sgam").equals("sGam sgam"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("rla").equals("rLa"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("bgla").equals("bgLa"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("g.ya").equals("g.Ya"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("bsnga").equals("bsNga"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("blda").equals("blDa"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("dza").equals("Dza"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("sha").equals("Sha"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("rdza").equals("rDza"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("snga").equals("sNga"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("'ja").equals("'Ja"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("ḥja").equals("ḥJa"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("ʼja").equals("ʼJa"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("mra").equals("Mra"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("nya").equals("Nya"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("rnya").equals("rNya"));
+        assertTrue(CSLJsonExport.upperCaseBoLatn("hra").equals("Hra"));
     }
 
 }
