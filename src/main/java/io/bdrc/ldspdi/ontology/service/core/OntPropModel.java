@@ -216,6 +216,8 @@ public class OntPropModel {
 
     public List<Property> getAdminAnnotProps() {
         ArrayList<Property> list = new ArrayList<>();
+        if (prop == null)
+            return list;
         StmtIterator it = prop.listProperties();
         while (it.hasNext()) {
             Statement stmt = it.next();
