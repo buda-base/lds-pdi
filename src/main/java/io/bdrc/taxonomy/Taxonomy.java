@@ -201,27 +201,26 @@ public class Taxonomy {
         
     }
 
-    public static final Property access = ResourceFactory.createProperty(Models.ADM+"access");
-    public static final Resource released = ResourceFactory.createProperty(Models.BDA+"AccessReleased");
+    public static final Property status = ResourceFactory.createProperty(Models.ADM+"status");
+    public static final Resource released = ResourceFactory.createProperty(Models.BDA+"StatusReleased");
     
     public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
         // check if work is released first: https://github.com/buda-base/lds-pdi/issues/221
         Model m = st.getModel();
-        Resource wa = st.getSubject();
-        Resource wadm = m.createResource(Models.BDA+wa.getLocalName());
-        if (!wadm.hasProperty(access, released))
+        final Resource wa = st.getSubject();
+        final Resource wadm = m.createResource(Models.BDA+wa.getLocalName());
+        if (!wadm.hasProperty(status, released))
             return;
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp = Wtopics.get(st.getObject().asNode().getURI());
         if (tmp == null) {
             tmp = new HashSet<>();
         }
-        final Resource sub = st.getSubject();
         final Node obj = st.getObject().asNode();
-        if (sub.isURIResource()) {
-            tmp.add(sub.getURI());
+        if (wa.isURIResource()) {
+            tmp.add(wa.getURI());
         } else {
-            tmp.add(sub.toString());
+            tmp.add(wa.toString());
         }
         Wtopics.put(obj.getURI(), tmp);
         LinkedList<String> nodes = Taxonomy.getRootToLeafPath(obj.getURI());
@@ -235,15 +234,15 @@ public class Taxonomy {
                 bt = new HashSet<>();
             }
 
-            if (sub.isURIResource()) {
-                bt.add(sub.getURI());
+            if (wa.isURIResource()) {
+                bt.add(wa.getURI());
             } else {
-                bt.add(sub.toString());
+                bt.add(wa.toString());
             }
             WorkBranch.put(s, bt);
             topics.put(s, bt.size());
         }
-        topics.put(sub.getURI(), Wtopics.get(obj.getURI()).size());
+        topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
     }
 
 }
