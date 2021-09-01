@@ -20,6 +20,7 @@ import org.apache.jena.graph.impl.LiteralLabel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -36,6 +37,7 @@ import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.TaxNode;
+import io.bdrc.libraries.Models;
 import io.bdrc.libraries.formatters.JSONLDFormatter;
 
 public class Taxonomy {
@@ -199,7 +201,16 @@ public class Taxonomy {
         
     }
 
+    public static final Property access = ResourceFactory.createProperty(Models.ADM+"access");
+    public static final Resource released = ResourceFactory.createProperty(Models.BDA+"AccessReleased");
+    
     public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
+        // check if work is released first: https://github.com/buda-base/lds-pdi/issues/221
+        Model m = st.getModel();
+        Resource wa = st.getSubject();
+        Resource wadm = m.createResource(Models.BDA+wa.getLocalName());
+        if (!wadm.hasProperty(access, released))
+            return;
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp = Wtopics.get(st.getObject().asNode().getURI());
         if (tmp == null) {
