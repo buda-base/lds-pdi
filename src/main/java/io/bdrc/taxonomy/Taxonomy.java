@@ -201,15 +201,13 @@ public class Taxonomy {
         
     }
 
-    public static final Property status = ResourceFactory.createProperty(Models.ADM+"status");
+    public static final Property tmpStatus = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/tmp/status");
     public static final Resource released = ResourceFactory.createProperty(Models.BDA+"StatusReleased");
     
     public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
         // check if work is released first: https://github.com/buda-base/lds-pdi/issues/221
-        Model m = st.getModel();
         final Resource wa = st.getSubject();
-        final Resource wadm = m.createResource(Models.BDA+wa.getLocalName());
-        if (!wadm.hasProperty(status, released))
+        if (!wa.hasProperty(tmpStatus, released))
             return;
         tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp = Wtopics.get(st.getObject().asNode().getURI());
