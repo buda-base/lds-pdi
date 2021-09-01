@@ -171,8 +171,32 @@ public class Taxonomy {
                 previous = node;
             }
         }
+        simplifySubnodes(res, ROOTURI);
         WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
         return res;
+    }
+    
+    public static String simplifySubnodes (final Map<String, Map<String, Object>> res, final String key) {
+        // simplifies the subnodes and returns the URI that should be substituted for this one, or null if it's fine
+        // see https://github.com/buda-base/lds-pdi/issues/220
+        final Map<String, Object> node = res.get(key);
+        @SuppressWarnings("unchecked")
+        Set<String> subnodes = (Set<String>) node.get("subclasses");
+        if (subnodes == null || subnodes.size() == 0)
+            return key;
+        if (subnodes.size() == 1) {
+            final String currentSubclass = subnodes.iterator().next();
+            final String newSubclass = simplifySubnodes(res, currentSubclass);
+            res.remove(key);
+            return newSubclass;
+        }
+        Set<String> newSubclasses = new HashSet<>();
+        for (final String subclass : subnodes) {
+            newSubclasses.add(simplifySubnodes(res, subclass));
+        }
+        node.put("subclasses", newSubclasses);
+        return key;
+        
     }
 
     public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
