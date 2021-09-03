@@ -25,6 +25,8 @@ public class WorkResults {
     public final static Logger log = LoggerFactory.getLogger(WorkResults.class);
     
     public final static Property tmpIsMain = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/tmp/isMain");
+    
+    public static final Map<String,String> queryTopToRid = new HashMap<>();
 
     public static Map<String, Object> getResultsMap(Model mod) throws RestException {
         long start = 0;

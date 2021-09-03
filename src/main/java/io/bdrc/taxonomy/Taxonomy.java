@@ -1,44 +1,31 @@
 package io.bdrc.taxonomy;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.graph.impl.LiteralLabel;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.iterator.ExtendedIterator;
-import org.apache.jena.vocabulary.SKOS;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.TaxNode;
 import io.bdrc.libraries.Models;
-import io.bdrc.libraries.formatters.JSONLDFormatter;
 
 public class Taxonomy {
 
@@ -88,7 +75,7 @@ public class Taxonomy {
     
     public static void init(String rootUri) {
         ROOTURI = rootUri;
-        ROOT = new TaxNode(rootUri);
+        //ROOT = new TaxNode(rootUri);
         Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
         Taxonomy.buildTree(t, ROOT);
     }
@@ -100,7 +87,7 @@ public class Taxonomy {
         while (ext.hasNext()) {
             final Triple tp = ext.next();
             final String uri = tp.getObject().getURI();
-            final TaxNode nn = new TaxNode(uri);
+            final TaxNode nn = new TaxNode(uri, mod);
             allNodes.put(uri, nn);
             root.addChild(nn);
             final Triple ttp = new Triple(tp.getObject(), hasSubClass, Node.ANY);
@@ -137,40 +124,29 @@ public class Taxonomy {
         long start = System.nanoTime();
         WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
         Map<String,Map<String, Object>> res = new HashMap<>();
-        final Graph modGraph = TaxModel.getModel().getGraph();
         String previous = ROOTURI;
         for (String uri : leafTopics) {
-            LinkedList<String> ll = getRootToLeafPath(uri);
-            for (String node : ll) {
-                Integer count = topics.get(node);
+            TaxNode leaf = allNodes.get(uri);
+            LinkedList<TaxNode> ll = leaf.getPathFromRoot();
+            for (TaxNode n : ll) {
+                String nodeUri = n.getUri();
+                Integer count = topics.get(nodeUri);
                 if (count == null) {
                     count = -1;
                 }
-                final Map<String,Object> nodeMap = res.computeIfAbsent(node, x -> new HashMap<>());
-                if (!node.equals(previous) && !node.equals(ROOTURI)) {
+                final Map<String,Object> nodeMap = res.computeIfAbsent(nodeUri, x -> new HashMap<>());
+                if (!nodeUri.equals(previous) && !nodeUri.equals(ROOTURI)) {
                     nodeMap.put("count", count);
                     final Map<String,Object> previousNodeMap = res.computeIfAbsent(previous, x -> new HashMap<>());
                     @SuppressWarnings("unchecked")
                     final Set<String> previousSubclasses = (Set<String>) previousNodeMap.computeIfAbsent("subclasses", x -> new HashSet<>());
-                    previousSubclasses.add(node);
+                    previousSubclasses.add(nodeUri);
                 }
 
-                // TODO: the labels should be added in the TaxNodes, this would save time at
-                // each query
                 if (!nodeMap.containsKey("skos:prefLabel")) {
-                    final List<Map<String,String>> labels = new ArrayList<>();
-                    nodeMap.put("skos:prefLabel", labels);
-                 
-                    final ExtendedIterator<Triple> labelIt = modGraph.find(NodeFactory.createURI(node), SKOS.prefLabel.asNode(), Node.ANY);
-                    while (labelIt.hasNext()) {
-                        LiteralLabel l = labelIt.next().getObject().getLiteral();
-                        final Map<String,String> label = new HashMap<>();
-                        labels.add(label);
-                        label.put("@language", l.language());
-                        label.put("@value", (String) l.getValue());
-                    }
+                    nodeMap.put("skos:prefLabel", n.getLabels());
                 }
-                previous = node;
+                previous = nodeUri;
             }
         }
         simplifySubnodes(res, ROOTURI);
@@ -221,13 +197,16 @@ public class Taxonomy {
             tmp.add(wa.toString());
         }
         Wtopics.put(obj.getURI(), tmp);
-        LinkedList<String> nodes = Taxonomy.getRootToLeafPath(obj.getURI());
-        if (!nodes.isEmpty()) {
-            nodes.removeFirst();
-            // nodes.removeLast();
-        }
-        for (String s : nodes) {
-            HashSet<String> bt = WorkBranch.get(s);
+        TaxNode n = Taxonomy.allNodes.get(obj.getURI());
+        LinkedList<TaxNode> nodes = n.getPathFromRoot();
+        boolean first = true;
+        for (TaxNode s : nodes) {
+            if (first) {
+                first = false;
+                continue;
+            }
+            String suri = s.getUri();
+            HashSet<String> bt = WorkBranch.get(suri);
             if (bt == null) {
                 bt = new HashSet<>();
             }
@@ -237,8 +216,8 @@ public class Taxonomy {
             } else {
                 bt.add(wa.toString());
             }
-            WorkBranch.put(s, bt);
-            topics.put(s, bt.size());
+            WorkBranch.put(suri, bt);
+            topics.put(suri, bt.size());
         }
         topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
     }
