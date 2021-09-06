@@ -1,0 +1,1066 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix bdan:  <http://purl.bdrc.io/annotation/> .
+@prefix bd:    <http://www.bigdata.com/rdf#> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix rsh:   <http://purl.bdrc.io/shacl/core/shape/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix admin: <http://webns.net/mvcb/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix bdac:  <http://purl.bdrc.io/anncollection/> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix oa:    <http://www.w3.org/ns/oa#> .
+@prefix dila:  <http://purl.dila.edu.tw/resource/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix ad:    <http://schemas.talis.com/2005/address/schema#> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix f:     <java:io.bdrc.libraries.sparql.functions.> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+@prefix viaf:  <http://viaf.org/viaf/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix eftr:  <http://purl.84000.co/resource/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> .
+@prefix as:    <http://www.w3.org/ns/activitystreams#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+bdr:T1325  skos:prefLabel  "zab lam thugs kyi nor bu (chos rje gling pa)"@bo-x-ewts .
+
+bdr:T536  skos:prefLabel  "liturgical recitation"@en , "ngag 'don/"@bo-x-ewts .
+
+bdr:T00JR690  skos:prefLabel  "prayer to be reborn in sukhavati, the western paradise of amitabha"@en , "bde smon/"@bo-x-ewts .
+
+bdr:T1114  skos:prefLabel  "phyi ma rgyud/"@bo-x-ewts .
+
+bdr:T012AG03520  skos:prefLabel  "explanation of medical practices"@en-x-mixed , "zin tig"@bo-x-ewts .
+
+bdr:T1029  skos:prefLabel  "講說"@zh-hant , "bhāṣyam"@sa-x-ndia , "explanation"@en , "bshad pa/"@bo-x-ewts .
+
+bdr:T1874  skos:prefLabel  "ma ha yo ga"@bo-x-ewts .
+
+bdr:T00KG02675  skos:prefLabel  "nang khrid kyi zhal shes/"@bo-x-ewts .
+
+bdr:T1CZ28  skos:prefLabel  "rituals for the sevasadhana"@en , "bsnyen yig"@bo-x-ewts .
+
+bdr:O3JW5309_0263  bdo:taxHasSubClass  bdr:T1098 , bdr:T1375 , bdr:T1493 ;
+        skos:prefLabel      "贵吉登楚坚伏藏法"@zh-hans , "Treasure Cycles of Godem Truchen"@en , "rgod kyi ldem 'phru can gyi gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1PD108901  skos:prefLabel  "档案"@zh-hans , "yig tshags/"@bo-x-ewts , "archival documents"@en .
+
+bdr:T1241  skos:prefLabel  "thugs sgrub yang snying 'dus pa (rat+na gling pa)"@bo-x-ewts .
+
+bdr:T1814  skos:prefLabel  "rtsa gsum yongs rdzogs rdo rje gro lod (yong dge mi 'gyur rdo rje)"@bo-x-ewts .
+
+bdr:T633  skos:prefLabel  "dus 'khor rgyud/"@bo-x-ewts .
+
+bdr:O3JW5309_0203  bdo:taxHasSubClass  bdr:T2511 ;
+        skos:prefLabel      "祝寿文"@zh-hans , "Long Life"@en , "zhan brtan/"@bo-x-ewts .
+
+bdr:T971  skos:prefLabel  "yogatantra"@sa-alalc97 , "rnal 'byor rgyud/"@bo-x-ewts .
+
+bdr:T11MS21  skos:prefLabel  "rgyas 'grel/"@bo-x-ewts .
+
+bdr:T2596  skos:prefLabel  "tshe yang phur gsum (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T00KG02742  skos:prefLabel  "亲训"@zh-hans , "oral directions"@en , "zhal shes/"@bo-x-ewts .
+
+bdr:T1941  skos:prefLabel  "gna' bo'i lo rgyus/"@bo-x-ewts , "prehistory"@en .
+
+bdr:T1253  skos:prefLabel  "jo nang khrid brgya/"@bo-x-ewts .
+
+bdr:T8LS1425  skos:prefLabel  "bka' rtsa/"@bo-x-ewts .
+
+bdr:T3  skos:prefLabel  "rnam thar/"@bo-x-ewts , "biography"@en .
+
+bdr:T012AG03489  skos:prefLabel  "the collected revelations of mchog gyur gling pa"@en-x-mixed , "mchog gling gter gsar/"@bo-x-ewts .
+
+bdr:T4CZ15086  skos:prefLabel  "fully able to separate. analyze, treatise, dissertation, accurate analysis."@en , "rab 'byed/"@bo-x-ewts .
+
+bdr:T1KG10014  skos:prefLabel  "e. gene smith's green books"@en .
+
+bdr:O3JW5309_0300  bdo:taxHasSubClass  bdr:T1327 ;
+        skos:prefLabel      "瑞贝多吉伏藏法"@zh-hans , "Treasure Cycles of Rolpe Dorje"@en , "rol pa'i rdo rje'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T00JR980  skos:prefLabel  "mdo chings/"@bo-x-ewts .
+
+bdr:T349  skos:prefLabel  "dran tho/"@bo-x-ewts , "memoirs"@en .
+
+bdr:T1983  skos:prefLabel  "journalistic writing"@en , "gsar 'gyur rtsom rig"@bo-x-ewts .
+
+bdr:T615  skos:prefLabel  "zhus lan/"@bo-x-ewts .
+
+bdr:O3JW5309_0191  bdo:taxHasSubClass  bdr:T139 , bdr:T00JR3437 , bdr:T00JR760 , bdr:T11 , bdr:T1887 , bdr:T2261 , bdr:T17 , bdr:T1244 , bdr:T145 , bdr:T140 , bdr:T1226 ;
+        skos:prefLabel      "gsol 'debs/"@bo-x-ewts , "Supplication"@en , "祈请文"@zh-hans .
+
+bdr:T1319  skos:prefLabel  "kun thub rgyal mo (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T1KG15050  skos:prefLabel  "management handbook"@en , "do dam lag deb/"@bo-x-ewts .
+
+bdr:O3JW5309_0287  bdo:taxHasSubClass  bdr:T1241 , bdr:T477 ;
+        skos:prefLabel      "然那林巴伏藏法"@zh-hans , "Treasure Cycles of Ratna Lingpa"@en , "rat+na gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T2397  skos:prefLabel  "word by word commentary"@en , "tshig 'grel/"@bo-x-ewts .
+
+bdr:T1868  skos:prefLabel  "esoteric experiences"@en , "gsang ba'i rnam thar/"@bo-x-ewts .
+
+bdr:T1KG8787  skos:prefLabel  "root text"@en , "rtsa ba/"@bo-x-ewts .
+
+bdr:T476  skos:prefLabel  "rtsa tshig"@bo-x-ewts .
+
+bdr:T1KG6097  skos:prefLabel  "gna' rtsom/"@bo-x-ewts .
+
+bdr:T2186  skos:prefLabel  "caryatantra"@en , "spyod rgyud/"@bo-x-ewts .
+
+bdr:O3JW5309_0257  bdo:taxHasSubClass  bdr:T00AG01370 , bdr:T01JR183 , bdr:T00AG01369 , bdr:T335 , bdr:T328 ;
+        skos:prefLabel      "晋美林巴伏藏法"@zh-hans , "Treasure Cycles of Jigme Lingpa"@en , "'jigs med gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1838  skos:prefLabel  "preface for an almanac"@en , "li tho 'go brjod/"@bo-x-ewts .
+
+bdr:O3JW5309_0438  bdo:taxHasSubClass  bdr:T298 , bdr:T2123 , bdr:T2176 , bdr:T1218 , bdr:T13 , bdr:T2196 , bdr:T514 , bdr:T00JR980 , bdr:T89 , bdr:T1PD95800 , bdr:T00KG02662 , bdr:T1GS44553 ;
+        skos:prefLabel      "大纲 ｜目录"@zh-hans , "sa bcad dang dkar chag"@bo-x-ewts , "Catalog | Bibliography"@en .
+
+bdr:T1446  skos:prefLabel  "memorandum; notes of points to remember"@en , "brjed byang /"@bo-x-ewts .
+
+bdr:T00JR624  skos:prefLabel  "dmar byang /"@bo-x-ewts .
+
+bdr:T531  skos:prefLabel  "rtsa gsum zab mo kun 'dus/"@bo-x-ewts .
+
+bdr:T1712  skos:prefLabel  "thugs rje chen po 'gro ba kun grol (byang gter)"@bo-x-ewts .
+
+bdr:T1KG3848  skos:prefLabel  "index"@en , "tha snyad zur bkol/"@bo-x-ewts .
+
+bdr:T2MS11744  skos:prefLabel  "cycle of gter ma associated with Yeshe Tsogyal"@en , "pad+ma snying thig"@bo-x-ewts .
+
+bdr:T1GS9767  skos:prefLabel  "deb yig mgo rgyan/"@bo-x-ewts .
+
+bdr:O3JW5309_0408  bdo:taxHasSubClass  bdr:T1846 , bdr:T1746 , bdr:T1124 , bdr:T30 ;
+        skos:prefLabel      "艺术手册"@zh-hans , "Art Manuals"@en , "bkod yig"@bo-x-ewts .
+
+bdr:T1GS129609  skos:prefLabel  "gu ru drag dmar (gter bdag gling pa)"@bo-x-ewts .
+
+bdr:T33  skos:prefLabel  "ma 'ongs lung bstan/"@bo-x-ewts , "prophecy"@en .
+
+bdr:T1181  skos:prefLabel  "sgrub skor/"@bo-x-ewts .
+
+bdr:T205  skos:prefLabel  "poetic examples"@en , "dper brjod/"@bo-x-ewts .
+
+bdr:T1096  skos:prefLabel  "thugs sgrub bde gshegs 'dus pa (stag lung sangs rgyas dbon)"@bo-x-ewts .
+
+bdr:T1488  skos:prefLabel  "'bru 'grel/"@bo-x-ewts , "syllable by syllable commentary; the words commented on are usually marked with circles beneath"@en .
+
+bdr:T1PD109546  skos:prefLabel  "bshad sgrub/"@bo-x-ewts .
+
+bdr:T2MS5993  skos:prefLabel  "five treatises of maitreya"@en , "byams chos sde lnga /"@bo-x-ewts .
+
+bdr:T2198  skos:prefLabel  "rta phag (chos rgyal ngag gi dbang po'i dgongs gter)"@bo-x-ewts .
+
+bdr:O3JW5309_0239  bdo:taxHasSubClass  bdr:T00AG01364 , bdr:T1815 , bdr:T00AG01363 , bdr:T1623 , bdr:T1317 , bdr:T00AG01324 , bdr:T012AG03489 , bdr:T1861 , bdr:T2140 , bdr:T00AG01362 , bdr:T2334 , bdr:T533 ;
+        skos:prefLabel      "秋吉林巴伏藏法"@zh-hans , "mchog gyur gling pa'i gter ma'i skor/"@bo-x-ewts , "Treasure Cycles of Chogyur Lingpa"@en .
+
+bdr:T1PD108883  skos:prefLabel  "snyan zhu/"@bo-x-ewts , "呈文"@zh-hans .
+
+bdr:T1905  skos:prefLabel  "bka' dang bstan bcos/"@bo-x-ewts , "canon and shastra"@en .
+
+bdr:T2404  skos:prefLabel  "lha sgrung /"@bo-x-ewts .
+
+bdr:T217  skos:prefLabel  "bod kyi rtsom rig"@bo-x-ewts , "tibetan literature"@en .
+
+bdr:T1851  skos:prefLabel  "kun bzang dgongs 'dus (pad+ma gling pa)"@bo-x-ewts .
+
+bdr:O3JW5309_0451  bdo:taxHasSubClass  bdr:T192 , bdr:T451 , bdr:T10MS14648 , bdr:T1446 , bdr:T00JR624 , bdr:T1372 , bdr:T2332 ;
+        skos:prefLabel      "Record"@en , "清册"@zh-hans , "'debs yig"@bo-x-ewts .
+
+bdr:T977  skos:prefLabel  "ritual text"@en , "法事"@zh-hans , "vidhi"@sa-x-iast , "cho ga"@bo-x-ewts .
+
+bdr:O3JW5309_0155  bdo:taxHasSubClass  bdr:O3JW5309_0191 , bdr:O3JW5309_0203 , bdr:T1016 , bdr:O3JW5309_0176 , bdr:T1 , bdr:O3JW5309_0167 , bdr:T2038 , bdr:O3JW5309_0205 , bdr:O3JW5309_0208 , bdr:T2579 , bdr:T1212 , bdr:T1447 , bdr:T536 , bdr:T10MS14575 , bdr:T1869 , bdr:T977 , bdr:T225 ;
+        skos:prefLabel      "Liturgy"@en , "chos spyod/"@bo-x-ewts , "法本"@zh-hans .
+
+bdr:T1917  skos:prefLabel  "jo bskul/"@bo-x-ewts .
+
+bdr:T1KG3927  skos:prefLabel  "gzungs 'bum/"@bo-x-ewts , "hundred thousand mantras"@en .
+
+bdr:T01AG03033  skos:prefLabel  "mkha' 'gro gsang 'dus (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:O3JW5309_0282  bdo:taxHasSubClass  bdr:T1851 , bdr:T1810 ;
+        skos:prefLabel      "白玛林巴伏藏法"@zh-hans , "Treasure Cycles of Padma Lingpa"@en , "pad+ma gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1GS108153  skos:prefLabel  "bka' rgya ma/"@bo-x-ewts .
+
+bdr:O3JW5309_0071  bdo:taxHasSubClass  bdr:T4CZ15086 , bdr:T29 , bdr:T132 , bdr:T11MS21 , bdr:T157 , bdr:T1PD109546 , bdr:T61 , bdr:T1029 , bdr:T3JT5054 , bdr:T1355 , bdr:T4JW5424 , bdr:T1491 , bdr:T10MS12837 , bdr:T012AG03497 , bdr:T2397 , bdr:T304 , bdr:T00UNK1 , bdr:T1488 , bdr:T2377 , bdr:T11MS31 ;
+        skos:prefLabel      "注疏"@zh-hans , "'grel pa/"@bo-x-ewts , "Commentaries"@en .
+
+bdr:O3JW5309_0252  bdo:taxHasSubClass  bdr:T1390 , bdr:T1394 , bdr:T1395 , bdr:T1686 ;
+        skos:prefLabel      "迦村宁波伏藏法"@zh-hans , "Treasure Cycles of Jatson Nyingpo"@en , "'ja' tshon snying po'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:O3JW5309_0167  bdo:taxHasSubClass  bdr:T1222 , bdr:T1PD110101 , bdr:T1CZ49 , bdr:T1146 , bdr:T1689 , bdr:T1051 , bdr:T67 , bdr:T901 ;
+        skos:prefLabel      "礼赞文"@zh-hans , "Praise"@en , "bstod pa/"@bo-x-ewts .
+
+bdr:T260  skos:prefLabel  "novel"@en , "brtsams sgrung /"@bo-x-ewts .
+
+bdr:T00AG01281  skos:prefLabel  "grol thig dgongs pa rang grol/"@bo-x-ewts .
+
+bdr:T10MS12837  skos:prefLabel  "commentary on the intent"@en , "dgongs 'grel/"@bo-x-ewts .
+
+bdr:T2332  skos:prefLabel  "document names"@en , "mtshan yig"@bo-x-ewts .
+
+bdr:T145  skos:prefLabel  "calling upon the lama from afar"@en-x-mixed , "bla ma rgyang 'bod/"@bo-x-ewts .
+
+bdr:O3JW5309_0294  bdo:taxHasSubClass  bdr:T1814 , bdr:T2134 ;
+        skos:prefLabel      "明珠多吉伏藏法（咏给）"@zh-hans , "Treasure Cycles of Yongde Mingyur Dorje (yongs dge)"@en , "mi 'gyur rdo rje'i gter ma'i skor (yongs dge)"@bo-x-ewts .
+
+bdr:T200  skos:prefLabel  "khrid yig"@bo-x-ewts , "instructional manual"@en .
+
+bdr:O3JW5309_0475  bdo:taxHasSubClass  bdr:T8LS1427 , bdr:T1PD108884 , bdr:T1PD108883 , bdr:T10 , bdr:T1974 , bdr:T221 , bdr:T8LS1425 , bdr:T1PD108882 ;
+        skos:prefLabel      "Official Document"@en , "gzhung yig"@bo-x-ewts , "公文"@zh-hans .
+
+bdr:T1KG5001  skos:prefLabel  "lecture"@en , "gsung bshad/"@bo-x-ewts .
+
+bdr:T1AT268  skos:prefLabel  "sngon chings dang mjug chings/"@bo-x-ewts .
+
+bdr:T00AG01402  skos:prefLabel  "klong snying yang gsang bla sgrub thig le'i rgya can/"@bo-x-ewts .
+
+bdr:T483  skos:prefLabel  "rtsa gsum (dgongs pa yang zab)"@bo-x-ewts .
+
+bdr:T2585  skos:prefLabel  "radio broadcasting"@en , "rlung 'phrin/"@bo-x-ewts .
+
+bdr:T1453  skos:prefLabel  "supplement"@en , "lhan thabs/"@bo-x-ewts .
+
+bdr:T1242  skos:prefLabel  "bla ma rig 'dzin yongs 'dus (mnga' ris paN chen)"@bo-x-ewts .
+
+bdr:T1CZ60  skos:prefLabel  "rang rnam/"@bo-x-ewts , "autobiography"@en .
+
+bdr:T1900  skos:prefLabel  "sdom tshig"@bo-x-ewts .
+
+bdr:T1815  skos:prefLabel  "thugs sgrub dgongs pa kun 'dus (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T157  skos:prefLabel  "explanation of the empowerment"@en , "dbang bshad/"@bo-x-ewts .
+
+bdr:T1212  skos:prefLabel  "reciting the names"@en , "mtshan brjod/"@bo-x-ewts .
+
+bdr:T11MS52  skos:prefLabel  "bka' 'bum/"@bo-x-ewts .
+
+bdr:T003JR4173  skos:prefLabel  "rgyud bcu bdun/"@bo-x-ewts .
+
+bdr:T1972  skos:prefLabel  "nad rtags/"@bo-x-ewts , "diagnosis of disease"@en .
+
+bdr:T1KG1401  skos:prefLabel  "testament"@en , "zhal chems/"@bo-x-ewts .
+
+bdr:T10  skos:prefLabel  "monastery regulations"@en , "bca' yig"@bo-x-ewts .
+
+bdr:T1887  skos:prefLabel  "skyes rabs gsol 'debs/"@bo-x-ewts .
+
+bdr:T1942  skos:prefLabel  "dbon zhang rdo ring /"@bo-x-ewts .
+
+bdr:T2597  skos:prefLabel  "phur pa gnam lcags spu gri (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T1199  skos:prefLabel  "byang gter/"@bo-x-ewts , "northern revelations"@en .
+
+bdr:O3JW5309_0150  bdo:taxHasSubClass  bdr:T1KG5001 , bdr:T28 , bdr:T102 , bdr:T615 ;
+        skos:prefLabel      "Polemics"@en , "问答"@zh-hans , "dris lan/"@bo-x-ewts .
+
+bdr:T1254  skos:prefLabel  "special preliminaries"@en , "不共前行"@zh-hans , "thun min sngon 'gro/"@bo-x-ewts .
+
+bdr:T8LS16966  skos:prefLabel  "lho gter/"@bo-x-ewts , "southern revelation"@en .
+
+bdr:T1PD96320  skos:prefLabel  "rta dpyad/"@bo-x-ewts .
+
+bdr:T254  skos:prefLabel  "table"@en , "re'u mig"@bo-x-ewts .
+
+bdr:T2356  skos:prefLabel  "gnas bskor/"@bo-x-ewts , "pilgrimage"@en .
+
+bdr:O3JW5309_0427  bdo:taxHasSubClass  bdr:T1PD113672 , bdr:T2052 , bdr:T254 ;
+        skos:prefLabel      "表格"@zh-hans , "Diagram"@en , "re'u mig"@bo-x-ewts .
+
+bdr:T2411  skos:prefLabel  "buddhist texts in sanskrit"@en , "梵文佛典"@zh-hans , "legs sbyar chos dpe/"@bo-x-ewts .
+
+bdr:T00AG01245  skos:prefLabel  "smin gling rdor sems/"@bo-x-ewts .
+
+bdr:T139  skos:prefLabel  "tshogs zhing /"@bo-x-ewts , "field of merit"@en , "资粮田"@zh-hans .
+
+bdr:T3JT12491  skos:prefLabel  "Thirteen major philosophical texts"@en , "gzhung chen bcu gsum/"@bo-x-ewts .
+
+bdr:T1109  skos:prefLabel  "retreat manuals"@en , "ri chos/"@bo-x-ewts .
+
+bdr:T1GS138984  skos:prefLabel  "lam 'bras slob bshad/"@bo-x-ewts .
+
+bdr:T1CZ4662  skos:prefLabel  "propitious in the beginning"@en , "thog mar dge ba/"@bo-x-ewts .
+
+bdr:T2398  skos:prefLabel  "概要"@zh-hans , "don bsdus/"@bo-x-ewts , "summary"@en .
+
+bdr:T01AG03281  skos:prefLabel  "dbang chen gsang ba 'dus pa (gter bdag gling pa)"@bo-x-ewts .
+
+bdr:T1869  skos:prefLabel  "list of offerings"@en , "'bul yig"@bo-x-ewts .
+
+bdr:O3JW5309_0469  bdo:taxHasSubClass  bdr:T1838 , bdr:T255 , bdr:T222 ;
+        skos:prefLabel      "历书 | 年表"@zh-hans , "Almanac | Calendar"@en , "lo tho/"@bo-x-ewts .
+
+bdr:T477  skos:prefLabel  "rtsa gsum 'bras bu ( rat+na gling pa)"@bo-x-ewts .
+
+bdr:T2187  skos:prefLabel  "ma rgyud (bla med rgyud)"@bo-x-ewts .
+
+bdr:T1KG6098  skos:prefLabel  "bar dus rtsom rig"@bo-x-ewts .
+
+bdr:T2579  skos:prefLabel  "compilation of recitations"@en , "'don 'grigs/"@bo-x-ewts .
+
+bdr:T351  skos:prefLabel  "zhi khro dgongs pa rang grol/ ( karma gling pa)"@bo-x-ewts .
+
+bdr:T1447  skos:prefLabel  "byabs khrus/"@bo-x-ewts .
+
+bdr:T266  skos:prefLabel  "slob deb/"@bo-x-ewts , "textbook"@en .
+
+bdr:T1321  skos:prefLabel  "rig 'dzin thugs thig (gter bdag gling pa)"@bo-x-ewts .
+
+bdr:T140  skos:prefLabel  "祈请"@zh-hans , "reverential petition"@en , "gsol 'debs/"@bo-x-ewts .
+
+bdr:T532  skos:prefLabel  "rtsa gsum spyi 'dus snying tig (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:T447  skos:prefLabel  "yig cha/"@bo-x-ewts , "obligatory syllabus"@en .
+
+bdr:O3JW5309_0228  bdo:taxHasSubClass  bdr:T532 , bdr:T01AG02947 , bdr:T2287 , bdr:T01AG03033 , bdr:T00AG01366 , bdr:T01AG03005 , bdr:T1097 , bdr:T2316 , bdr:T463 , bdr:T2317 ;
+        skos:prefLabel      "Treasure Cycles of Khyentse Wangpo"@en , "mkhyen brtse'i dbang po'i gter ma'i skor/"@bo-x-ewts , "钦则旺波伏藏法"@zh-hans .
+
+bdr:T1809  skos:prefLabel  "yi dam dgongs 'dus (bsam gtan gling pa)"@bo-x-ewts .
+
+bdr:O3JW5309_0017  bdo:taxHasSubClass  bdr:T003JR4759 , bdr:T1824 , bdr:T1992 , bdr:T971 , bdr:T633 , bdr:T1874 , bdr:T1114 , bdr:T1976 , bdr:T2186 , bdr:T1975 , bdr:T2187 , bdr:T1345 , bdr:T1460 , bdr:T2129 , bdr:T003JR4173 , bdr:T2245 , bdr:T1431 , bdr:T1GS108153 , bdr:T2461 ;
+        skos:prefLabel      "续"@zh-hans , "rgyud/"@bo-x-ewts , "Tantra"@en .
+
+bdr:T34  skos:prefLabel  "praṇidhāna"@sa-x-ndia , "祈愿"@zh-hans , "prayer"@en , "smon lam/"@bo-x-ewts .
+
+bdr:T1KG5906  skos:prefLabel  "dunhuang manuscripts"@en , "tun hong yig rnying /"@bo-x-ewts .
+
+bdr:T2604  skos:prefLabel  "dgongs gter/"@bo-x-ewts , "mind treasure"@en .
+
+bdr:T2001  skos:prefLabel  "bsngo smon shis brjod/"@bo-x-ewts .
+
+bdr:T206  skos:prefLabel  "poetic metrics"@en , "chanda"@sa-alalc97 , "sdeb sbyor/"@bo-x-ewts .
+
+bdr:T1097  skos:prefLabel  "bla ma bde mchog 'khor lo (rgya ston pad+ma dbang phyug; mkhyen brtse'i yang gter)"@bo-x-ewts .
+
+bdr:T11MS16  skos:prefLabel  "rus mdzod/"@bo-x-ewts .
+
+bdr:T1810  skos:prefLabel  "bla ma'i thugs sgrub nor bu rgya mtsho/"@bo-x-ewts .
+
+bdr:T936  skos:prefLabel  "garland of offering; offering verses"@en , "mchod phreng /"@bo-x-ewts .
+
+bdr:T1PD108884  skos:prefLabel  "gan rgya/"@bo-x-ewts , "written agreement or contract"@en , "契约，约据，文约"@zh-hans .
+
+bdr:T00KG03708  skos:prefLabel  "news"@en , "gnas tshul/"@bo-x-ewts .
+
+bdr:T1GS44553  skos:prefLabel  "mchod rten dkar chag"@bo-x-ewts .
+
+bdr:T248  skos:prefLabel  "ge sar sgrung /"@bo-x-ewts .
+
+bdr:T514  skos:prefLabel  "spyi chings/"@bo-x-ewts , "总纲"@zh-hans , "descriptive outline"@en .
+
+bdr:T1218  skos:prefLabel  "sku gdung dkar chag"@bo-x-ewts , "funeral reliquary choten"@en .
+
+bdr:T1GS135818  skos:prefLabel  "rdo rje phag mo gsang sgrub (byang gter)"@bo-x-ewts .
+
+bdr:T2592  skos:prefLabel  "dam chos sprul sku snying thig (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T00AG01324  skos:prefLabel  "dga' rab rdo rje snying thig (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T218  skos:prefLabel  "dag yig"@bo-x-ewts , "spelling"@en .
+
+bdr:T1460  skos:prefLabel  "anuttarayoga tantra"@sa-x-iast , "bla med rgyud/"@bo-x-ewts .
+
+bdr:T16  skos:prefLabel  "monastic chronicles"@en , "gdan rabs/"@bo-x-ewts .
+
+bdr:T10MS14285  skos:prefLabel  "vajra verses"@en , "rdo rje'i tshig rkang /"@bo-x-ewts .
+
+bdr:T1375  skos:prefLabel  "bsam pa lhun grub (rgod ldem 'phru can)"@bo-x-ewts .
+
+bdr:T1641  skos:prefLabel  "lam lha/"@bo-x-ewts .
+
+bdr:T01JR183  skos:prefLabel  "dpal chen bka' 'dus rgya mtsho ('jigs med gling pa)"@bo-x-ewts .
+
+bdr:O3JW5309_0422  bdo:taxHasSubClass  bdr:T1986 , bdr:T220 , bdr:T218 , bdr:T240 ;
+        skos:prefLabel      "词典"@zh-hans , "Dictionary"@en , "tshig mdzod/"@bo-x-ewts .
+
+bdr:T1345  skos:prefLabel  "gsang bde 'jigs gsum/"@bo-x-ewts .
+
+bdr:T1737  skos:prefLabel  "gter sgrub/"@bo-x-ewts .
+
+bdr:T2140  skos:prefLabel  "yang gsang thugs kyi phur gcig (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T1134  skos:prefLabel  "history"@en , "lo rgyus/"@bo-x-ewts .
+
+bdr:T00AG01366  skos:prefLabel  "'chi med 'phags ma'i snying thig (mkhyen brtse'i dbang po/)"@bo-x-ewts .
+
+bdr:T58  skos:prefLabel  "zhal gdams/"@bo-x-ewts , "instruction"@en .
+
+bdr:T00KG02665  skos:prefLabel  "las khrigs/"@bo-x-ewts , "arrangement for a sadhana practice"@en .
+
+bdr:T28  skos:prefLabel  "questions and responses"@en , "dris lan/"@bo-x-ewts .
+
+bdr:T1779  skos:prefLabel  "avadāna"@sa-x-iast , "rtogs brjod/"@bo-x-ewts .
+
+bdr:T2182  skos:prefLabel  "a rg+ha/"@bo-x-ewts , "renovation (of sacred objects)"@en .
+
+bdr:T1568  skos:prefLabel  "rdo rje phur pa spu gri reg gcod (gar dbang rdo rje)"@bo-x-ewts .
+
+bdr:T261  skos:prefLabel  "dgod gtam/"@bo-x-ewts , "humorous stories"@en .
+
+bdr:T012AG03497  skos:prefLabel  "explanation of the dharma"@en-x-mixed , "chos bshad/"@bo-x-ewts .
+
+bdr:T01AG03287  skos:prefLabel  "dbang tho/"@bo-x-ewts .
+
+bdr:T00JR3355  skos:prefLabel  "rdzas tho/"@bo-x-ewts .
+
+bdr:T1231  skos:prefLabel  "numerical categories"@en , "chos kyi rnam grangs/"@bo-x-ewts .
+
+bdr:T1623  skos:prefLabel  "kun 'khyil mched gsum (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T1146  skos:prefLabel  "bstod dbyangs/"@bo-x-ewts , "hymns"@en .
+
+bdr:O3JW5309_0012  bdo:taxHasSubClass  bdr:T00UNK196 , bdr:T1093 , bdr:T2002 , bdr:T769 ;
+        skos:prefLabel      "Sutra"@en , "经"@zh-hans , "mdo/"@bo-x-ewts .
+
+bdr:T1GS129605  skos:prefLabel  "gro lod hUm sgrub (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T1327  skos:prefLabel  "gu ru spros med don sgrub (rol pa'i rdo rje)"@bo-x-ewts .
+
+bdr:T412  skos:prefLabel  "prayers turning the merit"@en , "bsngo smon/"@bo-x-ewts .
+
+bdr:T2037  skos:prefLabel  "旅游指南，旅途纪实"@zh-hans , "lam yig ('gro lam mi nor ba'i lam yig)"@bo-x-ewts .
+
+bdr:T327  skos:prefLabel  "bka' brgyad bde gshegs 'dus pa (nyang ral nyi ma 'od zer)"@bo-x-ewts .
+
+bdr:T4CZ71  skos:prefLabel  "珍本、孤本"@zh-hans , "rare texts"@en , "dpe dkon/"@bo-x-ewts .
+
+bdr:T012AG03703  skos:prefLabel  "supplement"@en , "zur phyung /"@bo-x-ewts .
+
+bdr:T1750  skos:prefLabel  "tshogs chos/"@bo-x-ewts .
+
+bdr:T11MS11  skos:prefLabel  "khrid/"@bo-x-ewts .
+
+bdr:T10MS14575  skos:prefLabel  "bsangs yig"@bo-x-ewts .
+
+bdr:T1846  skos:prefLabel  "ri mo bri yig"@bo-x-ewts .
+
+bdr:T00UNK1  skos:prefLabel  "esoteric description"@en , "sbas bshad/"@bo-x-ewts .
+
+bdr:T1243  skos:prefLabel  "gu ru sgrub thabs yon tan gter mdzod/"@bo-x-ewts .
+
+bdr:T2079  skos:prefLabel  "噶玛大营寺"@zh-hans , "traveling encampment of the karma pa lama"@en , "kaM tshang sgar chen/"@bo-x-ewts .
+
+bdr:T1339  skos:prefLabel  "bla ma dgongs 'dus (sangs rgyas gling pa)"@bo-x-ewts .
+
+bdr:T901  skos:prefLabel  "bsngags pa/"@bo-x-ewts .
+
+bdr:T2134  skos:prefLabel  "tshe sgrub thabs shes kha sbyor (yongs dge mi 'gyur rdo rje)"@bo-x-ewts .
+
+bdr:T1792  skos:prefLabel  "lcags sdong ma tshar lugs/"@bo-x-ewts .
+
+bdr:O3JW5309_0205  bdo:taxHasSubClass  bdr:T2001 , bdr:T23 ;
+        skos:prefLabel      "Dedication"@en , "回向"@zh-hans , "bsngo ba/"@bo-x-ewts .
+
+bdr:T1KG6100  skos:prefLabel  "contemporary tibetan writings"@en , "bod kyi deng rabs rtsom rig"@bo-x-ewts .
+
+bdr:T11  skos:prefLabel  "prayers to teachers of the lineage of transmission"@en , "bla brgyud gsol 'debs/"@bo-x-ewts .
+
+bdr:O3JW5309_0362  bdo:taxHasSubClass  bdr:T100 , bdr:T216 , bdr:T217 , bdr:T1PD96322 , bdr:T286 , bdr:T260 , bdr:T261 , bdr:T1PD96324 , bdr:T445 , bdr:T2404 , bdr:T262 , bdr:T248 , bdr:T1679 , bdr:T1979 , bdr:T1884 , bdr:T1KG1401 , bdr:T257 , bdr:T276 ;
+        skos:prefLabel      "sgrung /"@bo-x-ewts , "故事"@zh-hans , "Narrative"@en .
+
+bdr:T1943  skos:prefLabel  "skar chung rdo ring /"@bo-x-ewts .
+
+bdr:T2261  skos:prefLabel  "document bestowing name"@en , "mtshan gsol ba/"@bo-x-ewts .
+
+bdr:T1732  skos:prefLabel  "speech on investiture"@en , "khri bshad/"@bo-x-ewts .
+
+bdr:T2176  skos:prefLabel  "tho yig"@bo-x-ewts .
+
+bdr:T00AG01095  skos:prefLabel  "twenty-five disciples of padmasambhava"@en , "rje 'bangs nyer lnga /"@bo-x-ewts .
+
+bdr:T340  skos:prefLabel  "method of explaining"@en , "'chad thabs/"@bo-x-ewts .
+
+bdr:O3JW5309_0121  bdo:taxHasSubClass  bdr:T2356 , bdr:T1641 , bdr:T25 , bdr:T2037 , bdr:T1203 , bdr:T1PD108881 , bdr:T2079 ;
+        skos:prefLabel      "游记"@zh-hans , "Travel"@en , "gnas yig"@bo-x-ewts .
+
+bdr:T255  skos:prefLabel  "chronology of the buddha's teaching"@en , "bstan rtsis/"@bo-x-ewts .
+
+bdr:T8LS1427  skos:prefLabel  "chings yig"@bo-x-ewts .
+
+bdr:T1702  skos:prefLabel  "bla ma brgyud pa'i rnam thar/"@bo-x-ewts .
+
+bdr:O3JW5309_0302  bdo:taxHasSubClass  bdr:T2MS20121 , bdr:T351 ;
+        skos:prefLabel      "噶玛林巴伏藏法"@zh-hans , "Treasure Cycle of Karma Lingpa"@en , "kar+ma gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1GS135825  skos:prefLabel  "short verse presentation"@en , "'dzud byang /"@bo-x-ewts .
+
+bdr:T436  skos:prefLabel  "nyams dbyangs/"@bo-x-ewts .
+
+bdr:O3JW5309_0217  bdo:taxHasSubClass  bdr:T00AG01095 , bdr:O3JW5309_0257 , bdr:T2182 , bdr:T8LS16966 , bdr:T1199 , bdr:O3JW5309_0228 , bdr:T2604 , bdr:T448 , bdr:O3JW5309_0290 , bdr:T33 , bdr:O3JW5309_0239 , bdr:T1737 , bdr:O3JW5309_0292 , bdr:O3JW5309_0274 , bdr:O3JW5309_0300 , bdr:O3JW5309_0282 , bdr:O3JW5309_0252 , bdr:T470 , bdr:O3JW5309_0305 , bdr:O3JW5309_0294 , bdr:O3JW5309_0302 , bdr:O3JW5309_0297 , bdr:O3JW5309_0285 , bdr:T00JR816 , bdr:O3JW5309_0263 , bdr:O3JW5309_0278 , bdr:O3JW5309_0287 , bdr:O3JW5309_0267 ;
+        skos:prefLabel      "Terma"@en , "gter ma/"@bo-x-ewts , "伏藏法"@zh-hans .
+
+bdr:T310  skos:prefLabel  "bka' ma/"@bo-x-ewts .
+
+bdr:T10MS12314  skos:prefLabel  "chronicle"@en , "deb ther/"@bo-x-ewts .
+
+bdr:T225  skos:prefLabel  "chos spyod/"@bo-x-ewts .
+
+bdr:T23  skos:prefLabel  "parinamana"@sa-alalc97 , "回向"@zh-hans , "bsngo ba/"@bo-x-ewts , "turning the merit"@en .
+
+bdr:T1774  skos:prefLabel  "mi tra brgya rtsa/"@bo-x-ewts .
+
+bdr:T003JR4759  skos:prefLabel  "rdzong 'phrang /"@bo-x-ewts .
+
+bdr:T1689  skos:prefLabel  "maṅgalam"@sa-x-ndia , "auspicious"@en , "吉祥"@zh-hans , "bkra shis/"@bo-x-ewts .
+
+bdr:T1171  skos:prefLabel  "mo dpe/"@bo-x-ewts , "prognostication"@en .
+
+bdr:T297  skos:prefLabel  "journals"@en-x-mixed , "dus deb/"@bo-x-ewts .
+
+bdr:T1478  skos:prefLabel  "zin tho/"@bo-x-ewts .
+
+bdr:T1352  skos:prefLabel  "stages of teachings"@en , "bstan rim/"@bo-x-ewts .
+
+bdr:T352  skos:prefLabel  "the bodhicitta of entering"@en , "'jug sems/"@bo-x-ewts , "入菩提心"@zh-hans .
+
+bdr:T533  skos:prefLabel  "rtsa gsum tshe zab (mchog gling)"@bo-x-ewts .
+
+bdr:T448  skos:prefLabel  "gter ma/"@bo-x-ewts , "rediscovered teachings"@en .
+
+bdr:O3JW5309_0290  bdo:taxHasSubClass  bdr:T1809 ;
+        skos:prefLabel      "桑丹林巴伏藏法"@zh-hans , "Treasure Cycles of Samten Lingpa"@en , "bsam gtan gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T237  skos:prefLabel  "materia medica"@en , "'khrungs dpe/"@bo-x-ewts .
+
+bdr:T1418  skos:prefLabel  "kun bzang 'khor lo/"@bo-x-ewts .
+
+bdr:T2339  skos:prefLabel  "dka' gnas/"@bo-x-ewts .
+
+bdr:T1871  skos:prefLabel  "four classes of tantra"@en , "四部密续"@zh-hans , "rgyud sde bzhi/"@bo-x-ewts .
+
+bdr:T1394  skos:prefLabel  "rta phag yid bzhin nor bu ('ja' tshon snying po)"@bo-x-ewts .
+
+bdr:T2002  skos:prefLabel  "Sutra Tradition"@en , "mdo phyogs/"@bo-x-ewts .
+
+bdr:T1183  skos:prefLabel  "bka' brgyad gsang ba yongs rdzogs (gu ru chos dbang)"@bo-x-ewts .
+
+bdr:T207  skos:prefLabel  "yig bskur/"@bo-x-ewts , "letter writing"@en .
+
+bdr:T1098  skos:prefLabel  "bla ma rig 'dzin gdung sgrub (rgod ldem 'phru can)"@bo-x-ewts .
+
+bdr:T1GS129612  skos:prefLabel  "gsang thig snying po'i skor ('jam mgon kong sprul)"@bo-x-ewts .
+
+bdr:T1KG15794  skos:prefLabel  "handbook"@en , "lag deb/"@bo-x-ewts .
+
+bdr:T003JR155  skos:prefLabel  "essay"@en , "dpyad rtsom/"@bo-x-ewts .
+
+bdr:T1PD110101  skos:prefLabel  "bstod tshogs/"@bo-x-ewts .
+
+bdr:T1PD45091  skos:prefLabel  "thugs sgrub dregs pa tshar gcod (gu ru chos dbang)"@bo-x-ewts .
+
+bdr:T1491  skos:prefLabel  "commentary on difficult points"@en , "pañjikā"@sa-x-ndia , "細疏"@zh-hant , "dka' 'grel/"@bo-x-ewts .
+
+bdr:T304  skos:prefLabel  "annotated commentary"@en , "mchan 'grel/"@bo-x-ewts .
+
+bdr:T219  skos:prefLabel  "ka bshad/"@bo-x-ewts , "alphabetic verse"@en .
+
+bdr:T1979  skos:prefLabel  "literature"@en , "rtsom rig"@bo-x-ewts .
+
+bdr:T2382  skos:prefLabel  "ngag rgyun lo rgyus/"@bo-x-ewts , "oral history"@en .
+
+bdr:T17  skos:prefLabel  "yang srid myur byon/"@bo-x-ewts , "prayers for speedy rebirth"@en .
+
+bdr:T01JR184  skos:prefLabel  "mkha' 'gro snying thig (pad+ma las 'brel rtsal)"@bo-x-ewts .
+
+bdr:T1431  skos:prefLabel  "tantra classification"@en , "rgyud sde spyi rnam/"@bo-x-ewts .
+
+bdr:T250  skos:prefLabel  "gnyen bshad/"@bo-x-ewts .
+
+bdr:T10MS14648  skos:prefLabel  "zhib bsher/"@bo-x-ewts , "survey"@en .
+
+bdr:T89  skos:prefLabel  "纲目"@zh-hans , "thematic outline"@en , "sa bcad/"@bo-x-ewts .
+
+bdr:T11MS60  skos:prefLabel  "zhib 'jug"@bo-x-ewts .
+
+bdr:T220  skos:prefLabel  "dictionary"@en , "tshig mdzod/"@bo-x-ewts .
+
+bdr:O3JW5309_0001  bdo:taxHasSubClass  bdr:T1253 , bdr:T1129 , bdr:T3JT12491 , bdr:T310 , bdr:O3JW5309_0012 , bdr:T1GS138984 , bdr:T2MS5993 , bdr:T1774 , bdr:T1PD110728 , bdr:T1905 , bdr:O3JW5309_0017 , bdr:T00AG01243 ;
+        skos:prefLabel      "Canon"@en , "大藏经"@zh-hans , "bka' bstan 'gyur/"@bo-x-ewts .
+
+bdr:T1CZ49  skos:prefLabel  "rkang brgyad bstod pa/"@bo-x-ewts .
+
+bdr:T1081  skos:prefLabel  "phyogs bsgrigs/"@bo-x-ewts , "collections (composite)"@en .
+
+bdr:T1473  skos:prefLabel  "smon lam lnga /"@bo-x-ewts .
+
+bdr:T29  skos:prefLabel  "explanations of the mandala offering"@en , "maN+Dal bshad pa/"@bo-x-ewts .
+
+bdr:O3JW5309_0465  bdo:taxHasSubClass  bdr:T1PD95792 , bdr:T1485 , bdr:T143 ;
+        skos:prefLabel      "目录｜地图"@zh-hans , "Directory | Map"@en , "phyogs deb dang sa khra/"@bo-x-ewts .
+
+bdr:T01AG03005  skos:prefLabel  "phrin las phur pa'i gnad tig (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:T2575  skos:prefLabel  "love poetry"@en , "mdza' gzhas/"@bo-x-ewts .
+
+bdr:T1051  skos:prefLabel  "offerings and praises"@en , "供赞"@zh-hans , "mchod bstod/"@bo-x-ewts .
+
+bdr:T262  skos:prefLabel  "dmangs sgrung /"@bo-x-ewts , "folk stories"@en .
+
+bdr:O3JW5309_0435  bdo:taxHasSubClass  bdr:T00KG02665 , bdr:T1KG3848 ;
+        skos:prefLabel      "流程"@zh-hans , "Arrangement"@en , "las khrigs/"@bo-x-ewts .
+
+bdr:T1PD110728  skos:prefLabel  "lam 'bras tshogs bshad/"@bo-x-ewts .
+
+bdr:T1CZ50  skos:prefLabel  "collects the essence of a text, the essential meaning of an expanded or great text"@en , "stong thun/"@bo-x-ewts .
+
+bdr:T2123  skos:prefLabel  "contents of collected writings"@en , "gsung 'bum dkar chag"@bo-x-ewts .
+
+bdr:T1992  skos:prefLabel  "kriyātantra"@sa-x-ndia , "action tantra"@en , "事部"@zh-hans , "bya rgyud/"@bo-x-ewts .
+
+bdr:T2334  skos:prefLabel  "gu ru drag po raksha thod phreng (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T30  skos:prefLabel  "iconographic description"@en , "bris yig"@bo-x-ewts .
+
+bdr:T11MS42  skos:prefLabel  "don khrid/"@bo-x-ewts .
+
+bdr:T328  skos:prefLabel  "klong chen snying thig ('jigs med gling pa)"@bo-x-ewts .
+
+bdr:T1202  skos:prefLabel  "be'u bum/"@bo-x-ewts .
+
+bdr:T413  skos:prefLabel  "miscellany"@en , "gsung thor bu/"@bo-x-ewts .
+
+bdr:O3JW5309_0381  bdo:taxHasSubClass  bdr:O3JW5309_0408 , bdr:T1KG10014 , bdr:T1KG15050 , bdr:T1PD96320 , bdr:T1446 , bdr:T10MS14643 , bdr:T237 , bdr:T1972 , bdr:T00JR3355 , bdr:T1171 , bdr:T1KG15794 , bdr:T1478 , bdr:T01AG03287 , bdr:T10MS14651 , bdr:T340 , bdr:O3JW5309_0401 , bdr:T2GS1099 , bdr:T342 , bdr:T012AG03520 , bdr:T409 , bdr:T1234 ;
+        skos:prefLabel      "手册"@zh-hans , "Manuals"@en , "zin tho/"@bo-x-ewts .
+
+bdr:T1117  skos:prefLabel  "bla ma bka' 'dus rin chen gter spungs (rdo rje gling pa)"@bo-x-ewts .
+
+bdr:T2038  skos:prefLabel  "gegs sel/"@bo-x-ewts .
+
+bdr:T1093  skos:prefLabel  "mdo dgongs 'dus/"@bo-x-ewts .
+
+bdr:T1485  skos:prefLabel  "标题｜单子"@zh-hans , "title, list"@en , "kha byang /"@bo-x-ewts .
+
+bdr:T1751  skos:prefLabel  "thub pa'i mdzad pa bcu gnyis/"@bo-x-ewts , "十二宏化"@zh-hans , "twelve acts of the buddha"@en .
+
+bdr:O3JW5309_0351  bdo:taxHasSubClass  bdr:T2559 , bdr:T1867 , bdr:T1445 , bdr:T1418 , bdr:T205 , bdr:T204 ;
+        skos:prefLabel      "诗学"@zh-hans , "Poetic Adornment"@en , "snyan ngag"@bo-x-ewts .
+
+bdr:T485  skos:prefLabel  "rtsa gsum kun 'dus (zhig gling)"@bo-x-ewts .
+
+bdr:T2461  skos:prefLabel  "a nu yo ga"@bo-x-ewts .
+
+bdr:T1244  skos:prefLabel  "dmigs brtse ma/"@bo-x-ewts .
+
+bdr:O3JW5309_0110  bdo:taxHasSubClass  bdr:T1449 , bdr:T10MS12314 , bdr:T12 , bdr:T1PD108901 , bdr:T16 , bdr:T1941 , bdr:T1673 , bdr:T1134 , bdr:T2382 , bdr:T793 ;
+        skos:prefLabel      "lo rgyus/"@bo-x-ewts , "历史"@zh-hans , "History"@en .
+
+bdr:T00AG0572  skos:prefLabel  "addendum, supplement"@en , "kha skong /"@bo-x-ewts .
+
+bdr:T01AG03059  skos:prefLabel  "bla sgrub 'od gsal snying thig (chos kyi blo gros)"@bo-x-ewts .
+
+bdr:T1129  skos:prefLabel  "about kanjur and tenjur"@en , "有关藏文大藏经"@zh-hans , "bka' bstan skor/"@bo-x-ewts .
+
+bdr:T1974  skos:prefLabel  "correspondence, official"@en , "yig rigs/"@bo-x-ewts .
+
+bdr:T2DB4572  skos:prefLabel  "dpe bsdur ma/"@bo-x-ewts .
+
+bdr:T2316  skos:prefLabel  "pad+ma tshe yi snying thig (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:T793  skos:prefLabel  "royal chronicles"@en , "rgyal rabs/"@bo-x-ewts .
+
+bdr:T00JR760  skos:prefLabel  "skul byang /"@bo-x-ewts .
+
+bdr:T12  skos:prefLabel  "religious histories"@en , "chos 'byung /"@bo-x-ewts .
+
+bdr:T1889  skos:prefLabel  "dgongs pa zang thal/"@bo-x-ewts .
+
+bdr:T1371  skos:prefLabel  "bla ma drag po ye shes rab 'bar (klong gsal snying po)"@bo-x-ewts .
+
+bdr:T1763  skos:prefLabel  "exegesis of the general meaning"@en , "spyi don/"@bo-x-ewts .
+
+bdr:O3JW5309_0278  bdo:taxHasSubClass  bdr:T01AG03281 , bdr:T1GS129609 , bdr:T1321 ;
+        skos:prefLabel      "德达林巴伏藏法"@zh-hans , "Treasure Cycles of Terdak Lingpa"@en , "gter bdag gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T286  skos:prefLabel  "bcos sgrung /"@bo-x-ewts , "fiction"@en .
+
+bdr:O3JW5309_0459  bdo:taxHasSubClass  bdr:T297 ;
+        skos:prefLabel      "Periodical"@en , "刊物"@zh-hans , "dus deb/"@bo-x-ewts .
+
+bdr:T10MS14643  skos:prefLabel  "nyams yig"@bo-x-ewts .
+
+bdr:T1PD96322  skos:prefLabel  "gter sgrung /"@bo-x-ewts .
+
+bdr:T00AG01362  skos:prefLabel  "thugs rje chen po pad+ma gtsug tor (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T6  skos:prefLabel  "songs of realization"@en , "mgur/"@bo-x-ewts .
+
+bdr:O3JW5309_0037  bdo:taxHasSubClass  bdr:T11MS16 , bdr:T1KG3927 , bdr:T1PD128746 , bdr:T01JR185 , bdr:T10MS11187 , bdr:T1081 , bdr:T11MS52 , bdr:T1202 , bdr:T413 , bdr:T1181 , bdr:T003JR48 , bdr:O3JW5309_0051 , bdr:T208 , bdr:T184 ;
+        skos:prefLabel      "文集"@zh-hans , "phyogs bsgrigs/"@bo-x-ewts , "Collections"@en .
+
+bdr:T1890  skos:prefLabel  "yang ti nag po gser gyi 'bru gcig"@bo-x-ewts .
+
+bdr:T522  skos:prefLabel  "tshe sgrub lcags sdong ma (byang gter)"@bo-x-ewts .
+
+bdr:T1226  skos:prefLabel  "'dod gsol/"@bo-x-ewts .
+
+bdr:T1986  skos:prefLabel  "biographical dictionaries"@en , "ming mdzod/"@bo-x-ewts .
+
+bdr:T100  skos:prefLabel  "'bel gtam/"@bo-x-ewts , "narrative"@en .
+
+bdr:T3JT5054  skos:prefLabel  "commentary of meaning"@en , "don 'grel/"@bo-x-ewts .
+
+bdr:T24  skos:prefLabel  "benedictory verses (books)"@en , "par byang smon tshig"@bo-x-ewts .
+
+bdr:T1830  skos:prefLabel  "encyclopedia"@en , "shes bya mdzod/"@bo-x-ewts .
+
+bdr:T1CZ4664  skos:prefLabel  "final benefit"@en , "tha mar dge ba/"@bo-x-ewts .
+
+bdr:T2GS1099  skos:prefLabel  "instructional scroll"@en , "shog dril/"@bo-x-ewts .
+
+bdr:T298  skos:prefLabel  "书目"@zh-hans , "dpe tho/"@bo-x-ewts , "bibliography"@en .
+
+bdr:T479  skos:prefLabel  "mar me'i smon lam/"@bo-x-ewts .
+
+bdr:T1449  skos:prefLabel  "lo rgyus rig gnas/"@bo-x-ewts , "gazetteer"@en , "地方志"@zh-hans .
+
+bdr:T2033  skos:prefLabel  "nītiśāstra"@sa-x-iast , "lugs kyi bstan bcos/"@bo-x-ewts .
+
+bdr:T1CZ56  skos:prefLabel  "analysis"@en , "rnam bzhag"@bo-x-ewts .
+
+bdr:T238  skos:prefLabel  "graduated approach"@en , "道次第"@zh-hans , "lam rim/"@bo-x-ewts .
+
+bdr:T1PD113672  skos:prefLabel  "bsdur 'bras re'u mig"@bo-x-ewts .
+
+bdr:T1395  skos:prefLabel  "dbang drag 'bar ba ('ja' tshon snying po)"@bo-x-ewts .
+
+bdr:T2129  skos:prefLabel  "續"@zh-hant , "tantras"@en , "tantra"@sa-x-ndia , "rgyud/"@bo-x-ewts .
+
+bdr:T208  skos:prefLabel  "collected works"@en , "gsung 'bum/"@bo-x-ewts .
+
+bdr:O3JW5309_0176  bdo:taxHasSubClass  bdr:T352 , bdr:T2411 , bdr:T2MS12423 , bdr:T1689 , bdr:T936 , bdr:T1917 , bdr:T34 , bdr:T1831 , bdr:T00JR690 , bdr:T1473 , bdr:T479 , bdr:T24 , bdr:T412 , bdr:T1226 ;
+        skos:prefLabel      "祈愿文"@zh-hans , "Prayer"@en , "smon lam/"@bo-x-ewts .
+
+bdr:T1099  skos:prefLabel  "kun bzang thugs gter gyi bla sgrub/ (byang chub gling pa)"@bo-x-ewts .
+
+bdr:T184  skos:prefLabel  "collection spiritual songs"@en-x-mixed , "mgur 'bum/"@bo-x-ewts .
+
+bdr:T10MS11187  skos:prefLabel  "chos skor/"@bo-x-ewts .
+
+bdr:T4CZ2184  skos:prefLabel  "song of the vajra"@en , "rdo rje'i glu/"@bo-x-ewts .
+
+bdr:T812  skos:prefLabel  "rig 'dzin srog sgrub (nam mkha' 'jigs med)"@bo-x-ewts .
+
+bdr:T1124  skos:prefLabel  "bkod yig"@bo-x-ewts , "description"@en .
+
+bdr:T335  skos:prefLabel  "klong chen snying thig dpal chen 'dus pa/"@bo-x-ewts .
+
+bdr:T1884  skos:prefLabel  "prose"@en , "lhug rtsom/"@bo-x-ewts .
+
+bdr:O3JW5309_0092  bdo:taxHasSubClass  bdr:T2016 , bdr:T2033 , bdr:T245 , bdr:T1CZ56 , bdr:T1AT670 , bdr:T1777 ;
+        skos:prefLabel      "论著｜论述"@zh-hant , "Treatises | Expositions"@en , "bstan bcos dang rnam bzhag"@bo-x-ewts .
+
+bdr:O3JW5309_0484  bdo:taxHasSubClass  bdr:T1942 , bdr:T1943 ;
+        skos:prefLabel      "碑文"@zh-hans , "Inscription"@en , "rdo ring /"@bo-x-ewts .
+
+bdr:T2MS12423  skos:prefLabel  "bar chad lam sel/"@bo-x-ewts .
+
+bdr:T1673  skos:prefLabel  "genealogy"@en , "gdung rabs/"@bo-x-ewts .
+
+bdr:T00AG01326  skos:prefLabel  "twelve manifestations of padmasambhava"@en , "rnam 'phrul bcu gnyis/"@bo-x-ewts .
+
+bdr:T281  skos:prefLabel  "snyan rtsom/"@bo-x-ewts .
+
+bdr:T01JR185  skos:prefLabel  "litany of names"@en , "mtshan 'bum/"@bo-x-ewts .
+
+bdr:T769  skos:prefLabel  "sutra"@sa-alalc97 , "经"@zh-hans , "mdo/"@bo-x-ewts .
+
+bdr:T1824  skos:prefLabel  "rgyud sde lnga /"@bo-x-ewts .
+
+bdr:T1  skos:prefLabel  "sādhana"@sa-x-ndia , "成就法"@zh-hans , "sgrub thabs/"@bo-x-ewts .
+
+bdr:T1AT670  skos:prefLabel  "gnad 'gag gsal byed/"@bo-x-ewts , "explanation and elucidation of crucial points and concepts"@en .
+
+bdr:T221  skos:prefLabel  "公文｜公涵"@zh-hans , "official letter"@en , "chab shog"@bo-x-ewts .
+
+bdr:T00AG01368  skos:prefLabel  "rdor sems snying thig"@bo-x-ewts .
+
+bdr:T613  skos:prefLabel  "avavāda"@sa-x-ndia , "語訣"@zh-hant , "instruction"@en , "gdams ngag"@bo-x-ewts .
+
+bdr:T1317  skos:prefLabel  "bla ma'i thugs sgrub (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T1770  skos:prefLabel  "discussions of terms and categories"@en , "mkhas 'jug"@bo-x-ewts .
+
+bdr:T11MS31  skos:prefLabel  "rgyas bshad/"@bo-x-ewts .
+
+bdr:O3JW5309_0285  bdo:taxHasSubClass  bdr:T1099 ;
+        skos:prefLabel      "强秋林巴伏藏法"@zh-hans , "Treasure Cycles of Changchub Lingpa"@en , "byang chub gling pa'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1866  skos:prefLabel  "bla ma gsang 'dus (gu ru chos dbang)"@bo-x-ewts .
+
+bdr:T01AG03006  skos:prefLabel  "rta mgrin yang phyungs dmar po (chos kyi blo gros)"@bo-x-ewts .
+
+bdr:T1GS147799  skos:prefLabel  "dbyangs chung /"@bo-x-ewts , "small verse works"@en .
+
+bdr:T61  skos:prefLabel  "vyākhyā"@sa-x-ndia , "detailed commentary"@en , "論"@zh-hant , "rnam bshad/"@bo-x-ewts .
+
+bdr:T1GS124517  skos:prefLabel  "gtum po nA ga rak+sha (skyid grong chos mdzad)"@bo-x-ewts .
+
+bdr:T1PD95792  skos:prefLabel  "map"@en , "sa khra/"@bo-x-ewts .
+
+bdr:T1390  skos:prefLabel  "'ja' tshon pod drug"@bo-x-ewts .
+
+bdr:T1203  skos:prefLabel  "'das log"@bo-x-ewts , "return from death experiences"@en .
+
+bdr:T003JR48  skos:prefLabel  "rgyud 'bum/"@bo-x-ewts .
+
+bdr:T329  skos:prefLabel  "tshogs gtam/"@bo-x-ewts .
+
+bdr:O3JW5309_0297  bdo:taxHasSubClass  bdr:T01AG03059 , bdr:T01AG03006 ;
+        skos:prefLabel      "曲吉洛周伏藏法"@zh-hans , "Treasure Cycles of Chokyi Lodro"@en , "chos kyi blo gros gter ma'i skor/"@bo-x-ewts .
+
+bdr:T1486  skos:prefLabel  "pad+ma'i gsang thig dgongs 'dus (sangs rgyas dbang 'dus)"@bo-x-ewts .
+
+bdr:T2196  skos:prefLabel  "library catalogs"@en , "dpe mdzod khang gi dkar chag"@bo-x-ewts .
+
+bdr:O3JW5309_0267  bdo:taxHasSubClass  bdr:T1319 , bdr:T2596 , bdr:T2597 , bdr:T2592 , bdr:T1GS129605 , bdr:T813 ;
+        skos:prefLabel      "敦都多吉伏藏法"@zh-hans , "Treasure Cycles of Dudul Dorje"@en , "bdud 'dul rdo rje'i gter ma'i skor/"@bo-x-ewts .
+
+bdr:O3JW5309_0056  bdo:taxHasSubClass  bdr:T1AT671 , bdr:O3JW5309_0071 , bdr:T1KG8787 , bdr:O3JW5309_0092 , bdr:T1CZ4665 , bdr:T266 , bdr:T447 , bdr:T10MS14464 , bdr:T2339 , bdr:T385 , bdr:T1CZ50 , bdr:T476 , bdr:T1900 , bdr:T1763 , bdr:T1215 , bdr:T1AT268 ;
+        skos:prefLabel      "yig cha dang 'grel pa/"@bo-x-ewts , "Curricular Writings"@en , "文本及注疏"@zh-hans .
+
+bdr:T2377  skos:prefLabel  "vocabulary"@en , "ming tshig 'grel bshad/"@bo-x-ewts .
+
+bdr:T1722  skos:prefLabel  "wisdom"@en , "智慧"@zh-hans , "prajna"@sa-x-ndia , "shes rab/"@bo-x-ewts .
+
+bdr:T456  skos:prefLabel  "指示"@zh-hans , "upadeśa"@sa-x-ndia , "method used in practice"@en , "man ngag"@bo-x-ewts .
+
+bdr:T1PD108881  skos:prefLabel  "lag khyer/"@bo-x-ewts , "护照，通行证"@zh-hans .
+
+bdr:O3JW5309  bdo:taxHasSubClass  bdr:O3JW5309_0121 , bdr:O3JW5309_0155 , bdr:O3JW5309_0341 , bdr:O3JW5309_0001 , bdr:O3JW5309_0056 , bdr:O3JW5309_0381 , bdr:O3JW5309_0413 , bdr:O3JW5309_0099 , bdr:O3JW5309_0037 , bdr:O3JW5309_0217 , bdr:O3JW5309_0129 , bdr:O3JW5309_0362 , bdr:O3JW5309_0110 .
+
+bdr:T245  skos:prefLabel  "didactic works"@en , "legs bshad/"@bo-x-ewts .
+
+bdr:T1215  skos:prefLabel  "mtha' gcod/"@bo-x-ewts , "analytic treatment"@en .
+
+bdr:T1975  skos:prefLabel  "pha rgyud (bla med rgyud)"@bo-x-ewts .
+
+bdr:T2317  skos:prefLabel  "'chi med tsaNDa li (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:T13  skos:prefLabel  "目录"@zh-hans , "notice of contents"@en , "dkar chag"@bo-x-ewts .
+
+bdr:T1372  skos:prefLabel  "khog dbub/"@bo-x-ewts , "survey"@en .
+
+bdr:T1679  skos:prefLabel  "ro sgrung /"@bo-x-ewts .
+
+bdr:T1GS138764  skos:prefLabel  "karma gu ru (bkra shis stobs rgyal)"@bo-x-ewts .
+
+bdr:T1KG3171  skos:prefLabel  "gleng brjod/"@bo-x-ewts , "foreword"@en .
+
+bdr:T1342  skos:prefLabel  "birth stories"@en , "jātaka"@sa-x-iast , "本生"@zh-hans , "skyes rabs/"@bo-x-ewts .
+
+bdr:T2052  skos:prefLabel  "lo ming re'u mig"@bo-x-ewts .
+
+bdr:T342  skos:prefLabel  "diaries"@en , "nyin tho/"@bo-x-ewts .
+
+bdr:T00AG01363  skos:prefLabel  "thugs chen 'khor ba dong sprugs (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T257  skos:prefLabel  "short stories"@en , "sgrung thung /"@bo-x-ewts .
+
+bdr:T523  skos:prefLabel  "tshe sgrub rdo rje phreng ba (pad gling lugs)"@bo-x-ewts .
+
+bdr:T1016  skos:prefLabel  "klog thabs/"@bo-x-ewts , "method of reading"@en .
+
+bdr:T00KG02662  skos:prefLabel  "chos skor dkar chag"@bo-x-ewts .
+
+bdr:T1861  skos:prefLabel  "bla ma'i thugs sgrub bar chad kun sel (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T25  skos:prefLabel  "mahātmya"@sa-x-iast , "guides"@en-x-mixed , "gnas yig"@bo-x-ewts .
+
+bdr:O3JW5309_0461  bdo:taxHasSubClass  bdr:T1983 , bdr:T00KG03708 , bdr:T2585 ;
+        skos:prefLabel      "新闻｜媒体"@zh-hans , "News | Media"@en , "gsar 'gyur dang brgyud lam/"@bo-x-ewts .
+
+bdr:O3JW5309_0431  bdo:taxHasSubClass  bdr:T012AG03703 , bdr:T1453 , bdr:T00AG0572 ;
+        skos:prefLabel      "补遗"@zh-hans , "Supplement"@en , "lhan thabs/"@bo-x-ewts .
+
+bdr:T2MS20121  skos:prefLabel  "bar do thos grol/"@bo-x-ewts .
+
+bdr:T1CZ4665  skos:prefLabel  "detailed analysis"@en , "rnam dbye/"@bo-x-ewts .
+
+bdr:T299  skos:prefLabel  "伺察"@zh-hans , "vicāra"@sa-x-ndia , "dpyad pa/"@bo-x-ewts , "literary criticism"@en .
+
+bdr:T1831  skos:prefLabel  "bstan pa rgyas pa'i smon lam/"@bo-x-ewts .
+
+bdr:T01AG03284  skos:prefLabel  "gsang bdag (lho gter lugs)"@bo-x-ewts .
+
+bdr:T1746  skos:prefLabel  "musical notation"@en , "dbyangs yig"@bo-x-ewts .
+
+bdr:T143  skos:prefLabel  "explanation of terms"@en , "ming don brda bkrol/"@bo-x-ewts .
+
+bdr:T2330  skos:prefLabel  "mchod brjod/"@bo-x-ewts .
+
+bdr:O3JW5309_0401  bdo:taxHasSubClass  bdr:T00JR624 , bdr:T11MS42 , bdr:T11MS11 , bdr:T1109 , bdr:T1CZ28 , bdr:T200 ;
+        skos:prefLabel      "导修文"@zh-hans , "Meditation Manuals"@en , "khrid yig"@bo-x-ewts .
+
+bdr:T2245  skos:prefLabel  "rgyud gsum/"@bo-x-ewts .
+
+bdr:T67  skos:prefLabel  "stotra"@sa-alalc97 , "bsngags brjod"@en , "讚"@zh-hans , "bstod pa/"@bo-x-ewts .
+
+bdr:T2511  skos:prefLabel  "zhabs brtan/"@bo-x-ewts .
+
+bdr:O3JW5309_0292  bdo:taxHasSubClass  bdr:T1119 ;
+        skos:prefLabel      "明珠多吉伏藏法（天法）"@zh-hans , "Treasure Cycles of Namcho Mingyur Dorje (gnam chos)"@en , "mi 'gyur rdo rje'i gter ma'i skor (gnam chos)"@bo-x-ewts .
+
+bdr:O3JW5309_0473  bdo:taxHasSubClass  bdr:T1830 ;
+        skos:prefLabel      "百科全书"@zh-hans , "shes bya'i mdzod/"@bo-x-ewts , "Encyclopedia"@en .
+
+bdr:O3JW5309_0051  bdo:taxHasSubClass  bdr:T1KG6098 , bdr:T1KG5906 , bdr:T1KG6100 , bdr:T1KG6097 ;
+        skos:prefLabel      "特定时代著作"@zh-hant , "Era-Specific Writings"@en , "dus skabs rtsom rig"@bo-x-ewts .
+
+bdr:T2287  skos:prefLabel  "sku gsum rigs 'dus zab tig (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:O3JW5309_0358  bdo:taxHasSubClass  bdr:T246 , bdr:T436 , bdr:T6 ;
+        skos:prefLabel      "道歌"@zh-hans , "Experiential Songs"@en , "nyams mgur/"@bo-x-ewts .
+
+bdr:T451  skos:prefLabel  "brgyud yig"@bo-x-ewts .
+
+bdr:O3JW5309_0147  bdo:taxHasSubClass  bdr:T207 , bdr:T14 ;
+        skos:prefLabel      "信函"@zh-hans , "Letters"@en , "spring yig"@bo-x-ewts .
+
+bdr:T240  skos:prefLabel  "skad shan sbyar/"@bo-x-ewts , "dictionaries, bilingual, trilingual and quadrilingual"@en .
+
+bdr:O3JW5309_0413  bdo:taxHasSubClass  bdr:T1GS9767 , bdr:O3JW5309_0435 , bdr:T916 , bdr:O3JW5309_0465 , bdr:O3JW5309_0473 , bdr:O3JW5309_0438 , bdr:O3JW5309_0422 , bdr:T1231 , bdr:T2398 , bdr:T4CZ71 , bdr:O3JW5309_0484 , bdr:O3JW5309_0431 , bdr:O3JW5309_0475 , bdr:T1KG3171 , bdr:O3JW5309_0461 , bdr:O3JW5309_0459 , bdr:O3JW5309_0451 , bdr:O3JW5309_0469 , bdr:O3JW5309_0427 , bdr:T2DB4572 , bdr:T2330 ;
+        skos:prefLabel      "参考资料"@zh-hans , "Reference Material"@en , "dpyad yig"@bo-x-ewts .
+
+bdr:T813  skos:prefLabel  "dam chos dgongs pa yongs 'dus (bdud 'dul rdo rje)"@bo-x-ewts .
+
+bdr:T1493  skos:prefLabel  "rig 'dzin 'dus pa (rgod kyi ldem 'phru can)"@bo-x-ewts .
+
+bdr:T2016  skos:prefLabel  "erotics"@en , "kāmaśāstra"@sa-x-iast , "'dod pa'i bstan bcos/"@bo-x-ewts .
+
+bdr:O3JW5309_0274  bdo:taxHasSubClass  bdr:T1866 , bdr:T1PD45091 , bdr:T1183 ;
+        skos:prefLabel      "古茹曲旺伏藏法"@zh-hans , "Treasure Cycles of Guru Chowang"@en , "gu ru chos dbang gi gter ma'i skor/"@bo-x-ewts .
+
+bdr:T463  skos:prefLabel  "grub thob thugs tig"@bo-x-ewts .
+
+bdr:T2620  skos:prefLabel  "golden rosary (transmission)"@en , "gser 'phreng /"@bo-x-ewts .
+
+bdr:T1222  skos:prefLabel  "gnas bstod/"@bo-x-ewts , "praise of a sacred place"@en .
+
+bdr:T222  skos:prefLabel  "calendar"@en , "li tho/"@bo-x-ewts .
+
+bdr:T1AT671  skos:prefLabel  "rgyab chos/"@bo-x-ewts .
+
+bdr:O3JW5309_0129  bdo:taxHasSubClass  bdr:T11MS60 , bdr:T250 , bdr:T258 , bdr:T1722 , bdr:T1750 , bdr:T1871 , bdr:T456 , bdr:O3JW5309_0147 , bdr:T1765 , bdr:T329 , bdr:T58 , bdr:T00KG02742 , bdr:T2023 , bdr:T1732 , bdr:T003JR155 , bdr:T00KG02675 , bdr:T613 , bdr:T299 , bdr:O3JW5309_0150 ;
+        skos:prefLabel      "Dialogue"@en , "zhal gdams/"@bo-x-ewts , "教诫"@zh-hans .
+
+bdr:T00AG01369  skos:prefLabel  "klong chen snying thig gi bla ma rig 'dzin 'dus pa ('jigs med gling pa)"@bo-x-ewts .
+
+bdr:T00AG01243  skos:prefLabel  "bi ma snying thig"@bo-x-ewts .
+
+bdr:T1686  skos:prefLabel  "dkon mchog spyi 'dus/ ('ja' tshon snying po)"@bo-x-ewts .
+
+bdr:T1867  skos:prefLabel  "mtshan gyi mngon brjod/"@bo-x-ewts , "ornate poetry recalling personal names"@en .
+
+bdr:T10MS14651  skos:prefLabel  "medical text"@en , "sman yig"@bo-x-ewts .
+
+bdr:O3JW5309_0341  bdo:taxHasSubClass  bdr:T1GS147799 , bdr:T10MS14285 , bdr:T1GS135825 , bdr:O3JW5309_0351 , bdr:T281 , bdr:T1343 , bdr:T206 , bdr:T2575 , bdr:T4CZ2184 , bdr:T219 , bdr:O3JW5309_0358 ;
+        skos:prefLabel      "Poetry"@en , "诗歌"@zh-hans , "snyan rtsom/"@bo-x-ewts .
+
+bdr:T00AG01370  skos:prefLabel  "bla ma drag po rta khyung 'bar ba ('jigs med gling pa)"@bo-x-ewts .
+
+bdr:T1445  skos:prefLabel  "don rgyan so lnga /"@bo-x-ewts .
+
+bdr:T530  skos:prefLabel  "'chi med rtsa gsum dril sgrub (chos rje gling pa)"@bo-x-ewts .
+
+bdr:T1PD128746  skos:prefLabel  "'dems sgrig"@bo-x-ewts , "selected works"@en .
+
+bdr:T179  skos:prefLabel  "general preliminaries"@en , "共同前行"@zh-hans , "thun mong sngon 'gro/"@bo-x-ewts .
+
+bdr:T1234  skos:prefLabel  "brtag thabs/"@bo-x-ewts , "methods for examinations"@en .
+
+bdr:T01AG02947  skos:prefLabel  "lce btsun snying thig (mkhyen brtse'i dbang po)"@bo-x-ewts .
+
+bdr:T445  skos:prefLabel  "gtam tshogs/"@bo-x-ewts .
+
+bdr:T1119  skos:prefLabel  "gnam chos (mi 'gyur rdo rje)"@bo-x-ewts .
+
+bdr:T204  skos:prefLabel  "kāvya"@sa-x-iast , "poetics"@en , "snyan ngag"@bo-x-ewts .
+
+bdr:T276  skos:prefLabel  "gtam rgyud/"@bo-x-ewts .
+
+bdr:T1246  skos:prefLabel  "禅修次第"@zh-hans , "stages of meditation"@en , "sgom rim/"@bo-x-ewts .
+
+bdr:T1PD108882  skos:prefLabel  "公文，命令，执照"@zh-hans , "bka' shog"@bo-x-ewts .
+
+bdr:T2559  skos:prefLabel  "prahelika"@sa-alalc97 , "gab tshig"@bo-x-ewts .
+
+bdr:T00JR816  skos:prefLabel  "account of a treasure revelation"@en , "gter 'byung /"@bo-x-ewts .
+
+bdr:T246  skos:prefLabel  "saṅgīta"@sa-x-iast , "songs"@en , "glu/"@bo-x-ewts .
+
+bdr:T1795  skos:prefLabel  "g.yu thog snying thig"@bo-x-ewts .
+
+bdr:O3JW5309_0208  bdo:taxHasSubClass  bdr:T1CZ4662 , bdr:T1352 , bdr:T179 , bdr:T1770 , bdr:T1246 , bdr:T1254 , bdr:T238 , bdr:T1CZ4664 ;
+        skos:prefLabel      "道次第"@zh-hans , "Path Literature"@en , "lam/"@bo-x-ewts .
+
+bdr:T216  skos:prefLabel  "sgrung gtam/"@bo-x-ewts , "kathā"@sa-x-iast , "stories"@en .
+
+bdr:T1976  skos:prefLabel  "gnyis med rgyud (bla med rgyud)"@bo-x-ewts .
+
+bdr:T14  skos:prefLabel  "'phrin yig"@en , "spring yig"@bo-x-ewts .
+
+bdr:O3JW5309_0099  bdo:taxHasSubClass  bdr:T1751 , bdr:T1868 , bdr:T1342 , bdr:T00AG01326 , bdr:T1702 , bdr:T349 , bdr:T1CZ60 , bdr:T3 , bdr:T2620 , bdr:T1779 ;
+        skos:prefLabel      "Biography"@en , "传记"@zh-hans , "rnam thar/"@bo-x-ewts .
+
+bdr:T192  skos:prefLabel  "record of teachings received"@en , "thob yig"@bo-x-ewts .
+
+bdr:T1765  skos:prefLabel  "dogs slong /"@bo-x-ewts .
+
+bdr:T00UNK196  skos:prefLabel  "nges don gyi mdo/"@bo-x-ewts .
+
+bdr:T10MS14464  skos:prefLabel  "ngo sprod/"@bo-x-ewts .
+
+bdr:T1343  skos:prefLabel  "tshigs bcad/"@bo-x-ewts , "versification"@en .
+
+bdr:T1PD95800  skos:prefLabel  "mi ming /"@bo-x-ewts .
+
+bdr:T1PD96324  skos:prefLabel  "dmangs khrod rtsom rig"@bo-x-ewts .
+
+bdr:T00AG01364  skos:prefLabel  "zab pa skor bdun (mchog gyur gling pa)"@bo-x-ewts .
+
+bdr:T258  skos:prefLabel  "rtsom yig"@bo-x-ewts , "essays"@en .
+
+bdr:T00JR3437  skos:prefLabel  "reverential petitions to the previous lives of a lama"@en , "skyes 'phreng gsol 'debs/"@bo-x-ewts .
+
+bdr:T132  skos:prefLabel  "說疏"@zh-hant , "ṭīkā"@sa-x-ndia , "'grel pa/"@bo-x-ewts , "commentary"@en .
+
+bdr:T916  skos:prefLabel  "spyi bshad/"@bo-x-ewts , "survey"@en .
+
+bdr:O3JW5309_0305  bdo:taxHasSubClass  bdr:T1325 , bdr:T00AG01368 , bdr:T1712 , bdr:T1486 , bdr:T522 , bdr:T327 , bdr:T1792 , bdr:T812 , bdr:T1371 , bdr:T1889 , bdr:T01JR184 , bdr:T00AG01245 , bdr:T1568 , bdr:T2MS11744 , bdr:T531 , bdr:T1GS135818 , bdr:T1242 , bdr:T483 , bdr:T1GS138764 , bdr:T1GS124517 , bdr:T1117 , bdr:T01AG03284 , bdr:T00AG01402 , bdr:T1890 , bdr:T1096 , bdr:T485 , bdr:T1339 , bdr:T2198 , bdr:T00AG01281 , bdr:T523 , bdr:T530 , bdr:T1GS129612 , bdr:T1243 , bdr:T1795 ;
+        skos:prefLabel      "其他伏藏法"@zh-hans , "gter ma'i gzhan pa'i skor/"@bo-x-ewts , "Further Treasure Cycles"@en .
+
+bdr:T2023  skos:prefLabel  "clarification of doubtful points"@en-x-mixed , "dogs gcod/"@bo-x-ewts .
+
+bdr:T102  skos:prefLabel  "polemic"@en , "brgal lan/"@bo-x-ewts .
+
+bdr:T409  skos:prefLabel  "procedural manual"@en , "sgrigs yig"@bo-x-ewts .
+
+bdr:T1777  skos:prefLabel  "śāstra"@sa-x-ndia , "論"@zh-hant , "treatise"@en , "bstan bcos/"@bo-x-ewts .
+
+bdr:T470  skos:prefLabel  "gter gzhung /"@bo-x-ewts .
+
+bdr:T4JW5424  skos:prefLabel  "autocommentary"@en , "rang 'grel/"@bo-x-ewts .
+
+bdr:T385  skos:prefLabel  "philosophical schools"@en , "宗派"@zh-hans , "siddhanta"@sa-alalc97 , "grub mtha'"@bo-x-ewts .
+
+bdr:T1355  skos:prefLabel  "khrom bshad/"@bo-x-ewts .
