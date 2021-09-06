@@ -24,7 +24,6 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultsCache;
-import io.bdrc.taxonomy.TaxModel;
 
 @SpringBootApplication
 @Configuration
@@ -54,17 +53,12 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             RdfAuthModel.readAuthModel();
         }
         ResultsCache.init();
-        // Pull lds-queries repo from git if not in china
+        // Pull lds-queries repo from git if not in China
         if (!ServiceConfig.isInChina()) {
             GitService gs = new GitService(0);
             String commit = gs.update(GitService.GIT_LOCAL_PATH,
                     GitService.GIT_REMOTE_URL);
             ServiceConfig.setQueriesCommit(commit);
-        }
-        if (ServiceConfig.getProperty("taxonomyRoot") != null) {
-            log.info("initialize taxonomy with root {}",
-                    ServiceConfig.getProperty("taxonomyRoot"));
-            TaxModel.fetchModel();
         }
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication app = new SpringApplication(SpringBootLdspdi.class);

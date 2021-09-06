@@ -1,6 +1,5 @@
 package io.bdrc.taxonomy;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,11 +11,12 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -24,14 +24,18 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
+import io.bdrc.ldspdi.sparql.LdsQuery;
+import io.bdrc.ldspdi.sparql.LdsQueryService;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.TaxNode;
-import io.bdrc.libraries.Models;
 
 public class Taxonomy {
 
-    public static Map<String, TaxNode> allNodes = new HashMap<>();
-    public static String ROOTURI = null;
-    public static TaxNode ROOT = null;
+    public Map<String, TaxNode> allNodes = new HashMap<>();
+    public String ROOTURI = null;
+    public TaxNode ROOT = null;
+    public Model model = null;
+    
     public final static String HASSUBCLASS = "http://purl.bdrc.io/ontology/core/taxHasSubClass";
     public final static Node hasSubClass = ResourceFactory.createProperty(HASSUBCLASS).asNode();
     public final static String COUNT = "http://purl.bdrc.io/ontology/tmp/count";
@@ -65,29 +69,48 @@ public class Taxonomy {
     public final static String ROLE = "http://purl.bdrc.io/ontology/core/Role";
 
     public final static ObjectMapper mapper = new ObjectMapper();
+    
+    public final static Logger log = LoggerFactory.getLogger(Taxonomy.class);
 
     static {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        String sysProp = ServiceConfig.getProperty("taxonomyRoot");
-        if (sysProp != null)
-            init(ServiceConfig.getProperty("taxonomyRoot"));
     }
     
-    public static void init(String rootUri) {
+    public Taxonomy(final String rootUri) {
         ROOTURI = rootUri;
-        //ROOT = new TaxNode(rootUri);
-        Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
-        Taxonomy.buildTree(t, ROOT);
+        try {
+            final LdsQuery qfp = LdsQueryService.get(ServiceConfig.getProperty("taxtreeArqFile"), "library");
+            final Map<String, String> map = new HashMap<>();
+            map.put("R_RES", rootUri);
+            final String query = qfp.getParametizedQuery(map, true);
+            model = QueryProcessor.getGraph(query);
+            ROOT = new TaxNode(rootUri, model);
+            Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
+            this.buildTree(t, ROOT);
+        } catch (Exception e) {
+            log.error("error when building taxonomy "+rootUri, e);
+        }
+    }
+    
+    public Taxonomy(final String rootUri, final Model model) {
+        ROOTURI = rootUri;
+        try {
+            this.model = model;
+            ROOT = new TaxNode(rootUri, model);
+            Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
+            this.buildTree(t, ROOT);
+        } catch (Exception e) {
+            log.error("error when building taxonomy "+rootUri, e);
+        }
     }
 
-    public static TaxNode buildTree(Triple t, TaxNode root) {
-        final Model mod = TaxModel.getModel();
-        final Graph mGraph = mod.getGraph();
+    public TaxNode buildTree(Triple t, TaxNode root) {
+        final Graph mGraph = model.getGraph();
         ExtendedIterator<Triple> ext = mGraph.find(t);
         while (ext.hasNext()) {
             final Triple tp = ext.next();
             final String uri = tp.getObject().getURI();
-            final TaxNode nn = new TaxNode(uri, mod);
+            final TaxNode nn = new TaxNode(uri, model);
             allNodes.put(uri, nn);
             root.addChild(nn);
             final Triple ttp = new Triple(tp.getObject(), hasSubClass, Node.ANY);
@@ -95,29 +118,8 @@ public class Taxonomy {
         }
         return root;
     }
-
-    public static LinkedList<String> getLeafToRootPath(String leaf) {
-        LinkedList<String> linkedList = new LinkedList<String>();
-        TaxNode node = allNodes.get(leaf);
-        if (node == null) {
-            return linkedList;
-        }
-        linkedList.addLast(node.getUri());
-        while (node != null) {
-            node = node.getParent();
-            if (node != null)
-                linkedList.addLast(node.getUri());
-        }
-        return linkedList;
-    }
-
-    public static LinkedList<String> getRootToLeafPath(String leaf) {
-        LinkedList<String> tmp = getLeafToRootPath(leaf);
-        Collections.reverse(tmp);
-        return tmp;
-    }
     
-    public static Map<String, Map<String, Object>> buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics) throws RestException {
+    public Map<String, Map<String, Object>> buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics) throws RestException {
         if (leafTopics.size() == 0) {
             return null;
         }
@@ -174,30 +176,25 @@ public class Taxonomy {
         }
         node.put("subclasses", newSubclasses);
         return key;
-        
     }
-
-    public static final Property tmpStatus = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/tmp/status");
-    public static final Resource released = ResourceFactory.createProperty(Models.BDA+"StatusReleased");
     
-    public static void processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics) {
-        // check if work is released first: https://github.com/buda-base/lds-pdi/issues/221
-        final Resource wa = st.getSubject();
-        if (!wa.hasProperty(tmpStatus, released))
-            return;
+    public boolean processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics, boolean putIfAbsent) {
         tops.add(st.getObject().asNode().getURI());
-        HashSet<String> tmp = Wtopics.get(st.getObject().asNode().getURI());
+        final Resource wa = st.getSubject();
+        final Node obj = st.getObject().asNode();
+        TaxNode n = allNodes.get(obj.getURI());
+        if (n == null) {
+            if (putIfAbsent) {
+                topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
+            }
+            return false;
+        }
+        HashSet<String> tmp = Wtopics.get(obj.getURI());
         if (tmp == null) {
             tmp = new HashSet<>();
-        }
-        final Node obj = st.getObject().asNode();
-        if (wa.isURIResource()) {
-            tmp.add(wa.getURI());
-        } else {
-            tmp.add(wa.toString());
-        }
+        }        
+        tmp.add(wa.getURI());
         Wtopics.put(obj.getURI(), tmp);
-        TaxNode n = Taxonomy.allNodes.get(obj.getURI());
         LinkedList<TaxNode> nodes = n.getPathFromRoot();
         boolean first = true;
         for (TaxNode s : nodes) {
@@ -210,16 +207,12 @@ public class Taxonomy {
             if (bt == null) {
                 bt = new HashSet<>();
             }
-
-            if (wa.isURIResource()) {
-                bt.add(wa.getURI());
-            } else {
-                bt.add(wa.toString());
-            }
+            bt.add(wa.getURI());
             WorkBranch.put(suri, bt);
             topics.put(suri, bt.size());
         }
         topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
+        return true;
     }
 
 }

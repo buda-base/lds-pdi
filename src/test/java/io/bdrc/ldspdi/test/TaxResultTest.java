@@ -15,22 +15,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.library.WorkResults;
-import io.bdrc.taxonomy.TaxModel;
+import io.bdrc.libraries.Models;
 import io.bdrc.taxonomy.Taxonomy;
 
 public class TaxResultTest {
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
-        final Model taxModel = Utils.getModelFromFileName(Utils.TESTDIR + "O9TAXTBRC201605" + ".ttl", Lang.TURTLE);
-        TaxModel.initWithModel(taxModel);
-        Taxonomy.init("http://purl.bdrc.io/resource/O9TAXTBRC201605");
+        final Model topicTaxModel = Utils.getModelFromFileName(Utils.TESTDIR + "O9TAXTBRC201605.ttl", Lang.TURTLE);
+        final Model genreTaxModel = Utils.getModelFromFileName(Utils.TESTDIR + "O3JW5309.ttl", Lang.TURTLE);
+        final Taxonomy genreTaxonomy = new Taxonomy(Models.BDR+"O3JW5309", genreTaxModel);
+        final Taxonomy topicTaxonomy = new Taxonomy(Models.BDR+"O9TAXTBRC201605", topicTaxModel);
+        WorkResults.initForTests(genreTaxonomy, topicTaxonomy);
     }
     
     @Test
     public void mainTest() throws RestException, JsonGenerationException, JsonMappingException, IOException {
-        final Model resModel = Utils.getModelFromFileName(Utils.TESTDIR + "taxtest-resmodel" + ".ttl", Lang.TURTLE);
+        final Model resModel = Utils.getModelFromFileName(Utils.TESTDIR + "taxtest-resmodel.ttl", Lang.TURTLE);
         Map<String, Object> res = WorkResults.getResultsMap(resModel);
         ObjectMapper om = new ObjectMapper();
         om.writerWithDefaultPrettyPrinter().writeValue(System.out, (((Map<String, Object>) res.get("facets")).get("topics")));
+        om.writerWithDefaultPrettyPrinter().writeValue(System.out, (((Map<String, Object>) res.get("facets")).get("genres")));
     }
 }
