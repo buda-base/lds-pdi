@@ -24,6 +24,7 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.results.library.WorkResults;
 
 @SpringBootApplication
 @Configuration
@@ -59,6 +60,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             String commit = gs.update(GitService.GIT_LOCAL_PATH,
                     GitService.GIT_REMOTE_URL);
             ServiceConfig.setQueriesCommit(commit);
+        }
+        if (ServiceConfig.getProperty("taxonomyRoot") != null) {
+            log.info("initialize taxonomies");
+            WorkResults.initForProd();
         }
         log.info("SpringBootLdspdi has been properly initialized");
         SpringApplication app = new SpringApplication(SpringBootLdspdi.class);
