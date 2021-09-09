@@ -1,5 +1,6 @@
 package io.bdrc.taxonomy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
@@ -180,22 +182,21 @@ public class Taxonomy {
     
     public boolean processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics, boolean putIfAbsent) {
         final Resource wa = st.getSubject();
+        if (!wa.isURIResource()) return true;
         final Node obj = st.getObject().asNode();
         TaxNode n = allNodes.get(obj.getURI());
         if (n == null) {
             if (putIfAbsent) {
                 tops.add(st.getObject().asNode().getURI());
-                topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
+                HashSet<String> tmp = Wtopics.computeIfAbsent(obj.getURI(), x -> new HashSet<>());
+                tmp.add(wa.getURI());
+                topics.put(wa.getURI(), tmp.size());
             }
             return false;
         }
         tops.add(st.getObject().asNode().getURI());
-        HashSet<String> tmp = Wtopics.get(obj.getURI());
-        if (tmp == null) {
-            tmp = new HashSet<>();
-        }        
+        HashSet<String> tmp = Wtopics.computeIfAbsent(obj.getURI(), x -> new HashSet<>());
         tmp.add(wa.getURI());
-        Wtopics.put(obj.getURI(), tmp);
         LinkedList<TaxNode> nodes = n.getPathFromRoot();
         boolean first = true;
         for (TaxNode s : nodes) {
@@ -212,7 +213,7 @@ public class Taxonomy {
             WorkBranch.put(suri, bt);
             topics.put(suri, bt.size());
         }
-        topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
+        topics.put(wa.getURI(), tmp.size());
         return true;
     }
 
