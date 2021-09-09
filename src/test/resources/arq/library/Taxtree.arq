@@ -20,3 +20,4 @@ where{
     BIND(?R_RES as ?sub)
   }
 }
+  

@@ -96,9 +96,8 @@ public class WorkResults {
                         continue;
                     }
                     boolean handled = genreTaxonomy.processTopicStatement(st, genreTops, Wtopics, WorkBranch, genres, false);
-                    if (!handled) {
+                    if (!handled)
                         topicTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
-                    }
                 }
             }
         }

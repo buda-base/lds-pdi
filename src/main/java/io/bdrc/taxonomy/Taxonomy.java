@@ -63,8 +63,6 @@ public class Taxonomy {
     public final static String INSTANCETYPE = "http://purl.bdrc.io/ontology/tmp/instanceType";
     public final static String LICENSE = "http://purl.bdrc.io/ontology/admin/license";
     public final static String STATUS = "http://purl.bdrc.io/ontology/admin/status";
-    //public final static String LANG_SCRIPT = "http://purl.bdrc.io/ontology/core/workLangScript";
-    public final static String LANGUAGE = "http://purl.bdrc.io/ontology/core/workLangScript";
     public final static String TOPIC = "http://purl.bdrc.io/ontology/core/Topic";
     public final static String ROLE = "http://purl.bdrc.io/ontology/core/Role";
 
@@ -129,6 +127,8 @@ public class Taxonomy {
         String previous = ROOTURI;
         for (String uri : leafTopics) {
             TaxNode leaf = allNodes.get(uri);
+            if (leaf == null) // shouldn't happen, just a safeguard
+                continue;
             LinkedList<TaxNode> ll = leaf.getPathFromRoot();
             for (TaxNode n : ll) {
                 String nodeUri = n.getUri();
@@ -179,16 +179,17 @@ public class Taxonomy {
     }
     
     public boolean processTopicStatement(Statement st, HashSet<String> tops, Map<String, HashSet<String>> Wtopics, Map<String, HashSet<String>> WorkBranch, Map<String, Integer> topics, boolean putIfAbsent) {
-        tops.add(st.getObject().asNode().getURI());
         final Resource wa = st.getSubject();
         final Node obj = st.getObject().asNode();
         TaxNode n = allNodes.get(obj.getURI());
         if (n == null) {
             if (putIfAbsent) {
+                tops.add(st.getObject().asNode().getURI());
                 topics.put(wa.getURI(), Wtopics.get(obj.getURI()).size());
             }
             return false;
         }
+        tops.add(st.getObject().asNode().getURI());
         HashSet<String> tmp = Wtopics.get(obj.getURI());
         if (tmp == null) {
             tmp = new HashSet<>();
