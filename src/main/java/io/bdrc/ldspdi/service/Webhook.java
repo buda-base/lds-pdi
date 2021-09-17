@@ -3,6 +3,8 @@ package io.bdrc.ldspdi.service;
 import java.io.IOException;
 
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.shapes.OntShapesData;
@@ -14,6 +16,7 @@ public class Webhook implements Runnable {
     String payload;
     GitService gs;
     String mode;
+    public final static Logger log = LoggerFactory.getLogger(Webhook.class);
 
     public Webhook(String payload, String mode) {
         super();
@@ -40,8 +43,7 @@ public class Webhook implements Runnable {
             try {
                 commitId = gs.update(GitService.GIT_SHAPES_PATH, GitService.GIT_SHAPES_REMOTE_URL);
             } catch (RevisionSyntaxException | IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error("error getting latest commit for shapes", e);
             }
             OntShapesData osd = new OntShapesData(payload, commitId);
             osd.update();
@@ -50,8 +52,7 @@ public class Webhook implements Runnable {
             try {
                 commitId = gs.update(GitService.GIT_ONT_PATH, GitService.GIT_ONT_REMOTE_URL);
             } catch (RevisionSyntaxException | IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error("error getting latest commit for ontology", e);
             }
             OntData od = new OntData(payload, commitId);
             od.init();
@@ -61,8 +62,7 @@ public class Webhook implements Runnable {
                 commitId = gs.update(GitService.GIT_LOCAL_PATH, GitService.GIT_REMOTE_URL);
                 ServiceConfig.setQueriesCommit(commitId);
             } catch (RevisionSyntaxException | IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error("error getting latest commit for queries", e);
             }
         }
     }

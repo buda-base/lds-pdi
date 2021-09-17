@@ -99,6 +99,7 @@ public class ShaclDataController {
             url = "http"+url.substring(5, url.length());
         }
         if (OntPolicies.isBaseUri(url)) {
+            //log.info("url {} is base uri", url);
             m = OntShapesData.getOntModelByBase(url);
         } else {
             if (resource) {

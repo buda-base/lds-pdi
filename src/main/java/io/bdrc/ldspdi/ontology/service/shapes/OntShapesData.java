@@ -45,7 +45,7 @@ public class OntShapesData {
 
     public void update() {
         try {
-            if (commitId == null) {
+            if (commitId == null && payload != null) {
                 JsonNode node = new ObjectMapper().readTree(payload);
                 commitId = node.get("commits").elements().next().get("id").asText();
             }
@@ -105,6 +105,7 @@ public class OntShapesData {
     }
 
     public static void addOntModelByBase(String baseUri, Model om) {
+        log.info("add model for {}", baseUri);
         modelsBase.put(baseUri, om);
     }
 

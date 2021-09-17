@@ -28,6 +28,7 @@ import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -105,6 +106,16 @@ public class GitService /* implements Runnable */ {
         }
     }
 
+    private String getHead(Repository localRepo) {
+        try {
+            ObjectId id = localRepo.resolve(Constants.HEAD);
+            return id.getName().substring(0, 7);
+          } catch (IOException e) {
+            log.error("can't get commit of repo");
+          }
+        return null;
+    }
+    
     private String updateRepo(Repository localRepo)
             throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
         String commitId = null;
@@ -117,6 +128,7 @@ public class GitService /* implements Runnable */ {
             log.info("LOCAL REPO >> {} was updated with commit {}", localRepo, commitId);
         } catch (Exception ex) {
             log.error(" Git was unable to pull in directory {}, message: {}", localRepo, ex.getMessage());
+            return getHead(localRepo);
         }
         return commitId;
     }

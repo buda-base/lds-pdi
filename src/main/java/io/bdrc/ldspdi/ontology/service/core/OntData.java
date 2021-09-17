@@ -84,7 +84,7 @@ public class OntData {
 
     public void init() {
         try {
-            if (commitId == null) {
+            if (commitId == null && payload != null) {
                 JsonNode node = new ObjectMapper().readTree(payload);
                 commitId = node.get("commits").elements().next().get("id").asText();
             }
