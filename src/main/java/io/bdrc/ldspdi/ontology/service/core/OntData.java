@@ -78,7 +78,6 @@ public class OntData {
     private static String commitId;
 
     public OntData(String payload, String commit) {
-        super();
         this.payload = payload;
         commitId = commit;
     }
@@ -125,7 +124,9 @@ public class OntData {
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
-            updateFusekiDataset();
+            boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
+            if (!readonly)
+                updateFusekiDataset();
             readGithubJsonLDContext();
             adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");

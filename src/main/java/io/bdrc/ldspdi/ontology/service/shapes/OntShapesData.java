@@ -84,7 +84,9 @@ public class OntShapesData {
                 fullMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
-            updateFusekiDataset();
+            boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
+            if (!readonly)
+                updateFusekiDataset();
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
