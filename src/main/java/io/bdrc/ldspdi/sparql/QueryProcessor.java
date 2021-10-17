@@ -112,7 +112,7 @@ public class QueryProcessor {
     }
 
     public static Model getDescribeModel(final String URI, String fusekiUrl,
-            String prefixesc) throws RestException {
+            String prefixes) throws RestException {
         if (prefixes == null) {
             prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
