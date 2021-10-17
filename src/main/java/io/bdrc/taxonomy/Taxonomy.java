@@ -120,12 +120,12 @@ public class Taxonomy {
     }
     
     public Map<String, Map<String, Object>> buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics) throws RestException {
+        final Map<String,Map<String, Object>> res = new HashMap<>();
         if (leafTopics.size() == 0) {
-            return null;
+            return res;
         }
         long start = System.nanoTime();
         WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
-        Map<String,Map<String, Object>> res = new HashMap<>();
         String previous = ROOTURI;
         for (String uri : leafTopics) {
             TaxNode leaf = allNodes.get(uri);
@@ -162,6 +162,8 @@ public class Taxonomy {
         // simplifies the subnodes and returns the URI that should be substituted for this one, or null if it's fine
         // see https://github.com/buda-base/lds-pdi/issues/220
         final Map<String, Object> node = res.get(key);
+        if (node == null)
+            return key;
         @SuppressWarnings("unchecked")
         Set<String> subnodes = (Set<String>) node.get("subclasses");
         if (subnodes == null || subnodes.size() == 0)
