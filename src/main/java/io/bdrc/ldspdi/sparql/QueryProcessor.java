@@ -29,8 +29,10 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
@@ -110,7 +112,7 @@ public class QueryProcessor {
     }
 
     public static Model getDescribeModel(final String URI, String fusekiUrl,
-            String prefixes) throws RestException {
+            String prefixesc) throws RestException {
         if (prefixes == null) {
             prefixes = ServiceConfig.PREFIX.getPrefixesString();
         }
@@ -137,7 +139,13 @@ public class QueryProcessor {
         Model model = (Model) ResultsCache.getObjectFromCache(hash);
         if (model == null) {
             log.info("getGraph: executing query: {}", query);
-            final Query q = QueryFactory.create(prefixes + " " + query);
+            final Query q;
+            try {
+                q = QueryFactory.create(prefixes + " " + query);
+            } catch (QueryParseException e) {
+                log.error("cannot parse following query: "+query);
+                return ModelFactory.createDefaultModel();
+            }
             RDFConnectionFuseki rvf = RDFConnectionFactory
                     .connectFuseki(fusekiUrl);
             // RDFConnection conn =
