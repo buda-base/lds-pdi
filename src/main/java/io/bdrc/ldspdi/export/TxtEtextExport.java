@@ -48,7 +48,9 @@ public class TxtEtextExport {
             // there is one solution that contains the access, etc. we put it first
             if (!a.contains("chunkstart")) return -1;
             if (!b.contains("chunkstart")) return 1;
-            return a.getLiteral("chunkstart").getString().compareTo(b.getLiteral("chunkstart").getString());
+            Integer ai = a.getLiteral("chunkstart").getInt();
+            Integer bi = a.getLiteral("chunkstart").getInt();
+            return ai.compareTo(bi);
         }
     }
 
