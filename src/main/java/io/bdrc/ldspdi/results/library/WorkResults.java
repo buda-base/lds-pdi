@@ -92,8 +92,14 @@ public class WorkResults {
             
             if (subjectIsMain) {
                 String prop = st.getPredicate().getURI();
+                
+                // F is for FEMC, temporarily I suppose
                 if (prop.equals(Taxonomy.WORK_GENRE)
-                        || prop.equals(Taxonomy.WORK_IS_ABOUT) && st.getObject().asResource().getLocalName().startsWith("T")) {
+                        || prop.equals(Taxonomy.WORK_IS_ABOUT)) {
+                    String lname = st.getObject().asResource().getLocalName();
+                    if (!lname.startsWith("T") && !lname.startsWith("F")) {
+                        continue;
+                    }
                     // check if work is released first: https://github.com/buda-base/lds-pdi/issues/221
                     if (!st.getSubject().hasProperty(tmpStatus, released)) {
                         continue;
@@ -108,8 +114,13 @@ public class WorkResults {
         }
         res.put("main", main);
         res.put("aux", aux);
-        facets.put("genres", genreTaxonomy.buildFacetTree(genreTops, genres));
-        facets.put("topics", topicTaxonomy.buildFacetTree(topicTops, topics));
+        final Map<String,Map<String, Object>> genreRes = new HashMap<>();
+        final Map<String,Map<String, Object>> topicRes = new HashMap<>();
+        genreTaxonomy.buildFacetTree(genreTops, genres, genreRes);
+        topicTaxonomy.buildFacetTree(topicTops, topics, topicRes);
+        femcTaxonomy.buildFacetTree(topicTops, topics, topicRes);
+        facets.put("topics", topicRes);
+        facets.put("genres", genreRes);
         if (log.isDebugEnabled())
             log.debug("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime() - start) / 1000);
         res.put("facets", facets);

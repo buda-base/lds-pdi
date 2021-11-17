@@ -119,10 +119,9 @@ public class Taxonomy {
         return root;
     }
     
-    public Map<String, Map<String, Object>> buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics) throws RestException {
-        final Map<String,Map<String, Object>> res = new HashMap<>();
+    public void buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics, final Map<String,Map<String, Object>> res) throws RestException {
         if (leafTopics.size() == 0) {
-            return res;
+            return;
         }
         long start = System.nanoTime();
         WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
@@ -154,8 +153,7 @@ public class Taxonomy {
             }
         }
         simplifySubnodes(res, ROOTURI);
-        WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
-        return res;
+        //WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
     }
     
     public static String simplifySubnodes (final Map<String, Map<String, Object>> res, final String key) {
