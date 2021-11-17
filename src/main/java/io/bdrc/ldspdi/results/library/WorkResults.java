@@ -34,6 +34,7 @@ public class WorkResults {
     
     public static Taxonomy genreTaxonomy = null;
     public static Taxonomy topicTaxonomy = null;
+    public static Taxonomy femcTaxonomy = null;
     
 
     public static void initForTests(Taxonomy genreTaxonomy2, Taxonomy topicTaxonomy2) {
@@ -44,6 +45,7 @@ public class WorkResults {
     public static void initForProd() {
         genreTaxonomy = new Taxonomy(Models.BDR+"O3JW5309");
         topicTaxonomy = new Taxonomy(Models.BDR+"O9TAXTBRC201605");
+        femcTaxonomy = new Taxonomy(Models.BDR+"FEMCScheme");
     }
 
     public static Map<String, Object> getResultsMap(Model mod) throws RestException {
@@ -97,7 +99,9 @@ public class WorkResults {
                     }
                     boolean handled = genreTaxonomy.processTopicStatement(st, genreTops, Wtopics, WorkBranch, genres, false);
                     if (!handled)
-                        topicTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
+                        handled = topicTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
+                    if (!handled)
+                        handled = femcTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
                 }
             }
         }
