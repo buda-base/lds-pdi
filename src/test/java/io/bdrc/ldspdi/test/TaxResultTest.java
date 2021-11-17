@@ -22,10 +22,13 @@ public class TaxResultTest {
     @BeforeClass
     public static void init() throws JsonParseException, JsonMappingException, IOException {
         final Model topicTaxModel = Utils.getModelFromFileName(Utils.TESTDIR + "O9TAXTBRC201605.ttl", Lang.TURTLE);
+        final Model femcTaxModel = Utils.getModelFromFileName(Utils.TESTDIR + "FEMCScheme.ttl", Lang.TURTLE);
         final Model genreTaxModel = Utils.getModelFromFileName(Utils.TESTDIR + "O3JW5309.ttl", Lang.TURTLE);
         final Taxonomy genreTaxonomy = new Taxonomy(Models.BDR+"O3JW5309", genreTaxModel);
         final Taxonomy topicTaxonomy = new Taxonomy(Models.BDR+"O9TAXTBRC201605", topicTaxModel);
-        WorkResults.initForTests(genreTaxonomy, topicTaxonomy);
+        final Taxonomy femcTaxonomy = new Taxonomy(Models.BDR+"FEMCScheme", femcTaxModel);
+        //WorkResults.initForTests(genreTaxonomy, topicTaxonomy);
+        WorkResults.initForTests(femcTaxonomy, femcTaxonomy);
     }
     
     @Test

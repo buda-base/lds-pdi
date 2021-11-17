@@ -1,0 +1,117 @@
+@prefix :      <http://purl.bdrc.io/ontology/core/> .
+@prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/> .
+@prefix bdan:  <http://purl.bdrc.io/annotation/> .
+@prefix bd:    <http://www.bigdata.com/rdf#> .
+@prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix tbr:   <http://purl.bdrc.io/ontology/toberemoved/> .
+@prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> .
+@prefix rsh:   <http://purl.bdrc.io/shacl/core/shape/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix admin: <http://webns.net/mvcb/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix bdac:  <http://purl.bdrc.io/anncollection/> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix oa:    <http://www.w3.org/ns/oa#> .
+@prefix dila:  <http://purl.dila.edu.tw/resource/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix tmp:   <http://purl.bdrc.io/ontology/tmp/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix text:  <http://jena.apache.org/text#> .
+@prefix bda:   <http://purl.bdrc.io/admindata/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix bdd:   <http://purl.bdrc.io/data/> .
+@prefix ad:    <http://schemas.talis.com/2005/address/schema#> .
+@prefix bdg:   <http://purl.bdrc.io/graph/> .
+@prefix f:     <java:io.bdrc.libraries.sparql.functions.> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix adm:   <http://purl.bdrc.io/ontology/admin/> .
+@prefix bdo:   <http://purl.bdrc.io/ontology/core/> .
+@prefix iiif2: <http://iiif.io/api/presentation/2#> .
+@prefix iiif3: <http://iiif.io/api/presentation/3#> .
+@prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> .
+@prefix viaf:  <http://viaf.org/viaf/> .
+@prefix bds:   <http://purl.bdrc.io/ontology/shapes/core/> .
+@prefix eftr:  <http://purl.84000.co/resource/core/> .
+@prefix bdr:   <http://purl.bdrc.io/resource/> .
+@prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> .
+@prefix as:    <http://www.w3.org/ns/activitystreams#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+bdr:FEMC_Scheme_IV_1  skos:prefLabel  "Biographies"@fr , "Biographies"@en , "jīv pravatti"@km-x-femc , "jīvapravatti"@km-x-bdrc .
+
+bdr:FEMC_Scheme_VI_5  skos:prefLabel  "Architectural manuals"@en , "saṅ' phdaḥ"@km-x-bdrc , "saṅ' phdaḥ"@km-x-femc .
+
+bdr:FEMC_Scheme_VII  skos:prefLabel  "Pali texts"@en , "Textes en Pāli"@fr , "pālī"@km-x-bdrc .
+
+bdr:FEMC_Scheme_III_6
+        skos:prefLabel  "Ānisaṅsa texts"@en , "ānisaṅsa"@km-x-femc .
+
+bdr:FEMC_Scheme_V  bdo:taxHasSubClass  bdr:FEMC_Scheme_V_1 , bdr:FEMC_Scheme_V_2 , bdr:FEMC_Scheme_V_3 ;
+        skos:prefLabel      "Textes traditionnels"@fr , "Traditional prose texts"@en .
+
+bdr:FEMC_Scheme_VI_4  skos:prefLabel  "Spell manuals"@en , "mant vijjā"@km-x-bdrc , "mant vijjā"@km-x-femc .
+
+bdr:FEMC_Scheme_VI  bdo:taxHasSubClass  bdr:FEMC_Scheme_VI_1 , bdr:FEMC_Scheme_VI_6 , bdr:FEMC_Scheme_VI_2 , bdr:FEMC_Scheme_VI_3 , bdr:FEMC_Scheme_VI_4 , bdr:FEMC_Scheme_VI_5 ;
+        skos:prefLabel      "Traditional prose manuals"@en .
+
+bdr:FEMC_Scheme_I  bdo:taxHasSubClass  bdr:FEMC_Scheme_I_3 , bdr:FEMC_Scheme_I_1 , bdr:FEMC_Scheme_I_2 ;
+        skos:prefLabel      "sāstrā Upades"@km-x-femc , "sāstrā 'upades"@km-x-bdrc , "សាស្ត្រាឧបទេស"@km , "Textes didactiques"@fr , "Didactic verse texts."@en .
+
+bdr:FEMC_Scheme_I_3  skos:prefLabel  "Buddhist poems"@en , "ល្បើកព្រះធម៌"@km , "lpök braḥ dhaŕm"@km-x-bdrc , "lpök braḥ dhaṛm"@km-x-femc , "Contes religieux"@fr .
+
+bdr:FEMC_Scheme_III_5
+        skos:prefLabel  "Jātaka texts"@en .
+
+bdr:FEMC_Scheme_VI_3  skos:prefLabel  "Yantra manuals"@en , "yănt"@km-x-femc , "yănt"@km-x-bdrc .
+
+bdr:FEMCScheme  bdo:taxHasSubClass  bdr:FEMC_Scheme_VIII , bdr:FEMC_Scheme_IV , bdr:FEMC_Scheme_I , bdr:FEMC_Scheme_VI , bdr:FEMC_Scheme_III , bdr:FEMC_Scheme_VII , bdr:FEMC_Scheme_II , bdr:FEMC_Scheme_V ;
+        skos:prefLabel      "FEMC Scheme"@en .
+
+bdr:FEMC_Scheme_IV  bdo:taxHasSubClass  bdr:FEMC_Scheme_IV_1 , bdr:FEMC_Scheme_IV_2 ;
+        skos:prefLabel      "Historical prose texts"@en , "Textes historiques"@fr .
+
+bdr:FEMC_Scheme_I_2  skos:prefLabel  "cpāp' subhāsit"@km-x-femc , "cpāp' subhāsit"@km-x-bdrc , "ច្បាប់សុភាសិត"@km , "Proverbes"@fr , "Proverbs"@en .
+
+bdr:FEMC_Scheme_III_4
+        skos:prefLabel  "Abhidhamma texts"@en , "abhidhamma"@km-x-femc .
+
+bdr:FEMC_Scheme_V_3  skos:prefLabel  "Meditation guides"@en , "Textes de méditation"@fr .
+
+bdr:FEMC_Scheme_VI_2  skos:prefLabel  "Medicinal manuals"@en , "thnāṃ"@km-x-bdrc , "thnāṃ"@km-x-femc .
+
+bdr:FEMC_Scheme_II  bdo:taxHasSubClass  bdr:FEMC_Scheme_II_1 , bdr:FEMC_Scheme_II_2 ;
+        skos:prefLabel      "sāstrā lpèṅ"@km-x-bdrc , "sāstrā lpèṅ"@km-x-femc , "Textes d'agrément"@fr , "Entertaining verse texts"@en , "សាស្ត្រាល្បែង"@km .
+
+bdr:FEMC_Scheme_I_1  skos:prefLabel  "ច្បាប់ទូន្មាន"@km , "cpāp' dūnmān"@km-x-bdrc , "cpāp' dūnmān"@km-x-femc , "Moral codes"@en , "Codes de conduite"@fr .
+
+bdr:FEMC_Scheme_III_3
+        skos:prefLabel  "Vinaya texts"@en , "vinaya"@km-x-femc .
+
+bdr:FEMC_Scheme_V_2  skos:prefLabel  "Legal codes"@en , "codes [juridiques] anciens"@fr .
+
+bdr:FEMC_Scheme_II_2  skos:prefLabel  "ល្បើកអប់រំ"@km , "Contes moraux"@fr , "lpök ap'raṃ"@km-x-bdrc , "lpök ap'raṃ"@km-x-femc , "Fables"@en .
+
+bdr:FEMC_Scheme_VI_1  skos:prefLabel  "Astrological manuals"@en , "Manuels d'astrologie et livres de prédiction"@fr , "horā"@km-x-femc , "horā"@km-x-bdrc .
+
+bdr:FEMC_Scheme_III_2
+        skos:prefLabel  "Sutta texts"@en , "sutta"@km-x-femc .
+
+bdr:FEMC_Scheme_V_1  skos:prefLabel  "Chronicles"@en , "Chroniques"@fr .
+
+bdr:FEMC_Scheme_II_1  skos:prefLabel  "Classical novels"@en , "pralom lok purāṇ"@km-x-bdrc , "pralom lok purāṇ"@km-x-femc , "Romans classiques"@fr , "ប្រលោមលោកបុរាណ"@km .
+
+bdr:FEMC_Scheme_IV_2  skos:prefLabel  "Chronicles"@en , "Chroniques"@fr .
+
+bdr:FEMC_Scheme_III  bdo:taxHasSubClass
+                bdr:FEMC_Scheme_III_6 , bdr:FEMC_Scheme_III_4 , bdr:FEMC_Scheme_III_5 , bdr:FEMC_Scheme_III_3 , bdr:FEMC_Scheme_III_2 , bdr:FEMC_Scheme_III_1 ;
+        skos:prefLabel      "Textes religieuxt"@fr , "Religious prose texts"@en , "sāstrā desan"@km-x-femc , "សាស្ត្រាទេសន៍"@km , "sāstrā desa(n)"@km-x-bdrc .
+
+bdr:FEMC_Scheme_VI_6  skos:prefLabel  "Ritual manuals"@en , "kpuon dhvö puṇy"@km-x-bdrc , "kpuon dhvö puṇy"@km-x-femc .
+
+bdr:FEMC_Scheme_III_1
+        skos:prefLabel  "Doctrinal texts"@en , "saddhamm"@km-x-femc .
+
+bdr:FEMC_Scheme_VIII  skos:prefLabel  "Divers"@fr , "Other"@en , "phseṅ phseṅ"@km-x-bdrc .

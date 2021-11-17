@@ -40,6 +40,7 @@ public class WorkResults {
     public static void initForTests(Taxonomy genreTaxonomy2, Taxonomy topicTaxonomy2) {
         genreTaxonomy = genreTaxonomy2;
         topicTaxonomy = topicTaxonomy2;
+        femcTaxonomy = topicTaxonomy2;
     }
     
     public static void initForProd() {
@@ -101,7 +102,7 @@ public class WorkResults {
                     if (!handled)
                         handled = topicTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
                     if (!handled)
-                        handled = femcTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
+                        femcTaxonomy.processTopicStatement(st, topicTops, Wtopics, WorkBranch, topics, true);
                 }
             }
         }

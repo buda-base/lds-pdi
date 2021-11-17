@@ -16,7 +16,7 @@ bdr:W1KG1795  a             bdo:SerialInstance , bdo:Instance ;
         tmp:instanceIsOpen  false ;
         skos:prefLabel      "spyod 'jug gi 'grel pa legs par bshad pa'i rgya mtsho/"@bo-x-ewts .
 
-bdr:WA1KG3818  bdo:workGenre  bdr:T89 , bdr:T304 ;
+bdr:WA1KG3818  bdo:workGenre  bdr:T89 , bdr:T304 , bdr:FEMC_Scheme_III_1 ;
         bdo:workHasInstance  bdr:W1KG3818 ;
         bdo:workIsAbout      bdr:W19740 ;
         tmp:isMain           true ;
