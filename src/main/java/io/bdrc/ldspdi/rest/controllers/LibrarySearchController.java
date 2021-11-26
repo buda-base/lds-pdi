@@ -83,6 +83,7 @@ public class LibrarySearchController {
             res = WorkResults.getResultsMap(model);
             break;
         case "workInstancesGraph":
+        case "instanceReproductionsGraph":
         case "personsCreatedIn":
         case "placesCreatedIn":
         case "personGraph":
