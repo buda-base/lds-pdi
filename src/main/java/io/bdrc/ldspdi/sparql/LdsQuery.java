@@ -235,12 +235,12 @@ public class LdsQuery {
                 q.setLimit(limit_max);
             }
         }
-
-        if (q.toString().startsWith(QueryConstants.QUERY_ERROR)) {
+        final String res = q.toString();
+        if (res.startsWith(QueryConstants.QUERY_ERROR)) {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR).setContext(
                     " in LdsQuery.getParametizedQuery() template ->" + getQueryName() + ".arq" + "; ERROR: " + query));
         }
-        return q.toString();
+        return res;
     }
 
     public String checkQueryArgsSyntax(Map<String, String> map) {
@@ -417,13 +417,15 @@ public class LdsQuery {
         try {
             ServiceConfig.init();
             HashMap<String, String> map = new HashMap<>();
-            LdsQuery lds = new LdsQuery("lds-queries/public/latestsyncssince.arq");
+            LdsQuery lds = new LdsQuery("src/test/resources/arq/public/optional_complex.arq");
             // LdsQueryNew lds = new
             // LdsQueryNew("lds-queries/public/Etexts_count.arq");
             // LdsQuery lds = new LdsQuery("lds-queries/public/Etext_base.arq");
             // map.put("R_RES", "bdr:UT4CZ5369_I1KG9127_0000");
             // map.put("L_LNG", "en");
-            map.put("D_SINCE", "08-09-2020");
+            map.put("R_COLLECTION", "bdr:PR1");
+            map.put("B_RIC", "true");
+            map.put("B_COMPLETE", "false");
             // map.put("D_TIME1", "2012-01-31 23:59:59");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");

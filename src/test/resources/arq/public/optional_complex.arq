@@ -1,0 +1,25 @@
+#QueryScope=Etexts
+#QueryReturnType=Table
+#QueryResults=etext chunks containing the given expression (only in open access instances with no geoblocking)
+#QueryUrl=/Etexts_chunks?L_NAME=("མཁན་ཆེན་" AND ("འོད་ཟེར་" OR "ཡེ་ཤེས་"))&LG_NAME=bo&LI_NAME=45
+#QueryParams=R_COLLECTION,B_RIC
+#QueryOptParams=B_COMPLETE,R_LANG
+
+#output.?c.type=int
+#output.?txt.desc=count of instances
+
+#param.R_COLLECTION.type=uri
+#param.B_COMPLETE.type=boolean
+#param.B_RIC.type=boolean
+#param.R_LANG.type=uri
+
+select (count (distinct ?res) as ?c)
+WHERE 
+{
+    ?w :inCollection ?R_COLLECTION .
+    ?w :instanceReproductionOf ?res .
+
+    FILTER(!?R_LANG_bound || EXISTS{?res :instanceOf ?wa . ?wa ?wap ?R_LANG})
+    FILTER(!?B_COMPLETE_bound || EXISTS{?res :instanceOf ?wa . ?wa bdo:language ?B_COMPLETE})
+    FILTER ((!?B_RIC) || NOT EXISTS { ?adm adm:restrictedInChina true. })
+}
