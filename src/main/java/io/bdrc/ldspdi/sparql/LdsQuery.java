@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.objects.json.BooleanParam;
 import io.bdrc.ldspdi.objects.json.DateTimeParam;
 import io.bdrc.ldspdi.objects.json.GYearParam;
 import io.bdrc.ldspdi.objects.json.IntParam;
@@ -101,6 +102,7 @@ public class LdsQuery {
             }
             brd.close();
             queryHtml = queryHtml.substring(15);
+            //log.error(queryData.toString());
             String customLimit = queryData.get(QueryConstants.QUERY_LIMIT);
             if (customLimit != null) {
                 this.limit_max = Long.parseLong(customLimit);
@@ -134,6 +136,11 @@ public class LdsQuery {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (converted.get(st) != null) {
                     queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
+                }
+            }
+            if (st.startsWith(QueryConstants.BOOLEAN_ARGS_PARAMPREFIX)) {
+                if (converted.get(st) != null) {
+                    queryStr.setLiteral(st, Boolean.parseBoolean(converted.get(st)));
                 }
             }
             if (st.startsWith(QueryConstants.DATE_ARGS_PARAMPREFIX)) {
@@ -326,6 +333,11 @@ public class LdsQuery {
                         IntParam intp = new IntParam(s);
                         intp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
                         p.add(intp);
+                        break;
+                    case QueryConstants.BOOLEAN_PARAM :
+                        BooleanParam boolp = new BooleanParam(s);
+                        boolp.setDescription(paramsData.get(prefix + s + "." + QueryConstants.PARAM_DESC));
+                        p.add(boolp);
                         break;
                     case QueryConstants.RES_PARAM :
                         ResParam rtp = new ResParam(s, paramsData.get(prefix + s + "." + QueryConstants.PARAM_SUBTYPE));

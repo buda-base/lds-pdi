@@ -77,6 +77,7 @@ public class QueryConstants {
 
     // Query Params prefixes
     public final static String INT_ARGS_PARAMPREFIX = "I_";
+    public final static String BOOLEAN_ARGS_PARAMPREFIX = "B_";
     public final static String DATE_ARGS_PARAMPREFIX = "D_";
     public final static String DATETIME_ARGS_PARAMPREFIX = "DT_";
     public final static String GY_ARGS_PARAMPREFIX = "GY_";
@@ -87,6 +88,7 @@ public class QueryConstants {
 
     // Query Params types
     public static final String INT_PARAM = "int";
+    public static final String BOOLEAN_PARAM = "boolean";
     public static final String GY_PARAM = "gYear";
     public static final String RES_PARAM = "resource";
     public static final String RES_PARAM_URI = "URI";
