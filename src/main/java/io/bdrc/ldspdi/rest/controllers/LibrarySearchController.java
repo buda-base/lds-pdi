@@ -34,6 +34,7 @@ import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
+import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.GeoLocation;
 import io.bdrc.ldspdi.utils.Helpers;
@@ -55,6 +56,9 @@ public class LibrarySearchController {
         log.info("Call to getLibGraphGet() with template name >> " + file);
         HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
+        if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+            map.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+        }
         final String query = qfp.getParametizedQuery(map, true);
         log.debug("Call to getLibGraphGet() with query >> " + query);
         final Model model = QueryProcessor.getGraph(query, fusekiUrl, null);

@@ -35,6 +35,7 @@ public class QueryConstants {
     public final static String QUERY_TYPE = "queryType";
     public final static String LIMIT = "limit";
     public final static String QUERY_LIMIT = "QueryLimit";
+    public final static String RIC = "B_RIC";
     public final static String QUERY_TIMEOUT = "timeout";
 
     // ****** URL QUERY TEMPLATE****************/

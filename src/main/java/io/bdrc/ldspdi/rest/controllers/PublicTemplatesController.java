@@ -65,6 +65,7 @@ import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryConstants;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.ldspdi.utils.GeoLocation;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
 import io.bdrc.libraries.GlobalHelpers;
@@ -107,6 +108,9 @@ public class PublicTemplatesController {
                 } catch (Exception e) {
                     throw new RestException(500, LdsError.UNKNOWN_ERR, e.getMessage());
                 }
+            }
+            if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+                hm.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
             }
             final String query = qfp.getParametizedQuery(hm, true);
             log.debug("Parametized Query >> : {}", query);
@@ -176,6 +180,9 @@ public class PublicTemplatesController {
 
             }
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
+            if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+                map.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+            }
             final String query = qfp.getParametizedQuery(map, true);
             if (query.startsWith(QueryConstants.QUERY_ERROR)) {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream(query));
@@ -232,6 +239,9 @@ public class PublicTemplatesController {
             HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
+            if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+                hm.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+            }
             final String query = qfp.getParametizedQuery(hm, true);
             log.debug("getGraphTemplateResults() Parametized query {}", query);
             // format is prevalent
@@ -286,6 +296,9 @@ public class PublicTemplatesController {
             }
             // process
             final LdsQuery qfp = LdsQueryService.get(file + ".arq");
+            if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+                map.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+            }
             final String query = qfp.getParametizedQuery(map, true);
             // format is prevalent
             mediaType = BudaMediaTypes.getMimeFromExtension(accept);

@@ -275,7 +275,7 @@ public class LdsQuery {
         return "";
     }
 
-    private List<String> getRequiredParams() {
+    public List<String> getRequiredParams() {
         if (requiredParams == null) {
             String s = queryData.get("QueryParams");
             if (s != null && !s.equalsIgnoreCase("NONE")) {
