@@ -23,7 +23,11 @@ public class GeoLocation {
     private static final String CHINA = "China";
     public static final String HEADER_NAME = "X-Real-IP";
     private static final Logger log = LoggerFactory.getLogger(GeoLocation.class);
-    private static DatabaseReader dbReader = getDbReader();
+    private static DatabaseReader dbReader;
+    
+    static {
+        dbReader = getDbReader();
+    }
 
     public static DatabaseReader getDbReader() {
         try {
