@@ -14,6 +14,7 @@ import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CountryResponse;
 
 import io.bdrc.auth.AuthProps;
+import io.bdrc.ldspdi.service.ServiceConfig;
 
 public class GeoLocation {
 
@@ -46,12 +47,14 @@ public class GeoLocation {
     }
 
     public static boolean isFromChina(final String addr) {
+        if (ServiceConfig.isInChina()) return true;
         final String country = GeoLocation.getCountryName(addr);
         log.debug("For address {}, country is {}", addr, country);
         return (country == null || CHINA.equalsIgnoreCase(country));
     }
 
     public static boolean isFromChina(HttpServletRequest request) {
+        if (ServiceConfig.isInChina()) return true;
         final String addr = request.getHeader(HEADER_NAME);
         return isFromChina(addr);
     }
