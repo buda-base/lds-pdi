@@ -131,27 +131,29 @@ public class LdsQuery {
         }
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query,
                 ServiceConfig.PREFIX.getPrefixMapping());
-
-        for (String st : getAllParams()) {
+        for (final String opt : getOptionalParams()) {
+            queryStr.setLiteral(opt+"_bound", converted.get(opt) != null);
+        }
+        for (final String st : getAllParams()) {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null) {
+                if (converted.get(st) != null)
                     queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
-                }
+                continue;
             }
             if (st.startsWith(QueryConstants.BOOLEAN_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null) {
+                if (converted.get(st) != null)
                     queryStr.setLiteral(st, Boolean.parseBoolean(converted.get(st)));
-                }
+                continue;
             }
             if (st.startsWith(QueryConstants.DATE_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null) {
+                if (converted.get(st) != null)
                     queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDdateTime);
-                }
+                continue;
             }
             if (st.startsWith(QueryConstants.GY_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null) {
+                if (converted.get(st) != null)
                     queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDgYear);
-                }
+                continue;
             }
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
                 String param = converted.get(st);
@@ -182,7 +184,7 @@ public class LdsQuery {
                                         + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
                     }
                 }
-
+                continue;
             }
             if (st.startsWith(QueryConstants.LITERAL_ARGS_PARAMPREFIX)) {
                 String lim = converted.get(QueryConstants.LITERAL_LIMITPREFIX + st.substring(st.indexOf('_') + 1));
