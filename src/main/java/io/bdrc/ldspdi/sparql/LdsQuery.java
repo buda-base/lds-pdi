@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.List;
@@ -12,9 +13,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,6 +125,34 @@ public class LdsQuery {
             }
         }
     }
+    
+    public String qNameToURI(final String param) throws RestException {
+        if (param.contains(":")) {
+            if (Helpers.isValidURI(param)) {
+                return param;
+            } else {
+                String[] parts = param.split(Pattern.compile(":").toString());
+                if (parts[0] == null) {
+                    parts[0] = "";
+                }
+                // may be done automatically by
+                // parametrizedSparqlString, to be checked
+                final String fullUri = ServiceConfig.PREFIX.getFullIRI(parts[0]);
+                if (fullUri != null) {
+                    return fullUri + parts[1];
+                } else {
+                    throw new RestException(500,
+                            new LdsError(LdsError.PARSE_ERR).setContext(
+                                    " in QueryFileParser.getParametizedQuery() ParameterException :" + param
+                                            + " Unknown prefix"));
+                }
+            }
+        } else {
+            throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
+                    .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
+                            + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
+        }
+    }
 
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
         String error = checkQueryArgsSyntax(converted);
@@ -132,57 +167,53 @@ public class LdsQuery {
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString(query,
                 ServiceConfig.PREFIX.getPrefixMapping());
         for (final String opt : getOptionalParams()) {
-            queryStr.setLiteral(opt+"_bound", converted.get(opt) != null);
+            queryStr.setLiteral(opt+QueryConstants.BOUND_ARGS_PARAMSUFFIX, converted.get(opt) != null);
         }
         for (final String st : getAllParams()) {
+            if (converted.get(st) == null)
+                continue;
+            final boolean listMode = st.endsWith(QueryConstants.LIST_ARGS_PARAMSUFFIX);
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null)
-                    queryStr.setLiteral(st, Integer.parseInt(converted.get(st)));
+                if (listMode) {
+                    List<Literal> l = new ArrayList<>();
+                    for (final String v : converted.get(st).split("\\|")) {
+                        l.add(ResourceFactory.createTypedLiteral(v, XSDDatatype.XSDinteger));
+                    }
+                    queryStr.setValues(st, l);
+                } else {
+                    queryStr.setLiteral(st, converted.get(st), XSDDatatype.XSDinteger);
+                }
                 continue;
             }
             if (st.startsWith(QueryConstants.BOOLEAN_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null)
+                if (listMode) {
+                    List<Literal> l = new ArrayList<>();
+                    for (final String v : converted.get(st).split("\\|")) {
+                        l.add(ResourceFactory.createTypedLiteral(Boolean.parseBoolean(v)));
+                    }
+                    queryStr.setValues(st, l);
+                } else {
                     queryStr.setLiteral(st, Boolean.parseBoolean(converted.get(st)));
+                }
                 continue;
             }
             if (st.startsWith(QueryConstants.DATE_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null)
-                    queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDdateTime);
+                queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDdateTime);
                 continue;
             }
             if (st.startsWith(QueryConstants.GY_ARGS_PARAMPREFIX)) {
-                if (converted.get(st) != null)
-                    queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDgYear);
+                queryStr.setLiteral(st, converted.get(st), XSDDateTimeType.XSDgYear);
                 continue;
             }
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
-                String param = converted.get(st);
-                if (param != null) {
-                    if (param.contains(":")) {
-                        if (Helpers.isValidURI(param)) {
-                            queryStr.setIri(st, param);
-                        } else {
-                            String[] parts = param.split(Pattern.compile(":").toString());
-                            if (parts[0] == null) {
-                                parts[0] = "";
-                            }
-                            // may be done automatically by
-                            // parametrizedSparqlString, to be checked
-                            final String fullUri = ServiceConfig.PREFIX.getFullIRI(parts[0]);
-                            if (fullUri != null) {
-                                queryStr.setIri(st, fullUri + parts[1]);
-                            } else {
-                                throw new RestException(500,
-                                        new LdsError(LdsError.PARSE_ERR).setContext(
-                                                " in QueryFileParser.getParametizedQuery() ParameterException :" + param
-                                                        + " Unknown prefix"));
-                            }
-                        }
-                    } else {
-                        throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
-                                .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
-                                        + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
+                if (listMode) {
+                    List<Resource> l = new ArrayList<>();
+                    for (final String v : converted.get(st).split("\\|")) {
+                        l.add(ResourceFactory.createResource(qNameToURI(v)));
                     }
+                    queryStr.setValues(st, l);
+                } else {
+                    queryStr.setIri(st, qNameToURI(converted.get(st)));
                 }
                 continue;
             }
@@ -224,7 +255,7 @@ public class LdsQuery {
         } catch (Exception e) {
             throw new RestException(500,
                     new LdsError(LdsError.PARSE_ERR).setContext(" in LdsQuery.getParametizedQuery() template ->"
-                            + getQueryName() + ".arq" + "; ERROR: " + queryStr.toString()));
+                            + getQueryName() + ".arq" + "; ERROR: " + e.getMessage() + "; query : "+queryStr.toString()));
         }
         if (!queryData.get(QueryConstants.QUERY_RETURN_TYPE).equals(QueryConstants.GRAPH)) {
             if (q.hasLimit()) {
@@ -426,6 +457,7 @@ public class LdsQuery {
             map.put("R_COLLECTION", "bdr:PR1");
             map.put("B_RIC", "true");
             map.put("B_COMPLETE", "false");
+            map.put("R_LANG_LIST", "bdr:l1|bdr:l2");
             // map.put("D_TIME1", "2012-01-31 23:59:59");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
