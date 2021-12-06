@@ -412,7 +412,7 @@ public class OntData {
     };
 
     public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
-        OntModel om = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/admin");
+        OntModel om = OntData.getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/admin"));
         return om.listAnnotationProperties().toList();
     }
 

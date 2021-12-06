@@ -206,13 +206,13 @@ public class QueryProcessor {
                     "updateOntology() was called with null model or null graph");
             return false;
         }
-        log.info(
+        log.error(
                 "Service fuseki for caller >> {} and {} Graph >> {} and InfModel Size >> {}",
                 caller, fusekiUrl, graph, mod.listStatements().toSet().size());
         RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
         rvf.put(graph, mod);
         rvf.close();
-        log.info(
+        log.error(
                 "updateOntology() is done updating for caller >> {} and {} Graph >> {} and InfModel Size >> {}",
                 caller, fusekiUrl, graph, mod.listStatements().toSet().size());
         return true;
