@@ -112,7 +112,7 @@ public class PublicDataController {
     public void getHomePage(HttpServletResponse response) throws RestException, IOException {
         log.info("Call to getHomePage()");
         Helpers.setCacheControl(response, "public");
-        response.sendRedirect("/index");
+        response.sendRedirect("index");
     }
 
     @GetMapping(value = "index", produces = MediaType.TEXT_HTML_VALUE)
