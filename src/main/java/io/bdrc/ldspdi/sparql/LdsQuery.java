@@ -153,6 +153,8 @@ public class LdsQuery {
                             + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
         }
     }
+    
+    public final List<Resource> nulllist = Arrays.asList(ResourceFactory.createResource("http://null.null/none"));
 
     public String getParametizedQuery(Map<String, String> converted, boolean limit) throws RestException {
         String error = checkQueryArgsSyntax(converted);
@@ -170,9 +172,12 @@ public class LdsQuery {
             queryStr.setLiteral(opt+QueryConstants.BOUND_ARGS_PARAMSUFFIX, converted.get(opt) != null);
         }
         for (final String st : getAllParams()) {
-            if (converted.get(st) == null)
-                continue;
             final boolean listMode = st.endsWith(QueryConstants.LIST_ARGS_PARAMSUFFIX);
+            if (converted.get(st) == null) {
+                if (listMode)
+                    queryStr.setValues(st, nulllist);
+                continue;
+            }
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (listMode) {
                     List<Literal> l = new ArrayList<>();
