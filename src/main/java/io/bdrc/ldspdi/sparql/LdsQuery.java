@@ -181,7 +181,7 @@ public class LdsQuery {
             if (st.startsWith(QueryConstants.INT_ARGS_PARAMPREFIX)) {
                 if (listMode) {
                     List<Literal> l = new ArrayList<>();
-                    for (final String v : converted.get(st).split("\\|")) {
+                    for (final String v : converted.get(st).split(",")) {
                         l.add(ResourceFactory.createTypedLiteral(v, XSDDatatype.XSDinteger));
                     }
                     queryStr.setValues(st, l);
@@ -193,7 +193,7 @@ public class LdsQuery {
             if (st.startsWith(QueryConstants.BOOLEAN_ARGS_PARAMPREFIX)) {
                 if (listMode) {
                     List<Literal> l = new ArrayList<>();
-                    for (final String v : converted.get(st).split("\\|")) {
+                    for (final String v : converted.get(st).split(",")) {
                         l.add(ResourceFactory.createTypedLiteral(Boolean.parseBoolean(v)));
                     }
                     queryStr.setValues(st, l);
@@ -213,7 +213,7 @@ public class LdsQuery {
             if (st.startsWith(QueryConstants.RES_ARGS_PARAMPREFIX)) {
                 if (listMode) {
                     List<Resource> l = new ArrayList<>();
-                    for (final String v : converted.get(st).split("\\|")) {
+                    for (final String v : converted.get(st).split(",")) {
                         l.add(ResourceFactory.createResource(qNameToURI(v)));
                     }
                     queryStr.setValues(st, l);
@@ -462,7 +462,7 @@ public class LdsQuery {
             map.put("R_COLLECTION", "bdr:PR1");
             map.put("B_RIC", "true");
             map.put("B_COMPLETE", "false");
-            map.put("R_LANG_LIST", "bdr:l1|bdr:l2");
+            map.put("R_LANG_LIST", "bdr:l1,bdr:l2");
             // map.put("D_TIME1", "2012-01-31 23:59:59");
             // map.put("L_l", "\"མིག་གི་ཡུལ\"");
             // map.put("LG_l", "bo");
