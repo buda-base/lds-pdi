@@ -76,7 +76,8 @@ public class OntData {
     static List<AnnotationProperty> adminAnnotProps;
     private String payload;
     private static String commitId;
-
+    private static String fusekidataUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data"; 
+    
     public OntData(String payload, String commit) {
         this.payload = payload;
         commitId = commit;
@@ -102,7 +103,7 @@ public class OntData {
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
                 String uri = it.next();
-                log.info("OntManagerDoc : {}", uri);
+                log.error("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 String tmp = uri.substring(0, uri.length() - 1);
                 File directory = new File("ontologies/");
@@ -172,24 +173,23 @@ public class OntData {
 
     private static void updateFusekiDataset() throws RestException {
         OntPolicies.init();
-        log.info("FUSEKI URL IS >>" + fusekiUrl);
-        log.info("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
-                parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/"));
-        log.info("updateFusekiDataset() is ontAllModByBaseNull {}",
-                (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")) == null));
-        log.info("updateFusekiDataset() is ontAllMod by base graph uri {}",
-                (OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph()));
+        log.error("FUSEKI URL IS >>" + fusekidataUrl);
+        log.error("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
+                parseBaseUri("http://purl.bdrc.io/ontology/core/"));
+        log.error("updateFusekiDataset() is ontAllModByBaseNull {}",
+                (OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")) == null));
+        log.error("updateFusekiDataset() is ontAllMod by base graph uri {}",
+                (OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph()));
         String rule = "[inverseOf1: (?P owl:inverseOf ?Q) -> (?Q owl:inverseOf ?P) ]";
         List<Rule> miniRules = Rule.parseRules(rule);
         Reasoner reasoner = new GenericRuleReasoner(miniRules);
         reasoner.setParameter(ReasonerVocabulary.PROPruleMode, "forward");
         InfModel core = ModelFactory.createInfModel(reasoner, ontAllMod);
-        QueryProcessor.updateOntology(core, fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/core/")).getGraph(), "update 1");
-        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth")),
-                fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data",
-                OntPolicies.getOntologyByBase(parseBaseUri("http://" + ServiceConfig.SERVER_ROOT + "/ontology/ext/auth/")).getGraph(), "update 2");
-
+        QueryProcessor.updateOntology(core, fusekidataUrl,
+                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph(), "update 1");
+        QueryProcessor.updateOntology(getOntModelByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth")),
+                fusekidataUrl,
+                OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/ext/auth/")).getGraph(), "update 2");
     }
 
     public static OWLPropsCharacteristics getOwlCharacteristics() throws IOException, RestException {
@@ -412,7 +412,7 @@ public class OntData {
     };
 
     public static List<AnnotationProperty> getAdminAnnotProps() throws RestException {
-        OntModel om = OntData.getOntModelByBase("http://" + ServiceConfig.SERVER_ROOT + "/ontology/admin");
+        OntModel om = OntData.getOntModelByBase("http://purl.bdrc.io/ontology/admin");
         return om.listAnnotationProperties().toList();
     }
 
