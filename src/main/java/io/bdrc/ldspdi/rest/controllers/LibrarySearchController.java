@@ -84,6 +84,8 @@ public class LibrarySearchController {
         case "instancesCreatedIn":
         case "worksCreatedIn":
         case "worksInCollection":
+        case "instancesInCollection":
+        case "instancesInCollectionWithProperties":
             res = WorkResults.getResultsMap(model);
             break;
         case "workInstancesGraph":
