@@ -1,6 +1,7 @@
 package io.bdrc.taxonomy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -170,7 +171,13 @@ public class Taxonomy {
             final String currentSubclass = subnodes.iterator().next();
             final String newSubclass = simplifySubnodes(res, currentSubclass, false);
             if (root) {
-                node.put("subclasses", res.get(newSubclass).get("subclasses"));
+                @SuppressWarnings("unchecked")
+                Set<String> newSubclasses = (Set<String>) res.get(newSubclass).get("subclasses");
+                if (newSubclasses == null) {
+                    node.put("subclasses", Arrays.asList(newSubclass));
+                } else {
+                    node.put("subclasses", newSubclasses);
+                }
                 res.remove(currentSubclass);
                 return key;
             } else {
