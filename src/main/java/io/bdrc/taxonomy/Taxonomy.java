@@ -152,11 +152,11 @@ public class Taxonomy {
                 previous = nodeUri;
             }
         }
-        simplifySubnodes(res, ROOTURI);
+        simplifySubnodes(res, ROOTURI, true);
         //WorkResults.log.error("WorkResults.getResultMap(), checkpoint3: {}", (System.nanoTime()-start)/1000);
     }
     
-    public static String simplifySubnodes (final Map<String, Map<String, Object>> res, final String key) {
+    public static String simplifySubnodes (final Map<String, Map<String, Object>> res, final String key, final boolean root) {
         // simplifies the subnodes and returns the URI that should be substituted for this one, or null if it's fine
         // see https://github.com/buda-base/lds-pdi/issues/220
         final Map<String, Object> node = res.get(key);
@@ -168,13 +168,19 @@ public class Taxonomy {
             return key;
         if (subnodes.size() == 1) {
             final String currentSubclass = subnodes.iterator().next();
-            final String newSubclass = simplifySubnodes(res, currentSubclass);
-            res.remove(key);
-            return newSubclass;
+            final String newSubclass = simplifySubnodes(res, currentSubclass, false);
+            if (root) {
+                node.put("subclasses", res.get(newSubclass).get("subclasses"));
+                res.remove(currentSubclass);
+                return key;
+            } else {
+                res.remove(key);
+                return newSubclass;
+            }
         }
         Set<String> newSubclasses = new HashSet<>();
         for (final String subclass : subnodes) {
-            newSubclasses.add(simplifySubnodes(res, subclass));
+            newSubclasses.add(simplifySubnodes(res, subclass, false));
         }
         node.put("subclasses", newSubclasses);
         return key;
