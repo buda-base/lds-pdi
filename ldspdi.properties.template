@@ -24,8 +24,8 @@ showUrl=https://library.bdrc.io/show/
 
 # change this to the query url of your triple store dataset endpoint
 fusekiUrl=http://localhost:13180/fuseki/corerw/query
-
-fusekiAuthData=http://buda1.bdrc.io:13180/fuseki/authrw/
+fusekiAuthUrl=http://localhost:13180/fuseki/authrw/
+fusekiAuthData=http://localhost:13180/fuseki/authrw/
 
 #activate/desactivate auth0
 useAuth=false
@@ -58,10 +58,6 @@ endpoints.admindata.fullprefix = http://purl.bdrc.io/admindata/
 
 
 #### SPARQL Templates ######
-
-# SPARQL queries templates git repository, no need to change in a BUDA environment.
-
-git_remote_url=https://github.com/buda-base/lds-queries.git
 
 # Sparql result set max size
 limit=500
@@ -136,4 +132,12 @@ authUpdatePath=http://purl.bdrc.io/authmodel/updated
 # the custom auth policies definition
 policiesUrl=https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl
 
+# SPARQL queries templates git repository, no need to change in a BUDA environment.
+
+git_remote_url=https://github.com/buda-base/lds-queries.git
 queryPath=local-queries
+
+git_shapes_remote_url=https://github.com/buda-base/editor-templates.git 
+git_ontologies_remote_url=https://github.com/buda-base/owl-schema.git
+
+
