@@ -171,6 +171,9 @@ public class MarcExport {
     static final DataField f338 = factory.newDataField("338", ' ', ' ');
     static final DataField f533 = factory.newDataField("533", ' ', ' ');
     static final DataField f710_2 = factory.newDataField("710", '2', ' ');
+    // this is the identifier used by Harvard for BDRC, it hasn't been used by Columbia
+    // see https://github.com/buda-base/lds-pdi/issues/227
+    static final ControlField f003 = factory.newControlField("003", "MaCbBDRC");
 
     static final DataField f506_restricted = factory.newDataField("506", '1', ' ');
     static final DataField f506_open = factory.newDataField("506", '0', ' ');
@@ -1182,9 +1185,10 @@ public class MarcExport {
     public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean scansMode, final boolean limitSize) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
-        record.addVariableField(factory.newControlField("001", "(BDRC)bdr:" + originalR.getLocalName()));
-        // maybe something like that could work?
-        // record.addVariableField(factory.newControlField("003", "BDRC"));
+        // Columbia originally asked us to prefix the ID with "(BDRC)", but Harvard specifically asked
+        // us not to do that, especially since they introduced the 003 control field
+        record.addVariableField(factory.newControlField("001", "bdr:" + originalR.getLocalName()));
+        record.addVariableField(f003);
         final LocalDateTime now = LocalDateTime.now();
         // record.addVariableField(factory.newControlField("005", now.format(f005_f)));
         record.addVariableField(f006);
@@ -1194,8 +1198,7 @@ public class MarcExport {
         String langMarcCode = null;
         // request from Columbia, when we have multiple languages recorded, we should
         // indicate Tibetan as the main language (since we cannot check every occurence
-        // of multiple
-        // languages).
+        // of multiple languages).
         // we first reorganize langUrls so that it contains Tibetan first in this case:
         String mainLangUrl = null;
         if (langUrls.size() == 1) {
@@ -1225,14 +1228,16 @@ public class MarcExport {
         }
         add008(m, workR, record, langMarcCode, now);
         addIsbn(m, workR, record, scansMode); // 020
-        final DataField f035 = factory.newDataField("035", ' ', ' ');
-        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + originalR.getLocalName()));
-        record.addVariableField(f035);
-        if (scansMode) {
-            DataField f035_2 = factory.newDataField("035", ' ', ' ');
-            f035_2.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + workR.getLocalName()));
-            record.addVariableField(f035_2);
-        }
+        // Colubia asked us to add a 035 field, but Harvard asked us to remove it
+        // since it can be derived from 001 + 003
+//        final DataField f035 = factory.newDataField("035", ' ', ' ');
+//        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + originalR.getLocalName()));
+//        record.addVariableField(f035);
+//        if (scansMode) {
+//            DataField f035_2 = factory.newDataField("035", ' ', ' ');
+//            f035_2.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + workR.getLocalName()));
+//            record.addVariableField(f035_2);
+//        }
         record.addVariableField(f040);
         add041(m, record, langUrls, langMarcCode);
         List<String> lcCallNumberList = getId(m, workR, m.getResource(BF+"ShelfMarkLcc"));
