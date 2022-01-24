@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -965,6 +966,8 @@ public class MarcExport {
         return res;
     }
 
+    private static final Pattern noScript = Pattern.compile(" script$", Pattern.CASE_INSENSITIVE);
+    
     private static void addLanguages(final Model m, final Resource main, final Record record) {
         final StringBuilder sb = new StringBuilder();
         int nbLangs = 0;
@@ -1000,6 +1003,7 @@ public class MarcExport {
         final DataField f546 = factory.newDataField("546", ' ', ' ');
         if (nbLangs == 1 && firstScriptLabel != null) {
             f546.addSubfield(factory.newSubfield('a', sb.toString() + ';'));
+            firstScriptLabel = noScript.matcher(firstScriptLabel).replaceAll("");
             f546.addSubfield(factory.newSubfield('b', firstScriptLabel + " script."));
         } else {
             sb.append('.');
