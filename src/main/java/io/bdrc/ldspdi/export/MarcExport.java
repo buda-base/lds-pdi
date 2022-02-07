@@ -108,7 +108,7 @@ public class MarcExport {
     public static final Property partTreeIndex = ResourceFactory.createProperty(BDO + "partTreeIndex");
     public static final Property hasInstance = ResourceFactory.createProperty(BDO + "workHasInstance");
     public static final Property editionStatement = ResourceFactory.createProperty(BDO + "editionStatement");
-    public static final Property extentStatement = ResourceFactory.createProperty(BDO + "instanceExtentStatement");
+    public static final Property extentStatement = ResourceFactory.createProperty(BDO + "extentStatement");
     public static final Property publisherName = ResourceFactory.createProperty(BDO + "publisherName");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO + "publisherLocation");
     public static final Property authorshipStatement = ResourceFactory.createProperty(BDO + "authorshipStatement");
