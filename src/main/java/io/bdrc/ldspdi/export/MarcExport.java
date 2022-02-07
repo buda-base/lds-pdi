@@ -320,7 +320,7 @@ public class MarcExport {
                 r.addVariableField(df);
             } else {
                 // changed by Harvard, Columbia made us put the ISBN in 020$z in that case
-                final DataField df = factory.newDataField("760", '0', ' ');
+                final DataField df = factory.newDataField("776", '0', ' ');
                 df.addSubfield(factory.newSubfield('c', "Original"));
                 df.addSubfield(factory.newSubfield('z', isbn));
                 r.addVariableField(df);
