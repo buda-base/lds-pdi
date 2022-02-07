@@ -108,7 +108,7 @@ public class MarcExport {
     public static final Property partTreeIndex = ResourceFactory.createProperty(BDO + "partTreeIndex");
     public static final Property hasInstance = ResourceFactory.createProperty(BDO + "workHasInstance");
     public static final Property editionStatement = ResourceFactory.createProperty(BDO + "editionStatement");
-    public static final Property extentStatement = ResourceFactory.createProperty(BDO + "extentStatement");
+    public static final Property extentStatement = ResourceFactory.createProperty(BDO + "instanceExtentStatement");
     public static final Property publisherName = ResourceFactory.createProperty(BDO + "publisherName");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO + "publisherLocation");
     public static final Property authorshipStatement = ResourceFactory.createProperty(BDO + "authorshipStatement");
@@ -310,13 +310,21 @@ public class MarcExport {
         final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
         for (final String isbn : isbnList) {
             final String validIsbn = isbnvalidator.validate(isbn);
-            final DataField df = factory.newDataField("020", ' ', ' ');
-            if (!itemMode && validIsbn != null) {
-                df.addSubfield(factory.newSubfield('a', validIsbn));
+            if (!itemMode) {
+                final DataField df = factory.newDataField("020", ' ', ' ');
+                if (validIsbn != null) {
+                    df.addSubfield(factory.newSubfield('a', validIsbn));
+                } else {
+                    df.addSubfield(factory.newSubfield('z', isbn));
+                }
+                r.addVariableField(df);
             } else {
+                // changed by Harvard, Columbia made us put the ISBN in 020$z in that case
+                final DataField df = factory.newDataField("760", '0', ' ');
+                df.addSubfield(factory.newSubfield('c', "Original"));
                 df.addSubfield(factory.newSubfield('z', isbn));
+                r.addVariableField(df);
             }
-            r.addVariableField(df);
         }
     }
 
@@ -437,6 +445,7 @@ public class MarcExport {
         st = st.replace("p.", "pages");
         st = st.replace("ff.", "folios");
         // the s in volume(s) is a bit annoying
+        st = st.replaceAll("(\\d,) +(\\d)", "$1$2");
         st = st.replaceAll("^1 ?v\\.", "1 volume");
         st = st.replaceAll("[^0-9]1 ?v\\.", "1 volume");
         st = st.replaceAll(" ?v\\.", " volumes");
