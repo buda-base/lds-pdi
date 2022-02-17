@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -47,6 +50,7 @@ import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
+import org.apache.jena.riot.system.PrefixMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.CacheControl;
@@ -64,6 +68,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.bdrc.jena.sttl.STriGWriter;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -82,6 +87,7 @@ import io.bdrc.ldspdi.sparql.QueryProcessor;
 import io.bdrc.ldspdi.utils.DocFileModel;
 import io.bdrc.ldspdi.utils.Helpers;
 import io.bdrc.libraries.BudaMediaTypes;
+import io.bdrc.libraries.GlobalHelpers;
 import io.bdrc.libraries.StreamingHelpers;
 import io.bdrc.libraries.formatters.TTLRDFWriter;
 
@@ -264,9 +270,29 @@ public class PublicDataController {
         }
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, null, getEtag(model, res)));
+        if ("trig".equals(ext)) {
+            Dataset ds = DatasetFactory.create();
+            ds.addNamedModel(GRAPH_PREFIX_FULL+res, model);
+            return ResponseEntity.ok().headers(hh).contentType(media).body(
+                    getDatasetStream(ds, ext, fullResURI, ServiceConfig.PREFIX.getPrefixMap()));
+        }
         return ResponseEntity.ok().headers(hh).contentType(media).body(
                 StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
 
+    }
+    
+    public static StreamingResponseBody getDatasetStream(final Dataset dsg, final String format, final String res,
+            PrefixMap prefixes) {
+        return new StreamingResponseBody() {
+            @Override
+            public void writeTo(OutputStream os) {
+                String JenaFormat = BudaMediaTypes.getJenaFromExtension(format);
+                if (JenaFormat.contentEquals(RDFLanguages.strLangTriG)) {
+                    new STriGWriter().write(os, dsg.asDatasetGraph(), prefixes, null, GlobalHelpers.createWriterContext());
+                    return;
+                }
+            }
+        };
     }
 
     @GetMapping(value = "/graph/{res:.+}")
@@ -321,6 +347,12 @@ public class PublicDataController {
         String ext = BudaMediaTypes.getExtFromMime(mediaType);
         HttpHeaders hh = new HttpHeaders();
         hh.setAll(getResourceHeaders(request.getServletPath(), ext, "Choice", getEtag(model, res)));
+        if ("trig".equals(ext)) {
+            Dataset ds = DatasetFactory.create();
+            ds.addNamedModel(GRAPH_PREFIX_FULL+res, model);
+            return ResponseEntity.ok().headers(hh).contentType(mediaType).body(
+                    getDatasetStream(ds, ext, fullResURI, ServiceConfig.PREFIX.getPrefixMap()));
+        }
         return ResponseEntity.ok().headers(hh).contentType(mediaType).body(
                 StreamingHelpers.getModelStream(model, ext, fullResURI, null, ServiceConfig.PREFIX.getPrefixMap()));
     }

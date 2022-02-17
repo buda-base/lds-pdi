@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -73,10 +74,15 @@ public class MarcExportTest {
         HttpResponse response = client.execute(get);
         System.out.println(response.getStatusLine().getStatusCode());
         System.out.println("result:");
-        //response.getEntity().writeTo(System.out);
+        response.getEntity().writeTo(System.out);
         //try (FileOutputStream fos = new FileOutputStream("/tmp/marc.xml")) {
         //    response.getEntity().writeTo(fos);
         // }
+        Pattern p = Pattern.compile(" script$", Pattern.CASE_INSENSITIVE);
+        String firstScriptLabel = "Tibetan Script";
+        firstScriptLabel = p.matcher(firstScriptLabel).replaceAll("");
+        //firstScriptLabel = firstScriptLabel.replaceAll("/ script$/i", "");
+        System.out.println(firstScriptLabel);
     }
 
 }

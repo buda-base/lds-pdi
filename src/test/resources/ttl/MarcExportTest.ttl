@@ -189,7 +189,7 @@ bdr:MW23819  a   bdo:Instance ;
                     bdo:onYear    "1979"^^xsd:gYear
                   ] ;
    bdo:editionStatement  "par gzhi1., par thengs 2."@bo-x-ewts ;
-   bdo:instanceExtentStatement  "3,256 pp." ;
+   bdo:extentStatement  "3, 347 p." ;
    bdo:instanceHasReproduction  bdr:W23819 ;
    bdo:instanceOf bdr:WA23819 ;
    bdo:hasPart  bdr:MW23819_0001 , bdr:MW23819_0017 , bdr:MW23819_0056 , bdr:MW23819_0074 ;
