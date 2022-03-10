@@ -98,6 +98,9 @@ bdr:CR472EFBB795AC  a  bdo:AgentAsCreator ;
    bdo:agent     bdr:P326 ;
    bdo:role      bdr:R0ER0019 .
 
+bdr:ID4E026CE83CC9  a  bdr:OclcControlNumber ;
+   rdf:value    "1147739284" .
+
 bdr:EV4E026CE83CC9  a  bdo:PublishedEvent ;
    bdo:onYear    1979 .
 
@@ -152,6 +155,7 @@ bda:WA23819  a    adm:AdminData ;
 bdr:W23819  a    bdo:ImageInstance ;
    bdo:isRoot    true ;
    bdo:instanceOf  bdr:WA23819 ;
+   bf:identifiedBy bdr:ID4E026CE83CC9 ;
    bdo:instanceReproductionOf bdr:MW23819 ;
    bdo:hasVolume  bdr:I2833 , bdr:I2834 , bdr:I2835 , bdr:I2836 ;
    bdo:scanInfo  "scanned at tbrc, 115 5th ave., 7th floor, new york city, ny 10003 by rabten 2003"@en ;

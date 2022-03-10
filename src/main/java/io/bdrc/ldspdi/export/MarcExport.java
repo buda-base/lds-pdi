@@ -103,6 +103,8 @@ public class MarcExport {
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
     public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
     public static final String BF = "http://id.loc.gov/ontologies/bibframe/";
+    public static final Property identifiedBy = ResourceFactory.createProperty(BF + "identifiedBy");
+    public static final Property OclcControlNumber = ResourceFactory.createProperty(BDR + "OclcControlNumber");
     public static final Property partOf = ResourceFactory.createProperty(BDO + "partOf");
     public static final Property hasPart = ResourceFactory.createProperty(BDO + "hasPart");
     public static final Property partTreeIndex = ResourceFactory.createProperty(BDO + "partTreeIndex");
@@ -1166,6 +1168,24 @@ public class MarcExport {
         }
     }
 
+    public static void addIdentifiers(final Model m, final Resource main, final Record r) {
+        final StmtIterator si = main.listProperties(identifiedBy);
+        while (si.hasNext()) {
+            final Resource id = si.next().getResource();
+            final Resource type = id.getPropertyResourceValue(RDF.type);
+            // in the case where the identifier is for the scan while creating the MARC record
+            // for the instance, this can happen:
+            if (type == null)
+                continue;
+            if (type.equals(OclcControlNumber)) {
+                final String value = id.getProperty(RDF.value).getString();
+                final DataField f035 = factory.newDataField("035", ' ', ' ');
+                f035.addSubfield(factory.newSubfield('a', "(OCoLC)"+value));
+                r.addVariableField(f035);
+            }
+        }
+    }
+    
     public static void add041(final Model m, final Record r, final List<String> langUrls, final String mainLangMarcCode) {
         if (langUrls.size() < 2)
             return;
@@ -1195,18 +1215,18 @@ public class MarcExport {
 
     public static final String langTibetan = BDR + "LangBo";
 
-    public static Record marcFromModel(final Model m, final Resource workR, final Resource originalR, final boolean scansMode, final boolean limitSize) {
+    public static Record marcFromModel(final Model m, final Resource main, final boolean scansMode, final boolean limitSize) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         // Columbia originally asked us to prefix the ID with "(BDRC)", but Harvard specifically asked
         // us not to do that, especially since they introduced the 003 control field
-        record.addVariableField(factory.newControlField("001", "bdr:" + originalR.getLocalName()));
+        record.addVariableField(factory.newControlField("001", "bdr:" + main.getLocalName()));
         record.addVariableField(f003);
         final LocalDateTime now = LocalDateTime.now();
         // record.addVariableField(factory.newControlField("005", now.format(f005_f)));
         record.addVariableField(f006);
         record.addVariableField(f007);
-        final List<String> langUrls = getLanguages(m, workR);
+        final List<String> langUrls = getLanguages(m, main);
         String bcp47lang = null;
         String langMarcCode = null;
         // request from Columbia, when we have multiple languages recorded, we should
@@ -1239,8 +1259,9 @@ public class MarcExport {
                 bcp47lang = bcpLangS.getString();
             }
         }
-        add008(m, workR, record, langMarcCode, now);
-        addIsbn(m, workR, record, scansMode); // 020
+        add008(m, main, record, langMarcCode, now);
+        addIsbn(m, main, record, scansMode); // 020
+        addIdentifiers(m, main, record);
         // Colubia asked us to add a 035 field, but Harvard asked us to remove it
         // since it can be derived from 001 + 003
 //        final DataField f035 = factory.newDataField("035", ' ', ' ');
@@ -1253,7 +1274,7 @@ public class MarcExport {
 //        }
         record.addVariableField(f040);
         add041(m, record, langUrls, langMarcCode);
-        List<String> lcCallNumberList = getId(m, workR, m.getResource(BF+"ShelfMarkLcc"));
+        List<String> lcCallNumberList = getId(m, main, m.getResource(BF+"ShelfMarkLcc"));
         for (String lcCallNumber : lcCallNumberList) {
             // https://github.com/BuddhistDigitalResourceCenter/xmltoldmigration/issues/55
             lcCallNumber = lcCallNumber.toUpperCase();
@@ -1270,16 +1291,16 @@ public class MarcExport {
         final List<DataField> list880 = new ArrayList<>();
         final List<DataField> list245246 = new ArrayList<>();
         // this records 066, 245, 246 and 880 that we will use later
-        addTitles(m, workR, record, bcp47lang, i880, list880, list245246);
+        addTitles(m, main, record, bcp47lang, i880, list880, list245246);
         // same principle, finishing the 880 and 066 record, and lists the 720 records
         final List<DataField> list720 = new ArrayList<>();
-        addAuthors(m, workR, record, i880, list880, list720);
+        addAuthors(m, main, record, i880, list880, list720);
         add066(record, i880);
         for (DataField df245246 : list245246) {
             record.addVariableField(df245246);
         }
         // edition statement
-        StmtIterator si = workR.listProperties(editionStatement);
+        StmtIterator si = main.listProperties(editionStatement);
         while (si.hasNext()) {
             final Literal editionStatement = si.next().getLiteral();
             final DataField f250 = factory.newDataField("250", ' ', ' ');
@@ -1290,16 +1311,16 @@ public class MarcExport {
             f250.addSubfield(factory.newSubfield('a', f250str));
             record.addVariableField(f250);
         }
-        addPubInfo(m, workR, record); // 264
-        add300(m, workR, record);
+        addPubInfo(m, main, record); // 264
+        add300(m, main, record);
         record.addVariableField(f336);
         record.addVariableField(f337);
         record.addVariableField(f338);
-        addSeries(m, workR, record, bcp47lang); // 490
+        addSeries(m, main, record, bcp47lang); // 490
         // Columbia requested that 546 be the first 5xx field
-        addLanguages(m, workR, record); // 546
+        addLanguages(m, main, record); // 546
         // biblio note
-        si = workR.listProperties(workBiblioNote);
+        si = main.listProperties(workBiblioNote);
         while (si.hasNext()) {
             final Literal biblioNote = si.next().getLiteral();
             final DataField f500 = factory.newDataField("500", ' ', ' ');
@@ -1310,13 +1331,13 @@ public class MarcExport {
             f500.addSubfield(factory.newSubfield('a', biblioNoteS));
             record.addVariableField(f500);
         }
-        if (!isJournal(m, workR)) {
-            addOutline(m, workR, record, bcp47lang, limitSize); // 505
+        if (!isJournal(m, main)) {
+            addOutline(m, main, record, bcp47lang, limitSize); // 505
         }
         if (scansMode)
-            addAccess(m, workR, record); // 506
+            addAccess(m, main, record); // 506
         // catalog info (summary)
-        si = workR.listProperties(catalogInfo);
+        si = main.listProperties(catalogInfo);
         while (si.hasNext()) {
             final Literal catalogInfo = si.next().getLiteral();
             final DataField f520 = factory.newDataField("520", ' ', ' ');
@@ -1325,7 +1346,7 @@ public class MarcExport {
         }
         if (scansMode)
             record.addVariableField(f533);
-        final Resource license = workR.getPropertyResourceValue(tmpLicense);
+        final Resource license = main.getPropertyResourceValue(tmpLicense);
         if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
             record.addVariableField(f542_PD);
         }
@@ -1334,13 +1355,13 @@ public class MarcExport {
         String dateStr = dateFormat.format(curDate);
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed " + dateStr + ")"));
         record.addVariableField(f588);
-        addTopics(m, workR, record); // 653
+        addTopics(m, main, record); // 653
         record.addVariableField(f710_2);
         for (DataField df720 : list720) {
             record.addVariableField(df720);
         }
         // lccn
-        List<String> lccnList = getId(m, workR, m.getResource(BF+"Lccn"));
+        List<String> lccnList = getId(m, main, m.getResource(BF+"Lccn"));
         for (String lccn : lccnList) {
             // from Columbia: spaces should be added at the end of the lccn string so that
             // it spans
@@ -1357,8 +1378,12 @@ public class MarcExport {
         }
         if (scansMode) {
             final DataField f856 = factory.newDataField("856", '4', '0');
-            f856.addSubfield(factory.newSubfield('u', originalR.getURI()));
-            f856.addSubfield(factory.newSubfield('z', "Available from BDRC"));
+            f856.addSubfield(factory.newSubfield('3', "Buddhist Digital Resource Center"));
+            f856.addSubfield(factory.newSubfield('u', main.getURI()));
+            final Resource access = main.getPropertyResourceValue(tmpAccess);
+            if (access != null && "AccessOpen".equals(access.getLocalName())) {
+                f856.addSubfield(factory.newSubfield('7', "0"));
+            }
             record.addVariableField(f856);
         }
         for (DataField df880 : list880) {
@@ -1437,7 +1462,7 @@ public class MarcExport {
         main = m.getResource(resUri);
         
         final Resource origMain = m.getResource(resUri);
-        final Record r = marcFromModel(m, main, origMain, scansMode, limitSize);
+        final Record r = marcFromModel(m, main, scansMode, limitSize);
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
             public void writeTo(final OutputStream os) throws IOException {
