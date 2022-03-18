@@ -548,7 +548,7 @@ public class MarcExport {
             // otherwise the output could be inconsistent among queries
             final List<Literal> names = new ArrayList<>();
             final List<Literal> otherNames = new ArrayList<>();
-            final List<Literal> titles = new ArrayList<>();
+            final List<Literal> primaryTitles = new ArrayList<>();
             final List<Literal> tulkutitles = new ArrayList<>();
             final List<Literal> otherTitles = new ArrayList<>();
             StmtIterator nsi = agentR.listProperties(personName);
@@ -564,7 +564,7 @@ public class MarcExport {
                     addCreatorName(m, name, tulkutitles);
                     break;
                 case "PersonPrimaryTitle":
-                    addCreatorName(m, name, titles);
+                    addCreatorName(m, name, primaryTitles);
                     break;
                 case "PersonTitle":
                     addCreatorName(m, name, otherTitles);
@@ -597,6 +597,15 @@ public class MarcExport {
                     has880 = true;
                 }
             }
+            else if (!primaryTitles.isEmpty()) {
+                Collections.sort(primaryTitles, baseComp);
+                subfield_a = getLangStr(primaryTitles.get(0))+",";
+                subfield_a_880 = get880String(primaryTitles.get(0))+",";
+                if (subfield_a_880 != null) {
+                    i880.addScript("Tibt");
+                    has880 = true;
+                }
+            }
             if (!tulkutitles.isEmpty()) {
                 Collections.sort(tulkutitles, baseComp);
                 subfield_c = getLangStr(tulkutitles.get(0))+",";
@@ -610,19 +619,7 @@ public class MarcExport {
                     }
                 }
             }
-            else if (!titles.isEmpty()) {
-                Collections.sort(titles, baseComp);
-                subfield_c = getLangStr(titles.get(0))+",";
-                if (has880) {
-                    final String title880 = get880String(titles.get(0));
-                    if (title880 != null) {
-                        subfield_c_880 = title880+",";
-                        i880.addScript("Tibt");
-                    } else {
-                        subfield_c_880 = subfield_c;
-                    }
-                }
-            } else if (!otherTitles.isEmpty()) {
+            else if (!otherTitles.isEmpty()) {
                 Collections.sort(otherTitles, baseComp);
                 subfield_c = getLangStr(otherTitles.get(0))+",";
                 if (has880) {
