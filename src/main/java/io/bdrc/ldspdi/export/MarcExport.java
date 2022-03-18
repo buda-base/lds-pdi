@@ -1,8 +1,6 @@
 package io.bdrc.ldspdi.export;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +36,7 @@ import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
@@ -475,8 +474,63 @@ public class MarcExport {
         roleToName.put("R0ER0013", "calligrapher."); // creatorCalligrapher
         roleToName.put("R0ER0010", "artist."); // creatorArtist
     }
+    
+    public static String getDateStr(final Model m, final Resource person) {
+        // TODO: handle century, see https://www.loc.gov/marc/bibliographic/bdx00.html for format
+        Integer birthYear = null;
+        Integer deathYear = null;
+        StmtIterator si = person.listProperties(personEvent);
+        while (si.hasNext()) {
+            final Resource event = si.next().getResource();
+            final Resource eventType = event.getPropertyResourceValue(RDF.type);
+            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
+                if (event.hasProperty(onYear)) {
+                    final String birthYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
+                    try {
+                        birthYear = Integer.parseInt(birthYearStr);
+                    } catch (NumberFormatException e) {  }
+                }
+            }
+            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
+                if (event.hasProperty(onYear)) {
+                    final String deathYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
+                    try {
+                        deathYear = Integer.parseInt(deathYearStr);
+                    } catch (NumberFormatException e) {  }
+                }
+            }
+        }
+        if (birthYear == null && deathYear == null)
+            return null;
+        String dateStr = "";
+        // There should be a coma at the end, except when the date ends with a hyphen.
+        if (birthYear == null) {
+            if (deathYear != null) {
+                dateStr += "d. "+deathYear;
+            }
+        } else {
+            dateStr += birthYear+"-";
+            if (deathYear != null) {
+                dateStr += deathYear;
+            }
+        }
+        return dateStr;
+    }
+    
+    public static String getSubfield1(final Model m, final Resource person) {
+        final StmtIterator si = person.listProperties(OWL.sameAs);
+        String res = null;
+        while (si.hasNext()) {
+            final String uri = si.next().getResource().getURI();
+            if (uri.startsWith("http://viaf.org/viaf/")) {
+                if (res == null || res.length() > uri.length() || res.compareTo(uri) < 0)
+                    res = uri;
+            }
+        }
+        return res;
+    }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list700) {
         StmtIterator si = main.listProperties(creator);
         while (si.hasNext()) {
             final Resource agentAsRole = si.next().getResource();
@@ -485,15 +539,17 @@ public class MarcExport {
             if (roleR == null || agentR == null) {
                 return;
             }
-            String rel = roleToName.get(roleR.getLocalName());
-            if (rel == null) {
-                rel = "author.";
+            String subfield_e = roleToName.get(roleR.getLocalName());
+            if (subfield_e == null) {
+                subfield_e = "author.";
             }
+            final String subfield_1 = getSubfield1(m, agentR);
             // here we want to keep an order among the various names and titles
             // otherwise the output could be inconsistent among queries
             final List<Literal> names = new ArrayList<>();
             final List<Literal> otherNames = new ArrayList<>();
             final List<Literal> titles = new ArrayList<>();
+            final List<Literal> tulkutitles = new ArrayList<>();
             final List<Literal> otherTitles = new ArrayList<>();
             StmtIterator nsi = agentR.listProperties(personName);
             while (nsi.hasNext()) {
@@ -503,6 +559,9 @@ public class MarcExport {
                 switch (typeLocalName) {
                 case "PersonPrimaryName":
                     addCreatorName(m, name, names);
+                    break;
+                case "PersonTulkuTitle":
+                    addCreatorName(m, name, tulkutitles);
                     break;
                 case "PersonPrimaryTitle":
                     addCreatorName(m, name, titles);
@@ -515,122 +574,95 @@ public class MarcExport {
                     break;
                 }
             }
-            Integer birthYear = null;
-            Integer deathYear = null;
-            si = agentR.listProperties(personEvent);
-            while (si.hasNext()) {
-                final Resource event = si.next().getResource();
-                final Resource eventType = event.getPropertyResourceValue(RDF.type);
-                if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
-                    if (event.hasProperty(onYear)) {
-                        final String birthYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
-                        try {
-                            birthYear = Integer.parseInt(birthYearStr);
-                        } catch (NumberFormatException e) {  }
-                    }
-                }
-                if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
-                    if (event.hasProperty(onYear)) {
-                        final String deathYearStr = event.getProperty(onYear).getLiteral().getLexicalForm();
-                        try {
-                            deathYear = Integer.parseInt(deathYearStr);
-                        } catch (NumberFormatException e) {  }
-                    }
-                }
-            }
-            final StringBuilder sb = new StringBuilder();
-            final StringBuilder sb880 = new StringBuilder();
             boolean has880 = false;
+            String subfield_a = "";
+            String subfield_c = null;
+            String subfield_d = null;
+            String subfield_a_880 = null;
+            String subfield_c_880 = null;
             if (!names.isEmpty()) {
                 Collections.sort(names, baseComp);
-                sb.append(getLangStr(names.get(0)));
-                final String name880 = get880String(names.get(0));
-                if (name880 != null) {
-                    sb880.append(name880);
+                subfield_a = getLangStr(names.get(0))+",";
+                subfield_a_880 = get880String(names.get(0))+",";
+                if (subfield_a_880 != null) {
                     i880.addScript("Tibt");
                     has880 = true;
                 }
             } else if (!otherNames.isEmpty()) {
                 Collections.sort(otherNames, baseComp);
-                sb.append(getLangStr(otherNames.get(0)));
-                final String name880 = get880String(otherNames.get(0));
-                if (name880 != null) {
-                    sb880.append(name880);
+                subfield_a = getLangStr(otherNames.get(0))+",";
+                subfield_a_880 = get880String(otherNames.get(0))+",";
+                if (subfield_a_880 != null) {
                     i880.addScript("Tibt");
                     has880 = true;
                 }
             }
-            if (!titles.isEmpty()) {
+            if (!tulkutitles.isEmpty()) {
+                Collections.sort(tulkutitles, baseComp);
+                subfield_c = getLangStr(tulkutitles.get(0))+",";
+                if (has880) {
+                    final String title880 = get880String(tulkutitles.get(0));
+                    if (title880 != null) {
+                        subfield_c_880 = title880+",";
+                        i880.addScript("Tibt");
+                    } else {
+                        subfield_c_880 = subfield_c;
+                    }
+                }
+            }
+            else if (!titles.isEmpty()) {
                 Collections.sort(titles, baseComp);
-                sb.append(" / ");
-                final String title = getLangStr(titles.get(0));
-                sb.append(title);
+                subfield_c = getLangStr(titles.get(0))+",";
                 if (has880) {
                     final String title880 = get880String(titles.get(0));
                     if (title880 != null) {
-                        sb880.append(" / ");
-                        sb880.append(title880);
+                        subfield_c_880 = title880+",";
                         i880.addScript("Tibt");
                     } else {
-                        sb880.append(title);
+                        subfield_c_880 = subfield_c;
                     }
                 }
             } else if (!otherTitles.isEmpty()) {
                 Collections.sort(otherTitles, baseComp);
-                sb.append(" / ");
-                final String title = getLangStr(otherTitles.get(0));
-                sb.append(title);
+                subfield_c = getLangStr(otherTitles.get(0))+",";
                 if (has880) {
                     final String title880 = get880String(otherTitles.get(0));
                     if (title880 != null) {
-                        sb880.append(" / ");
-                        sb880.append(title880);
+                        subfield_c_880 = title880+",";
+                        i880.addScript("Tibt");
                     } else {
-                        sb880.append(title);
+                        subfield_c_880 = subfield_c;
                     }
                 }
             }
-            // There should be a coma at the end, except when the date ends with a hyphen.
-            if (birthYear == null) {
-                if (deathYear != null) {
-                    sb.append(", ?-");
-                    sb.append(deathYear + ",");
-                    if (has880) {
-                        sb880.append(", ?-");
-                        sb880.append(deathYear + ",");
-                    }
-                } else {
-                    sb.append(',');
-                }
-            } else {
-                sb.append(", ");
-                sb.append(birthYear);
-                sb.append('-');
-                if (has880) {
-                    sb880.append(", ");
-                    sb880.append(birthYear);
-                    sb880.append('-');
-                }
-                if (deathYear != null) {
-                    sb.append(deathYear + ",");
-                    if (has880) {
-                        sb880.append(deathYear + ",");
-                    }
-                }
-            }
-            final DataField f720_1_ = factory.newDataField("720", '1', ' ');
+            subfield_d = getDateStr(m, agentR);
+            if (subfield_d != null)
+                subfield_d += ",";
+            final DataField f700_0_ = factory.newDataField("700", '0', ' ');
             if (has880) {
                 String curi880 = i880.getNext();
-                final DataField f880 = factory.newDataField("880", '1', ' ');
+                final DataField f880 = factory.newDataField("880", '0', ' ');
                 list880.add(f880);
-                f720_1_.addSubfield(factory.newSubfield('6', "880-" + curi880));
-                f880.addSubfield(factory.newSubfield('6', "720-" + curi880));
-                f880.addSubfield(factory.newSubfield('a', sb880.toString()));
-                f880.addSubfield(factory.newSubfield('e', rel));
+                f700_0_.addSubfield(factory.newSubfield('6', "880-" + curi880));
+                f880.addSubfield(factory.newSubfield('6', "700-" + curi880));
+                f880.addSubfield(factory.newSubfield('a', subfield_a_880));
+                if (subfield_c_880 != null)
+                    f880.addSubfield(factory.newSubfield('c', subfield_c_880));
+                if (subfield_d != null)
+                    f880.addSubfield(factory.newSubfield('d', subfield_d));
+                f880.addSubfield(factory.newSubfield('e', subfield_e));
+                if (subfield_1 != null)
+                    f880.addSubfield(factory.newSubfield('1', subfield_1));
             }
-            f720_1_.addSubfield(factory.newSubfield('a', sb.toString()));
-            f720_1_.addSubfield(factory.newSubfield('e', rel));
-            list720.add(f720_1_);
+            f700_0_.addSubfield(factory.newSubfield('a', subfield_a));
+            if (subfield_c != null)
+                f700_0_.addSubfield(factory.newSubfield('c', subfield_c));
+            if (subfield_d != null)
+                f700_0_.addSubfield(factory.newSubfield('d', subfield_d));
+            f700_0_.addSubfield(factory.newSubfield('e', subfield_e));
+            if (subfield_1 != null)
+                f700_0_.addSubfield(factory.newSubfield('1', subfield_1));
+            list700.add(f700_0_);
         }
     }
 
@@ -1262,7 +1294,7 @@ public class MarcExport {
         add008(m, main, record, langMarcCode, now);
         addIsbn(m, main, record, scansMode); // 020
         addIdentifiers(m, main, record);
-        // Colubia asked us to add a 035 field, but Harvard asked us to remove it
+        // Columbia asked us to add a 035 field, but Harvard asked us to remove it
         // since it can be derived from 001 + 003
 //        final DataField f035 = factory.newDataField("035", ' ', ' ');
 //        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + originalR.getLocalName()));
@@ -1293,8 +1325,8 @@ public class MarcExport {
         // this records 066, 245, 246 and 880 that we will use later
         addTitles(m, main, record, bcp47lang, i880, list880, list245246);
         // same principle, finishing the 880 and 066 record, and lists the 720 records
-        final List<DataField> list720 = new ArrayList<>();
-        addAuthors(m, main, record, i880, list880, list720);
+        final List<DataField> listPersonFields = new ArrayList<>();
+        addAuthors(m, main, record, i880, list880, listPersonFields);
         add066(record, i880);
         for (DataField df245246 : list245246) {
             record.addVariableField(df245246);
@@ -1356,10 +1388,10 @@ public class MarcExport {
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed " + dateStr + ")"));
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
-        record.addVariableField(f710_2);
-        for (DataField df720 : list720) {
-            record.addVariableField(df720);
+        for (DataField dfAuthorField : listPersonFields) {
+            record.addVariableField(dfAuthorField);
         }
+        record.addVariableField(f710_2);
         // lccn
         List<String> lccnList = getId(m, main, m.getResource(BF+"Lccn"));
         for (String lccn : lccnList) {
@@ -1378,7 +1410,7 @@ public class MarcExport {
         }
         if (scansMode) {
             final DataField f856 = factory.newDataField("856", '4', '0');
-            f856.addSubfield(factory.newSubfield('3', "Buddhist Digital Resource Center"));
+            f856.addSubfield(factory.newSubfield('y', "Buddhist Digital Resource Center"));
             f856.addSubfield(factory.newSubfield('u', main.getURI()));
             final Resource access = main.getPropertyResourceValue(tmpAccess);
             if (access != null && "AccessOpen".equals(access.getLocalName())) {
@@ -1460,8 +1492,7 @@ public class MarcExport {
         final boolean limitSize = mt.equals(BudaMediaTypes.MT_MRC);
         m = getModelForMarc(resUri);
         main = m.getResource(resUri);
-        
-        final Resource origMain = m.getResource(resUri);
+
         final Record r = marcFromModel(m, main, scansMode, limitSize);
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override

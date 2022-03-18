@@ -28,6 +28,7 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix bf:    <http://id.loc.gov/ontologies/bibframe/> .
+@prefix viaf: <http://viaf.org/viaf/> .
 
 bdr:ScriptTibt
   a bdo:Script ;
@@ -239,6 +240,7 @@ bdr:MW23819  a   bdo:Instance ;
 bdr:P326  a      bdo:Person ;
    rdfs:seeAlso  "https://www.treasuryoflives.org/biographies/view/Guru-Chowang/5588"^^xsd:anyURI ;
    skos:prefLabel  "bstan 'dzin rnam rgyal rab dga'"@bo-x-ewts ;
+   owl:sameAs viaf:212019698 , viaf:28489592 ;
    bdo:note      [ bdo:contentLocationStatement  "p. 2284" ;
                    bdo:noteText  "1212. gter ston gu ru chos dbang 'khrungs"@en ;
                    bdo:noteSource  bdr:MW26372
@@ -265,10 +267,10 @@ bdr:P326  a      bdo:Person ;
            bdo:eventWhere  bdr:G388
          ] ;
    bdo:personGender  bdr:GenderMale ;
-   bdo:personName  [ a             bdo:PersonPersonalName ;
-                     rdfs:label    "bstan 'dzin rnam rgyal rab dga'"@bo-x-ewts ;
-                   ] , [ a             bdo:PersonPrimaryName ;
-                     rdfs:label    "bstan 'dzin rnam rgyal rab dga' 2"@bo-x-ewts ;
+   bdo:personName  [ a             bdo:PersonPrimaryName ;
+                     rdfs:label    "chos grags rgya mtsho"@bo-x-ewts ;
+                   ] , [ a             bdo:PersonTulkuTitle ;
+                     rdfs:label    "karma pa 07"@bo-x-ewts ;
                    ] ;
    bdo:personStudentOf  bdr:P7695 ;
    bdo:personTeacherOf  bdr:P7173 , bdr:P8510 ;

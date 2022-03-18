@@ -32,6 +32,7 @@ construct {
   ?scripto ?scriptop ?scriptoo .
   ?ools ?oolsp ?oolso .
   ?id ?idp ?ido .
+  ?ag ?agp ?ago .
 } where {
   {
     ?R_RES ?p ?o .
@@ -71,6 +72,12 @@ construct {
   union {
     ?R_RES :instanceReproductionOf?/bdo:serialInstanceOf ?series .
     ?series skos:prefLabel ?seriesl .
+  }
+  union {
+    ?R_RES bdo:instanceOf/bdo:creator ?aac .
+    ?aac ?aacp ?aaco .
+    ?aac bdo:agent ?p .
+    ?ag ?agp ?ago .
   }
   union {
     ?R_RES bdo:instanceOf/bdo:creator ?aac .
