@@ -76,7 +76,7 @@ construct {
   union {
     ?R_RES bdo:instanceOf/bdo:creator ?aac .
     ?aac ?aacp ?aaco .
-    ?aac bdo:agent ?p .
+    ?aac bdo:agent ?ag .
     ?ag ?agp ?ago .
   }
   union {

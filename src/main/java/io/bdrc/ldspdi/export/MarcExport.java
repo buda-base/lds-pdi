@@ -608,6 +608,10 @@ public class MarcExport {
                     has880 = true;
                 }
             }
+            if (subfield_a.isEmpty()) {
+                log.error("can't find proper name for "+agentR.getLocalName());
+                continue;
+            }
             if (!hasTitle) {
                 if (!tulkutitles.isEmpty()) {
                     Collections.sort(tulkutitles, baseComp);
