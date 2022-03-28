@@ -1,8 +1,6 @@
 package io.bdrc.ldspdi.export;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -918,7 +916,9 @@ public class MarcExport {
         si = main.listProperties(seriesNumber);
         while (si.hasNext()) {
             final Literal series = si.next().getLiteral();
-            hasSeries = true;
+            // weirdly enough, some records can have seriesNumber but no associated series
+            // see https://github.com/buda-base/library-issues/issues/424
+            // hasSeries = true;
             f490.addSubfield(factory.newSubfield('v', getLangStr(series)));
         }
         if (hasSeries)
