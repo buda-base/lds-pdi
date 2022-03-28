@@ -33,6 +33,8 @@ construct {
   ?ools ?oolsp ?oolso .
   ?id ?idp ?ido .
   ?ag ?agp ?ago .
+  ?R_RES :instanceHasVolume ?i .
+  ?i :volumeNumber ?vn .
 } where {
   {
     ?R_RES ?p ?o .
@@ -112,5 +114,11 @@ construct {
   union {
       ?R_RES :instanceReproductionOf?/:hasTitle ?o .
       ?o ?op ?oo .
+  } 
+  union {
+    ?R_RES :instanceHasReproduction? ?ii .
+    ?ii a :ImageInstance ;
+      :instanceHasVolume ?i .
+    ?i :volumeNumber ?vn .
   }
 }

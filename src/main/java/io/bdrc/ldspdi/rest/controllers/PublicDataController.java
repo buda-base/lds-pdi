@@ -372,13 +372,13 @@ public class PublicDataController {
             @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response,
             HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
-            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar)
+            @RequestParam(value = "endChar", defaultValue = "999999999") String endChar, @RequestParam(value = "style", required = false) String style)
             throws RestException, IOException {
         Helpers.setCacheControl(response, "public");
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
-            return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, response, request);
+            return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, style, response, request);
         }
         String prefixedRes = RES_PREFIX_SHORT + res;
         String fullResURI = GRAPH_PREFIX_FULL + res;
@@ -453,7 +453,7 @@ public class PublicDataController {
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res,
             @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
             @RequestParam(value = "endChar", defaultValue = defaultMaxVal) String endChar,
-            @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, HttpServletResponse response,
+            @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestParam(value = "style", required = false) String style, HttpServletResponse response,
             HttpServletRequest request) throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
         final String prefixedRes = RES_PREFIX_SHORT + res;
@@ -481,7 +481,7 @@ public class PublicDataController {
             response.sendRedirect(ServiceConfig.getProperty("showUrl") + type + res);
         }
         if (ext.startsWith("mrc")) {
-            return MarcExport.getResponse(media, RES_PREFIX + res);
+            return MarcExport.getResponse(media, RES_PREFIX + res, style);
         }
         if (ext.equals("txt")) {
             return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar),

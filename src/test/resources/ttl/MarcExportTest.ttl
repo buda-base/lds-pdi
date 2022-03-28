@@ -287,3 +287,13 @@ bdr:P326  a      bdo:Person ;
            adm:logMessage  "treasury link"@en ;
            adm:logWho    bdr:U00002
          ] .
+
+bdr:I2834  bdo:volumeNumber  2 .
+
+bdr:I2835  bdo:volumeNumber  3 .
+
+bdr:I2833  bdo:volumeNumber  1 .
+
+bdr:W23819  bdo:instanceHasVolume  bdr:I2836 , bdr:I2833 , bdr:I2834 , bdr:I2835 .
+
+bdr:I2836  bdo:volumeNumber  4 .

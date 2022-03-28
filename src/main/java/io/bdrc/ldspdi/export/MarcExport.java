@@ -140,6 +140,8 @@ public class MarcExport {
     public static final Property langBCP47Lang = ResourceFactory.createProperty(BDO + "langBCP47Lang");
     public static final Property langMARCCode = ResourceFactory.createProperty(BDO + "langMARCCode");
     public static final Property restrictedInChina = ResourceFactory.createProperty(TMP + "restrictedInChina");
+    public static final Property instanceHasVolume = ResourceFactory.createProperty(BDO + "instanceHasVolume");
+    public static final Property volumeNumber = ResourceFactory.createProperty(BDO + "volumeNumber");
     
     public static final class MarcInfo {
         public final Integer prio;
@@ -1249,10 +1251,55 @@ public class MarcExport {
         }
         r.addVariableField(f041);
     }
+    
+    public final static class GC955VolStatus implements Comparable<GC955VolStatus> {
+        public String barcode;
+        public int volnum;
+        
+        public GC955VolStatus(final String barcode, final int volnum) {
+            this.barcode = barcode;
+            this.volnum = volnum;
+        }
+
+        @Override
+        public int compareTo(GC955VolStatus other) {
+            return Integer.compare(this.volnum, other.volnum);
+        }
+    }
+    
+    public static Pattern oldStyleImgPattern = Pattern.compile("I\\d\\d\\d\\d");
+    
+    public static void addGB955(final Model m, final Resource main, final Record r) {
+        // this is the 955 field for Google Books only. It's quite silly but we have no choice because
+        // they need it in the same format as the existing export (from tbrc.org) so...
+        // for further exports, this field should be reworked thoroughly
+        final List<GC955VolStatus> vols = new ArrayList<>();
+        final StmtIterator si = main.listProperties(instanceHasVolume);
+        final String barCodePrefix = main.getLocalName()+"-";
+        while (si.hasNext()) {
+            final Resource imgGroup = si.next().getResource();
+            final Statement vnumS = imgGroup.getProperty(volumeNumber);
+            if (vnumS != null) {
+                int vnum = vnumS.getInt();
+                String barCodeSuffix = imgGroup.getLocalName();
+                // again, must match tbrc.org exactly
+                if (oldStyleImgPattern.matcher(barCodeSuffix).matches())
+                    barCodeSuffix = barCodeSuffix.substring(1);
+                vols.add(new GC955VolStatus(barCodePrefix+barCodeSuffix, vnum));
+            }
+        }
+        Collections.sort(vols);
+        for (final GC955VolStatus v : vols) {
+            final DataField f955 = factory.newDataField("955", ' ', ' ');
+            f955.addSubfield(factory.newSubfield('a', v.barcode));
+            f955.addSubfield(factory.newSubfield('c', "v."+String.valueOf(v.volnum)));
+            r.addVariableField(f955);
+        }
+    }
 
     public static final String langTibetan = BDR + "LangBo";
 
-    public static Record marcFromModel(final Model m, final Resource main, final boolean scansMode, final boolean limitSize) {
+    public static Record marcFromModel(final Model m, final Resource main, final boolean scansMode, final boolean limitSize, final boolean googlebooksstyle) {
         final Index880 i880 = new Index880();
         final Record record = factory.newRecord(leader);
         // Columbia originally asked us to prefix the ID with "(BDRC)", but Harvard specifically asked
@@ -1433,6 +1480,8 @@ public class MarcExport {
         // System.out.println("test");
         // }
         // }
+        if (googlebooksstyle)
+            addGB955(m, main, record);
         return record;
     }
 
@@ -1482,7 +1531,7 @@ public class MarcExport {
     public static final String ScanUriPrefix = BDR + "W";
     public static final String InstanceUriPrefix = BDR + "MW";
 
-    public static ResponseEntity<StreamingResponseBody> getResponse(final MediaType mt, final String resUri) throws RestException {
+    public static ResponseEntity<StreamingResponseBody> getResponse(final MediaType mt, final String resUri, String style) throws RestException {
         // I really don't like that but making that better would mean either:
         // - a very weird and probably slower SPARQL query
         // - two queries
@@ -1497,8 +1546,7 @@ public class MarcExport {
         final boolean limitSize = mt.equals(BudaMediaTypes.MT_MRC);
         m = getModelForMarc(resUri);
         main = m.getResource(resUri);
-
-        final Record r = marcFromModel(m, main, scansMode, limitSize);
+        final Record r = marcFromModel(m, main, scansMode, limitSize, "google_books".equals(style));
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
             public void writeTo(final OutputStream os) throws IOException {
