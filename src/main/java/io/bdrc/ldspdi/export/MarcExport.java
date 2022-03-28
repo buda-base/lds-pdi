@@ -1407,7 +1407,7 @@ public class MarcExport {
                 lccn += ' ';
             }
             final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation)"));
+            f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation):"));
             f776_08.addSubfield(factory.newSubfield('w', "(DLC)   " + lccn));
             if (scansMode)
                 record.addVariableField(f776_08);
