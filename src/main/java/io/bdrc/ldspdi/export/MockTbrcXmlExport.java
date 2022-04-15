@@ -90,6 +90,14 @@ public class MockTbrcXmlExport {
         final Resource cs = main.getPropertyResourceValue(MarcExport.copyrightStatus);
         if (cs != null) {
             res.copyrightStatus = bdoAccessToTbrcCs.getOrDefault(cs.getLocalName(), "incopyright");
+            // if a book has been determined as being in copyright but is put in open access on our website
+            // we still want to restrict it on IA
+            if (res.copyrightStatus.equals("incopyright")) {
+                if (res.access.equals("openAccess"))
+                    res.access = "fairUse";
+                if (res.license.equals("ccby"))
+                    res.license = "copyright";
+            }
         } else {
             res.copyrightStatus = "publicdomain";
         }
