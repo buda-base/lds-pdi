@@ -132,14 +132,14 @@ public class MarcExport {
     public static final Property notBefore = ResourceFactory.createProperty(BDO + "notBefore");
     public static final Property notAfter = ResourceFactory.createProperty(BDO + "notAfter");
     public static final Property workLcCallNumber = ResourceFactory.createProperty(BDO + "workLcCallNumber");
-    public static final Property tmpAccess = ResourceFactory.createProperty(TMP + "access");
-    public static final Property tmpLicense = ResourceFactory.createProperty(TMP + "license");
+    public static final Property access = ResourceFactory.createProperty(ADM + "access");
     public static final Property tmpStatus = ResourceFactory.createProperty(TMP + "status");
     public static final Property tmpPublishedYear = ResourceFactory.createProperty(TMP + "publishedYear");
     public static final Property langBCP47Lang = ResourceFactory.createProperty(BDO + "langBCP47Lang");
     public static final Property langMARCCode = ResourceFactory.createProperty(BDO + "langMARCCode");
-    public static final Property restrictedInChina = ResourceFactory.createProperty(TMP + "restrictedInChina");
+    public static final Property restrictedInChina = ResourceFactory.createProperty(ADM + "restrictedInChina");
     public static final Property instanceHasVolume = ResourceFactory.createProperty(BDO + "instanceHasVolume");
+    public static final Property copyrightStatus = ResourceFactory.createProperty(BDO + "copyrightStatus");
     public static final Property volumeNumber = ResourceFactory.createProperty(BDO + "volumeNumber");
     
     public static final class MarcInfo {
@@ -331,8 +331,8 @@ public class MarcExport {
     }
 
     public static void addAccess(final Model m, final Resource main, final Record r) {
-        final Resource access = main.getPropertyResourceValue(tmpAccess);
-        if (access == null) {
+        final Resource accessVal = main.getPropertyResourceValue(access);
+        if (accessVal == null) {
             return; // maybe there should be a f506_unknown?
         }
         boolean ric = false;
@@ -340,7 +340,7 @@ public class MarcExport {
         if (ricS != null) {
             ric = ricS.getBoolean();
         }
-        switch (access.getLocalName()) {
+        switch (accessVal.getLocalName()) {
         case "AccessOpen":
             r.addVariableField(ric ? f506_open_ric : f506_open);
             break;
@@ -421,7 +421,13 @@ public class MarcExport {
         }
         final Statement publisherLocationS = main.getProperty(publisherLocation);
         if (publisherLocationS == null) {
-            sb.append(defaultCountryCode);
+            if (main.getLocalName().contains("FPL") || main.getLocalName().contains("EAP")) {
+                sb.append("br ");
+            } else if (main.getLocalName().contains("FEMC")) {
+                sb.append("cb ");
+            } else {
+                sb.append(defaultCountryCode);                
+            }
         } else {
             String pubLocStr = publisherLocationS.getObject().asLiteral().getString().toLowerCase().trim();
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
@@ -1393,8 +1399,8 @@ public class MarcExport {
         }
         if (scansMode)
             record.addVariableField(f533);
-        final Resource license = main.getPropertyResourceValue(tmpLicense);
-        if (license != null && license.getLocalName().equals("LicensePublicDomain")) {
+        final Resource cs = main.getPropertyResourceValue(copyrightStatus);
+        if (cs == null || cs.getLocalName().equals("CopyrightPublicDomain")) {
             record.addVariableField(f542_PD);
         }
         final DataField f588 = factory.newDataField("588", ' ', ' ');
@@ -1427,8 +1433,8 @@ public class MarcExport {
             final DataField f856 = factory.newDataField("856", '4', '0');
             f856.addSubfield(factory.newSubfield('3', "Buddhist Digital Resource Center"));
             f856.addSubfield(factory.newSubfield('u', main.getURI()));
-            final Resource access = main.getPropertyResourceValue(tmpAccess);
-            if (access != null && "AccessOpen".equals(access.getLocalName())) {
+            final Resource accessVal = main.getPropertyResourceValue(access);
+            if (accessVal != null && "AccessOpen".equals(accessVal.getLocalName())) {
                 f856.addSubfield(factory.newSubfield('7', "0"));
             }
             record.addVariableField(f856);

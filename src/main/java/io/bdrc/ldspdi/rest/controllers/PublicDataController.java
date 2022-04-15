@@ -73,6 +73,7 @@ import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.export.MarcExport;
+import io.bdrc.ldspdi.export.MockTbrcXmlExport;
 import io.bdrc.ldspdi.export.TxtEtextExport;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -455,11 +456,14 @@ public class PublicDataController {
             @RequestParam(value = "endChar", defaultValue = defaultMaxVal) String endChar,
             @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestParam(value = "style", required = false) String style, HttpServletResponse response,
             HttpServletRequest request) throws RestException, IOException {
-        log.info("Call to getFormattedResourceGraph() res {}, ext {}", res, ext);
+        log.info("Call to getFormattedResourceGraph() res {}, ext {}, style {}", res, ext, style);
         final String prefixedRes = RES_PREFIX_SHORT + res;
         final String fullResURI = GRAPH_PREFIX_FULL + res;
-        final MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
+        MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         log.info("Call to getFormattedResourceGraph() path is {}", request.getServletPath());
+        // dirty hack
+        if (media == null && ext.equals("xml"))
+            media = MediaType.APPLICATION_XML; 
         if (media == null) {
             final String html = Helpers.getMultiChoicesHtml("/resource/" + res, true);
             return ResponseEntity.status(300).header("Content-Type", "text/html")
@@ -480,13 +484,13 @@ public class PublicDataController {
             }
             response.sendRedirect(ServiceConfig.getProperty("showUrl") + type + res);
         }
-        if (ext.startsWith("mrc")) {
+        if (ext.startsWith("mrc"))
             return MarcExport.getResponse(media, RES_PREFIX + res, style);
-        }
-        if (ext.equals("txt")) {
+        else if (ext.equals("txt"))
             return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar),
                     Integer.parseInt(endChar), res);
-        }
+        else if (ext.equals("xml") && "tbrc-ia".equals(style))
+            return MockTbrcXmlExport.getResponse(RES_PREFIX+res);
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null,
                 computeGraphType(request));
         if (model.size() == 0) {

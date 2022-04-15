@@ -13,9 +13,7 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 construct {
   ?R_RES ?p ?o .
   ?R_RES tmp:status ?status .
-  ?R_RES tmp:access ?access .
   ?R_RES tmp:license ?license .
-  ?R_RES tmp:restrictedInChina ?ric .
   ?o ?op ?oo .
   ?t skos:prefLabel ?to .
   ?series skos:prefLabel ?seriesl .
@@ -32,6 +30,7 @@ construct {
   ?scripto ?scriptop ?scriptoo .
   ?ools ?oolsp ?oolso .
   ?id ?idp ?ido .
+  ?ag ?agp ?ago .
   ?R_RES :instanceHasVolume ?i .
   ?i :volumeNumber ?vn .
 } where {
@@ -59,11 +58,10 @@ construct {
     ?R_RES :instanceHasReproduction? ?item .
     ?item a :ImageInstance .
     ?admItem adm:adminAbout ?item .
-    ?admItem adm:access ?access .
-    ?admItem adm:restrictedInChina ?ric .
+    ?admItem ?p ?o .
     ?admItem adm:contentLegal/adm:license ?license .
-    ?admWork adm:adminAbout ?R_RES .
-    ?admWork adm:status ?status .
+    ?admForRes adm:adminAbout ?R_RES .
+    ?admForRes adm:status ?status .
   }
   union {
     ?R_RES :instanceReproductionOf?/bdo:hasPart+ ?part .
@@ -73,6 +71,12 @@ construct {
   union {
     ?R_RES :instanceReproductionOf?/bdo:serialInstanceOf ?series .
     ?series skos:prefLabel ?seriesl .
+  }
+  union {
+    ?R_RES bdo:instanceOf/bdo:creator ?aac .
+    ?aac ?aacp ?aaco .
+    ?aac bdo:agent ?ag .
+    ?ag ?agp ?ago .
   }
   union {
     ?R_RES bdo:instanceOf/bdo:creator ?aac .
@@ -107,7 +111,7 @@ construct {
   union {
       ?R_RES :instanceReproductionOf?/:hasTitle ?o .
       ?o ?op ?oo .
-  } 
+  }  
   union {
     ?R_RES :instanceHasReproduction? ?ii .
     ?ii a :ImageInstance ;
