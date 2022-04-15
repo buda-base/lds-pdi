@@ -81,9 +81,9 @@ public class MockTbrcXmlExport {
         final Resource statusVal = main.getPropertyResourceValue(MarcExport.tmpStatus);
         if (statusVal != null)
             res.status = bdoStatusToTbrcStatus.getOrDefault(statusVal.getLocalName(), "onHold");
-        final Statement dlpS = main.getProperty(digitalLendingPossible);
-        if (dlpS != null && dlpS.getBoolean() == false) 
-            res.okForCdl = "false";
+        // IA's script doesn't look at the status, so the idea is to mark the unreleased items as restricted
+        if (!res.status.equals("released"))
+            res.access = "restrictedByTbrc";
         final Statement ricS = main.getProperty(MarcExport.restrictedInChina);
         if (ricS != null && ricS.getBoolean() == true) 
             res.access = "restrictedInChina";
@@ -100,6 +100,15 @@ public class MockTbrcXmlExport {
             }
         } else {
             res.copyrightStatus = "publicdomain";
+        }
+        // introducing a new access value (fairUse-nocdl) and a new license value (copyright-nocdl)
+        final Statement dlpS = main.getProperty(digitalLendingPossible);
+        if (dlpS != null && dlpS.getBoolean() == false) { 
+            res.okForCdl = "false";
+            if (res.access.equals("fairUse"))
+                res.access = "fairUse-nocdl";
+            if (res.license.equals("copyright"))
+                res.license = "copyright-nocdl";
         }
         return res;
     }
@@ -126,15 +135,15 @@ public class MockTbrcXmlExport {
         final Element rootElement = doc.createElementNS(workNs, "work:work");
         rootElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:work", workNs);
         rootElement.setAttribute("RID", main.getLocalName());
-        rootElement.setAttribute("status", info.status);
+        //rootElement.setAttribute("status", info.status);
         doc.appendChild(rootElement);
 
         final Element archiveInfoElt = doc.createElementNS(workNs, "work:archiveInfo");
         rootElement.appendChild(archiveInfoElt);
         archiveInfoElt.setAttribute("access", info.access);
         archiveInfoElt.setAttribute("license", info.license);
-        archiveInfoElt.setAttribute("okForCdl", info.okForCdl);
-        archiveInfoElt.setAttribute("copyrightStatus", info.copyrightStatus);
+        //archiveInfoElt.setAttribute("okForCdl", info.okForCdl);
+        //archiveInfoElt.setAttribute("copyrightStatus", info.copyrightStatus);
         
         final StreamingResponseBody stream = new StreamingResponseBody() {
             @Override
