@@ -40,14 +40,14 @@ public class MockTbrcXmlExport {
         public String status = "editing";
         public String access = "restrictedByTbrc";
         public String license = "copyright";
-        public String okForCdl = "true";
+        public String cdl = "ok";
         public String copyrightStatus = "PublicDomain";
     }
     
     public static final Map<String,String> bdoAccessToTbrcAccess = new HashMap<>();
     public static final Map<String,String> bdoStatusToTbrcStatus = new HashMap<>();
     public static final Map<String,String> bdoAccessToTbrcLicense = new HashMap<>();
-    public static final Map<String,String> bdoAccessToTbrcCs = new HashMap<>();
+    public static final Map<String,String> bdoCsToStr = new HashMap<>();
     
     static {
         bdoAccessToTbrcAccess.put("AccessFairUse", "fairUse");
@@ -65,10 +65,10 @@ public class MockTbrcXmlExport {
         bdoStatusToTbrcStatus.put("StatusProvisional", "provisional");
         bdoStatusToTbrcStatus.put("StatusReleased", "released");
         bdoStatusToTbrcStatus.put("StatusWithdrawn", "withdrawn");
-        bdoAccessToTbrcCs.put("CopyrightClaimed", "incopyright");
-        bdoAccessToTbrcCs.put("CopyrightInCopyright", "incopyright");
-        bdoAccessToTbrcCs.put("CopyrightPublicDomain", "publicdomain");
-        bdoAccessToTbrcCs.put("CopyrightUndetermined", "undetermined");
+        bdoCsToStr.put("CopyrightClaimed", "incopyright");
+        bdoCsToStr.put("CopyrightInCopyright", "incopyright");
+        bdoCsToStr.put("CopyrightPublicDomain", "publicdomain");
+        bdoCsToStr.put("CopyrightUndetermined", "undetermined");
     }
     
     public static InfoForXML infoForXML(final Model m, final Resource main) {
@@ -89,7 +89,7 @@ public class MockTbrcXmlExport {
             res.access = "restrictedInChina";
         final Resource cs = main.getPropertyResourceValue(MarcExport.copyrightStatus);
         if (cs != null) {
-            res.copyrightStatus = bdoAccessToTbrcCs.getOrDefault(cs.getLocalName(), "incopyright");
+            res.copyrightStatus = bdoCsToStr.getOrDefault(cs.getLocalName(), "incopyright");
             // if a book has been determined as being in copyright but is put in open access on our website
             // we still want to restrict it on IA
             if (res.copyrightStatus.equals("incopyright")) {
@@ -103,13 +103,8 @@ public class MockTbrcXmlExport {
         }
         // introducing a new access value (fairUse-nocdl) and a new license value (copyright-nocdl)
         final Statement dlpS = main.getProperty(digitalLendingPossible);
-        if (dlpS != null && dlpS.getBoolean() == false) { 
-            res.okForCdl = "false";
-            if (res.access.equals("fairUse"))
-                res.access = "fairUse-nocdl";
-            if (res.license.equals("copyright"))
-                res.license = "copyright-nocdl";
-        }
+        if (dlpS != null && dlpS.getBoolean() == false)
+            res.cdl = "nok";
         return res;
     }
     
@@ -142,7 +137,7 @@ public class MockTbrcXmlExport {
         rootElement.appendChild(archiveInfoElt);
         archiveInfoElt.setAttribute("access", info.access);
         archiveInfoElt.setAttribute("license", info.license);
-        //archiveInfoElt.setAttribute("okForCdl", info.okForCdl);
+        archiveInfoElt.setAttribute("cdl", info.cdl);
         //archiveInfoElt.setAttribute("copyrightStatus", info.copyrightStatus);
         
         final StreamingResponseBody stream = new StreamingResponseBody() {

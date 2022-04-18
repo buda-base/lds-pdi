@@ -470,16 +470,16 @@ public class MarcExport {
     public static final Map<String, String> roleToName = new HashMap<>();
     static {
         roleToName.put("R0ER0025", "author."); // terton
-        roleToName.put("R0ER0019", "author."); // creatorMainAuthor
-        roleToName.put("R0ER0020", "translator."); // creatorTranslator
-        roleToName.put("R0ER0018", "consultant."); // creatorIndicScholar
-        roleToName.put("R0ER0016", "contributor."); // creatorContributingAuthor
-        roleToName.put("R0ER0014", "commentator for written text."); // creatorCommentator
-        roleToName.put("R0ER0014", "editor."); // creatorCompiler
-        roleToName.put("R0ER0023", "corrector."); // creatorReviser
-        roleToName.put("R0ER0024", "scribe."); // creatorScribe
-        roleToName.put("R0ER0013", "calligrapher."); // creatorCalligrapher
-        roleToName.put("R0ER0010", "artist."); // creatorArtist
+        roleToName.put("R0ER0019", "author."); // MainAuthor
+        roleToName.put("R0ER0020", "translator."); // Translator
+        roleToName.put("R0ER0018", "translator."); // IndicScholar
+        roleToName.put("R0ER0016", "contributor."); // ContributingAuthor
+        roleToName.put("R0ER0014", "commentator for written text."); // Commentator
+        roleToName.put("R0ER0014", "editor."); // Compiler
+        roleToName.put("R0ER0023", "corrector."); // Reviser
+        roleToName.put("R0ER0024", "scribe."); // Scribe
+        roleToName.put("R0ER0013", "calligrapher."); // Calligrapher
+        roleToName.put("R0ER0010", "artist."); // Artist
     }
 
     public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
