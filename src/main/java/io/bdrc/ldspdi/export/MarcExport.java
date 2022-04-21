@@ -472,7 +472,9 @@ public class MarcExport {
     static {
         roleToName.put("R0ER0025", "author."); // terton
         roleToName.put("R0ER0019", "author."); // MainAuthor
-        roleToName.put("R0ER0020", "translator."); // Translator
+        roleToName.put("R0ER0020", "translator."); // oral translator
+        roleToName.put("R0ER0017", "translator."); // head translator
+        roleToName.put("R0ER0026", "translator."); // translator
         roleToName.put("R0ER0018", "translator."); // IndicScholar
         roleToName.put("R0ER0016", "contributor."); // ContributingAuthor
         roleToName.put("R0ER0014", "commentator for written text."); // Commentator
