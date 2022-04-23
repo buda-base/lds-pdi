@@ -40,7 +40,7 @@ public class MockTbrcXmlExport {
         public String status = "editing";
         public String access = "restrictedByTbrc";
         public String license = "copyright";
-        public String cdl = "ok";
+        public String cdl = "yes";
         public String copyrightStatus = "PublicDomain";
     }
     
@@ -104,7 +104,7 @@ public class MockTbrcXmlExport {
         // introducing a new access value (fairUse-nocdl) and a new license value (copyright-nocdl)
         final Statement dlpS = main.getProperty(digitalLendingPossible);
         if (dlpS != null && dlpS.getBoolean() == false)
-            res.cdl = "nok";
+            res.cdl = "false";
         return res;
     }
     
