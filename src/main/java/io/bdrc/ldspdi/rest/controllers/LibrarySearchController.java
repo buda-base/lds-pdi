@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.rest.controllers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.auth.Access;
 import io.bdrc.auth.Access.AccessLevel;
+import io.bdrc.auth.rdf.Subscribers;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -58,6 +60,20 @@ public class LibrarySearchController {
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
         if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
             map.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+        }
+        if (qfp.getRequiredParams().contains(QueryConstants.SUBSCRIBEDLIST)) {
+            final String ipAddress = request.getHeader("X-Real-IP");
+            final String subscriberLname = Subscribers.getCachedSubscriber(ipAddress);
+            if (subscriberLname == null || subscriberLname.isEmpty()) {
+                map.put(QueryConstants.SUBSCRIBEDLIST, "bdr:nil");
+            } else {
+                List<String> collections = Subscribers.collectionsOfSubscriber(subscriberLname);
+                if (collections == null || collections.isEmpty()) {
+                    map.put(QueryConstants.SUBSCRIBEDLIST, "bdr:nil");
+                } else {
+                    map.put(QueryConstants.SUBSCRIBEDLIST, "bdr:"+String.join(",bdr:", collections));
+                }
+            }
         }
         final String query = qfp.getParametizedQuery(map, true);
         log.debug("Call to getLibGraphGet() with query >> " + query);

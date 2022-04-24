@@ -36,6 +36,8 @@ public class QueryConstants {
     public final static String LIMIT = "limit";
     public final static String QUERY_LIMIT = "QueryLimit";
     public final static String RIC = "B_RIC";
+    public final static String SUBSCRIBEDLIST = "R_SUBSCRIBED_LIST";
+    public final static String SUBSCRIBER = "R_SUBSCRIBER";
     public final static String QUERY_TIMEOUT = "timeout";
 
     // ****** URL QUERY TEMPLATE****************/

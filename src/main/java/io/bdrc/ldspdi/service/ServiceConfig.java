@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.auth.AuthProps;
+import io.bdrc.auth.rdf.Subscribers;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.libraries.LibProps;
 import io.bdrc.libraries.Prefix;
@@ -100,6 +101,10 @@ public class ServiceConfig {
             SERVER_ROOT = prop.getProperty("serverRoot");
             PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
             OntPolicies.init();
+            if ("true".equals(prop.getProperty("authEnabled")) && !isInChina()) {
+                Subscribers.init();
+                Subscribers.setCache(new IPCacheImpl());
+            }
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }
