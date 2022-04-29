@@ -101,10 +101,6 @@ public class ServiceConfig {
             SERVER_ROOT = prop.getProperty("serverRoot");
             PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
             OntPolicies.init();
-            if ("true".equals(prop.getProperty("authEnabled")) && !isInChina()) {
-                Subscribers.init();
-                Subscribers.setCache(new IPCacheImpl());
-            }
         } catch (IOException ex) {
             log.error("ServiceConfig init error", ex);
         }

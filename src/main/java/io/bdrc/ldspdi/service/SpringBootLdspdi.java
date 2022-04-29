@@ -21,6 +21,7 @@ import org.springframework.context.event.EventListener;
 
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.rdf.RdfAuthModel;
+import io.bdrc.auth.rdf.Subscribers;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.results.ResultsCache;
@@ -52,6 +53,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         AuthProps.init(props);
         if (ServiceConfig.useAuth()) {
             RdfAuthModel.readAuthModel();
+            Subscribers.init();
+            Subscribers.setCache(new IPCacheImpl());
         }
         ResultsCache.init();
         // Pull lds-queries repo from git if not in China
