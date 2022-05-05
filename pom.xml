@@ -9,7 +9,7 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    
-    <jena.version>3.14.0</jena.version>
+    <jena.version>4.2.0</jena.version>
     <jcs.version>2.2.1</jcs.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
