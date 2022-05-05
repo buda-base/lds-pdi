@@ -43,6 +43,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             RevisionSyntaxException, AmbiguousObjectException,
             IncorrectObjectTypeException, IOException, InterruptedException {
         try {
+            log.error("service config init");
             ServiceConfig.init();
         } catch (IOException e1) {
             log.error("Primary config could not be load in ServiceConfig", e1);
@@ -50,22 +51,30 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
                     .setContext("Ldspdi startup and initialization", e1));
         }
         final Properties props = ServiceConfig.getProperties();
+        log.error("init auth props");
         AuthProps.init(props);
         if (ServiceConfig.useAuth()) {
+            log.error("read auth model");
             RdfAuthModel.readAuthModel();
-            Subscribers.init();
+            log.error("set subscribers cache");
             Subscribers.setCache(new IPCacheImpl());
+            log.error("init subscribers cache");
+            Subscribers.init();
         }
+        log.error("init results cache");
         ResultsCache.init();
         // Pull lds-queries repo from git if not in China
         if (!ServiceConfig.isInChina()) {
+            log.error("init git service");
             GitService gs = new GitService(0);
+            log.error("git service update");
             String commit = gs.update(GitService.GIT_LOCAL_PATH,
                     GitService.GIT_REMOTE_URL);
+            log.error("set queries commit");
             ServiceConfig.setQueriesCommit(commit);
         }
         if (ServiceConfig.getProperty("taxonomyRoot") != null) {
-            log.info("initialize taxonomies");
+            log.error("initialize taxonomies");
             WorkResults.initForProd();
         }
         log.info("SpringBootLdspdi has been properly initialized");
