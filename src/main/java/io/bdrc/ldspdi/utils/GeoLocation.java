@@ -31,7 +31,7 @@ public class GeoLocation {
     public static DatabaseReader getDbReader() {
         try {
             File database = new File(DBLocation);
-            return new DatabaseReader.Builder(database).withCache(new CHMCache()).build();
+            return new DatabaseReader.Builder(database).withCache(new JCSNodeCache()).build();
         } catch (IOException e) {
             log.error("getDbReader()", e);
             return null;
