@@ -35,6 +35,8 @@ public class MockTbrcXmlExport {
     public static final String workNs = "http://www.tbrc.org/models/work#";
     public final static Logger log = LoggerFactory.getLogger(MockTbrcXmlExport.class);
     public static final Property digitalLendingPossible = ResourceFactory.createProperty(MarcExport.BDO + "digitalLendingPossible");
+    public static final Property inCollection = ResourceFactory.createProperty(MarcExport.BDO + "inCollection");
+    public static final Resource bdrPR1NLM00 = ResourceFactory.createResource(MarcExport.BDR + "PR1NLM00");
 
     public static class InfoForXML {
         public String status = "editing";
@@ -84,6 +86,9 @@ public class MockTbrcXmlExport {
         // IA's script doesn't look at the status, so the idea is to mark the unreleased items as restricted
         if (!res.status.equals("released"))
             res.access = "restrictedByTbrc";
+        // NLM doesn't want their scans on IA so we mark them as restrictedTemporarily
+        if (m.contains(main, inCollection, bdrPR1NLM00))
+            res.access = "temporarilyRestricted";
         final Statement ricS = main.getProperty(MarcExport.restrictedInChina);
         if (ricS != null && ricS.getBoolean() == true) 
             res.access = "restrictedInChina";
