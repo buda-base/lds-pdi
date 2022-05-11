@@ -126,8 +126,11 @@ public class OntData {
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
             boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
-            if (!readonly)
+            if (!readonly) {
                 updateFusekiDataset();
+            } else {
+                log.error("read only mode, don't update Fuseki with the ontology");
+            }
             readGithubJsonLDContext();
             adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
