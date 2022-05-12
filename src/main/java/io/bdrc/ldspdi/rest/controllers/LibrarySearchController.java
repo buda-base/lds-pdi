@@ -86,6 +86,7 @@ public class LibrarySearchController {
             // the etext
             return filteredChunkResponse(request, model, format);
         case "workFacetGraph":
+        case "serialWorkFacetGraph":
         case "instanceFacetGraph":
         case "iinstanceFacetGraph":
         case "einstanceFacetGraph":
