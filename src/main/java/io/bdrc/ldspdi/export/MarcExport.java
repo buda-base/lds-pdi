@@ -198,6 +198,9 @@ public class MarcExport {
         // If you use first indicator 1 and subfield $i, then there is no second
         // indicator. It needs to be blank.
         titleLocalNameToMarcInfo.put("TitlePageTitle", new MarcInfo(0, '5', null));
+        // Title is the new BibliographicalTitle. In some cases (ex: W1KG14512), the main title has type
+        // :Title
+        titleLocalNameToMarcInfo.put("Title", new MarcInfo(0, ' ', null));
         titleLocalNameToMarcInfo.put("BibliographicalTitle", new MarcInfo(1, ' ', "BDRC Bibliographical title:"));
         titleLocalNameToMarcInfo.put("CoverTitle", new MarcInfo(2, '4', null));
         titleLocalNameToMarcInfo.put("FullTitle", new MarcInfo(3, '3', null));
@@ -209,7 +212,6 @@ public class MarcExport {
         titleLocalNameToMarcInfo.put("RunningTitle", new MarcInfo(9, '7', null));
         titleLocalNameToMarcInfo.put("SpineTitle", new MarcInfo(10, '8', null));
         titleLocalNameToMarcInfo.put("TitlePortion", new MarcInfo(11, '0', null));
-        titleLocalNameToMarcInfo.put("Title", new MarcInfo(99, '3', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
         // Columbia doesn't want RDA here
