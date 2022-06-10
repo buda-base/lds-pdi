@@ -371,6 +371,7 @@ public class PublicDataController {
     @GetMapping(value = "/resource/{res:.+}")
     public ResponseEntity<StreamingResponseBody> getResourceGraph(@PathVariable String res,
             @RequestHeader(value = "fusekiUrl", required = false) final String fusekiUrl,
+            @RequestParam(value = "prefLangs", required = false) String prefLangs,
             @RequestHeader(value = "Accept", required = false) String format, HttpServletResponse response,
             HttpServletRequest request, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
             @RequestParam(value = "endChar", defaultValue = "999999999") String endChar, @RequestParam(value = "style", required = false) String style)
@@ -379,7 +380,7 @@ public class PublicDataController {
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
             String[] parts = res.split("\\.");
-            return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, fusekiUrl, style, response, request);
+            return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, prefLangs, fusekiUrl, style, response, request);
         }
         String prefixedRes = RES_PREFIX_SHORT + res;
         String fullResURI = GRAPH_PREFIX_FULL + res;
@@ -454,6 +455,7 @@ public class PublicDataController {
     public ResponseEntity<StreamingResponseBody> getFormattedResourceGraph(@PathVariable("res") String res,
             @PathVariable("ext") String ext, @RequestParam(value = "startChar", defaultValue = "0") String startChar,
             @RequestParam(value = "endChar", defaultValue = defaultMaxVal) String endChar,
+            @RequestParam(value = "prefLangs", required = false) String prefLangs,
             @RequestHeader(value = "fusekiUrl", required = false) String fusekiUrl, @RequestParam(value = "style", required = false) String style, HttpServletResponse response,
             HttpServletRequest request) throws RestException, IOException {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}, style {}", res, ext, style);
@@ -488,7 +490,7 @@ public class PublicDataController {
             return MarcExport.getResponse(media, RES_PREFIX + res, style);
         else if (ext.equals("txt"))
             return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar),
-                    Integer.parseInt(endChar), res);
+                    Integer.parseInt(endChar), res, prefLangs);
         else if (ext.equals("xml") && "tbrc-ia".equals(style))
             return MockTbrcXmlExport.getResponse(RES_PREFIX+res);
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null,

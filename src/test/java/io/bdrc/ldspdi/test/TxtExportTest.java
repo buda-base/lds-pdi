@@ -70,6 +70,7 @@ public class TxtExportTest {
                 "http://localhost:" + environment.getProperty("local.server.port") + "/resource/UT11577_004_0000.txt?startChar=1234&endChar=2444");
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet(uri);
+        //get.addHeader("Accept-Language", "bo-x-ewts, sa-x-iast");
         HttpResponse resp = client.execute(get);
         System.out.println(resp.getStatusLine());
         // resp.getEntity().writeTo(System.out);

@@ -2,14 +2,19 @@ package io.bdrc.ldspdi.export;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.bdrc.auth.Access;
 import io.bdrc.auth.Access.AccessLevel;
+import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.controllers.PublicDataController;
@@ -29,6 +35,9 @@ import io.bdrc.ldspdi.utils.GeoLocation;
 import io.bdrc.libraries.StreamingHelpers;
 
 public class TxtEtextExport {
+    
+    public static final EwtsConverter ewtsConverter = new EwtsConverter();
+    public final static Logger log = LoggerFactory.getLogger(TxtEtextExport.class);
 
     public static ResultSetWrapper getResults(final String resUri, final Integer startChar, final Integer endChar) throws RestException {
         Map<String, String> args = new HashMap<>();
@@ -56,7 +65,7 @@ public class TxtEtextExport {
 
     static final StartCharComparator startCharComparatorInstance = new StartCharComparator();
 
-    public static String getStringForTxt(final ResultSetWrapper res, final Integer startChar, final Integer endChar) {
+    public static String getStringForTxt(final ResultSetWrapper res, final Integer startChar, final Integer endChar, final Map<String,String> ltagConversionMap) {
         List<QuerySolution> sols = res.getQuerySolutions();
         Collections.sort(sols, startCharComparatorInstance);
         final StringBuilder sb = new StringBuilder();
@@ -65,21 +74,51 @@ public class TxtEtextExport {
                 continue;
             final int qsStartChar = qs.getLiteral("chunkstart").getInt();
             final int qsEndChar = qs.getLiteral("chunkend").getInt();
-            final String qsContent = qs.getLiteral("chunkcontent").getString();
+            final Literal qsContent = qs.getLiteral("chunkcontent").asLiteral();
+            final String qsContentS = qsContent.getString();
+            final String qsContentSToAdd;
             if (qsStartChar < startChar && qsEndChar > endChar) {
-                sb.append(qsContent.substring(startChar - qsStartChar, endChar - qsStartChar));
+                qsContentSToAdd = qsContentS.substring(startChar - qsStartChar, endChar - qsStartChar);
             } else if (qsStartChar < startChar) {
-                sb.append(qsContent.substring(startChar - qsStartChar));
+                qsContentSToAdd = qsContentS.substring(startChar - qsStartChar);
             } else if (qsEndChar > endChar) {
-                sb.append(qsContent.substring(0, endChar - qsStartChar));
+                qsContentSToAdd = qsContentS.substring(0, endChar - qsStartChar);
             } else {
-                sb.append(qsContent);
+                qsContentSToAdd = qsContentS;
+            }
+            if (ltagConversionMap.containsKey(qsContent.getLanguage())) {
+                // here we just assume that we're converting to ewts since it's the only thing that
+                // can happen in the code
+                sb.append(ewtsConverter.toWylie(qsContentSToAdd));
+            } else {
+                sb.append(qsContentSToAdd);
             }
         }
         return sb.toString();
     }
     
-    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar, final String resName) throws RestException {
+    public static final Map<String,String> getLtagConversionMap(final List<Locale> llist) {
+        final Map<String,String> res = new HashMap<>();
+        for (final Locale l : llist) {
+            final String ltag = l.toLanguageTag();
+            if (ltag.equals("bo-x-ewts")) {
+                res.put("bo", "bo-x-ewts");
+            }
+        }
+        return res;
+    }
+    
+    public static void addToLtagConversionMap(final String prefLangs, Map<String,String> ltagConversionMap) {
+        if (prefLangs == null || prefLangs.isEmpty())
+            return;
+        for (final String l : prefLangs.split(",")) {
+            if (l.equals("bo-x-ewts")) {
+                ltagConversionMap.put("bo", "bo-x-ewts");
+            }
+        }
+    }
+    
+    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar, final String resName, final String prefLangs) throws RestException {
         final ResultSetWrapper res = getResults(resUri, startChar, endChar);
         if (res.numResults < 2) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
@@ -120,7 +159,10 @@ public class TxtEtextExport {
             }
         }
         fName += ".txt";
-        final String resStr = getStringForTxt(res, startChar, endChar);
+        final List<Locale> locales = Collections.list(request.getLocales());
+        final Map<String,String> ltagConversionMap = getLtagConversionMap(locales);
+        addToLtagConversionMap(prefLangs, ltagConversionMap);
+        final String resStr = getStringForTxt(res, startChar, endChar, ltagConversionMap);
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD")
                 .header("Vary", "Negotiate, Accept")
                 .header("Content-Disposition", "attachment; filename=\""+fName+"\"")
