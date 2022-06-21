@@ -53,12 +53,12 @@ public class TxtEtextExport {
 
     static class StartCharComparator implements Comparator<QuerySolution> {
         @Override
-        public int compare(QuerySolution a, QuerySolution b) {
+        public int compare(final QuerySolution a, final QuerySolution b) {
             // there is one solution that contains the access, etc. we put it first
             if (!a.contains("chunkstart")) return -1;
             if (!b.contains("chunkstart")) return 1;
-            Integer ai = a.getLiteral("chunkstart").getInt();
-            Integer bi = a.getLiteral("chunkstart").getInt();
+            final Integer ai = a.getLiteral("chunkstart").getInt();
+            final Integer bi = b.getLiteral("chunkstart").getInt();
             return ai.compareTo(bi);
         }
     }
