@@ -218,7 +218,7 @@ public class PublicTemplatesController {
     @GetMapping(value = "/query/graph/{file}")
     public ResponseEntity<StreamingResponseBody> getGraphTemplateResults(HttpServletResponse response, HttpServletRequest request,
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
-            @RequestParam(value = "format", defaultValue = "jsonld") final String format, @PathVariable("file") String file) throws RestException {
+            @RequestParam(value = "format", required = false) String format, @PathVariable("file") String file) throws RestException {
         Helpers.setCacheControl(response, "public");
         MediaType mediaType = null;
         Model model = null;
@@ -227,6 +227,10 @@ public class PublicTemplatesController {
             String path = request.getServletPath();
             MediaType variant = BudaMediaTypes.selectVariant(request.getHeader("Accept"), BudaMediaTypes.graphVariants);
             log.info("Call to getGraphTemplateResults() with URL: {}, accept {}, variant {}", path, format, variant);
+            if (format == null && variant == null) {
+                format = "jsonld";
+            }
+            // dead code but we need to keep jsonld as the default for now for pdl
             if (format == null && variant == null) {
                 HttpHeaders hh = new HttpHeaders();
                 hh.setAll(getGraphResourceHeaders(path, null, "List"));
