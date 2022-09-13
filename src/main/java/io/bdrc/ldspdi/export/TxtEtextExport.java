@@ -2,7 +2,6 @@ package io.bdrc.ldspdi.export;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -20,8 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.auth.Access;
-import io.bdrc.auth.Access.AccessLevel;
+import io.bdrc.auth.AccessInfo;
+import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
@@ -133,14 +132,14 @@ public class TxtEtextExport {
         if (restrictedInChina && GeoLocation.isFromChina(request)) {
             return ResponseEntity.status(451).contentType(MediaType.TEXT_PLAIN).body(StreamingHelpers.getStream("Etext not available in your geographical area"));
         }
-        Access acc = (Access) request.getAttribute("access");
+        AccessInfo acc = (AccessInfo) request.getAttribute("access");
         if (acc == null)
-            acc = new Access();
+            acc = new AccessInfoAuthImpl();
         final String accessShortName = qs.get("access").asResource().getLocalName();
         final String statusShortName = qs.get("status").asResource().getLocalName();
-        final AccessLevel al = acc.hasResourceAccess(accessShortName, statusShortName, qs.get("einst").asResource().getURI());
-        if (al != AccessLevel.OPEN) {
-            return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache())
+        final AccessInfoAuthImpl.AccessLevel al = acc.hasResourceAccess(accessShortName, statusShortName, qs.get("einst").asResource().getURI());
+        if (al != AccessInfoAuthImpl.AccessLevel.OPEN) {
+            return ResponseEntity.status(acc.isLogged() ? 403 : 401).cacheControl(CacheControl.noCache())
                     .body(StreamingHelpers.getStream("Insufficient rights"));
         }
         CacheControl cc = CacheControl.maxAge(CorsFilter.ACCESS_CONTROL_MAX_AGE_IN_SECONDS, TimeUnit.SECONDS);

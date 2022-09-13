@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.auth.Access;
+import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
@@ -88,7 +88,7 @@ public class BdrcAuthController {
                 return ResponseEntity.status(200).body(StreamingHelpers.getModelStream(
                         getUserModelFromUserId(false, res), "jsonld", ServiceConfig.PREFIX.getPrefixMap()));
             } else {
-                Access acc = (Access) request.getAttribute("access");
+                AccessInfoAuthImpl acc = (AccessInfoAuthImpl) request.getAttribute("access");
                 // auth0Id corresponding to the logged on user - from the token
                 log.info("User in userResource() >> {}", acc.getUser());
                 String auth0Id = acc.getUser().getUserId();

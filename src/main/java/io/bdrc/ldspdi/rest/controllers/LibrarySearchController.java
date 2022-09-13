@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import io.bdrc.auth.Access;
-import io.bdrc.auth.Access.AccessLevel;
+import io.bdrc.auth.AccessInfo;
+import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.auth.rdf.Subscribers;
 import io.bdrc.ldspdi.exceptions.ErrorMessage;
 import io.bdrc.ldspdi.exceptions.LdsError;
@@ -164,12 +164,12 @@ public class LibrarySearchController {
         //m.removeAll(admData, null, null);
         if (m.isEmpty())
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Nothing found (empty)\""));
-        Access acc = (Access) request.getAttribute("access");
+        AccessInfo acc = (AccessInfo) request.getAttribute("access");
         if (acc == null)
-            acc = new Access();
-        final AccessLevel al = acc.hasResourceAccess(access.getLocalName(), status.getLocalName(), einst.getURI());
-        if (al != AccessLevel.OPEN) {
-            return ResponseEntity.status(acc.isUserLoggedIn() ? 403 : 401).cacheControl(CacheControl.noCache())
+            acc = new AccessInfoAuthImpl();
+        final AccessInfoAuthImpl.AccessLevel al = acc.hasResourceAccess(access.getLocalName(), status.getLocalName(), einst.getURI());
+        if (al != AccessInfoAuthImpl.AccessLevel.OPEN) {
+            return ResponseEntity.status(acc.isLogged() ? 403 : 401).cacheControl(CacheControl.noCache())
                     .contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getStream("\"Insufficient rights\""));
         }
         CacheControl cc = CacheControl.maxAge(CorsFilter.ACCESS_CONTROL_MAX_AGE_IN_SECONDS, TimeUnit.SECONDS);

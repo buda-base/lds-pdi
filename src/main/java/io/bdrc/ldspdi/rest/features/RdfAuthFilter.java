@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import io.bdrc.auth.Access;
+import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.model.Endpoint;
@@ -39,7 +39,7 @@ public class RdfAuthFilter implements Filter {
                     && !method.equalsIgnoreCase("OPTIONS")) {
                 HttpServletRequest req = (HttpServletRequest) request;
                 boolean isSecuredEndpoint = true;
-                request.setAttribute("access", new Access());
+                request.setAttribute("access", new AccessInfoAuthImpl());
                 String token = getToken(req.getHeader("Authorization"));
                 TokenValidation validation = null;
                 String path = req.getServletPath();
@@ -82,7 +82,7 @@ public class RdfAuthFilter implements Filter {
                         ((HttpServletResponse) response).setStatus(403);
                         return;
                     } else {
-                        Access access = new Access(prof, end);
+                        AccessInfoAuthImpl access = new AccessInfoAuthImpl(prof, end);
                         log.debug("FILTER Access matchGroup >> {}",
                                 access.matchGroup());
                         log.debug("FILTER Access matchRole >> {}",
@@ -99,7 +99,7 @@ public class RdfAuthFilter implements Filter {
                     // end point not secured
                     if (validation != null) {
                         // token present since validation is not null
-                        Access acc = new Access(prof, end);
+                        AccessInfoAuthImpl acc = new AccessInfoAuthImpl(prof, end);
                         request.setAttribute("access", acc);
                         log.debug("FILTER Access is >> {}", acc);
                     }

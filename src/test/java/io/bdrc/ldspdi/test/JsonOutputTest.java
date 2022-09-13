@@ -125,7 +125,7 @@ public class JsonOutputTest {
         ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes());
         ResultSet rs1=ResultSetFactory.fromJSON(is);
         is=new ByteArrayInputStream(json.getBytes());
-        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.SPARQLResultSetJSON);
+        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.RS_JSON);
         ResultSetRewindable rwd1=ResultSetFactory.copyResults(rs1);
         ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);
         assertEquals(rwd1.size(),limit);
@@ -144,7 +144,7 @@ public class JsonOutputTest {
         ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes());
         ResultSet rs1=ResultSetFactory.fromJSON(is);
         is=new ByteArrayInputStream(json.getBytes());
-        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.SPARQLResultSetJSON);
+        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.RS_JSON);
         ResultSetRewindable rwd1=ResultSetFactory.copyResults(rs1);
         ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);
         assertEquals(rwd1.size(),limit);
@@ -183,7 +183,7 @@ public class JsonOutputTest {
         ByteArrayInputStream is=new ByteArrayInputStream(json.getBytes());
         ResultSet rs1=ResultSetFactory.fromJSON(is);
         is=new ByteArrayInputStream(json.getBytes());
-        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.SPARQLResultSetJSON);
+        ResultSet rs2=ResultSetMgr.read(is, ResultSetLang.RS_JSON);
         ResultSetRewindable rwd1=ResultSetFactory.copyResults(rs1);
         ResultSetRewindable rwd2=ResultSetFactory.copyResults(rs2);
         assertEquals(rwd1.size(),limit);

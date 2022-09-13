@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.auth.Access;
+import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.auth.TokenValidation;
 import io.bdrc.auth.UserProfile;
 import io.bdrc.auth.model.Endpoint;
@@ -30,7 +30,7 @@ public class RdfAuthTestFilter implements Filter {
         if (ServiceConfig.useAuth()) {
             HttpServletRequest req = (HttpServletRequest) request;
             boolean isSecuredEndpoint = true;
-            request.setAttribute("access", new Access());
+            request.setAttribute("access", new AccessInfoAuthImpl());
             String token = getToken(req.getHeader("Authorization"));
             TokenValidation validation = null;
             String path = req.getServletPath();
@@ -69,7 +69,7 @@ public class RdfAuthTestFilter implements Filter {
                     // no token --> access forbidden
                     return;
                 } else {
-                    Access access = new Access(prof, end);
+                    AccessInfoAuthImpl access = new AccessInfoAuthImpl(prof, end);
                     // System.out.println("FILTER Access matchGroup >> " + access.matchGroup());
                     // System.out.println("FILTER Access matchRole >> " + access.matchRole());
                     // System.out.println("FILTER Access matchPerm >> " +
@@ -84,7 +84,7 @@ public class RdfAuthTestFilter implements Filter {
                 // end point not secured
                 if (validation != null) {
                     // token present since validation is not null
-                    Access acc = new Access(prof, end);
+                    AccessInfoAuthImpl acc = new AccessInfoAuthImpl(prof, end);
                     request.setAttribute("access", acc);
                 }
             }

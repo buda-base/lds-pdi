@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.results;
 
+import javax.cache.CacheException;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -19,31 +21,39 @@ package io.bdrc.ldspdi.results;
  * limitations under the License.
  ******************************************************************************/
 
-import org.apache.commons.jcs.JCS;
-import org.apache.commons.jcs.access.CacheAccess;
-import org.apache.commons.jcs.access.exception.CacheException;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ResultsCache {
 
-    public static CacheAccess<Integer, Object> CACHE;
+    public static Cache<Integer, Object> CACHE;
     public final static Logger log = LoggerFactory.getLogger(ResultsCache.class);
 
     public static void init() {
-        CACHE = JCS.getInstance("ldspdi");
+        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
+        cacheManager.init();
+        CACHE = cacheManager.createCache("geoloc", CacheConfigurationBuilder.newCacheConfigurationBuilder(Integer.class, Object.class,
+                ResourcePoolsBuilder.newResourcePoolsBuilder().heap(500, EntryUnit.ENTRIES)));
+        log.debug("Cache was initialized {}", CACHE);
+        //cacheManager.close();
     }
 
-    public static void addToCache(Object res, int hash) {
+    public static void addToCache(final Object res, final int hash) {
         try {
             CACHE.put(Integer.valueOf(hash), res);
-            res = null;
         } catch (CacheException e) {
             log.error("Problem putting Results -->" + res + " in the cache, for key -->" + hash + " Exception:" + e.getMessage());
         }
+        
     }
 
-    public static Object getObjectFromCache(int hash) {
+    public static Object getObjectFromCache(final int hash) {
         return CACHE.get(Integer.valueOf(hash));
     }
 

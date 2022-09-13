@@ -27,7 +27,7 @@ public class IPCacheImpl implements IPCache {
     }
     
     @Override
-    public String getSubscriber(String ip, Loader loader) throws IOException {
+    public String getSubscriber(final String ip, final Loader loader) throws IOException {
         try {
             String value = CACHE.get(ip);
             if (value == null) {

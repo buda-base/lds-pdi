@@ -44,6 +44,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFWriterI;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.Reasoner;
@@ -79,7 +80,6 @@ import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.ontology.service.core.OntPropModel;
-import io.bdrc.ldspdi.results.CacheAccessModel;
 import io.bdrc.ldspdi.service.GitService;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -138,15 +138,6 @@ public class PublicDataController {
         log.info("Call getRobots()");
         Helpers.setCacheControl(response, "public");
         return ResponseEntity.ok().body(ServiceConfig.getRobots());
-    }
-
-    @GetMapping(value = "cache", produces = MediaType.TEXT_HTML_VALUE)
-    public ModelAndView getCacheInfo() {
-        log.info("Call to getCacheInfo()");
-        ModelAndView model = new ModelAndView();
-        model.addObject("model", new CacheAccessModel());
-        model.setViewName("cache");
-        return model;
     }
 
     @GetMapping(value = "/context.jsonld", produces = "application/ld+json;charset=utf-8")
@@ -653,7 +644,7 @@ public class PublicDataController {
                     if (JenaLangStr == RDFLanguages.strLangTurtle) {
                         model.write(baos, "TURTLE");
                     } else {
-                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                        RDFWriterI wr = model.getWriter(JenaLangStr);
                         if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
                             wr.setProperty("xmlbase", params.getBaseUri());
                         }
@@ -688,7 +679,7 @@ public class PublicDataController {
                     if (JenaLangStr == RDFLanguages.strLangTurtle) {
                         model.write(baos, "TURTLE");
                     } else {
-                        org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
+                        RDFWriterI wr = model.getWriter(JenaLangStr);
                         if (JenaLangStr.equals(RDFLanguages.strLangRDFXML)) {
                             wr.setProperty("xmlbase", null);
                         }
@@ -748,9 +739,7 @@ public class PublicDataController {
                 if (JenaLangStr == RDFLanguages.strLangTurtle) {
                     model.write(baos, "TURTLE");
                 } else {
-                    org.apache.jena.rdf.model.RDFWriter wr = model.getWriter(JenaLangStr);
-
-                    wr.write(model, baos, "http://purl.bdrc.io/ontology/core/");
+                    model.write(baos, "TURTLE", "http://purl.bdrc.io/ontology/core/");
                 }
             }
         } else {
