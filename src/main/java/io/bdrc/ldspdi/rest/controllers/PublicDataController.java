@@ -728,6 +728,7 @@ public class PublicDataController {
         Model model = OntData.ontAllMod;
         Helpers.setCacheControl(resp, "public");
         final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
+        
         // Inference here if required
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (model != null) {
@@ -739,7 +740,7 @@ public class PublicDataController {
                 if (JenaLangStr == RDFLanguages.strLangTurtle) {
                     model.write(baos, "TURTLE");
                 } else {
-                    model.write(baos, "TURTLE", "http://purl.bdrc.io/ontology/core/");
+                    model.write(baos, JenaLangStr, "http://purl.bdrc.io/ontology/core/");
                 }
             }
         } else {
