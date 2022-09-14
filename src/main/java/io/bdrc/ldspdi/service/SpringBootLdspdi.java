@@ -37,7 +37,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     // public final static Logger log =
     // LoggerFactory.getLogger(SpringBootLdspdi.class);
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(SpringBootLdspdi.class);
 
     public static void main(String[] args) throws RestException,
             RevisionSyntaxException, AmbiguousObjectException,
@@ -55,7 +55,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         AuthProps.init(props);
         if (ServiceConfig.useAuth()) {
             log.error("read auth model");
-            RdfAuthModel.readAuthModel();
+            RdfAuthModel.init();
             log.error("set subscribers cache");
             Subscribers.setCache(new IPCacheImpl());
             log.error("init subscribers cache");
@@ -78,9 +78,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             WorkResults.initForProd();
         }
         log.info("SpringBootLdspdi has been properly initialized");
-        SpringApplication app = new SpringApplication(SpringBootLdspdi.class);
-        app.setDefaultProperties(props);
-        app.run(args);
+        //SpringApplication app = new SpringApplication(SpringBootLdspdi.class);
+        //app.setDefaultProperties(props);
+        //app.run(args);
+        SpringApplication.run(SpringBootLdspdi.class, args);
     }
 
     @EventListener(ApplicationReadyEvent.class)
