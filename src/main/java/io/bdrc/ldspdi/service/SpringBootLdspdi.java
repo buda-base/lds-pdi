@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,10 +30,9 @@ import io.bdrc.ldspdi.results.library.WorkResults;
 
 @SpringBootApplication
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude=ErrorMvcAutoConfiguration.class)
 @Primary
 @ComponentScan(basePackages = {"io.bdrc.ldspdi"})
-
 public class SpringBootLdspdi extends SpringBootServletInitializer {
 
     // public final static Logger log =
