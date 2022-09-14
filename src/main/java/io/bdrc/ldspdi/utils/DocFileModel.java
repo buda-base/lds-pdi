@@ -38,8 +38,6 @@ public class DocFileModel {
         try {
             setContentModel();
         } catch (RestException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             log.error("DocFileModel init failed !", e);
         }
     }

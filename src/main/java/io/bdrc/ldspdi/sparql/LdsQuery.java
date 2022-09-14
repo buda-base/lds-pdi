@@ -48,6 +48,7 @@ public class LdsQuery {
     private final String QUERY = "#Query";
 
     private QueryTemplate template;
+    private String filePath;
     private String queryName;
     private String query;
     private String queryHtml;
@@ -61,6 +62,7 @@ public class LdsQuery {
     private long limit_max = Long.parseLong(ServiceConfig.getProperty(QueryConstants.LIMIT));
 
     public LdsQuery(String filePath) throws RestException {
+        this.filePath = filePath;
         final File f = new File(filePath);
         final String fileBaseName = f.getName();
         queryName = fileBaseName.substring(0, fileBaseName.lastIndexOf("."));
@@ -115,7 +117,7 @@ public class LdsQuery {
                 this.limit_max = Long.parseLong(customLimit);
             }
         } catch (Exception e) {
-            log.error("QueryFile parsing error", e);
+            log.error("QueryFile parsing error for "+this.filePath, e);
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
                     .setContext("Query template parsing failed for: " + file.getName()));
         } finally {
@@ -144,13 +146,13 @@ public class LdsQuery {
                     throw new RestException(500,
                             new LdsError(LdsError.PARSE_ERR).setContext(
                                     " in QueryFileParser.getParametizedQuery() ParameterException :" + param
-                                            + " Unknown prefix"));
+                                            + " Unknown prefix in "+this.filePath));
                 }
             }
         } else {
             throw new RestException(500, new LdsError(LdsError.PARSE_ERR)
                     .setContext(" in QueryFileParser.getParametizedQuery() ParameterException :" + param
-                            + " This parameter must be of the form prefix:resource or spaceNameUri/resource"));
+                            + " This parameter must be of the form prefix:resource or spaceNameUri/resource in "+this.filePath));
         }
     }
     
@@ -284,7 +286,7 @@ public class LdsQuery {
         System.out.println("PARAMS>> " + getRequiredParams() + " MAp >>" + map);
         for (String required : getRequiredParams()) {
             if (map.get(required) == null || "null".contentEquals(map.get(required))) {
-                check = "The request mandatory parameter " + required + " is missing : the query cannot be built";
+                check = "The request mandatory parameter " + required + " is missing : the query cannot be built for "+this.filePath;
                 return check;
             }
         }
@@ -399,7 +401,7 @@ public class LdsQuery {
                         p.add(gp);
                         break;
                     default :
-                        log.error("unknown type: " + type);
+                        log.error("unknown type: " + type + " in " + this.filePath);
                 }
             }
         }

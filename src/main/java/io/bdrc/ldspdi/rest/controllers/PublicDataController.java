@@ -96,7 +96,7 @@ import io.bdrc.libraries.formatters.TTLRDFWriter;
 @RequestMapping("/")
 public class PublicDataController {
 
-    public final static Logger log = LoggerFactory.getLogger("default");
+    public final static Logger log = LoggerFactory.getLogger(PublicDataController.class);
 
     public static final String RES_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.resource.shortprefix");
     public static final String RES_PREFIX = ServiceConfig.getProperty("endpoints.resource.fullprefix");
