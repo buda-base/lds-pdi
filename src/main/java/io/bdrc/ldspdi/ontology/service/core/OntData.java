@@ -103,7 +103,7 @@ public class OntData {
             Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
                 String uri = it.next();
-                log.error("OntManagerDoc : {}", uri);
+                log.info("OntManagerDoc : {}", uri);
                 OntModel om = odm.getOntology(uri, oms);
                 String tmp = uri.substring(0, uri.length() - 1);
                 File directory = new File("ontologies/");
