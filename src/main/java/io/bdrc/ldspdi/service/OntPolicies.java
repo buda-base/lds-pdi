@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 
 public class OntPolicies {
@@ -78,9 +77,8 @@ public class OntPolicies {
 
     public static void set(String type) {
         try {
-            HashMap<String, OntPolicy> map = new HashMap<>();
-            String graph = "";
-            FileManager fm = FileManager.get().clone(); // the global FileManager
+            final HashMap<String, OntPolicy> map = new HashMap<>();
+            final FileManager fm = FileManager.get().clone(); // the global FileManager
             InputStream stream = null;
             if (type.equals(CORE_TYPE)) {
                 stream = new FileInputStream(policiesUrl);
@@ -91,13 +89,17 @@ public class OntPolicies {
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
             // mod.write(System.out, "TURTLE");
-            ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
+            final ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
             String defGraph = null;
             while (it2.hasNext()) {
-                Resource r = it2.next();
-                defGraph = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph")).getObject()
-                        .asResource().getURI();
+                final Resource r = it2.next();
+                final Statement defGraphS = r.getProperty(ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/defaultOntGraph"));
+                if (defGraphS == null) {
+                	log.error("can't find adm:defaultOntGraph for {}", r.getURI());
+                	continue;
+                }
+                defGraph = defGraphS.getObject().asResource().getURI();
             }
             if (type.equals(CORE_TYPE)) {
                 mapCore = map;
@@ -107,20 +109,18 @@ public class OntPolicies {
                 mapShapes = map;
                 defaultShapesGraph = defGraph;
             }
-            ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
+            final ResIterator it1 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#OntologySpec"));
             while (it1.hasNext()) {
-                Resource r = it1.next();
-                OntPolicy op = loadPolicy(r, fm, type);
+                final Resource r = it1.next();
+                final OntPolicy op = loadPolicy(r, fm, type);
                 map.put(op.getBaseUri(), op);
                 mapAll.put(op.getBaseUri(), op);
                 log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
             stream.close();
-
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("error setting ontology", e);
         }
     }
 
