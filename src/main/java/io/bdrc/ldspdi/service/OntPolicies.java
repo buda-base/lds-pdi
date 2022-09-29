@@ -1,8 +1,7 @@
 package io.bdrc.ldspdi.service;
 
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -75,19 +74,20 @@ public class OntPolicies {
         }
     }
 
-    public static void set(String type) {
+    public static void set(final String type) {
         try {
             final HashMap<String, OntPolicy> map = new HashMap<>();
             final FileManager fm = FileManager.get().clone(); // the global FileManager
-            InputStream stream = null;
+            FileReader stream = null;
             if (type.equals(CORE_TYPE)) {
-                stream = new FileInputStream(policiesUrl);
+                stream = new FileReader(policiesUrl);
             }
             if (type.equals(SHAPES_TYPE)) {
-                stream = new FileInputStream(shapesPoliciesUrl);
+                stream = new FileReader(shapesPoliciesUrl);
             }
             mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
+            stream.close();
             // mod.write(System.out, "TURTLE");
             final ResIterator it2 = mod.listResourcesWithProperty(RDF.type,
                     ResourceFactory.createResource("http://jena.hpl.hp.com/schemas/2003/03/ont-manager#DocumentManagerPolicy"));
@@ -118,9 +118,8 @@ public class OntPolicies {
                 mapAll.put(op.getBaseUri(), op);
                 log.info("loaded OntPolicy for uri {} >> {} ", op.getBaseUri(), op);
             }
-            stream.close();
         } catch (IOException e) {
-            log.error("error setting ontology", e);
+            log.error("error setting ontology {}", type, e);
         }
     }
 
