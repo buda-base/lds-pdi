@@ -34,7 +34,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.bdrc.auth.AuthProps;
-import io.bdrc.auth.rdf.Subscribers;
 import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.libraries.LibProps;
 import io.bdrc.libraries.Prefix;
@@ -58,52 +57,40 @@ public class ServiceConfig {
     // the jar
     public static void init()
             throws JsonParseException, JsonMappingException, IOException {
-        try {
-            log.info("user.dir = " + System.getProperty("user.dir"));
-            LOCAL_QUERIES_DIR = System.getProperty("user.dir")
-                    + "/lds-queries/";
-            log.info("LOCAL_QUERIES_DIR = " + LOCAL_QUERIES_DIR);
-            LOCAL_SHAPES_DIR = System.getProperty("user.dir")
-                    + "/editor-templates/";
-            LOCAL_ONT_DIR = System.getProperty("user.dir") + "/owl-schema/";
-            log.info("getting properties from packaged ldspdi.properties");
-            InputStream input = ServiceConfig.class.getClassLoader()
-                    .getResourceAsStream("ldspdi.properties");
-            prop.load(input);
-            input.close();
-            input = ServiceConfig.class.getClassLoader()
-                    .getResourceAsStream("edit.properties");
-            prop.load(input);
-            input.close();
-            final String configPath = System.getProperty("ldspdi.configpath");
-            if (configPath != null) {
-                log.info("getting properties from {}",
+        log.info("user.dir = " + System.getProperty("user.dir"));
+        LOCAL_QUERIES_DIR = System.getProperty("user.dir")
+                + "/lds-queries/";
+        log.info("LOCAL_QUERIES_DIR = " + LOCAL_QUERIES_DIR);
+        LOCAL_SHAPES_DIR = System.getProperty("user.dir")
+                + "/editor-templates/";
+        LOCAL_ONT_DIR = System.getProperty("user.dir") + "/owl-schema/";
+        log.info("getting properties from packaged ldspdi.properties");
+        final String configPath = System.getProperty("ldspdi.configpath");
+        if (configPath != null) {
+            log.info("getting properties from {}",
+                    configPath + "ldspdi.properties");
+            try {
+                InputStream is = new FileInputStream(
                         configPath + "ldspdi.properties");
-                try {
-                    InputStream is = new FileInputStream(
-                            configPath + "ldspdi.properties");
-                    prop.load(is);
-                    is = new FileInputStream(
-                            configPath + "ldspdi-private.properties");
-                    prop.load(is);
-                    is.close();
+                prop.load(is);
+                is = new FileInputStream(
+                        configPath + "ldspdi-private.properties");
+                prop.load(is);
+                is.close();
 
-                } catch (IOException e) {
-                    log.warn(
-                            "No custom properties file could be found: using default props");
-                }
-            } else {
-                log.info("using default properties");
+            } catch (IOException e) {
+                log.warn(
+                        "No custom properties file could be found: using default props");
             }
-            prop.setProperty("jsonldContextFile",
-                    LOCAL_ONT_DIR + "context.jsonld");
-            LibProps.init(prop);
-            SERVER_ROOT = prop.getProperty("serverRoot");
-            PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
-            OntPolicies.init();
-        } catch (IOException ex) {
-            log.error("ServiceConfig init error", ex);
+        } else {
+            log.info("using default properties");
         }
+        prop.setProperty("jsonldContextFile",
+                LOCAL_ONT_DIR + "context.jsonld");
+        LibProps.init(prop);
+        SERVER_ROOT = prop.getProperty("serverRoot");
+        PREFIX = new Prefix(LOCAL_QUERIES_DIR + "public/prefixes.txt");
+        OntPolicies.init();
     }
 
     public static String getQueriesCommit() {
