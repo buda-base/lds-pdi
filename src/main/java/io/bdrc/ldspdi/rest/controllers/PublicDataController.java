@@ -505,7 +505,12 @@ public class PublicDataController {
         String path = request.getRequestURI();
         log.info("getExtOntologyHomePage WAS CALLED WITH >> pathUri : {}/ servletPath{} ", path,
                 request.getServletPath());
-        String other = request.getServletPath().substring(base.length() + 2);
+        String other;
+        try {
+        	other = request.getServletPath().substring(base.length() + 2);
+        } catch (StringIndexOutOfBoundsException e) {
+        	throw new RestException(500, 500, "can't understand path "+request.getServletPath()+", base "+base);
+        }
         if (other.contains(".")) {
             String[] parts = other.split("\\.");
             log.info("getExtOntologyHomePage With EXT >> base : {}/ other:{} and ext: {}", base, parts[0], parts[1]);

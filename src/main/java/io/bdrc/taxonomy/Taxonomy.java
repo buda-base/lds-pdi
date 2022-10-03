@@ -125,7 +125,9 @@ public class Taxonomy {
             return;
         }
         long start = System.nanoTime();
-        WorkResults.log.error("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
+        if (WorkResults.log.isDebugEnabled()) {
+        	WorkResults.log.debug("WorkResults.getResultMap(), checkpoint1: {}", (System.nanoTime()-start)/1000);
+        }
         String previous = ROOTURI;
         for (String uri : leafTopics) {
             TaxNode leaf = allNodes.get(uri);
