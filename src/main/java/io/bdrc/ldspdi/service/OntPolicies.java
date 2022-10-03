@@ -32,7 +32,6 @@ public class OntPolicies {
     public static HashMap<String, OntPolicy> mapAll;
     public static HashMap<String, OntPolicy> mapCore;
     public static HashMap<String, OntPolicy> mapShapes;
-    private static Model mod;
     public static String defaultCoreGraph;
     public static String defaultShapesGraph;
     public final static Logger log = LoggerFactory.getLogger(OntPolicies.class);
@@ -85,7 +84,7 @@ public class OntPolicies {
             if (type.equals(SHAPES_TYPE)) {
                 stream = new FileReader(shapesPoliciesUrl);
             }
-            mod = ModelFactory.createDefaultModel();
+            final Model mod = ModelFactory.createDefaultModel();
             mod.read(stream, RDFLanguages.strLangRDFXML);
             stream.close();
             // mod.write(System.out, "TURTLE");
