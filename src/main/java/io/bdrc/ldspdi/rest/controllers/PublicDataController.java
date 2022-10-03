@@ -509,6 +509,7 @@ public class PublicDataController {
         try {
         	other = request.getServletPath().substring(base.length() + 2);
         } catch (StringIndexOutOfBoundsException e) {
+        	log.error("can't understand path {}, base {}", request.getServletPath(), base);
         	throw new RestException(500, 500, "can't understand path "+request.getServletPath()+", base "+base);
         }
         if (other.contains(".")) {
