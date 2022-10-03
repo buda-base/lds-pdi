@@ -176,12 +176,12 @@ public class OntData {
 
     private static void updateFusekiDataset() throws RestException {
         OntPolicies.init();
-        log.error("FUSEKI URL IS >>" + fusekidataUrl);
-        log.error("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
+        log.info("FUSEKI URL IS >>" + fusekidataUrl);
+        log.info("updateFusekiDataset() is ontAllModNull {} ont graph uri {} ", (ontAllMod == null),
                 parseBaseUri("http://purl.bdrc.io/ontology/core/"));
-        log.error("updateFusekiDataset() is ontAllModByBaseNull {}",
+        log.info("updateFusekiDataset() is ontAllModByBaseNull {}",
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")) == null));
-        log.error("updateFusekiDataset() is ontAllMod by base graph uri {}",
+        log.info("updateFusekiDataset() is ontAllMod by base graph uri {}",
                 (OntPolicies.getOntologyByBase(parseBaseUri("http://purl.bdrc.io/ontology/core/")).getGraph()));
         String rule = "[inverseOf1: (?P owl:inverseOf ?Q) -> (?Q owl:inverseOf ?P) ]";
         List<Rule> miniRules = Rule.parseRules(rule);
