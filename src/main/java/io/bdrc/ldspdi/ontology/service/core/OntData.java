@@ -76,7 +76,8 @@ public class OntData {
     static List<AnnotationProperty> adminAnnotProps;
     private String payload;
     private static String commitId;
-    private static String fusekidataUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data"; 
+    private static String fusekidataUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf('/')) + "/data";
+    private static boolean writeDebugFiles = false;
     
     public OntData(String payload, String commit) {
         this.payload = payload;
@@ -86,13 +87,13 @@ public class OntData {
     public void init() {
         try {
             if (commitId == null && payload != null) {
-                JsonNode node = new ObjectMapper().readTree(payload);
+                final JsonNode node = new ObjectMapper().readTree(payload);
                 commitId = node.get("commits").elements().next().get("id").asText();
             }
             OntPolicies.init();
             modelsBase = new HashMap<>();
-            Model md = ModelFactory.createDefaultModel();
-            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            final Model md = ModelFactory.createDefaultModel();
+            final OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = null;
             odm = new OntDocumentManager(System.getProperty("user.dir") + "/owl-schema/ont-policy.rdf");
             odm.getFileManager().resetCache();
@@ -100,27 +101,29 @@ public class OntData {
             odm.setProcessImports(false);
             oms.setDocumentManager(odm);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
-            Iterator<String> it = odm.listDocuments();
+            final Iterator<String> it = odm.listDocuments();
             while (it.hasNext()) {
-                String uri = it.next();
+                final String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
-                OntModel om = odm.getOntology(uri, oms);
-                String tmp = uri.substring(0, uri.length() - 1);
-                File directory = new File("ontologies/");
-                if (!directory.exists()) {
-                    directory.mkdir();
-                }
-                directory = new File("ontologies/" + commitId);
-                if (!directory.exists()) {
-                    directory.mkdir();
-                }
-                String file = null;
-                try {
-                    file = "ontologies/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
-                    Helpers.writeModelToFile(om, file);
-                } catch (Exception ex) {
-                    // do absolutely nothing so the shapoes are loaded anyway - just log
-                    log.info("Could not write file {}", file);
+                final OntModel om = odm.getOntology(uri, oms);
+                if (writeDebugFiles) {
+	                final String tmp = uri.substring(0, uri.length() - 1);
+	                File directory = new File("ontologies/");
+	                if (!directory.exists()) {
+	                    directory.mkdir();
+	                }
+	                directory = new File("ontologies/" + commitId);
+	                if (!directory.exists()) {
+	                    directory.mkdir();
+	                }
+	                String file = null;
+	                try {
+	                    file = "ontologies/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
+	                    Helpers.writeModelToFile(om, file);
+	                } catch (Exception ex) {
+	                    // do absolutely nothing so the shapoes are loaded anyway - just log
+	                    log.info("Could not write file {}", file);
+	                }
                 }
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);

@@ -39,15 +39,6 @@ public class Webhook implements Runnable {
         String commitId = null;
         ResultsCache.clearCache();
         LdsQueryService.clearCache();
-        if (GitService.SHAPES.equals(mode)) {
-            try {
-                commitId = gs.update(GitService.GIT_SHAPES_PATH, GitService.GIT_SHAPES_REMOTE_URL);
-            } catch (RevisionSyntaxException | IOException | InterruptedException e) {
-                log.error("error getting latest commit for shapes", e);
-            }
-            OntShapesData osd = new OntShapesData(payload, commitId);
-            osd.update();
-        }
         if (GitService.ONTOLOGIES.equals(mode)) {
             try {
                 commitId = gs.update(GitService.GIT_ONT_PATH, GitService.GIT_ONT_REMOTE_URL);
@@ -64,6 +55,16 @@ public class Webhook implements Runnable {
             } catch (RevisionSyntaxException | IOException | InterruptedException e) {
                 log.error("error getting latest commit for queries", e);
             }
+        }
+        // loading shapes after ontology to add the labels
+        if (GitService.SHAPES.equals(mode)) {
+            try {
+                commitId = gs.update(GitService.GIT_SHAPES_PATH, GitService.GIT_SHAPES_REMOTE_URL);
+            } catch (RevisionSyntaxException | IOException | InterruptedException e) {
+                log.error("error getting latest commit for shapes", e);
+            }
+            OntShapesData osd = new OntShapesData(payload, commitId);
+            osd.update();
         }
     }
 

@@ -32,6 +32,7 @@ public class OntShapesData {
     private static Model fullMod;
     private String payload;
     private static String commitId;
+    private static boolean writeDebugFiles = false;
 
     public OntShapesData(String payload, String commit) {
         super();
@@ -46,50 +47,56 @@ public class OntShapesData {
     public void update() {
         try {
             if (commitId == null && payload != null) {
-                JsonNode node = new ObjectMapper().readTree(payload);
+                final JsonNode node = new ObjectMapper().readTree(payload);
                 commitId = node.get("commits").elements().next().get("id").asText();
             }
             OntPolicies.init();
             modelsBase = new HashMap<>();
-            OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
+            final OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf");
             odm.setProcessImports(true);
             odm.setCacheModels(false);
             odm.getFileManager().resetCache();
             oms.setDocumentManager(odm);
-            Iterator<String> it = odm.listDocuments();
+            final Iterator<String> it = odm.listDocuments();
             fullMod = ModelFactory.createDefaultModel();
             while (it.hasNext()) {
-                String uri = it.next();
+                final String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
-                OntModel om = odm.getOntology(uri, oms);
-                String tmp = uri.substring(0, uri.length() - 1);
-                File directory = new File("shapes/");
-                if (!directory.exists()) {
-                    directory.mkdir();
-                }
-                directory = new File("shapes/" + commitId);
-                if (!directory.exists()) {
-                    directory.mkdir();
-                }
-                String file = null;
-                try {
-                    file = "shapes/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
-                    Helpers.writeModelToFile(om, file);
-                } catch (Exception ex) {
-                    // do absolutely nothing so the shapoes are loaded anyway - just log
-                    log.info("Could not write file {}", file);
+                final OntModel om = odm.getOntology(uri, oms);
+                if (writeDebugFiles) {
+	                final String tmp = uri.substring(0, uri.length() - 1);
+	                File directory = new File("shapes/");
+	                if (!directory.exists()) {
+	                    directory.mkdir();
+	                }
+	                directory = new File("shapes/" + commitId);
+	                if (!directory.exists()) {
+	                    directory.mkdir();
+	                }
+	                String file = null;
+	                try {
+	                    file = "shapes/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
+	                    Helpers.writeModelToFile(om, file);
+	                } catch (Exception ex) {
+	                    // do absolutely nothing so the shapoes are loaded anyway - just log
+	                    log.info("Could not write file {}", file);
+	                }
                 }
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
             boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
-            if (!readonly)
-                updateFusekiDataset();
+            //if (!readonly)
+            //    updateFusekiDataset();
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
+    }
+    
+    public static void addLabelsAndDescriptions(Model shapesM, Model ontoModel) {
+    	
     }
 
     public static Model getFullModel() {
