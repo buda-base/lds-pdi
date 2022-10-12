@@ -27,8 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.bdrc.auth.AccessInfo;
 import io.bdrc.auth.AccessInfoAuthImpl;
 import io.bdrc.auth.rdf.Subscribers;
-import io.bdrc.ldspdi.exceptions.ErrorMessage;
-import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.results.library.TypeResults;
@@ -105,34 +103,9 @@ public class LibrarySearchController {
         case "instancesInCollectionWithProperties":
             res = WorkResults.getResultsMap(model);
             break;
-        case "workInstancesGraph":
-        case "instanceReproductionsGraph":
-        case "personsCreatedIn":
-        case "placesCreatedIn":
-        case "personGraph":
-        case "personGraph-sameAs":
-        case "associatedPersons":
-        case "associatedLineages":
-        case "associatedSimpleTypes":
-        case "associatedPlaces":
-        case "datePlaces":
-        case "datePersons":
-        case "placeGraph":
-        case "typeSimpleGraph":
-        case "typeCreatedIn":
-        case "chunksFacetGraph":
-        case "imLuckyAssociatedGraph":
-        case "imLuckySearchGraph":
-        case "etextContentFacetGraph":
-        case "etextContentFacetGraphInInstance":
-        case "etextContentFacetGraphInEtext":
+        default:
             res = TypeResults.getResultsMap(model);
             break;
-        default:
-            Helpers.setCacheControl(response, "public");
-            LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext("unknown query " + file);
-            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
-                    .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
         }
         Helpers.setCacheControl(response, "public");
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(StreamingHelpers.getJsonObjectStream(res));
