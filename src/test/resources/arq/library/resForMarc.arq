@@ -13,7 +13,6 @@ PREFIX tmp: <http://purl.bdrc.io/ontology/tmp/>
 construct {
   ?R_RES ?p ?o .
   ?R_RES tmp:status ?status .
-  ?R_RES tmp:license ?license .
   ?o ?op ?oo .
   ?t skos:prefLabel ?to .
   ?series skos:prefLabel ?seriesl .
@@ -59,7 +58,6 @@ construct {
     ?item a :ImageInstance .
     ?admItem adm:adminAbout ?item .
     ?admItem ?p ?o .
-    ?admItem adm:contentLegal/adm:license ?license .
     ?admForRes adm:adminAbout ?R_RES .
     ?admForRes adm:status ?status .
   }
