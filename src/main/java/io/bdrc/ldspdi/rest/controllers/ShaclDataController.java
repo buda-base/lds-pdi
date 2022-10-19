@@ -98,13 +98,11 @@ public class ShaclDataController {
         if (url.startsWith("https")) {
             url = "http"+url.substring(5, url.length());
         }
-        if (OntPolicies.isBaseUri(url)) {
-            //log.info("url {} is base uri", url);
+        url = url.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
+        final boolean isBaseUri = OntPolicies.isBaseUri(url);
+        if (isBaseUri) {
             m = OntShapesData.getOntModelByBase(url);
         } else {
-            if (resource) {
-                url = url.replace(ServiceConfig.getProperty("serverRoot"), "purl.bdrc.io");
-            }
             String query = "describe <" + url + ">";
             m = QueryProcessor.getGraphFromModel(query, OntShapesData.getFullModel());
         }
@@ -113,6 +111,7 @@ public class ShaclDataController {
             return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
                     .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
+        log.error("couldn't find shape for {} ({}, {})", url, isBaseUri, m);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)
                 .body(StreamingHelpers.getStream("The requested shape could not be found"));
     }

@@ -51,6 +51,7 @@ public class OntShapesData {
                 commitId = node.get("commits").elements().next().get("id").asText();
             }
             OntPolicies.init();
+            log.info("reinitialize modelsBase");
             modelsBase = new HashMap<>();
             final OntModelSpec oms = new OntModelSpec(OntModelSpec.OWL_MEM);
             OntDocumentManager odm = new OntDocumentManager(System.getProperty("user.dir") + "/editor-templates/ont-policy.rdf");
@@ -107,12 +108,11 @@ public class OntShapesData {
         if (s.endsWith("/") || s.endsWith("#")) {
             s = s.substring(0, s.length() - 1);
         }
-        s = s.replace("purl.bdrc.io", ServiceConfig.SERVER_ROOT);
         return s;
     }
 
     public static void addOntModelByBase(String baseUri, Model om) {
-        log.info("add model for {}", baseUri);
+        log.info("add model for {} ({})", baseUri, om.size());
         modelsBase.put(baseUri, om);
     }
 
