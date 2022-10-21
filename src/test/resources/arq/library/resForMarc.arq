@@ -54,6 +54,10 @@ construct {
     ?t skos:prefLabel ?to .
   }
   union {
+    ?R_RES bdo:instanceOf/bdo:workGenre ?t .
+    ?t skos:prefLabel ?to .
+  }
+  union {
     ?R_RES :instanceHasReproduction? ?item .
     ?item a :ImageInstance .
     ?admItem adm:adminAbout ?item .

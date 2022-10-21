@@ -214,8 +214,8 @@ public class MarcExport {
         titleLocalNameToMarcInfo.put("TitlePortion", new MarcInfo(11, '0', null));
         f040.addSubfield(factory.newSubfield('a', "NNC"));
         f040.addSubfield(factory.newSubfield('b', "eng"));
-        // Columbia doesn't want RDA here
-        // f040.addSubfield(factory.newSubfield('e', "rda"));
+        // Columbia doesn't want RDA here, but Harvard does
+        f040.addSubfield(factory.newSubfield('e', "rda"));
         f040.addSubfield(factory.newSubfield('c', "NNC"));
         f336.addSubfield(factory.newSubfield('a', "text"));
         f336.addSubfield(factory.newSubfield('b', "txt"));
@@ -311,11 +311,11 @@ public class MarcExport {
     }
 
     // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
-    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean itemMode) {
+    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean scansMode) {
         final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
         for (final String isbn : isbnList) {
             final String validIsbn = isbnvalidator.validate(isbn);
-            if (!itemMode) {
+            if (!scansMode) {
                 final DataField df = factory.newDataField("020", ' ', ' ');
                 if (validIsbn != null) {
                     df.addSubfield(factory.newSubfield('a', validIsbn));
@@ -324,11 +324,15 @@ public class MarcExport {
                 }
                 r.addVariableField(df);
             } else {
-                // changed by Harvard, Columbia made us put the ISBN in 020$z in that case
-                final DataField df = factory.newDataField("776", '0', ' ');
-                df.addSubfield(factory.newSubfield('c', "Original"));
-                df.addSubfield(factory.newSubfield('z', isbn));
-                r.addVariableField(df);
+                // changed by Harvard, Columbia made us put the ISBN in 020$z only in that case
+                final DataField df776 = factory.newDataField("776", '0', ' ');
+                df776.addSubfield(factory.newSubfield('c', "Original"));
+                df776.addSubfield(factory.newSubfield('z', isbn));
+                r.addVariableField(df776);
+                final DataField df020 = factory.newDataField("020", '0', ' ');
+                df020.addSubfield(factory.newSubfield('c', "Original"));
+                df020.addSubfield(factory.newSubfield('z', isbn));
+                r.addVariableField(df020);
             }
         }
     }
@@ -402,7 +406,7 @@ public class MarcExport {
         r.addVariableField(f264);
     }
 
-    public static void add008(final Model m, final Resource main, final Record r, final String marcLang, final LocalDateTime now) {
+    public static void add008(final Model m, final Resource main, final Record r, final String marcLang, final LocalDateTime now, final boolean scansMode) {
         final StringBuilder sb = new StringBuilder();
         sb.append(now.format(yymmdd));
         final Statement publishedYearS = main.getProperty(tmpPublishedYear);
@@ -436,7 +440,11 @@ public class MarcExport {
             final String marcCC = pubLocToCC.getOrDefault(pubLocStr, defaultCountryCode);
             sb.append(marcCC);
         }
-        sb.append("|||||||||| 000 ||");
+        // 008/23 Form of Item should be o (online) per Harvard's request
+        if (scansMode)
+            sb.append("|||||o|||| 000 ||");
+        else
+            sb.append("|||||||||| 000 ||");
         if (marcLang == null) {
             sb.append(defaultLang);
         } else {
@@ -934,7 +942,7 @@ public class MarcExport {
     }
 
     private static void addTopics(final Model m, final Resource main, final Record record) {
-        final StmtIterator si = main.listProperties(workIsAbout); // TODO: also workGenre?
+        final StmtIterator si = main.listProperties(workIsAbout);
         final DataField f653 = factory.newDataField("653", ' ', ' ');
         boolean hasTopic = false;
         while (si.hasNext()) {
@@ -947,6 +955,29 @@ public class MarcExport {
         }
         if (hasTopic) {
             record.addVariableField(f653);
+        }
+    }
+    
+    private static void addGenres(final Model m, final Resource main, final Record record) {
+        final StmtIterator si = main.listProperties(workGenre);
+        while (si.hasNext()) {
+            final Resource genre = si.next().getResource();
+            final Literal l = getDirectPreferredLit(genre, "bo-x-ewts");
+            if (l == null)
+                continue;
+            final DataField f655 = factory.newDataField("655", '#', '7');
+            f655.addSubfield(factory.newSubfield('a', getLangStr(l)));
+            f655.addSubfield(factory.newSubfield('1', genre.getURI()));
+            // available as of June 22, 2022
+            f655.addSubfield(factory.newSubfield('2', "bdrc"));
+            record.addVariableField(f655);
+            // in case we have an English label we add it too:
+            final Literal l_en = getDirectPreferredLit(genre, "en");
+            if (l_en == null)
+                continue;
+            final DataField f655_2 = factory.newDataField("655", '#', '4');
+            f655_2.addSubfield(factory.newSubfield('a', getLangStr(l_en)));
+            record.addVariableField(f655_2);
         }
     }
 
@@ -1006,6 +1037,32 @@ public class MarcExport {
         return interestingLiterals.get(0);
     }
 
+    private static Literal getDirectPreferredLit(Resource r, final String bcp47lang) {
+        StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
+        if (!labelSi.hasNext()) {
+            labelSi = r.listProperties(RDFS.label);
+            if (!labelSi.hasNext())
+                return null;
+        }
+        final Map<String, List<Literal>> labels = new TreeMap<>();
+        while (labelSi.hasNext()) {
+            final Literal label = labelSi.next().getLiteral();
+            final String lng = label.getLanguage();
+            final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
+            litList.add(label);
+        }
+        List<Literal> interestingLiterals = null;
+        if (labels.containsKey(bcp47lang)) {
+            interestingLiterals = labels.get(bcp47lang);
+        } else {
+            return null;
+        }
+        Collections.sort(interestingLiterals, new CompareStringLiterals(bcp47lang));
+        if (interestingLiterals.size() == 0)
+            return null;
+        return interestingLiterals.get(0);
+    }
+    
     private static CompareStringLiterals baseComp = new CompareStringLiterals(null);
 
     private static List<Resource> getScriptLeaves(final Model m, final Resource main, final Property p) {
@@ -1309,6 +1366,15 @@ public class MarcExport {
         }
     }
 
+    public static void add024(final Resource main, final Record r) {
+        // this is the 024 field devised with Harvard
+        final DataField f024 = factory.newDataField("024", '7', '#');
+        f024.addSubfield(factory.newSubfield('a', main.getLocalName()));
+        // https://www.loc.gov/marc/relators/tn220613src.html
+        f024.addSubfield(factory.newSubfield('2', "bdrc"));
+        r.addVariableField(f024);
+    }
+    
     public static final String langTibetan = BDR + "LangBo";
 
     public static Record marcFromModel(final Model m, final Resource main, final boolean scansMode, final boolean limitSize, final boolean googlebooksstyle) {
@@ -1316,7 +1382,7 @@ public class MarcExport {
         final Record record = factory.newRecord(leader);
         // Columbia originally asked us to prefix the ID with "(BDRC)", but Harvard specifically asked
         // us not to do that, especially since they introduced the 003 control field
-        record.addVariableField(factory.newControlField("001", "bdr:" + main.getLocalName()));
+        record.addVariableField(factory.newControlField("001", main.getLocalName()));
         record.addVariableField(f003);
         final LocalDateTime now = LocalDateTime.now();
         // record.addVariableField(factory.newControlField("005", now.format(f005_f)));
@@ -1355,9 +1421,10 @@ public class MarcExport {
                 bcp47lang = bcpLangS.getString();
             }
         }
-        add008(m, main, record, langMarcCode, now);
+        add008(m, main, record, langMarcCode, now, scansMode);
         addIsbn(m, main, record, scansMode); // 020
-        addIdentifiers(m, main, record);
+        add024(main, record);
+        addIdentifiers(m, main, record); // 035
         // Columbia asked us to add a 035 field, but Harvard asked us to remove it
         // since it can be derived from 001 + 003
 //        final DataField f035 = factory.newDataField("035", ' ', ' ');
@@ -1452,6 +1519,7 @@ public class MarcExport {
         f588.addSubfield(factory.newSubfield('a', "Description based on online resource (BDRC, viewed " + dateStr + ")"));
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
+        addGenres(m, main, record); // 655
         for (DataField dfAuthorField : listPersonFields) {
             record.addVariableField(dfAuthorField);
         }
