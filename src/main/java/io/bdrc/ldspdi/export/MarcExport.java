@@ -962,7 +962,7 @@ public class MarcExport {
         final StmtIterator si = main.listProperties(workGenre);
         while (si.hasNext()) {
             final Resource genre = si.next().getResource();
-            final Literal l = getDirectPreferredLit(genre, "bo-x-ewts");
+            final Literal l = getDirectPreferredLit(m, genre, "bo");
             if (l == null)
                 continue;
             final DataField f655 = factory.newDataField("655", '#', '7');
@@ -972,7 +972,7 @@ public class MarcExport {
             f655.addSubfield(factory.newSubfield('2', "bdrc"));
             record.addVariableField(f655);
             // in case we have an English label we add it too:
-            final Literal l_en = getDirectPreferredLit(genre, "en");
+            final Literal l_en = getDirectPreferredLit(m, genre, "en");
             if (l_en == null)
                 continue;
             final DataField f655_2 = factory.newDataField("655", '#', '4');
@@ -1037,7 +1037,7 @@ public class MarcExport {
         return interestingLiterals.get(0);
     }
 
-    private static Literal getDirectPreferredLit(Resource r, final String bcp47lang) {
+    private static Literal getDirectPreferredLit(Model m, Resource r, final String bcp47lang) {
         StmtIterator labelSi = r.listProperties(SKOS.prefLabel);
         if (!labelSi.hasNext()) {
             labelSi = r.listProperties(RDFS.label);
@@ -1048,8 +1048,14 @@ public class MarcExport {
         while (labelSi.hasNext()) {
             final Literal label = labelSi.next().getLiteral();
             final String lng = label.getLanguage();
-            final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
-            litList.add(label);
+            if ("bo-x-ewts".equals(lng) && "bo".equals(bcp47lang)) {
+                final List<Literal> litList = labels.computeIfAbsent("bo", x -> new ArrayList<>());
+                final String u = ewtsConverter.toUnicode(label.getString());
+                litList.add(m.createLiteral(u, "bo")); 
+            } else {
+                final List<Literal> litList = labels.computeIfAbsent(lng, x -> new ArrayList<>());
+                litList.add(label);        
+            }
         }
         List<Literal> interestingLiterals = null;
         if (labels.containsKey(bcp47lang)) {
