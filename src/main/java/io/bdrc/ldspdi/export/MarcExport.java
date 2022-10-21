@@ -969,6 +969,7 @@ public class MarcExport {
             f655.addSubfield(factory.newSubfield('a', getLangStr(l)));
             f655.addSubfield(factory.newSubfield('1', genre.getURI()));
             // available as of June 22, 2022
+            // https://www.loc.gov/marc/relators/tn220622src.html
             f655.addSubfield(factory.newSubfield('2', "bdrc"));
             record.addVariableField(f655);
             // in case we have an English label we add it too:
