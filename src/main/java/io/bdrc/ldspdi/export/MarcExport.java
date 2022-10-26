@@ -111,6 +111,7 @@ public class MarcExport {
     public static final Property editionStatement = ResourceFactory.createProperty(BDO + "editionStatement");
     public static final Property extentStatement = ResourceFactory.createProperty(BDO + "extentStatement");
     public static final Property publisherName = ResourceFactory.createProperty(BDO + "publisherName");
+    public static final Property reproductionOf = ResourceFactory.createProperty(BDO + "instanceReproductionOf");
     public static final Property publisherLocation = ResourceFactory.createProperty(BDO + "publisherLocation");
     public static final Property authorshipStatement = ResourceFactory.createProperty(BDO + "authorshipStatement");
     public static final Property catalogInfo = ResourceFactory.createProperty(BDO + "catalogInfo");
@@ -216,6 +217,7 @@ public class MarcExport {
         f040.addSubfield(factory.newSubfield('b', "eng"));
         // Columbia doesn't want RDA here, but Harvard does
         f040.addSubfield(factory.newSubfield('e', "rda"));
+        f040.addSubfield(factory.newSubfield('e', "pn"));
         f040.addSubfield(factory.newSubfield('c', "NNC"));
         f336.addSubfield(factory.newSubfield('a', "text"));
         f336.addSubfield(factory.newSubfield('b', "txt"));
@@ -311,7 +313,7 @@ public class MarcExport {
     }
 
     // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
-    public static void addIsbn(final Model m, final Resource main, final Record r, final boolean scansMode) {
+    public static void addIsbn020(final Model m, final Resource main, final Record r, final boolean scansMode) {
         final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
         for (final String isbn : isbnList) {
             final String validIsbn = isbnvalidator.validate(isbn);
@@ -324,14 +326,64 @@ public class MarcExport {
                 }
                 r.addVariableField(df);
             } else {
-                // changed by Harvard, Columbia made us put the ISBN in 020$z only in that case
-                final DataField df776 = factory.newDataField("776", '0', ' ');
-                df776.addSubfield(factory.newSubfield('c', "Original"));
-                df776.addSubfield(factory.newSubfield('z', isbn));
-                r.addVariableField(df776);
-                final DataField df020 = factory.newDataField("020", '0', ' ');
-                df020.addSubfield(factory.newSubfield('c', "Original"));
+                final DataField df020 = factory.newDataField("020", ' ', ' ');
                 df020.addSubfield(factory.newSubfield('z', isbn));
+                df020.addSubfield(factory.newSubfield('q', "(print)."));
+                r.addVariableField(df020);
+            }
+        }
+    }
+    
+    public static void addIsbn776(final Model m, final Resource main, final Record r) {
+        // makes sense only in scans mode
+        final List<String> lccnList = getId(m, main, m.getResource(BF+"Lccn"));
+        String lccn = lccnList.size() > 0 ? lccnList.get(0) : null;
+        final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
+        String isbn = isbnList.isEmpty() ? null : isbnList.get(0);
+        if (lccn == null && isbnList.isEmpty())
+            return;
+        if (isbn != null) {
+            final String validIsbn = isbnvalidator.validate(isbn);
+            if (validIsbn != null)
+                isbn = validIsbn;
+        }
+        if (lccn != null) {
+            // from Columbia: spaces should be added at the end of the lccn string so that
+            // it spans
+            // 12 characters exactly, counting the 3 first spaces (so 9 for our lccn string)
+            for (int i = lccn.length(); i < 9; i++) {
+                lccn += ' ';
+            }
+        }
+        final DataField f776_08 = factory.newDataField("776", '0', '8');
+        f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation):"));
+        final Resource instance = main.getPropertyResourceValue(reproductionOf);
+        if (instance != null)
+            f776_08.addSubfield(factory.newSubfield('o', "(MaCbBDRC)" + instance.getLocalName()));
+        if (isbn != null)
+            f776_08.addSubfield(factory.newSubfield('z', isbn));
+        if (lccn != null)
+            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   " + lccn));
+        r.addVariableField(f776_08);
+    }
+    
+    // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
+    public static void addIsbn776(final Model m, final Resource main, final Record r, final boolean scansMode) {
+        final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
+        for (final String isbn : isbnList) {
+            final String validIsbn = isbnvalidator.validate(isbn);
+            if (!scansMode) {
+                final DataField df = factory.newDataField("020", ' ', ' ');
+                if (validIsbn != null) {
+                    df.addSubfield(factory.newSubfield('a', validIsbn));
+                } else {
+                    df.addSubfield(factory.newSubfield('z', isbn));
+                }
+                r.addVariableField(df);
+            } else {
+                final DataField df020 = factory.newDataField("020", ' ', ' ');
+                df020.addSubfield(factory.newSubfield('z', isbn));
+                df020.addSubfield(factory.newSubfield('q', "(print)."));
                 r.addVariableField(df020);
             }
         }
@@ -943,17 +995,13 @@ public class MarcExport {
 
     private static void addTopics(final Model m, final Resource main, final Record record) {
         final StmtIterator si = main.listProperties(workIsAbout);
-        final DataField f653 = factory.newDataField("653", ' ', ' ');
-        boolean hasTopic = false;
         while (si.hasNext()) {
             final Resource topic = si.next().getResource();
             final Literal l = getPreferredLit(topic, null);
             if (l == null)
                 continue;
-            hasTopic = true;
+            final DataField f653 = factory.newDataField("653", ' ', ' ');
             f653.addSubfield(factory.newSubfield('a', getLangStr(l)));
-        }
-        if (hasTopic) {
             record.addVariableField(f653);
         }
     }
@@ -1429,17 +1477,17 @@ public class MarcExport {
             }
         }
         add008(m, main, record, langMarcCode, now, scansMode);
-        addIsbn(m, main, record, scansMode); // 020
+        addIsbn020(m, main, record, scansMode); // 020
         add024(main, record);
         addIdentifiers(m, main, record); // 035
         // Columbia asked us to add a 035 field, but Harvard asked us to remove it
         // since it can be derived from 001 + 003
 //        final DataField f035 = factory.newDataField("035", ' ', ' ');
-//        f035.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + originalR.getLocalName()));
+//        f035.addSubfield(factory.newSubfield('a', "(BDRC)" + originalR.getLocalName()));
 //        record.addVariableField(f035);
 //        if (scansMode) {
 //            DataField f035_2 = factory.newDataField("035", ' ', ' ');
-//            f035_2.addSubfield(factory.newSubfield('a', "(BDRC)bdr:" + workR.getLocalName()));
+//            f035_2.addSubfield(factory.newSubfield('a', "(BDRC)" + workR.getLocalName()));
 //            record.addVariableField(f035_2);
 //        }
         record.addVariableField(f040);
@@ -1531,23 +1579,8 @@ public class MarcExport {
             record.addVariableField(dfAuthorField);
         }
         record.addVariableField(f710_2);
-        // lccn
-        List<String> lccnList = getId(m, main, m.getResource(BF+"Lccn"));
-        for (String lccn : lccnList) {
-            // from Columbia: spaces should be added at the end of the lccn string so that
-            // it spans
-            // 12 characters exactly, counting the 3 first spaces (so 9 for our lccn string)
-            for (int i = lccn.length(); i < 9; i++) {
-                lccn += ' ';
-            }
-            final DataField f776_08 = factory.newDataField("776", '0', '8');
-            f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation):"));
-            f776_08.addSubfield(factory.newSubfield('w', "(DLC)   " + lccn));
-            if (scansMode)
-                record.addVariableField(f776_08);
-            // TODO: in normal mode, I'm not sure what this should be
-        }
         if (scansMode) {
+            addIsbn776(m, main, record);
             final DataField f856 = factory.newDataField("856", '4', '0');
             f856.addSubfield(factory.newSubfield('y', "Buddhist Digital Resource Center"));
             f856.addSubfield(factory.newSubfield('u', main.getURI()));
@@ -1573,7 +1606,7 @@ public class MarcExport {
     }
 
     public static Model getModelForMarc(final String resUri) throws RestException {
-        Model model = QueryProcessor.getSimpleResourceGraph(resUri, "resForMarc.arq");
+        final Model model = QueryProcessor.getSimpleResourceGraph(resUri, "resForMarc.arq");
         if (model.size() < 1) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(resUri));
         }
@@ -1605,10 +1638,10 @@ public class MarcExport {
     public static void remove505(Record r) {
         // removing all 505 fields
         // this code is very weird but it's apparently the canonical way to do that
-        List<DataField> fields = r.getDataFields();
-        Iterator<DataField> i = fields.iterator();
+        final List<DataField> fields = r.getDataFields();
+        final Iterator<DataField> i = fields.iterator();
         while (i.hasNext()) {
-            DataField field = i.next();
+            final DataField field = i.next();
             if (field.getTag().equals("505")) {
                 i.remove();
             }
@@ -1655,6 +1688,5 @@ public class MarcExport {
             }
         };
         return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").header("Vary", "Negotiate, Accept").contentType(mt).body(stream);
-
     }
 }
