@@ -359,7 +359,7 @@ public class MarcExport {
         f776_08.addSubfield(factory.newSubfield('i', "Electronic reproduction of (manifestation):"));
         final Resource instance = main.getPropertyResourceValue(reproductionOf);
         if (instance != null)
-            f776_08.addSubfield(factory.newSubfield('o', "(MaCbBDRC)" + instance.getLocalName()));
+            f776_08.addSubfield(factory.newSubfield('o', "(BDRC)" + instance.getLocalName()));
         if (isbn != null)
             f776_08.addSubfield(factory.newSubfield('z', isbn));
         if (lccn != null)
@@ -383,7 +383,7 @@ public class MarcExport {
             } else {
                 final DataField df020 = factory.newDataField("020", ' ', ' ');
                 df020.addSubfield(factory.newSubfield('z', isbn));
-                df020.addSubfield(factory.newSubfield('q', "(print)."));
+                df020.addSubfield(factory.newSubfield('q', "(print)"));
                 r.addVariableField(df020);
             }
         }
