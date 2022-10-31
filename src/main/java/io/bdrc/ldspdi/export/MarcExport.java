@@ -328,7 +328,7 @@ public class MarcExport {
             } else {
                 final DataField df020 = factory.newDataField("020", ' ', ' ');
                 df020.addSubfield(factory.newSubfield('z', isbn));
-                df020.addSubfield(factory.newSubfield('q', "(print)."));
+                df020.addSubfield(factory.newSubfield('q', "(print)"));
                 r.addVariableField(df020);
             }
         }
@@ -365,28 +365,6 @@ public class MarcExport {
         if (lccn != null)
             f776_08.addSubfield(factory.newSubfield('w', "(DLC)   " + lccn));
         r.addVariableField(f776_08);
-    }
-    
-    // possible types: bdr:HollisId, bf:Isbn, bf:Lccn, bf:ShelfMarkLcc 
-    public static void addIsbn776(final Model m, final Resource main, final Record r, final boolean scansMode) {
-        final List<String> isbnList = getId(m, main, m.createResource(BF+"Isbn"));
-        for (final String isbn : isbnList) {
-            final String validIsbn = isbnvalidator.validate(isbn);
-            if (!scansMode) {
-                final DataField df = factory.newDataField("020", ' ', ' ');
-                if (validIsbn != null) {
-                    df.addSubfield(factory.newSubfield('a', validIsbn));
-                } else {
-                    df.addSubfield(factory.newSubfield('z', isbn));
-                }
-                r.addVariableField(df);
-            } else {
-                final DataField df020 = factory.newDataField("020", ' ', ' ');
-                df020.addSubfield(factory.newSubfield('z', isbn));
-                df020.addSubfield(factory.newSubfield('q', "(print)"));
-                r.addVariableField(df020);
-            }
-        }
     }
 
     public static void addAccess(final Model m, final Resource main, final Record r) {
