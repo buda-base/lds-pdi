@@ -1,15 +1,23 @@
 package io.bdrc.ldspdi.ontology.service.shapes;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +27,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.ontology.service.core.OntData;
 import io.bdrc.ldspdi.ontology.service.core.OntPolicy;
 import io.bdrc.ldspdi.service.OntPolicies;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
-import io.bdrc.ldspdi.utils.Helpers;
 
 public class OntShapesData {
 
@@ -31,13 +39,12 @@ public class OntShapesData {
     public static HashMap<String, Model> modelsBase = new HashMap<>();
     private static Model fullMod;
     private String payload;
-    private static String commitId;
-    private static boolean writeDebugFiles = false;
+    private static String commitId = null;
 
     public OntShapesData(String payload, String commit) {
         super();
         this.payload = payload;
-        this.commitId = commit;
+        commitId = commit;
     }
 
     public static String getCommitId() {
@@ -65,39 +72,32 @@ public class OntShapesData {
                 final String uri = it.next();
                 log.info("OntManagerDoc : {}", uri);
                 final OntModel om = odm.getOntology(uri, oms);
-                if (writeDebugFiles) {
-	                final String tmp = uri.substring(0, uri.length() - 1);
-	                File directory = new File("shapes/");
-	                if (!directory.exists()) {
-	                    directory.mkdir();
-	                }
-	                directory = new File("shapes/" + commitId);
-	                if (!directory.exists()) {
-	                    directory.mkdir();
-	                }
-	                String file = null;
-	                try {
-	                    file = "shapes/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
-	                    Helpers.writeModelToFile(om, file);
-	                } catch (Exception ex) {
-	                    // do absolutely nothing so the shapoes are loaded anyway - just log
-	                    log.info("Could not write file {}", file);
-	                }
-                }
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
             log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
-            boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
-            //if (!readonly)
-            //    updateFusekiDataset();
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
     }
     
-    public static void addLabelsAndDescriptions(Model shapesM, Model ontoModel) {
-    	
+    public static final Property shPath = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#path");
+    public static final Property shInversePath = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#inversePath");
+    public static final Property shTargetObjectsOf = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#targetObjectsOf");
+
+    public static final List<Property> propertiesForLabels = Arrays.asList(new Property[]{shPath, shInversePath, shTargetObjectsOf});
+    
+    public static void addLabelsAndDescriptions(final Model shapesM, final Model ontoModel) {
+        final List<Resource> resources = new ArrayList<>();
+    	for (final Property p : propertiesForLabels) {
+    	    final NodeIterator ni = shapesM.listObjectsOfProperty(p);
+    	    while (ni.hasNext()) {
+    	        resources.add(ni.next().asResource());
+    	    }
+    	}
+    	for (final Resource r : resources) {
+    	    shapesM.add(ontoModel.listStatements(r, null, (RDFNode) null));
+    	}
     }
 
     public static Model getFullModel() {
@@ -111,8 +111,14 @@ public class OntShapesData {
         return s;
     }
 
-    public static void addOntModelByBase(String baseUri, Model om) {
-        log.info("add model for {} ({})", baseUri, om.size());
+    public static void addOntModelByBase(final String baseUri, final Model om) {
+        if (OntData.ontAllMod == null) {
+            log.error("OntData.ontAllMod is null for {}", baseUri);
+            modelsBase.put(baseUri, om);
+            return;
+        }
+        log.info("add model for {} ({}) with labels from ontology ({})", baseUri, om.size(), OntData.ontAllMod.size());
+        addLabelsAndDescriptions(om, OntData.ontAllMod);
         modelsBase.put(baseUri, om);
     }
 
