@@ -85,10 +85,11 @@ public class OntShapesData {
     public static final Property shPath = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#path");
     public static final Property shInversePath = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#inversePath");
     public static final Property shTargetObjectsOf = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#targetObjectsOf");
+    public static final Property shTargetClass = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#targetClass");
 
     // RDF.first is kind of a dirty trick to account for the resources listed in sh:in that takes
     // a list as its object.
-    public static final List<Property> propertiesForLabels = Arrays.asList(new Property[]{shPath, shInversePath, shTargetObjectsOf, RDF.first});
+    public static final List<Property> propertiesForLabels = Arrays.asList(new Property[]{shPath, shInversePath, shTargetObjectsOf, RDF.first, shTargetClass});
     
     public static void addLabelsAndDescriptions(final Model shapesM, final Model ontoModel) {
         final List<Resource> resources = new ArrayList<>();
