@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,14 +86,18 @@ public class OntShapesData {
     public static final Property shInversePath = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#inversePath");
     public static final Property shTargetObjectsOf = ResourceFactory.createProperty("http://www.w3.org/ns/shacl#targetObjectsOf");
 
-    public static final List<Property> propertiesForLabels = Arrays.asList(new Property[]{shPath, shInversePath, shTargetObjectsOf});
+    // RDF.first is kind of a dirty trick to account for the resources listed in sh:in that takes
+    // a list as its object.
+    public static final List<Property> propertiesForLabels = Arrays.asList(new Property[]{shPath, shInversePath, shTargetObjectsOf, RDF.first});
     
     public static void addLabelsAndDescriptions(final Model shapesM, final Model ontoModel) {
         final List<Resource> resources = new ArrayList<>();
     	for (final Property p : propertiesForLabels) {
     	    final NodeIterator ni = shapesM.listObjectsOfProperty(p);
     	    while (ni.hasNext()) {
-    	        resources.add(ni.next().asResource());
+    	        final RDFNode n = ni.next();
+    	        if (n.isResource())
+    	            resources.add(n.asResource());
     	    }
     	}
     	for (final Resource r : resources) {
