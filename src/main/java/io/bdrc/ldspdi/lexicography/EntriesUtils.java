@@ -93,6 +93,10 @@ public class EntriesUtils {
         public final Literal def;
         public final Resource res;
         public int nb_tokens_matching = 0;
+        public int match_offset_start = 0;
+        public int chunk_offset_start = 0;
+        public int match_offset_end = 0;
+        public int chunk_offset_end = 0;
         
         public Entry(final Literal word, final Literal def, final Resource res) {
             this.word = word;
@@ -121,7 +125,8 @@ public class EntriesUtils {
             final Resource lx = qs.getResource("res");
             final Literal word = qs.getLiteral("word");
             final Literal def = qs.getLiteral("def");
-            res.add(new Entry(word, def, lx));
+            final Entry e = new Entry(word, def, lx);
+            res.add(e);
         }
         return res;
     }
@@ -144,25 +149,49 @@ public class EntriesUtils {
         return -1;
     }
     
-    public static int[] get_matching_tokens_range(final Literal word, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) {
-        final List<Token> word_tokens = getTokens(word.getLexicalForm(), word.getLanguage());
+    public static void fill_entry(final Entry entry, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) {
+        final List<Token> word_tokens = getTokens(entry.word.getLexicalForm(), entry.word.getLanguage());
         final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
         if (match_start_ti == -1) {
             log.error("couldn't find {} in {}", cursor_tokens.toString(), word_tokens.toString());
-            return null;
+            return;
         }
-        int[] res = new int[2];
-        res[0] = match_start_ti;
-        res[1] = match_start_ti + cursor_tokens.size();
+        int ti_start = match_start_ti;
+        int ti_end = match_start_ti + cursor_tokens.size();
+        final int diff = match_start_ti - cursor_start_ti;
         // adding matching tokens after the match:
-        final int max_ti_forward = Math.min(cursor_tokens.size(), word_tokens.size()-match_start_ti);
-        //for (int i = match_start_ti + cursor_tokens.size() +1 ;)
-        return null;
+        for (int i = match_start_ti + cursor_tokens.size() +1 ; i < chunk_tokens.size() ; i ++) {
+            if (i - diff >= word_tokens.size())
+                break;
+            if (word_tokens.get(i-diff).charTerm.equals(chunk_tokens.get(i).charTerm)) {
+                ti_end = i;
+                entry.chunk_offset_end = chunk_tokens.get(i).end;
+                entry.match_offset_end = word_tokens.get(i-diff).end;
+            }
+            else
+                break;
+        }
+        for (int i = match_start_ti -1 ; i >= 0 ; i--) {
+            if (i - diff <= 0)
+                break;
+            if (word_tokens.get(i-diff).charTerm.equals(chunk_tokens.get(i).charTerm)) {
+                ti_start = i;
+                entry.chunk_offset_start = chunk_tokens.get(i).start;
+                entry.match_offset_start = word_tokens.get(i-diff).start;
+            }
+            else
+                break;
+        }
+        entry.nb_tokens_matching = ti_end - ti_start;
     }
     
     public static List<EntryMatch> getOrderedEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) {
         final List<Token> tokens = getTokens(chunk, chunk_lang);
         final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
+        final List<Token> cursor_tokens = new ArrayList<>();
+        for (int i = cursor_tokens_range[0] ; i <= cursor_tokens_range[1] ; i++) {
+            cursor_tokens.add(tokens.get(i));
+        }
         final String cursor_string = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]).start);
         String cursor_string_minus1 = null;
         if (cursor_tokens_range[0] > 0)
@@ -171,6 +200,9 @@ public class EntriesUtils {
         if (cursor_tokens_range[1] < tokens.size()-1)
             cursor_string_plus1 = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]+1).start);
         final List<Entry> entries = searchInFuseki(cursor_string, cursor_string_minus1, cursor_string_plus1, chunk_lang);
+        for (Entry e : entries) {
+            fill_entry(e, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1]);
+        }
         return null;
     }
     
