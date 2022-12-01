@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -16,6 +17,11 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.lucene.bo.TibetanAnalyzer;
@@ -79,20 +85,41 @@ public class EntriesUtils {
         return res;
     }
     
+    public static class SimpleLiteralSerializer extends JsonSerializer<Literal> {
+        @Override
+        public void serialize(Literal value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeStartObject();
+            final String lang = value.getLanguage();
+            if (lang != null && !lang.isEmpty()) {
+                gen.writeStringField("lang", value.getLanguage());
+            }
+            gen.writeStringField("value", value.getLexicalForm());
+            gen.writeEndObject();
+        }
+    }
+    
     public static class Entry {
+        @JsonProperty("word")
         public final Literal word;
+        @JsonProperty("def")
         public final Literal def;
-        public final Resource res;
+        @JsonProperty("uri")
+        public final String res_uri;
+        @JsonProperty("nb_tokens")
         public int nb_tokens = 0;
+        @JsonProperty("chunk_offset_start")
         public int chunk_offset_start = 0;
+        @JsonProperty("chunk_offset_end")
         public int chunk_offset_end = 0;
+        @JsonProperty("cursor_in_entry_start")
         public int cursor_in_entry_start = 0;
+        @JsonProperty("cursor_in_entry_end")
         public int cursor_in_entry_end = 0;
         
         public Entry(final Literal word, final Literal def, final Resource res) {
             this.word = word;
             this.def = def;
-            this.res = res;
+            this.res_uri = res.getURI();
         }
     }
     
@@ -191,7 +218,7 @@ public class EntriesUtils {
         return res;
     }
     
-    public static List<Entry> getOrderedEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) {
+    public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) {
         final List<Token> tokens = getTokens(chunk, chunk_lang);
         final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
         final List<Token> cursor_tokens = new ArrayList<>();

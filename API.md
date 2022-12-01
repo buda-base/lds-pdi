@@ -298,8 +298,11 @@ The endpoint returns dictionary entries corresponding to a range of characters i
 - `{cursor_start}` and `cursor_end` represent the character coordinates of the selected text within the chunk, with the first character of the chunk having the coordinate 0.
 
 The result of the call is an unordered JSON array of "entries", where an entry has the following fields:
-- `word` (string): the key of the entry in the dictionary
-- `def` (string): the definition in the dictionary
+- `uri` (string): the uri of the entry
+- `word` (literal): the key of the entry in the dictionary
+- `def` (literal): the definition in the dictionary
 - `nb_tokens` (int): the number of tokens in the word (to help sorting the entries in the display)
 - `chunk_offset_start` and `chunk_offset_end` represent the character range of the entry in the original chunk
 - `cursor_in_entry_start` and `cursor_in_entry_end` represent the (approximate) character range of the selected text within the entry
+
+where the type `literal` is a dictionary with two keys: `value` and `lang`.
