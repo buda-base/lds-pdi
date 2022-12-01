@@ -287,3 +287,19 @@ For queries returning a graph, the endpoint is `/query/graph/{template_id}`. Exa
 ```
 
 The returned value is a model, serialized according to the value of the HTTP `Accept:` header, with JSON-LD being the default.
+
+## Lexicography endpoints
+
+### /lexicography/entriesForChunk?chunk={chunk}&lang={lang}&cursor_start={cursor_start}&cursor_end={cursor_end}
+
+The endpoint returns dictionary entries corresponding to a range of characters in a context. It takes 4 arguments :
+- `{chunk}` is a piece of text surrounding the selected text. There is no restriction on its size, but we advise at least 40 characters on both sides of the selected text. There is no restriction on the boundaries (they can be in the middle of a word or syllable).
+- `{lang}` is the BCP47 tag of the language of the chunk
+- `{cursor_start}` and `cursor_end` represent the character coordinates of the selected text within the chunk, with the first character of the chunk having the coordinate 0.
+
+The result of the call is an unordered JSON array of "entries", where an entry has the following fields:
+- `word` (string): the key of the entry in the dictionary
+- `def` (string): the definition in the dictionary
+- `nb_tokens` (int): the number of tokens in the word (to help sorting the entries in the display)
+- `chunk_offset_start` and `chunk_offset_end` represent the character range of the entry in the original chunk
+- `cursor_in_entry_start` and `cursor_in_entry_end` represent the (approximate) character range of the selected text within the entry
