@@ -201,8 +201,9 @@ public class EntriesUtils {
             entry.cursor_in_entry_end = word_tokens.get(match_start_ti+cursor_tokens.size()-1).end;
             final int diff = cursor_start_ti - match_start_ti;
             boolean matches = true;
+            entry.chunk_offset_end = chunk_tokens.get(cursor_end_ti).end;
             // checking if entry matches forward
-            for (int i = match_start_ti + cursor_tokens.size() ; i < chunk_tokens.size() ; i ++) {
+            for (int i = cursor_end_ti + 1 ; i < chunk_tokens.size() ; i ++) {
                 if (i - diff >= word_tokens.size()) {
                     break;
                 }
@@ -218,8 +219,9 @@ public class EntriesUtils {
                 continue;
             }
             // and backwards
-            for (int i = match_start_ti -1 ; i >= 0 ; i--) {
-                if (i - diff <= 0)
+            entry.chunk_offset_start = chunk_tokens.get(cursor_start_ti).start;
+            for (int i = cursor_start_ti -1 ; i >= 0 ; i--) {
+                if (i - diff < 0)
                     break;
                 if (word_tokens.get(i-diff).charTerm.equals(chunk_tokens.get(i).charTerm)) {
                     entry.chunk_offset_start = chunk_tokens.get(i).start;
