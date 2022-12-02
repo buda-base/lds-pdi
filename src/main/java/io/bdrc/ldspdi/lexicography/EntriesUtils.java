@@ -2,9 +2,9 @@ package io.bdrc.ldspdi.lexicography;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -40,18 +40,27 @@ public class EntriesUtils {
             this.end = end;
             this.charTerm = charTerm;
         }
+        @Override
+        public String toString() {
+             return this.charTerm+" ("+this.start+"-"+this.end+")";
+        }
     }
     
-    static private List<Token> getTokens(final String inputStr, final String inputStr_lang) {
-        final String method = inputStr_lang.equals("bo-x-ewts") ? "ewts" : "unicode";
-        final TibetanAnalyzer ta;
+    static public TibetanAnalyzer uniAnalyzer = null;
+    static public TibetanAnalyzer ewtsAnalyzer = null;
+    static {
         try {
-            ta = new TibetanAnalyzer(false, true, true, method, "");
-        } catch (IOException e1) {
-            log.error("can't initialize Tibetan analyzer");
-            return null;
+            uniAnalyzer = new TibetanAnalyzer(false, true, true, "unicode", "");
+            ewtsAnalyzer = new TibetanAnalyzer(false, true, true, "ewts", "");
+        } catch (IOException e) {
+            log.error("can't initialize Tibetan analyzer", e);
         }
+    }
+    
+    static public List<Token> getTokens(final String inputStr, final String inputStr_lang) throws IOException {
+        final TibetanAnalyzer ta = inputStr_lang.equals("bo-x-ewts") ? ewtsAnalyzer : uniAnalyzer;
         final TokenStream ts =  ta.tokenStream("", inputStr);
+        ts.reset();
         final List<Token> res = new ArrayList<>();
         try {
             final CharTermAttribute charTermAttr = ts.addAttribute(CharTermAttribute.class);
@@ -63,7 +72,7 @@ public class EntriesUtils {
             log.error("error while tokenizing {}", inputStr, e);
             return null;
         } finally {
-            ta.close();
+            ts.close();
         }
         return res;
     }
@@ -121,17 +130,22 @@ public class EntriesUtils {
             this.def = def;
             this.res_uri = res.getURI();
         }
+        
+        @Override
+        public String toString() {
+            return this.word.getLexicalForm();
+        }
     }
     
     public static List<Entry> searchInFuseki(final String cursor_string, final String cursor_string_left, final String cursor_string_right, final String lang) {
         final List<Entry> res = new ArrayList<>();
-        String sparql = "select distinct res, word, def where {";
-        sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string+"\"@"+lang+" . BIND(\""+cursor_string+"\"@"+lang+" as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+        String sparql = "select distinct ?res ?word ?def where {";
+        sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string.replace("\"", "")+"\"@bo . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
         if (cursor_string_left != null) {
-            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_left+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_left.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
         }
         if (cursor_string_right != null) {
-            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_right+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_right.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
         }
         sparql +=       "} limit 200";
         log.info(sparql);
@@ -168,9 +182,10 @@ public class EntriesUtils {
         return -1;
     }
     
-    public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) {
+    public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) throws IOException {
         final List<Entry> res = new ArrayList<>();
         for (final Entry entry : entries) {
+            log.debug("looking at {}", entry.word);
             final List<Token> word_tokens = getTokens(entry.word.getLexicalForm(), entry.word.getLanguage());
             final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
             if (match_start_ti == -1) {
@@ -183,13 +198,14 @@ public class EntriesUtils {
             if (word_tokens.size() - match_start_ti > chunk_tokens.size() - cursor_start_ti)
                 continue;
             entry.cursor_in_entry_start = word_tokens.get(match_start_ti).start;
-            entry.cursor_in_entry_end = word_tokens.get(match_start_ti+cursor_tokens.size()).end;
-            final int diff = match_start_ti - cursor_start_ti;
-            boolean matches = false;
+            entry.cursor_in_entry_end = word_tokens.get(match_start_ti+cursor_tokens.size()-1).end;
+            final int diff = cursor_start_ti - match_start_ti;
+            boolean matches = true;
             // checking if entry matches forward
-            for (int i = match_start_ti + cursor_tokens.size() +1 ; i < chunk_tokens.size() ; i ++) {
-                if (i - diff >= word_tokens.size())
+            for (int i = match_start_ti + cursor_tokens.size() ; i < chunk_tokens.size() ; i ++) {
+                if (i - diff >= word_tokens.size()) {
                     break;
+                }
                 if (word_tokens.get(i-diff).charTerm.equals(chunk_tokens.get(i).charTerm)) {
                     entry.chunk_offset_end = chunk_tokens.get(i).end;
                 } else {
@@ -197,8 +213,10 @@ public class EntriesUtils {
                     break;
                 }
             }
-            if (!matches)
+            if (!matches) {
+                log.debug("not matching forward");
                 continue;
+            }
             // and backwards
             for (int i = match_start_ti -1 ; i >= 0 ; i--) {
                 if (i - diff <= 0)
@@ -210,15 +228,17 @@ public class EntriesUtils {
                     break;
                 }
             }
-            if (!matches)
+            if (!matches) {
+                log.debug("not matching backward");
                 continue;
+            }
             entry.nb_tokens = word_tokens.size();
             res.add(entry);
         }
         return res;
     }
     
-    public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) {
+    public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) throws IOException {
         final List<Token> tokens = getTokens(chunk, chunk_lang);
         final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
         final List<Token> cursor_tokens = new ArrayList<>();
@@ -230,10 +250,10 @@ public class EntriesUtils {
         }
         String cursor_string_minus1 = null;
         if (cursor_tokens_range[0] > 0)
-            cursor_string_minus1 = chunk.substring(tokens.get(cursor_tokens_range[0]-1).start, tokens.get(cursor_tokens_range[1]).start);
+            cursor_string_minus1 = chunk.substring(tokens.get(cursor_tokens_range[0]-1).start, tokens.get(cursor_tokens_range[1]).end);
         String cursor_string_plus1 = null;
         if (cursor_tokens_range[1] < tokens.size()-1)
-            cursor_string_plus1 = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]+1).start);
+            cursor_string_plus1 = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]+1).end);
         List<Entry> entries = searchInFuseki(cursor_string, cursor_string_minus1, cursor_string_plus1, chunk_lang);
         entries = selectAndFillEntries(entries, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1]);
         return entries;

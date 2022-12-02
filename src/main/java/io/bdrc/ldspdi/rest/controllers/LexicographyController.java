@@ -1,5 +1,6 @@
 package io.bdrc.ldspdi.rest.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,19 +15,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.lexicography.EntriesUtils;
 
-
 @RestController
-@RequestMapping("/lexicography")
+@RequestMapping("/lexicography/")
 public class LexicographyController {
     
-    public final static Logger log = LoggerFactory.getLogger(LibrarySearchController.class);
+    public final static Logger log = LoggerFactory.getLogger(LexicographyController.class);
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -36,13 +35,13 @@ public class LexicographyController {
         objectMapper.registerModule(simpleModule);
     }
     
-    @GetMapping(value = "/entriesForChunk")
+    @GetMapping(value = "entriesForChunk")
     public ResponseEntity<String> getEntriesForChunk(HttpServletRequest request, HttpServletResponse response,
             @RequestParam(value = "chunk") String chunk,
             @RequestParam(value = "lang") String lang,
             @RequestParam(value = "cursor_start") int cursor_start,
             @RequestParam(value = "cursor_end") int cursor_end
-            ) throws RestException, JsonProcessingException {
+            ) throws RestException, IOException {
         if (!lang.equals("bo") && !lang.equals("bo-x-ewts"))
             throw new RestException(404, 5000, "invalid lang parameter");
         if (chunk.length() == 0)
