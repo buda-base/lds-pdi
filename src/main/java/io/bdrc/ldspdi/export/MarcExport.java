@@ -991,7 +991,7 @@ public class MarcExport {
             final Literal l = getDirectPreferredLit(m, genre, "bo");
             if (l == null)
                 continue;
-            final DataField f655 = factory.newDataField("655", '#', '7');
+            final DataField f655 = factory.newDataField("655", ' ', '7');
             f655.addSubfield(factory.newSubfield('a', getLangStr(l)));
             f655.addSubfield(factory.newSubfield('1', genre.getURI()));
             // available as of June 22, 2022
@@ -1002,7 +1002,7 @@ public class MarcExport {
             final Literal l_en = getDirectPreferredLit(m, genre, "en");
             if (l_en == null)
                 continue;
-            final DataField f655_2 = factory.newDataField("655", '#', '4');
+            final DataField f655_2 = factory.newDataField("655", ' ', '4');
             f655_2.addSubfield(factory.newSubfield('a', getLangStr(l_en)));
             record.addVariableField(f655_2);
         }
@@ -1401,7 +1401,7 @@ public class MarcExport {
 
     public static void add024(final Resource main, final Record r) {
         // this is the 024 field devised with Harvard
-        final DataField f024 = factory.newDataField("024", '7', '#');
+        final DataField f024 = factory.newDataField("024", '7', ' ');
         f024.addSubfield(factory.newSubfield('a', main.getLocalName()));
         // https://www.loc.gov/marc/relators/tn220613src.html
         f024.addSubfield(factory.newSubfield('2', "bdrc"));
