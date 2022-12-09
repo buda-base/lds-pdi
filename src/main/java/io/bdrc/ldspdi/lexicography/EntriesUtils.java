@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.lucene.bo.TibetanAnalyzer;
 
@@ -57,7 +58,7 @@ public class EntriesUtils {
         }
     }
     
-    static public List<Token> getTokens(final String inputStr, final String inputStr_lang) throws IOException {
+    static public List<Token> getTokens(String inputStr, final String inputStr_lang) throws IOException {
         final TibetanAnalyzer ta = inputStr_lang.equals("bo-x-ewts") ? ewtsAnalyzer : uniAnalyzer;
         final TokenStream ts =  ta.tokenStream("", inputStr);
         ts.reset();
@@ -78,13 +79,15 @@ public class EntriesUtils {
     }
     
     public static int[] getTokensRange(final List<Token> tokens, final int offset_start, final int offset_end) {
-        final int[] res = new int[2];
+        final int[] res = { -1, -1 };
         final boolean first_seen = false;
         int t_i = 0;
         for (final Token t : tokens) {
+            if (t.start <= offset_end && !first_seen) {
+                res[0] = t_i;
+                res[1] = t_i;
+            }
             if (t.start <= offset_end && t.end >= offset_start) {
-                if (!first_seen)
-                    res[0] = t_i; 
                 res[1] = t_i;
             }
             if (t.start > offset_end)
@@ -240,9 +243,11 @@ public class EntriesUtils {
         return res;
     }
     
-    public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) throws IOException {
+    public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) throws IOException, RestException {
         final List<Token> tokens = getTokens(chunk, chunk_lang);
         final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
+        if (cursor_tokens_range[0] == -1)
+            throw new RestException(404, 5000, "cannot find token around the cursor");
         final List<Token> cursor_tokens = new ArrayList<>();
         String cursor_string = "";
         for (int i = cursor_tokens_range[0] ; i <= cursor_tokens_range[1] ; i++) {
