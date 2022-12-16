@@ -79,15 +79,18 @@ public class EntriesUtils {
     }
     
     public static int[] getTokensRange(final List<Token> tokens, final int offset_start, final int offset_end) {
+        log.debug("get tokens in the range {}:{}", offset_start, offset_end);
         final int[] res = { -1, -1 };
-        final boolean first_seen = false;
+        boolean first_seen = false;
         int t_i = 0;
         for (final Token t : tokens) {
-            if (t.start <= offset_end && !first_seen) {
-                res[0] = t_i;
-                res[1] = t_i;
-            }
-            if (t.start <= offset_end && t.end >= offset_start) {
+            log.debug("look at token at range {}:{}", t.start, t.end);
+            if (t.start < offset_end && t.end > offset_start) {
+                if (!first_seen) {
+                    res[0] = t_i;
+                    first_seen = true;
+                }
+                log.debug("token matches");
                 res[1] = t_i;
             }
             if (t.start > offset_end)
@@ -244,8 +247,14 @@ public class EntriesUtils {
     }
     
     public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) throws IOException, RestException {
+        log.debug("get entries for {}@{}", chunk, chunk_lang);
         final List<Token> tokens = getTokens(chunk, chunk_lang);
+        log.debug("found tokens {}", tokens);
         final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
+        if (log.isDebugEnabled()) {
+            log.debug("looking at tokens around {}", chunk.subSequence(cursor_start, cursor_end));
+            log.debug("found tokens[{}:{}]", cursor_tokens_range[0], cursor_tokens_range[1]);
+        }
         if (cursor_tokens_range[0] == -1)
             throw new RestException(404, 5000, "cannot find token around the cursor");
         final List<Token> cursor_tokens = new ArrayList<>();
