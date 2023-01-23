@@ -96,6 +96,7 @@ public class LibrarySearchController {
         case "associatedWorks":
         case "associatedInstances":
         case "associatedIInstances":
+        case "associatedEInstances":
         case "instancesCreatedIn":
         case "worksCreatedIn":
         case "worksInCollection":
