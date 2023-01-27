@@ -40,7 +40,13 @@ public class ReconciliationController {
         prefixes.add("mkhan [pm]o ");
         prefixes.add("rgya gar kyi ");
         prefixes.add("mkhan chen ");
+        prefixes.add("a lag ");
+        prefixes.add("a khu ");
+        prefixes.add("rgan ");
+        prefixes.add("rgan lags ");
+        prefixes.add("zhabs drung "); // can appear in the middle of words
         prefixes.add("mkhas grub ");
+        prefixes.add("mkhas dbang ");
         prefixes.add("mkhas pa ");
         prefixes.add("bla ma ");
         prefixes.add("sman pa "); // ?
@@ -55,10 +61,10 @@ public class ReconciliationController {
         prefixes.add("rje ");
         prefixes.add("rje btsun ");
         prefixes.add("rje btsun [pm]a ");
-        prefixes.add("kun mkhyen");
-        prefixes.add("lo tsA ba");
-        prefixes.add("lo tswa ba");
-        prefixes.add("lo cA ba");
+        prefixes.add("kun mkhyen ");
+        prefixes.add("lo tsA ba ");
+        prefixes.add("lo tswa ba ");
+        prefixes.add("lo cA ba ");
         prefixes.add("lo chen ");
         prefixes.add("slob dpon ");
         prefixes.add("paN+Di ta ");
