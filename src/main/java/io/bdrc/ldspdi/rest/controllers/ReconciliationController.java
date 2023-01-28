@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,12 @@ public class ReconciliationController {
      * https://reconciliation-api.github.io/specs/0.1/
      */
     
+    
+    public final static class PropertyValue {
+        // pid
+        // v
+    }
+    
     public final static class Query {
         // query
         // type (string?)
@@ -33,8 +40,14 @@ public class ReconciliationController {
         // type_strict ("should", "all" or "any")
     }
     
+    public final static class QueryBatch {
+        // query_id -> query
+    }
+    
     final static List<String> prefixes = new ArrayList<>();
     final static List<String> suffixes = new ArrayList<>();
+    final static Pattern prefixPattern;
+    final static Pattern suffixPattern;
     static {
         // discussed in https://github.com/buda-base/library-issues/issues/466
         prefixes.add("mkhan [pm]o ");
@@ -57,7 +70,7 @@ public class ReconciliationController {
         prefixes.add("sngags mo ");
         prefixes.add("sngags pa'i rgyal po ");
         prefixes.add("sems dpa' chen po ");
-        prefixes.add("rnal 'byor [p]a ");
+        prefixes.add("rnal 'byor [pm]a ");
         prefixes.add("rje ");
         prefixes.add("rje btsun ");
         prefixes.add("rje btsun [pm]a ");
@@ -67,7 +80,7 @@ public class ReconciliationController {
         prefixes.add("lo cA ba ");
         prefixes.add("lo chen ");
         prefixes.add("slob dpon ");
-        prefixes.add("paN+Di ta ");
+        prefixes.add("paN\\+Di ta ");
         prefixes.add("paN chen ");
         prefixes.add("srI ");
         prefixes.add("dpal ");
@@ -84,7 +97,7 @@ public class ReconciliationController {
         prefixes.add("a ni lags ");
         prefixes.add("rig 'dzin ");
         prefixes.add("chen [pm]o ");
-        prefixes.add("A tsar+yA ");
+        prefixes.add("A tsar\\+yA ");
         prefixes.add("gter ston ");
         prefixes.add("gter chen ");
         prefixes.add("thams cad mkhyen pa ");
@@ -95,9 +108,9 @@ public class ReconciliationController {
         prefixes.add("theg pa chen po'i ");
         // prefixes found in Mongolian names
         prefixes.add("hor ");
+        prefixes.add("sog [pm]o ");
         prefixes.add("sog ");
         prefixes.add("a lags sha ");
-        prefixes.add("sog [pm]o ");
         prefixes.add("khal kha ");
         prefixes.add("cha har ");
         prefixes.add("jung gar ");
@@ -119,11 +132,25 @@ public class ReconciliationController {
         suffixes.add(" bzhugs so");
         suffixes.add(" sku gzhogs");
         suffixes.add(" (c|[sz])es bya ba");
+        
+        String patStr = String.join("|", prefixes);
+        prefixPattern = Pattern.compile("^(?:"+patStr+")+");
+        patStr = String.join("|", suffixes);
+        suffixPattern = Pattern.compile("(?:"+patStr+")+$");
     }
     
-    public static String normalizeTibetan(final String orig, final String type) {
-        
-        return orig;
+    public static String normalize(String orig, final String type) {
+        // TODO: if Tibetan Unicode, convert to Wylie
+        String repl = orig;
+        repl = repl.replaceAll("[\\s#_/\\-\\*\\.@\\d\\(\\)]+$", "");
+        repl = repl.replaceAll("^[\\s#_/@\\*]+", "");
+        repl = prefixPattern.matcher(repl).replaceAll("");
+        // we add a space at the beginning so that suffixes can match from the start
+        repl = suffixPattern.matcher(" "+repl).replaceAll("");
+        if (repl.length() == 0 && orig.length() > 0)
+            return orig;
+        // offset by 1 because of space we added earlier
+        return repl.substring(1);
     }
     
     @GetMapping(value = "/reconciliation/{lang}/service")
