@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.bdrc.ldspdi.exceptions.RestException;
 
 @RestController
@@ -26,23 +33,35 @@ public class ReconciliationController {
      * https://reconciliation-api.github.io/specs/0.1/
      */
     
+    public static final ObjectMapper objectMapper = new ObjectMapper();
     
     public final static class PropertyValue {
-        // pid
-        // v
+        @JsonProperty(value="pid", required=true)
+        public String pid = null;
+        
+        @JsonProperty(value="v", required=true)
+        public String v = null;
     }
     
     public final static class Query {
-        // query
-        // type (string?)
-        // limit (int)
-        // properties list of Property (pid, v)
-        // type_strict ("should", "all" or "any")
+        @JsonProperty(value="query", required=true)
+        public String query = null;
+        
+        @JsonProperty(value="type", required=false)
+        public String type = null;
+        
+        @JsonProperty(value="limit", required=false)
+        public Integer limit = null;
+        
+        // "should", "all" or "any"
+        @JsonProperty(value="type_strict", required=false)
+        public Integer type_strict = null;
+        
+        @JsonProperty(value="properties", required=false)
+        public List<PropertyValue> properties = null;
     }
     
-    public final static class QueryBatch {
-        // query_id -> query
-    }
+    public final static TypeReference<HashMap<String,Query>> QueryBatchTR = new TypeReference<HashMap<String,Query>>(){};
     
     final static List<String> prefixes = new ArrayList<>();
     final static List<String> suffixes = new ArrayList<>();
@@ -163,8 +182,9 @@ public class ReconciliationController {
     
     @PostMapping(path = "/{lang}/query",
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<String> query(@RequestParam Map<String,String> paramMap) {
+    public ResponseEntity<String> query(@RequestParam Map<String,String> paramMap) throws JsonMappingException, JsonProcessingException {
         final String jsonStr = paramMap.get("queries");
+        final HashMap<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(null);
     }
