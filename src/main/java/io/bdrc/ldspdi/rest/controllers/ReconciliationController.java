@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,14 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.SKOS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +34,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.export.MarcExport;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
 
 @RestController
 @RequestMapping("/")
@@ -36,6 +47,9 @@ public class ReconciliationController {
      */
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
+    
+    public final static Logger log = LoggerFactory
+            .getLogger(ReconciliationController.class);
     
     public final static class PropertyValue {
         @JsonProperty(value="pid", required=true)
@@ -63,7 +77,7 @@ public class ReconciliationController {
         public List<PropertyValue> properties = null;
     }
     
-    public final static class Result {
+    public final static class Result implements Comparable<Result> {
         @JsonProperty(value="id", required=true)
         public String id = null;
         
@@ -78,6 +92,13 @@ public class ReconciliationController {
         
         @JsonProperty(value="match", required=true)
         public Boolean match = null;
+
+        @Override
+        public int compareTo(final Result o) {
+            if (score == null)
+                return 0;
+            return score.compareTo(o.score);
+        }
     }
     
     public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
@@ -199,18 +220,19 @@ public class ReconciliationController {
                 .body(null);
     }
     
-    public static Map<String,Map<String,String>> analyzeQueryBatch(final Map<String,Query> queryBatch) {
-        final Map<String,Map<String,String>> typeToNormalizedToQueryId = new HashMap<>();
+    public static Map<String,Map<String,List<String>>> analyzeQueryBatch(final Map<String,Query> queryBatch) {
+        final Map<String,Map<String,List<String>>> typeToNormalizedToQueryIds = new HashMap<>();
         for (final Entry<String,Query> e : queryBatch.entrySet()) {
             final Query q = e.getValue();
             final String query_str = q.query;
             String type = q.type;
             if (type == null)
                 type = "Person";
-            final Map<String,String> normalizedToQueryId = typeToNormalizedToQueryId.getOrDefault(type, new HashMap<>());
-            normalizedToQueryId.put(normalize(query_str, type), e.getKey());
+            final Map<String,List<String>> normalizedToQueryIds = typeToNormalizedToQueryIds.getOrDefault(type, new HashMap<>());
+            final List<String> ids = normalizedToQueryIds.getOrDefault(query_str, new ArrayList<>());
+            ids.add(e.getKey());
         }
-        return typeToNormalizedToQueryId;
+        return typeToNormalizedToQueryIds;
     }
     
     public static String getPersonQuery(final String name, final String lang) {
@@ -263,15 +285,70 @@ public class ReconciliationController {
                 + "}";
     }
     
-    public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,String> queries, final Map<String,Query> queryBatch, final String lang) {
-        for (final Entry<String,String> e : queries.entrySet()) {
-            //getPersonQuery()
+    public static final Property isMain = ResourceFactory.createProperty(MarcExport.TMP + "isMain");
+    public static final Property entityScore = ResourceFactory.createProperty(MarcExport.TMP + "entityScore");
+    public static final Property luceneScore = ResourceFactory.createProperty(MarcExport.TMP + "luceneScore");
+    public static final Property associatedCentury = ResourceFactory.createProperty(MarcExport.TMP + "associatedCentury");
+    public static List<Result> personModelToResult(final Model m, final String lang) {
+        final List<Result> resList = new ArrayList<>();
+        final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
+        while (mainIt.hasNext()) {
+            final Result res = new Result();
+            resList.add(res);
+            res.type = "Person";
+            final Resource main = mainIt.next();
+            Statement scoreS = main.getProperty(entityScore);
+            if (scoreS == null)
+                scoreS = main.getProperty(luceneScore);
+            if (scoreS != null)
+                res.score = entityScore.asLiteral().getInt();
+            Statement nameS = main.getProperty(SKOS.prefLabel, lang);
+            if (nameS == null)
+                nameS = main.getProperty(SKOS.prefLabel);
+            if (nameS == null)
+                continue;
+            String name = nameS.getString();
+            final String dateStr = MarcExport.getDateStr(m, main);
+            if (dateStr != null) {
+                name += " ("+dateStr+")";
+                res.name = name;
+                continue;
+            }
+            final Statement centuryS = main.getProperty(associatedCentury);
+            if (centuryS != null)
+                name += " (~"+String.valueOf(centuryS.getInt())+"c.)";
+            res.name = name;
+        }
+        Collections.sort(resList);
+        return resList;
+    }
+    
+    public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
+        for (final Entry<String,List<String>> e : queries.entrySet()) {
+            final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
+            final Model model;
+            try {
+                model = QueryProcessor.getGraph(qstr, null, null);
+            } catch (RestException e1) {
+                log.error("error running query for {}", e.getKey(), e1);
+                continue;
+            }
+            final List<Result> resList = personModelToResult(model, lang);
+            for (final String qid : e.getValue()) {
+                final Query q = queryBatch.get(qid);
+                final Integer limit = q.limit;
+                if (limit != null && limit > resList.size()) {
+                    res.put(qid, resList.subList(0, limit));
+                } else {
+                    res.put(qid, resList);
+                }
+            }
         }
     }
     
-    public static Map<String,List<Result>> runSPARQLs(Map<String,Map<String,String>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
+    public static Map<String,List<Result>> runSPARQLs(Map<String,Map<String,List<String>>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
         final Map<String,List<Result>> res = new HashMap<>();
-        for (final Entry<String,Map<String,String>> e : analyzedQuery.entrySet()) {
+        for (final Entry<String,Map<String,List<String>>> e : analyzedQuery.entrySet()) {
             final String type = e.getKey();
             switch(type) {
             case "Person":
@@ -285,13 +362,13 @@ public class ReconciliationController {
     
     @PostMapping(path = "/{lang}/query",
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<String> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws JsonMappingException, JsonProcessingException {
+    public ResponseEntity<Map<String,List<Result>>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws JsonMappingException, JsonProcessingException {
         final String jsonStr = paramMap.get("queries");
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
-        final Map<String,Map<String,String>> analyzedQuery = analyzeQueryBatch(queryBatch);
+        final Map<String,Map<String,List<String>>> analyzedQuery = analyzeQueryBatch(queryBatch);
         final Map<String,List<Result>> res = runSPARQLs(analyzedQuery, queryBatch,lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
-                .body(null);
+                .body(res);
     }
     
 }
