@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.apache.jena.rdf.model.Model;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +63,25 @@ public class ReconciliationController {
         public List<PropertyValue> properties = null;
     }
     
-    public final static TypeReference<HashMap<String,Query>> QueryBatchTR = new TypeReference<HashMap<String,Query>>(){};
+    public final static class Result {
+        @JsonProperty(value="id", required=true)
+        public String id = null;
+        
+        @JsonProperty(value="name", required=true)
+        public String name = null;
+        
+        @JsonProperty(value="type", required=true)
+        public String type = null;
+        
+        @JsonProperty(value="score", required=true)
+        public Integer score = null;
+        
+        @JsonProperty(value="match", required=true)
+        public Boolean match = null;
+    }
+    
+    public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
+    public final static TypeReference<Map<String,List<Result>>> ResultBatchTR = new TypeReference<Map<String,List<Result>>>(){};
     
     final static List<String> prefixes = new ArrayList<>();
     final static List<String> suffixes = new ArrayList<>();
@@ -173,18 +193,103 @@ public class ReconciliationController {
     }
     
     @GetMapping(value = "/reconciliation/{lang}/service")
-    public ResponseEntity<String> getResourceGraph(@PathVariable String res,
-            @PathVariable("lang") String ext)
+    public ResponseEntity<String> getResourceGraph(@PathVariable("lang") String lang)
             throws RestException, IOException {
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(null);
     }
     
+    public static Map<String,Map<String,String>> analyzeQueryBatch(final Map<String,Query> queryBatch) {
+        final Map<String,Map<String,String>> typeToNormalizedToQueryId = new HashMap<>();
+        for (final Entry<String,Query> e : queryBatch.entrySet()) {
+            final Query q = e.getValue();
+            final String query_str = q.query;
+            String type = q.type;
+            if (type == null)
+                type = "Person";
+            final Map<String,String> normalizedToQueryId = typeToNormalizedToQueryId.getOrDefault(type, new HashMap<>());
+            normalizedToQueryId.put(normalize(query_str, type), e.getKey());
+        }
+        return typeToNormalizedToQueryId;
+    }
+    
+    public static String getPersonQuery(final String name, final String lang) {
+        return "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
+                + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
+                + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
+                + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n"
+                + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
+                + "prefix text:  <http://jena.apache.org/text#>\n"
+                + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
+                + "construct {\n"
+                + "    ?res tmp:luceneScore ?sc ;\n"
+                + "       tmp:isMain true ;\n"
+                + "    ?res ?resp ?reso .\n"
+                + "    ?evt :eventWhen ?evtw ;\n"
+                + "         a ?evtType .\n"
+                + "} where {\n"
+                + "  {\n"
+                + "    {\n"
+                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        ?res bdo:personName ?name .\n"
+                + "    } union {\n"
+                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        ?res a :Person .\n"
+                + "    }\n"
+                + "\n"
+                + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
+                + "    ?res ?resp ?reso .\n"
+                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                + "            adm:status    bda:StatusReleased .\n"
+                + "  } union {\n"
+                + "\n"
+                + "    # get events\n"
+                + "    {\n"
+                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" \"highlight:\" ) .\n"
+                + "        ?res bdo:personName ?name .\n"
+                + "    } union {\n"
+                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" \"highlight:\" ) .\n"
+                + "        ?res a :Person .\n"
+                + "    }\n"
+                + "\n"
+                + "    ?res bdo:personEvent ?evt .\n"
+                + "    ?evt a ?evtType .\n"
+                + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath))\n"
+                + "    ?evt :eventWhen ?evtw .\n"
+                + "\n"
+                + "  }\n"
+                + "}";
+    }
+    
+    public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,String> queries, final Map<String,Query> queryBatch, final String lang) {
+        for (final Entry<String,String> e : queries.entrySet()) {
+            //getPersonQuery()
+        }
+    }
+    
+    public static Map<String,List<Result>> runSPARQLs(Map<String,Map<String,String>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
+        final Map<String,List<Result>> res = new HashMap<>();
+        for (final Entry<String,Map<String,String>> e : analyzedQuery.entrySet()) {
+            final String type = e.getKey();
+            switch(type) {
+            case "Person":
+                fillResultsForPersons(res, e.getValue(), queryBatch, lang);
+            }
+        }
+        return res;
+    }
+    
+    
+    
     @PostMapping(path = "/{lang}/query",
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<String> query(@RequestParam Map<String,String> paramMap) throws JsonMappingException, JsonProcessingException {
+    public ResponseEntity<String> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws JsonMappingException, JsonProcessingException {
         final String jsonStr = paramMap.get("queries");
-        final HashMap<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
+        final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
+        final Map<String,Map<String,String>> analyzedQuery = analyzeQueryBatch(queryBatch);
+        final Map<String,List<Result>> res = runSPARQLs(analyzedQuery, queryBatch,lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(null);
     }
