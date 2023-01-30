@@ -15,6 +15,9 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +33,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.export.MarcExport;
+import io.bdrc.ldspdi.results.ResultsCache;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 
 @RestController
@@ -99,6 +103,63 @@ public class ReconciliationController {
                 return 0;
             return score.compareTo(o.score);
         }
+    }
+    
+    public final static class DefaultType {
+        @JsonProperty(value="name", required=true)
+        public String name = null;
+        
+        @JsonProperty(value="id", required=true)
+        public String id = null;
+        
+        public DefaultType(final String name, final String id) {
+            this.name = name;
+            this.id = id;
+        }
+    }
+    
+    public final static class Preview {
+        @JsonProperty(value="width", required=true)
+        public final Integer width = 400;
+        
+        @JsonProperty(value="height", required=true)
+        public final Integer height = 400;
+        
+        @JsonProperty(value="url", required=true)
+        public final String url = "https://library.bdrc.io/preview/{{id}}";
+    }
+    
+    public final static class View {
+        @JsonProperty(value="url", required=true)
+        public final String url = "https://library.bdrc.io/show/{{id}}";
+    }
+    
+    public final static class Service {
+        @JsonProperty(value="name", required=true)
+        public String name = null;
+        
+        @JsonProperty(value="identifierSpace", required=false)
+        public final String identifierSpace = "http://purl.bdrc.io/";
+        
+        @JsonProperty(value="schemaSpace", required=true)
+        public final String schemaSpace = "http://purl.bdrc.io/ontology/core/";
+        
+        @JsonProperty(value="defaultTypes", required=true)
+        public List<DefaultType> defaultTypes = null;
+        
+        @JsonProperty(value="view", required=true)
+        public final View view = new View();
+        
+        @JsonProperty(value="preview", required=true)
+        public final Preview preview = new Preview();
+
+    }
+    
+    public static final Service service_en = new Service();
+    static {
+        service_en.name = "Buddhist Digital Resource Center";
+        service_en.defaultTypes = new ArrayList<>();
+        service_en.defaultTypes.add(new DefaultType("person", "Person"));
     }
     
     public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
@@ -213,11 +274,11 @@ public class ReconciliationController {
         return repl.substring(1);
     }
     
-    @GetMapping(value = "/reconciliation/{lang}/service")
-    public ResponseEntity<String> getResourceGraph(@PathVariable("lang") String lang)
+    @GetMapping(value = "/reconciliation/{lang}/")
+    public ResponseEntity<Service> getResourceGraph(@PathVariable("lang") String lang)
             throws RestException, IOException {
         return ResponseEntity.status(200).header("Content-Type", "application/json")
-                .body(null);
+                .body(service_en);
     }
     
     public static Map<String,Map<String,List<String>>> analyzeQueryBatch(final Map<String,Query> queryBatch) {
@@ -228,8 +289,8 @@ public class ReconciliationController {
             String type = q.type;
             if (type == null)
                 type = "Person";
-            final Map<String,List<String>> normalizedToQueryIds = typeToNormalizedToQueryIds.getOrDefault(type, new HashMap<>());
-            final List<String> ids = normalizedToQueryIds.getOrDefault(query_str, new ArrayList<>());
+            final Map<String,List<String>> normalizedToQueryIds = typeToNormalizedToQueryIds.computeIfAbsent(type, k -> new HashMap<>());
+            final List<String> ids = normalizedToQueryIds.computeIfAbsent(normalize(query_str, type), k -> new ArrayList<>());
             ids.add(e.getKey());
         }
         return typeToNormalizedToQueryIds;
@@ -246,7 +307,7 @@ public class ReconciliationController {
                 + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
                 + "construct {\n"
                 + "    ?res tmp:luceneScore ?sc ;\n"
-                + "       tmp:isMain true ;\n"
+                + "       tmp:isMain true .\n"
                 + "    ?res ?resp ?reso .\n"
                 + "    ?evt :eventWhen ?evtw ;\n"
                 + "         a ?evtType .\n"
@@ -260,11 +321,11 @@ public class ReconciliationController {
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
-                + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                + "    ?res ?resp ?reso .\n"
                 + "    ?resAdm adm:adminAbout ?res .\n"
                 + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
                 + "            adm:status    bda:StatusReleased .\n"
+                + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
+                + "    ?res ?resp ?reso .\n"
                 + "  } union {\n"
                 + "\n"
                 + "    # get events\n"
@@ -276,6 +337,9 @@ public class ReconciliationController {
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
+                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                + "            adm:status    bda:StatusReleased .\n"
                 + "    ?res bdo:personEvent ?evt .\n"
                 + "    ?evt a ?evtType .\n"
                 + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath))\n"
@@ -297,12 +361,23 @@ public class ReconciliationController {
             resList.add(res);
             res.type = "Person";
             final Resource main = mainIt.next();
+            res.id = main.getLocalName();
+            // not quite sure what a good value is...
+            res.match = false;
             Statement scoreS = main.getProperty(entityScore);
             if (scoreS == null)
                 scoreS = main.getProperty(luceneScore);
             if (scoreS != null)
-                res.score = entityScore.asLiteral().getInt();
-            Statement nameS = main.getProperty(SKOS.prefLabel, lang);
+                res.score = scoreS.getInt();
+            //System.out.println(lang);
+            Statement nameS;
+            if (lang.equals("en")) {
+                nameS = main.getProperty(SKOS.prefLabel, "bo-x-ewts");
+                if (nameS == null)
+                    nameS = main.getProperty(SKOS.prefLabel, lang);
+            } else {
+                nameS = main.getProperty(SKOS.prefLabel, lang);
+            }
             if (nameS == null)
                 nameS = main.getProperty(SKOS.prefLabel);
             if (nameS == null)
@@ -319,20 +394,19 @@ public class ReconciliationController {
                 name += " (~"+String.valueOf(centuryS.getInt())+"c.)";
             res.name = name;
         }
-        Collections.sort(resList);
+        Collections.sort(resList, Collections.reverseOrder());
         return resList;
     }
     
     public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
         for (final Entry<String,List<String>> e : queries.entrySet()) {
             final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
+            //System.out.println(qstr);
             final Model model;
-            try {
-                model = QueryProcessor.getGraph(qstr, null, null);
-            } catch (RestException e1) {
-                log.error("error running query for {}", e.getKey(), e1);
-                continue;
-            }
+            RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
+            model = rvf.queryConstruct(qstr);
+            rvf.close();
+            model.write(System.out, "TTL");
             final List<Result> resList = personModelToResult(model, lang);
             for (final String qid : e.getValue()) {
                 final Query q = queryBatch.get(qid);
@@ -357,15 +431,14 @@ public class ReconciliationController {
         }
         return res;
     }
-    
-    
-    
-    @PostMapping(path = "/{lang}/query",
+
+    @PostMapping(path = "/reconciliation/{lang}/",
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<Map<String,List<Result>>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws JsonMappingException, JsonProcessingException {
+    public ResponseEntity<Map<String,List<Result>>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Map<String,List<String>>> analyzedQuery = analyzeQueryBatch(queryBatch);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValues(System.out).write(analyzedQuery);
         final Map<String,List<Result>> res = runSPARQLs(analyzedQuery, queryBatch,lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
