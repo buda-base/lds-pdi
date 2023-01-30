@@ -16,7 +16,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
@@ -35,6 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.bdrc.ewtsconverter.EwtsConverter;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.export.MarcExport;
 import io.bdrc.ldspdi.results.ResultsCache;
@@ -51,6 +51,7 @@ public class ReconciliationController {
      */
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
+    public static final EwtsConverter converter = new EwtsConverter();
     
     public final static Logger log = LoggerFactory
             .getLogger(ReconciliationController.class);
@@ -260,9 +261,23 @@ public class ReconciliationController {
         suffixPattern = Pattern.compile("(?:"+patStr+")+$");
     }
     
-    public static String normalize(String orig, final String type) {
-        // TODO: if Tibetan Unicode, convert to Wylie
+    public static boolean isAllTibetanUnicode(String input) {
+        final int len = Math.min(10, input.length());
+        if (len == 0) return false;
+        int nbNonTibUni = 0;
+        for (int i = 0; i < len; i++) {
+            int c = input.charAt(i);
+            if ((c < 0x0F00 || c > 0x0FFF) && c != ' ') {
+                nbNonTibUni += 1;
+            }
+        }
+        return nbNonTibUni < 3;
+    }
+    
+    public static String normalize(final String orig, final String type) {
         String repl = orig;
+        if (isAllTibetanUnicode(orig))
+            repl = converter.toWylie(orig);
         repl = repl.replaceAll("[\\s#_/\\-\\*\\.@\\d\\(\\)]+$", "");
         repl = repl.replaceAll("^[\\s#_/@\\*]+", "");
         repl = prefixPattern.matcher(repl).replaceAll("");
@@ -406,7 +421,7 @@ public class ReconciliationController {
             RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
             model = rvf.queryConstruct(qstr);
             rvf.close();
-            model.write(System.out, "TTL");
+            //model.write(System.out, "TTL");
             final List<Result> resList = personModelToResult(model, lang);
             for (final String qid : e.getValue()) {
                 final Query q = queryBatch.get(qid);
@@ -438,7 +453,7 @@ public class ReconciliationController {
         final String jsonStr = paramMap.get("queries");
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Map<String,List<String>>> analyzedQuery = analyzeQueryBatch(queryBatch);
-        objectMapper.writerWithDefaultPrettyPrinter().writeValues(System.out).write(analyzedQuery);
+        //objectMapper.writerWithDefaultPrettyPrinter().writeValues(System.out).write(analyzedQuery);
         final Map<String,List<Result>> res = runSPARQLs(analyzedQuery, queryBatch,lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
