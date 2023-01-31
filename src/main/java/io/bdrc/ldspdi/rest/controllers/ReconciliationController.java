@@ -2,6 +2,7 @@ package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +85,15 @@ public class ReconciliationController {
         public List<PropertyValue> properties = null;
     }
     
+    public final static class Results {
+        @JsonProperty(value="result", required=true)
+        public List<Result> result = null;
+        
+        public Results(final List<Result> result) {
+            this.result = result;
+        }
+    }
+    
     public final static class Result implements Comparable<Result> {
         @JsonProperty(value="id", required=true)
         public String id = null;
@@ -92,7 +102,7 @@ public class ReconciliationController {
         public String name = null;
         
         @JsonProperty(value="type", required=true)
-        public String type = null;
+        public List<String> type = null;
         
         @JsonProperty(value="score", required=true)
         public Integer score = null;
@@ -129,7 +139,7 @@ public class ReconciliationController {
         public final Integer height = 400;
         
         @JsonProperty(value="url", required=true)
-        public final String url = "https://library.bdrc.io/preview/{{id}}";
+        public final String url = "https://library-dev.bdrc.io/preview/{{id}}";
     }
     
     public final static class View {
@@ -293,7 +303,7 @@ public class ReconciliationController {
     
     @GetMapping(value = "/reconciliation/{lang}/")
     public ResponseEntity<Service> getResourceGraph(@PathVariable("lang") String lang)
-            throws RestException, IOException {
+            throws IOException {
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(service_en);
     }
@@ -425,13 +435,16 @@ public class ReconciliationController {
     public static final Property entityScore = ResourceFactory.createProperty(MarcExport.TMP + "entityScore");
     public static final Property luceneScore = ResourceFactory.createProperty(MarcExport.TMP + "luceneScore");
     public static final Property associatedCentury = ResourceFactory.createProperty(MarcExport.TMP + "associatedCentury");
+    
+    public static final List<String> person_types = Arrays.asList("Person");
+    
     public static List<Result> personModelToResult(final Model m, final String lang) {
         final List<Result> resList = new ArrayList<>();
         final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
         while (mainIt.hasNext()) {
             final Result res = new Result();
             resList.add(res);
-            res.type = "Person";
+            res.type = person_types;
             final Resource main = mainIt.next();
             res.id = main.getLocalName();
             // not quite sure what a good value is...
@@ -467,7 +480,7 @@ public class ReconciliationController {
         return resList;
     }
     
-    public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
+    public static void fillResultsForPersons(Map<String,Results> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
         for (final Entry<String,List<String>> e : queries.entrySet()) {
             final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
             final Model model;
@@ -480,16 +493,16 @@ public class ReconciliationController {
                 final Query q = queryBatch.get(qid);
                 final Integer limit = q.limit;
                 if (limit != null && limit < resList.size()) {
-                    res.put(qid, resList.subList(0, limit));
+                    res.put(qid, new Results(resList.subList(0, limit)));
                 } else {
-                    res.put(qid, resList);
+                    res.put(qid, new Results(resList));
                 }
             }
         }
     }
     
-    public static Map<String,List<Result>> runSPARQLs(Map<String,Map<String,List<String>>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
-        final Map<String,List<Result>> res = new HashMap<>();
+    public static Map<String,Results> runSPARQLs(Map<String,Map<String,List<String>>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
+        final Map<String,Results> res = new HashMap<>();
         for (final Entry<String,Map<String,List<String>>> e : analyzedQuery.entrySet()) {
             final String type = e.getKey();
             switch(type) {
@@ -502,12 +515,12 @@ public class ReconciliationController {
 
     @PostMapping(path = "/reconciliation/{lang}/",
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<Map<String,List<Result>>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
+    public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Map<String,List<String>>> analyzedQuery = analyzeQueryBatch(queryBatch);
         //objectMapper.writerWithDefaultPrettyPrinter().writeValues(System.out).write(analyzedQuery);
-        final Map<String,List<Result>> res = runSPARQLs(analyzedQuery, queryBatch,lang);
+        final Map<String,Results> res = runSPARQLs(analyzedQuery, queryBatch,lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
     }
