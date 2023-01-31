@@ -15,8 +15,10 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +78,7 @@ public class ReconciliationController {
         
         // "should", "all" or "any"
         @JsonProperty(value="type_strict", required=false)
-        public Integer type_strict = null;
+        public String type_strict = null;
         
         @JsonProperty(value="properties", required=false)
         public List<PropertyValue> properties = null;
@@ -320,10 +322,12 @@ public class ReconciliationController {
                 + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
                 + "prefix text:  <http://jena.apache.org/text#>\n"
                 + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
+                + "prefix owl:   <http://www.w3.org/2002/07/owl#> "
                 + "construct {\n"
-                + "    ?res tmp:luceneScore ?sc ;\n"
+                + "    ?bdrcres tmp:luceneScore ?sc ;\n"
                 + "       tmp:isMain true .\n"
-                + "    ?res ?resp ?reso .\n"
+                + "    ?bdrcres ?resp ?reso .\n"
+                + "    ?bdrcres bdo:personEvent ?evt .\n"
                 + "    ?evt :eventWhen ?evtw ;\n"
                 + "         a ?evtType .\n"
                 + "} where {\n"
@@ -336,11 +340,12 @@ public class ReconciliationController {
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
-                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?res owl:sameAs* ?bdrcres ."
+                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
                 + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
                 + "            adm:status    bda:StatusReleased .\n"
                 + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                + "    ?res ?resp ?reso .\n"
+                + "    ?bdrcres ?resp ?reso .\n"
                 + "  } union {\n"
                 + "\n"
                 + "    # get events\n"
@@ -352,16 +357,68 @@ public class ReconciliationController {
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
-                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?res owl:sameAs* ?bdrcres ."
+                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
                 + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
                 + "            adm:status    bda:StatusReleased .\n"
-                + "    ?res bdo:personEvent ?evt .\n"
+                + "    ?bdrcres bdo:personEvent ?evt .\n"
                 + "    ?evt a ?evtType .\n"
-                + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath))\n"
+                + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
                 + "    ?evt :eventWhen ?evtw .\n"
                 + "\n"
                 + "  }\n"
                 + "}";
+    }
+    
+    public static String getDateStrEdtf(final Model m, final Resource person) {
+        // TODO: handle century, see https://www.loc.gov/marc/bibliographic/bdx00.html for format
+        String birthStr = null;
+        String deathStr = null;
+        String floruitStr = null;
+        StmtIterator si = person.listProperties(MarcExport.personEvent);
+        while (si.hasNext()) {
+            final Resource event = si.next().getResource();
+            final Resource eventType = event.getPropertyResourceValue(RDF.type);
+            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
+                if (event.hasProperty(MarcExport.eventWhen)) {
+                    birthStr = event.getProperty(MarcExport.eventWhen).getLiteral().getLexicalForm();
+                }
+            }
+            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
+                if (event.hasProperty(MarcExport.eventWhen)) {
+                    deathStr = event.getProperty(MarcExport.eventWhen).getString();
+                }
+            }
+            if (eventType != null && eventType.getLocalName().equals("PersonFlourished")) {
+                if (event.hasProperty(MarcExport.eventWhen)) {
+                    floruitStr = event.getProperty(MarcExport.eventWhen).getString();
+                }
+            }
+        }
+        if (birthStr != null || deathStr != null) {
+            String dateStr = "";
+            // There should be a coma at the end, except when the date ends with a hyphen.
+            if (birthStr == null) {
+                if (deathStr != null) {
+                    dateStr += "d. "+deathStr;
+                }
+            } else {
+                dateStr += birthStr+"-";
+                if (deathStr != null) {
+                    dateStr += deathStr;
+                }
+            }
+            return dateStr;
+        }
+        if (floruitStr != null) {
+            if (floruitStr.length() > 3)
+                return floruitStr;
+            return floruitStr+"XX";
+        }
+        final Statement centuryS = person.getProperty(associatedCentury);
+        if (centuryS != null)
+            return String.valueOf(centuryS.getInt()-1)+"XX";
+        return null;
     }
     
     public static final Property isMain = ResourceFactory.createProperty(MarcExport.TMP + "isMain");
@@ -398,15 +455,12 @@ public class ReconciliationController {
             if (nameS == null)
                 continue;
             String name = nameS.getString();
-            final String dateStr = MarcExport.getDateStr(m, main);
+            final String dateStr = getDateStrEdtf(m, main);
             if (dateStr != null) {
                 name += " ("+dateStr+")";
                 res.name = name;
                 continue;
             }
-            final Statement centuryS = main.getProperty(associatedCentury);
-            if (centuryS != null)
-                name += " (~"+String.valueOf(centuryS.getInt())+"c.)";
             res.name = name;
         }
         Collections.sort(resList, Collections.reverseOrder());
@@ -416,7 +470,6 @@ public class ReconciliationController {
     public static void fillResultsForPersons(Map<String,List<Result>> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
         for (final Entry<String,List<String>> e : queries.entrySet()) {
             final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
-            //System.out.println(qstr);
             final Model model;
             RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
             model = rvf.queryConstruct(qstr);
@@ -426,7 +479,7 @@ public class ReconciliationController {
             for (final String qid : e.getValue()) {
                 final Query q = queryBatch.get(qid);
                 final Integer limit = q.limit;
-                if (limit != null && limit > resList.size()) {
+                if (limit != null && limit < resList.size()) {
                     res.put(qid, resList.subList(0, limit));
                 } else {
                     res.put(qid, resList);
