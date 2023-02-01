@@ -173,6 +173,7 @@ public class ReconciliationController {
         service_en.name = "Buddhist Digital Resource Center";
         service_en.defaultTypes = new ArrayList<>();
         service_en.defaultTypes.add(new DefaultType("person", "Person"));
+        service_en.defaultTypes.add(new DefaultType("work", "Work"));
     }
     
     public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
@@ -380,6 +381,48 @@ public class ReconciliationController {
                 + "}";
     }
     
+    public static String getWorkQuery(final String name, final String lang) {
+        return "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
+                + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
+                + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
+                + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n"
+                + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
+                + "prefix text:  <http://jena.apache.org/text#>\n"
+                + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
+                + "prefix owl:   <http://www.w3.org/2002/07/owl#> "
+                + "construct {\n"
+                + "    ?res tmp:luceneScore ?sc ;\n"
+                + "       tmp:isMain true .\n"
+                + "    ?res ?resp ?reso .\n"
+                + "    ?res :creator ?aac .\n"
+                + "    ?aac ?aacp ?aaco .\n"
+                + "    ?p skos:prefLabel ?pl .\n"
+                + "} where {\n"
+                + "  {\n"
+                + "    (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "    ?res a :Work .\n"
+                + "\n"
+                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                + "            adm:status    bda:StatusReleased .\n"
+                + "    VALUES ?resp { skos:prefLabel tmp:entityScore }\n"
+                + "    ?res ?resp ?reso .\n"
+                + "  } union {\n"
+                + "    (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "    ?res a :Work .\n"
+                + "\n"
+                + "    ?resAdm adm:adminAbout ?res .\n"
+                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                + "            adm:status    bda:StatusReleased .\n"
+                + "    ?res :creator ?aac .\n"
+                + "    ?aac ?aacp ?aaco .\n"
+                + "    ?aac :agent ?p .\n"
+                + "    ?p skos:prefLabel ?pl .\n"
+                + "  }\n"
+                + "}";
+    }
+    
     public static String getDateStrEdtf(final Model m, final Resource person) {
         // TODO: handle century, see https://www.loc.gov/marc/bibliographic/bdx00.html for format
         String birthStr = null;
@@ -437,6 +480,7 @@ public class ReconciliationController {
     public static final Property associatedCentury = ResourceFactory.createProperty(MarcExport.TMP + "associatedCentury");
     
     public static final List<String> person_types = Arrays.asList("Person");
+    public static final List<String> work_types = Arrays.asList("Work");
     
     public static List<Result> personModelToResult(final Model m, final String lang) {
         final List<Result> resList = new ArrayList<>();
@@ -450,24 +494,11 @@ public class ReconciliationController {
             // not quite sure what a good value is...
             res.match = false;
             Statement scoreS = main.getProperty(entityScore);
-            if (scoreS == null)
-                scoreS = main.getProperty(luceneScore);
             if (scoreS != null)
                 res.score = scoreS.getInt();
-            //System.out.println(lang);
-            Statement nameS;
-            if (lang.equals("en")) {
-                nameS = main.getProperty(SKOS.prefLabel, "bo-x-ewts");
-                if (nameS == null)
-                    nameS = main.getProperty(SKOS.prefLabel, lang);
-            } else {
-                nameS = main.getProperty(SKOS.prefLabel, lang);
-            }
-            if (nameS == null)
-                nameS = main.getProperty(SKOS.prefLabel);
-            if (nameS == null)
-                continue;
-            String name = nameS.getString();
+            else
+                res.score = 1;
+            String name = getPrefLabel(m, main, lang);;
             final String dateStr = getDateStrEdtf(m, main);
             if (dateStr != null) {
                 name += " ("+dateStr+")";
@@ -480,6 +511,104 @@ public class ReconciliationController {
         return resList;
     }
     
+    public static final String getPrefLabel(final Model m, final Resource main, final String lang) {
+        Statement nameS;
+        if (lang.equals("en")) {
+            nameS = main.getProperty(SKOS.prefLabel, "bo-x-ewts");
+            if (nameS == null)
+                nameS = main.getProperty(SKOS.prefLabel, lang);
+        } else {
+            nameS = main.getProperty(SKOS.prefLabel, lang);
+        }
+        if (nameS == null)
+            nameS = main.getProperty(SKOS.prefLabel);
+        if (nameS == null)
+            return null;
+        return nameS.getString();
+    }
+    
+    public static List<Result> workModelToResult(final Model m, final String lang) {
+        final List<Result> resList = new ArrayList<>();
+        final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
+        while (mainIt.hasNext()) {
+            final Result res = new Result();
+            resList.add(res);
+            res.type = work_types;
+            final Resource main = mainIt.next();
+            res.id = main.getLocalName();
+            // not quite sure what a good value is...
+            res.match = false;
+            Statement scoreS = main.getProperty(entityScore);
+            int baseScore = 1;
+            if (scoreS != null) {
+                baseScore = scoreS.getInt();
+            }
+            // work have a score of 1 in many cases, we differentiate them through their lucene score
+            scoreS = main.getProperty(luceneScore);
+            if (scoreS != null) {
+                res.score = Math.round(baseScore*scoreS.getFloat());
+            } else {
+                res.score = baseScore;
+            }
+            String name = getPrefLabel(m, main, lang);
+            final String creatorsStr = getCreatorsStr(m, main, lang);
+            if (creatorsStr != null) {
+                res.name = name+creatorsStr;
+                continue;
+            }
+            res.name = name;
+        }
+        Collections.sort(resList, Collections.reverseOrder());
+        return resList;
+    }
+    
+    static final Map<String,String> roleToStr = new HashMap<>();
+    static {
+        roleToStr.put("R0ER0011", "A"); // attributed author
+        roleToStr.put("R0ER0014", "C"); // commentator
+        roleToStr.put("R0ER0016", "A"); // contributing author
+        roleToStr.put("R0ER0017", "T"); // head translator
+        roleToStr.put("R0ER0018", "T"); // pandita
+        roleToStr.put("R0ER0019", "A"); // main author
+        roleToStr.put("R0ER0020", "T"); // oral translator
+        roleToStr.put("R0ER0015", "E"); // compiler (editor)
+        roleToStr.put("R0ER0022", "T"); // reciter (in Chinese translations)
+        roleToStr.put("R0ER0025", "TT"); // Terton
+        roleToStr.put("R0ER0026", "T"); // translator
+    }
+    
+    private static String getCreatorsStr(final Model m, final Resource main, final String lang) {
+        final StmtIterator mainIt = main.listProperties(MarcExport.creator);
+        String res = null;
+        int nbFound = 0;
+        while (mainIt.hasNext()) {
+            final Resource aac = mainIt.next().getResource(); 
+            final Resource role = aac.getPropertyResourceValue(MarcExport.role);
+            if (role == null)
+                continue;
+            final String roleLname = role.getLocalName();
+            final String roleShort = roleToStr.getOrDefault(roleLname, null);
+            if (roleShort == null)
+                continue;
+            final Resource agent = aac.getPropertyResourceValue(MarcExport.agent);
+            if (agent == null)
+                continue;
+            final String agentLabel = getPrefLabel(m, agent, lang);
+            if (agentLabel == null)
+                continue;
+            if (nbFound == 0) {
+                res = "  ["+agentLabel+" ("+roleShort+")";
+            } else {
+                res += ", "+agentLabel+" ("+roleShort+")";
+            }
+            nbFound += 1;
+        }
+        if (nbFound > 0) {
+            return res+"]";
+        }
+        return null;
+    }
+
     public static void fillResultsForPersons(Map<String,Results> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
         for (final Entry<String,List<String>> e : queries.entrySet()) {
             final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
@@ -501,6 +630,27 @@ public class ReconciliationController {
         }
     }
     
+    public static void fillResultsForWorks(Map<String,Results> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
+        for (final Entry<String,List<String>> e : queries.entrySet()) {
+            final String qstr = getWorkQuery(e.getKey(), "bo-x-ewts");
+            final Model model;
+            RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
+            model = rvf.queryConstruct(qstr);
+            rvf.close();
+            //model.write(System.out, "TTL");
+            final List<Result> resList = workModelToResult(model, lang);
+            for (final String qid : e.getValue()) {
+                final Query q = queryBatch.get(qid);
+                final Integer limit = q.limit;
+                if (limit != null && limit < resList.size()) {
+                    res.put(qid, new Results(resList.subList(0, limit)));
+                } else {
+                    res.put(qid, new Results(resList));
+                }
+            }
+        }
+    }
+    
     public static Map<String,Results> runSPARQLs(Map<String,Map<String,List<String>>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
         final Map<String,Results> res = new HashMap<>();
         for (final Entry<String,Map<String,List<String>>> e : analyzedQuery.entrySet()) {
@@ -508,6 +658,10 @@ public class ReconciliationController {
             switch(type) {
             case "Person":
                 fillResultsForPersons(res, e.getValue(), queryBatch, lang);
+                break;
+            case "Work":
+                fillResultsForWorks(res, e.getValue(), queryBatch, lang);
+                break;
             }
         }
         return res;
