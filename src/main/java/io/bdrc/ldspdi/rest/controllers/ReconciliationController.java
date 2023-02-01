@@ -64,7 +64,7 @@ public class ReconciliationController {
         public String pid = null;
         
         @JsonProperty(value="v", required=true)
-        public String v = null;
+        public Object v = null;
     }
     
     public final static class Query {
@@ -309,7 +309,7 @@ public class ReconciliationController {
                 .body(service_en);
     }
     
-    public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang) {
+    public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang, final String workId) {
         String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
                 + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
@@ -377,10 +377,28 @@ public class ReconciliationController {
                         + "            adm:status    bda:StatusReleased ."
                         + "    ?wa text:query ( bdo:skosLabels \"\\\""+worktitle+"\\\"\"@"+worktitle_lang+" ) .\n"
                         + "    ?wa a :Work ;\n"
-                        + "                                                                  :creator ?aac .\n"
+                        + "        :creator ?aac .\n"
                         + "    ?aac :agent ?bdrcres .\n"
-                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
+                        + "    ?resAdm adm:adminAbout ?wa .\n"
                         + "    ?resAdm adm:status    bda:StatusReleased .\n"
+                        + "    BIND(true as ?superMatch)";
+                } else if (workId != null) {
+                    res += "  } union {"
+                        + "    # get matches with work\n"
+                        + "    {\n"
+                        + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        ?res bdo:personName ?name .\n"
+                        + "    } union {\n"
+                        + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        ?res a :Person .\n"
+                        + "    }\n"
+                        + "    ?res owl:sameAs* ?bdrcres ."
+                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
+                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                        + "            adm:status    bda:StatusReleased ."
+                        + "    bdr:"+workId+" a :Work ;\n"
+                        + "          :creator ?aac .\n"
+                        + "    ?aac :agent ?bdrcres .\n"
                         + "    BIND(true as ?superMatch)";
                 }
                 res += "  }\n"
@@ -625,21 +643,30 @@ public class ReconciliationController {
         
     }
 
-    public static String getFirstPropertyValue(final Query q, final String pid) {
+    public static Object getFirstPropertyValue(final Query q, final String pid) {
         if (q.properties == null)
             return null;
         for (PropertyValue pv : q.properties) {
-            if (pv.pid.equals(pid))
+            if (pv.pid.equals(pid)) {
                 return pv.v;
+            }
         }
         return null;
     }
     
     public static void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) {
         final String normalized = normalize(q.query, "Person");
-        String workTitle = getFirstPropertyValue(q, "authorOf");
-        String workTitle_lang = guessLang(workTitle);
-        final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang);
+        String workTitle = null;
+        String workTitle_lang = null;
+        String workId = null;
+        final Object value = getFirstPropertyValue(q, "authorOf");
+        if (value instanceof String) {
+            workTitle = (String) value;
+            workTitle_lang = guessLang(workTitle);
+        } else if (value instanceof Map) {
+            workId = ((Map<String,String>)value).getOrDefault("id", null);
+        }
+        final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang, workId);
         System.out.println(qstr);
         final Model model;
         RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
@@ -676,6 +703,8 @@ public class ReconciliationController {
         final Map<String,Results> res = new HashMap<>();
         for (final Entry<String,Query> e : queryBatch.entrySet()) {
             final Query q = e.getValue();
+            if (q.type == null)
+                q.type = "Person";
             switch (q.type) {
             case "Person":
                 fillResultsForPersons(res, e.getKey(), q, lang);
@@ -692,6 +721,7 @@ public class ReconciliationController {
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
+        System.out.println(jsonStr);
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
