@@ -139,12 +139,12 @@ public class ReconciliationController {
         public final Integer height = 400;
         
         @JsonProperty(value="url", required=true)
-        public final String url = "https://library-dev.bdrc.io/preview/{{id}}";
+        public final String url = "https://library-dev.bdrc.io/preview/bdr:{{id}}";
     }
     
     public final static class View {
         @JsonProperty(value="url", required=true)
-        public final String url = "https://library.bdrc.io/show/{{id}}";
+        public final String url = "https://library.bdrc.io/show/bdr:{{id}}";
     }
     
     public final static class Service {
