@@ -309,23 +309,8 @@ public class ReconciliationController {
                 .body(service_en);
     }
     
-    public static Map<String,Map<String,List<String>>> analyzeQueryBatch(final Map<String,Query> queryBatch) {
-        final Map<String,Map<String,List<String>>> typeToNormalizedToQueryIds = new HashMap<>();
-        for (final Entry<String,Query> e : queryBatch.entrySet()) {
-            final Query q = e.getValue();
-            final String query_str = q.query;
-            String type = q.type;
-            if (type == null)
-                type = "Person";
-            final Map<String,List<String>> normalizedToQueryIds = typeToNormalizedToQueryIds.computeIfAbsent(type, k -> new HashMap<>());
-            final List<String> ids = normalizedToQueryIds.computeIfAbsent(normalize(query_str, type), k -> new ArrayList<>());
-            ids.add(e.getKey());
-        }
-        return typeToNormalizedToQueryIds;
-    }
-    
-    public static String getPersonQuery(final String name, final String lang) {
-        return "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
+    public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang) {
+        String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
                 + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -336,7 +321,8 @@ public class ReconciliationController {
                 + "prefix owl:   <http://www.w3.org/2002/07/owl#> "
                 + "construct {\n"
                 + "    ?bdrcres tmp:luceneScore ?sc ;\n"
-                + "       tmp:isMain true .\n"
+                + "       tmp:isMain true ;"
+                + "       tmp:superMatch ?superMatch .\n"
                 + "    ?bdrcres ?resp ?reso .\n"
                 + "    ?bdrcres bdo:personEvent ?evt .\n"
                 + "    ?evt :eventWhen ?evtw ;\n"
@@ -358,13 +344,12 @@ public class ReconciliationController {
                 + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
                 + "    ?bdrcres ?resp ?reso .\n"
                 + "  } union {\n"
-                + "\n"
                 + "    # get events\n"
                 + "    {\n"
-                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" \"highlight:\" ) .\n"
+                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res bdo:personName ?name .\n"
                 + "    } union {\n"
-                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" \"highlight:\" ) .\n"
+                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
@@ -375,10 +360,32 @@ public class ReconciliationController {
                 + "    ?bdrcres bdo:personEvent ?evt .\n"
                 + "    ?evt a ?evtType .\n"
                 + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
-                + "    ?evt :eventWhen ?evtw .\n"
-                + "\n"
-                + "  }\n"
+                + "    ?evt :eventWhen ?evtw .\n";
+                if (worktitle != null) {
+                    res += "  } union {"
+                        + "    # get matches with work\n"
+                        + "    {\n"
+                        + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        ?res bdo:personName ?name .\n"
+                        + "    } union {\n"
+                        + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        ?res a :Person .\n"
+                        + "    }\n"
+                        + "    ?res owl:sameAs* ?bdrcres ."
+                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
+                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                        + "            adm:status    bda:StatusReleased ."
+                        + "    ?wa text:query ( bdo:skosLabels \"\\\""+worktitle+"\\\"\"@"+worktitle_lang+" ) .\n"
+                        + "    ?wa a :Work ;\n"
+                        + "                                                                  :creator ?aac .\n"
+                        + "    ?aac :agent ?bdrcres .\n"
+                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
+                        + "    ?resAdm adm:status    bda:StatusReleased .\n"
+                        + "    BIND(true as ?superMatch)";
+                }
+                res += "  }\n"
                 + "}";
+                return res;
     }
     
     public static String getWorkQuery(final String name, final String lang) {
@@ -478,6 +485,7 @@ public class ReconciliationController {
     public static final Property entityScore = ResourceFactory.createProperty(MarcExport.TMP + "entityScore");
     public static final Property luceneScore = ResourceFactory.createProperty(MarcExport.TMP + "luceneScore");
     public static final Property associatedCentury = ResourceFactory.createProperty(MarcExport.TMP + "associatedCentury");
+    public static final Property superMatch = ResourceFactory.createProperty(MarcExport.TMP + "superMatch");
     
     public static final List<String> person_types = Arrays.asList("Person");
     public static final List<String> work_types = Arrays.asList("Work");
@@ -491,14 +499,13 @@ public class ReconciliationController {
             res.type = person_types;
             final Resource main = mainIt.next();
             res.id = main.getLocalName();
-            // not quite sure what a good value is...
-            res.match = false;
+            res.match = main.hasProperty(superMatch);
             Statement scoreS = main.getProperty(entityScore);
             if (scoreS != null)
                 res.score = scoreS.getInt();
             else
                 res.score = 1;
-            String name = getPrefLabel(m, main, lang);;
+            String name = getPrefLabel(m, main, lang);
             final String dateStr = getDateStrEdtf(m, main);
             if (dateStr != null) {
                 name += " ("+dateStr+")";
@@ -608,59 +615,73 @@ public class ReconciliationController {
         }
         return null;
     }
+    
+    public static String guessLang(final String str) {
+        if (str == null)
+            return null;
+        if (isAllTibetanUnicode(str))
+            return "bo";
+        return "bo-x-ewts";
+        
+    }
 
-    public static void fillResultsForPersons(Map<String,Results> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
-        for (final Entry<String,List<String>> e : queries.entrySet()) {
-            final String qstr = getPersonQuery(e.getKey(), "bo-x-ewts");
-            final Model model;
-            RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
-            model = rvf.queryConstruct(qstr);
-            rvf.close();
-            //model.write(System.out, "TTL");
-            final List<Result> resList = personModelToResult(model, lang);
-            for (final String qid : e.getValue()) {
-                final Query q = queryBatch.get(qid);
-                final Integer limit = q.limit;
-                if (limit != null && limit < resList.size()) {
-                    res.put(qid, new Results(resList.subList(0, limit)));
-                } else {
-                    res.put(qid, new Results(resList));
-                }
-            }
+    public static String getFirstPropertyValue(final Query q, final String pid) {
+        if (q.properties == null)
+            return null;
+        for (PropertyValue pv : q.properties) {
+            if (pv.pid.equals(pid))
+                return pv.v;
+        }
+        return null;
+    }
+    
+    public static void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) {
+        final String normalized = normalize(q.query, "Person");
+        String workTitle = getFirstPropertyValue(q, "authorOf");
+        String workTitle_lang = guessLang(workTitle);
+        final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang);
+        System.out.println(qstr);
+        final Model model;
+        RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
+        model = rvf.queryConstruct(qstr);
+        rvf.close();
+        model.write(System.out, "TTL");
+        final List<Result> resList = personModelToResult(model, lang);
+        final Integer limit = q.limit;
+        if (limit != null && limit < resList.size()) {
+            res.put(qid, new Results(resList.subList(0, limit)));
+        } else {
+            res.put(qid, new Results(resList));
         }
     }
     
-    public static void fillResultsForWorks(Map<String,Results> res, final Map<String,List<String>> queries, final Map<String,Query> queryBatch, final String lang) {
-        for (final Entry<String,List<String>> e : queries.entrySet()) {
-            final String qstr = getWorkQuery(e.getKey(), "bo-x-ewts");
-            final Model model;
-            RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
-            model = rvf.queryConstruct(qstr);
-            rvf.close();
-            //model.write(System.out, "TTL");
-            final List<Result> resList = workModelToResult(model, lang);
-            for (final String qid : e.getValue()) {
-                final Query q = queryBatch.get(qid);
-                final Integer limit = q.limit;
-                if (limit != null && limit < resList.size()) {
-                    res.put(qid, new Results(resList.subList(0, limit)));
-                } else {
-                    res.put(qid, new Results(resList));
-                }
-            }
+    public static void fillResultsForWorks(final Map<String,Results> res, final String qid, final Query q, final String lang) {
+        final String normalized = normalize(q.query, "Work");
+        final String qstr = getWorkQuery(normalized, "bo-x-ewts");
+        final Model model;
+        RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
+        model = rvf.queryConstruct(qstr);
+        rvf.close();
+        //model.write(System.out, "TTL");
+        final List<Result> resList = workModelToResult(model, lang);
+        final Integer limit = q.limit;
+        if (limit != null && limit < resList.size()) {
+            res.put(qid, new Results(resList.subList(0, limit)));
+        } else {
+            res.put(qid, new Results(resList));
         }
     }
     
-    public static Map<String,Results> runSPARQLs(Map<String,Map<String,List<String>>> analyzedQuery, final Map<String,Query> queryBatch, final String lang) {
+    public static Map<String,Results> runQueries(final Map<String,Query> queryBatch, final String lang) {
         final Map<String,Results> res = new HashMap<>();
-        for (final Entry<String,Map<String,List<String>>> e : analyzedQuery.entrySet()) {
-            final String type = e.getKey();
-            switch(type) {
+        for (final Entry<String,Query> e : queryBatch.entrySet()) {
+            final Query q = e.getValue();
+            switch (q.type) {
             case "Person":
-                fillResultsForPersons(res, e.getValue(), queryBatch, lang);
+                fillResultsForPersons(res, e.getKey(), q, lang);
                 break;
             case "Work":
-                fillResultsForWorks(res, e.getValue(), queryBatch, lang);
+                fillResultsForWorks(res, e.getKey(), q, lang);
                 break;
             }
         }
@@ -672,9 +693,7 @@ public class ReconciliationController {
     public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
-        final Map<String,Map<String,List<String>>> analyzedQuery = analyzeQueryBatch(queryBatch);
-        //objectMapper.writerWithDefaultPrettyPrinter().writeValues(System.out).write(analyzedQuery);
-        final Map<String,Results> res = runSPARQLs(analyzedQuery, queryBatch,lang);
+        final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
     }
