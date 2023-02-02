@@ -318,10 +318,12 @@ public class ReconciliationController {
                 + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
                 + "prefix text:  <http://jena.apache.org/text#>\n"
                 + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
-                + "prefix owl:   <http://www.w3.org/2002/07/owl#> "
+                + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
+                + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
                 + "construct {\n"
                 + "    ?bdrcres tmp:luceneScore ?sc ;\n"
                 + "       tmp:isMain true ;"
+                + "       tmp:idMatch ?idMatch ;"
                 + "       tmp:superMatch ?superMatch .\n"
                 + "    ?bdrcres ?resp ?reso .\n"
                 + "    ?bdrcres bdo:personEvent ?evt .\n"
@@ -383,7 +385,7 @@ public class ReconciliationController {
                         + "    ?resAdm adm:status    bda:StatusReleased .\n"
                         + "    BIND(true as ?superMatch)";
                 } else if (workId != null) {
-                    res += "  } union {"
+                    res += "  } union {\n"
                         + "    # get matches with work\n"
                         + "    {\n"
                         + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
@@ -396,10 +398,24 @@ public class ReconciliationController {
                         + "    ?resAdm adm:adminAbout ?bdrcres .\n"
                         + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
                         + "            adm:status    bda:StatusReleased ."
-                        + "    bdr:"+workId+" a :Work ;\n"
-                        + "          :creator ?aac .\n"
+                        + "    bdr:"+workId+" :creator ?aac .\n"
                         + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?superMatch)";
+                        + "    BIND(true as ?superMatch)\n"
+                        + "  } union {\n"
+                        // add creators of reconciled work
+                        + "    bdr:"+workId+" :creator ?aac .\n"
+                        + "    ?aac :agent ?bdrcres .\n"
+                        + "    BIND(true as ?idMatch)\n"
+                        + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
+                        + "    ?bdrcres ?resp ?reso .\n"
+                        + "  } union {\n"
+                        + "    bdr:"+workId+" :creator ?aac .\n"
+                        + "    ?aac :agent ?bdrcres .\n"
+                        + "    BIND(true as ?idMatch)\n"
+                        + "    ?bdrcres bdo:personEvent ?evt .\n"
+                        + "    ?evt a ?evtType .\n"
+                        + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
+                        + "    ?evt :eventWhen ?evtw .\n";
                 }
                 res += "  }\n"
                 + "}";
@@ -415,7 +431,8 @@ public class ReconciliationController {
                 + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
                 + "prefix text:  <http://jena.apache.org/text#>\n"
                 + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
-                + "prefix owl:   <http://www.w3.org/2002/07/owl#> "
+                + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
+                + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
                 + "construct {\n"
                 + "    ?res tmp:luceneScore ?sc ;\n"
                 + "       tmp:isMain true .\n"
@@ -504,20 +521,31 @@ public class ReconciliationController {
     public static final Property luceneScore = ResourceFactory.createProperty(MarcExport.TMP + "luceneScore");
     public static final Property associatedCentury = ResourceFactory.createProperty(MarcExport.TMP + "associatedCentury");
     public static final Property superMatch = ResourceFactory.createProperty(MarcExport.TMP + "superMatch");
+    public static final Property idMatch = ResourceFactory.createProperty(MarcExport.TMP + "idMatch");
     
     public static final List<String> person_types = Arrays.asList("Person");
     public static final List<String> work_types = Arrays.asList("Work");
     
     public static List<Result> personModelToResult(final Model m, final String lang) {
         final List<Result> resList = new ArrayList<>();
+        final List<Result> superMatchList = new ArrayList<>();
+        final List<Result> idMatchList = new ArrayList<>();
+        final List<Result> otherMatchList = new ArrayList<>();
         final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
         while (mainIt.hasNext()) {
             final Result res = new Result();
-            resList.add(res);
             res.type = person_types;
             final Resource main = mainIt.next();
             res.id = main.getLocalName();
-            res.match = main.hasProperty(superMatch);
+            res.match = false;
+            if (main.hasProperty(superMatch)) {
+                res.match = true;
+                superMatchList.add(res);
+            } else if (main.hasProperty(idMatch)) {
+                idMatchList.add(res);
+            } else {
+                otherMatchList.add(res);
+            }
             Statement scoreS = main.getProperty(entityScore);
             if (scoreS != null)
                 res.score = scoreS.getInt();
@@ -532,7 +560,12 @@ public class ReconciliationController {
             }
             res.name = name;
         }
-        Collections.sort(resList, Collections.reverseOrder());
+        Collections.sort(superMatchList, Collections.reverseOrder());
+        Collections.sort(idMatchList, Collections.reverseOrder());
+        Collections.sort(otherMatchList, Collections.reverseOrder());
+        resList.addAll(superMatchList);
+        resList.addAll(idMatchList);
+        resList.addAll(otherMatchList);
         return resList;
     }
     
@@ -667,12 +700,12 @@ public class ReconciliationController {
             workId = ((Map<String,String>)value).getOrDefault("id", null);
         }
         final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang, workId);
-        System.out.println(qstr);
+        //System.out.println(qstr);
         final Model model;
         RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
         model = rvf.queryConstruct(qstr);
         rvf.close();
-        model.write(System.out, "TTL");
+        //model.write(System.out, "TTL");
         final List<Result> resList = personModelToResult(model, lang);
         final Integer limit = q.limit;
         if (limit != null && limit < resList.size()) {
@@ -721,7 +754,7 @@ public class ReconciliationController {
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
-        System.out.println(jsonStr);
+        //System.out.println(jsonStr);
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
