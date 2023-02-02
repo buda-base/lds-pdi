@@ -332,10 +332,10 @@ public class ReconciliationController {
                 + "} where {\n"
                 + "  {\n"
                 + "    {\n"
-                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        (?name ?sc) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res bdo:personName ?name .\n"
                 + "    } union {\n"
-                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        (?res ?sc) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
@@ -348,10 +348,10 @@ public class ReconciliationController {
                 + "  } union {\n"
                 + "    # get events\n"
                 + "    {\n"
-                + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res bdo:personName ?name .\n"
                 + "    } union {\n"
-                + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "        ?res a :Person .\n"
                 + "    }\n"
                 + "\n"
@@ -367,10 +367,10 @@ public class ReconciliationController {
                     res += "  } union {"
                         + "    # get matches with work\n"
                         + "    {\n"
-                        + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                         + "        ?res bdo:personName ?name .\n"
                         + "    } union {\n"
-                        + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                         + "        ?res a :Person .\n"
                         + "    }\n"
                         + "    ?res owl:sameAs* ?bdrcres ."
@@ -383,15 +383,15 @@ public class ReconciliationController {
                         + "    ?aac :agent ?bdrcres .\n"
                         + "    ?resAdm adm:adminAbout ?wa .\n"
                         + "    ?resAdm adm:status    bda:StatusReleased .\n"
-                        + "    BIND(true as ?superMatch)";
+                        + "    BIND(true as ?superMatch)\n";
                 } else if (workId != null) {
                     res += "  } union {\n"
                         + "    # get matches with work\n"
                         + "    {\n"
-                        + "        (?name ?sc ?nameMatch) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                         + "        ?res bdo:personName ?name .\n"
                         + "    } union {\n"
-                        + "        (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                         + "        ?res a :Person .\n"
                         + "    }\n"
                         + "    ?res owl:sameAs* ?bdrcres ."
@@ -422,8 +422,8 @@ public class ReconciliationController {
                 return res;
     }
     
-    public static String getWorkQuery(final String name, final String lang) {
-        return "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
+    public static String getWorkQuery(final String name, final String lang, final String personName, final String personName_lang, final String personId) {
+        String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
                 + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -435,14 +435,15 @@ public class ReconciliationController {
                 + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
                 + "construct {\n"
                 + "    ?res tmp:luceneScore ?sc ;\n"
-                + "       tmp:isMain true .\n"
+                + "       tmp:isMain true ;"
+                + "       tmp:superMatch ?superMatch .\n"
                 + "    ?res ?resp ?reso .\n"
                 + "    ?res :creator ?aac .\n"
                 + "    ?aac ?aacp ?aaco .\n"
                 + "    ?p skos:prefLabel ?pl .\n"
                 + "} where {\n"
                 + "  {\n"
-                + "    (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "    (?res ?sc) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "    ?res a :Work .\n"
                 + "\n"
                 + "    ?resAdm adm:adminAbout ?res .\n"
@@ -451,7 +452,7 @@ public class ReconciliationController {
                 + "    VALUES ?resp { skos:prefLabel tmp:entityScore }\n"
                 + "    ?res ?resp ?reso .\n"
                 + "  } union {\n"
-                + "    (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                + "    (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
                 + "    ?res a :Work .\n"
                 + "\n"
                 + "    ?resAdm adm:adminAbout ?res .\n"
@@ -460,9 +461,45 @@ public class ReconciliationController {
                 + "    ?res :creator ?aac .\n"
                 + "    ?aac ?aacp ?aaco .\n"
                 + "    ?aac :agent ?p .\n"
-                + "    ?p skos:prefLabel ?pl .\n"
-                + "  }\n"
-                + "}";
+                + "    ?p skos:prefLabel ?pl .\n";
+                if (personName != null) {
+                    res += "  } union {\n"
+                    + "    (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                    + "    ?res a :Work .\n"
+                    + "\n"
+                    + "    ?resAdm adm:adminAbout ?res .\n"
+                    + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                    + "            adm:status    bda:StatusReleased .\n"
+                    + "    {\n"
+                    + "        (?name) text:query ( rdfs:label \"\\\""+personName+"\\\"\"@"+personName_lang+" ) .\n"
+                    + "        ?p bdo:personName ?name .\n"
+                    + "    } union {\n"
+                    + "        (?p) text:query ( bdo:skosLabels \"\\\""+personName+"\\\"\"@"+personName_lang+" ) .\n"
+                    + "        ?p a :Person .\n"
+                    + "    }\n"
+                    + "    ?res :creator ?aac .\n"
+                    + "    ?aac ?aacp ?aaco .\n"
+                    + "    ?aac :agent ?p .\n"
+                    + "    ?p skos:prefLabel ?pl .\n"
+                    + "    BIND(true as ?superMatch)\n";
+                } else if (personId != null) {
+                    res += "  } union {\n"
+                    + "    BIND(bdr:"+personId+" as ?p)\n"
+                    + "    (?res ?sc ?labelMatch) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
+                    + "    ?res a :Work .\n"
+                    + "\n"
+                    + "    ?resAdm adm:adminAbout ?res .\n"
+                    + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
+                    + "            adm:status    bda:StatusReleased .\n"
+                    + "    ?res :creator ?aac .\n"
+                    + "    ?aac ?aacp ?aaco .\n"
+                    + "    ?aac :agent ?p .\n"
+                    + "    ?p skos:prefLabel ?pl .\n"
+                    + "    BIND(true as ?superMatch)\n";
+                }
+        res += "  }\n"
+        + "}";
+        return res;
     }
     
     public static String getDateStrEdtf(final Model m, final Resource person) {
@@ -587,15 +624,21 @@ public class ReconciliationController {
     
     public static List<Result> workModelToResult(final Model m, final String lang) {
         final List<Result> resList = new ArrayList<>();
+        final List<Result> superMatchList = new ArrayList<>();
+        final List<Result> otherMatchList = new ArrayList<>();
         final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
         while (mainIt.hasNext()) {
             final Result res = new Result();
-            resList.add(res);
             res.type = work_types;
             final Resource main = mainIt.next();
             res.id = main.getLocalName();
-            // not quite sure what a good value is...
-            res.match = false;
+            if (main.hasProperty(superMatch)) {
+                res.match = true;
+                superMatchList.add(res);
+            } else {
+                res.match = false;
+                otherMatchList.add(res);
+            }
             Statement scoreS = main.getProperty(entityScore);
             int baseScore = 1;
             if (scoreS != null) {
@@ -616,7 +659,10 @@ public class ReconciliationController {
             }
             res.name = name;
         }
-        Collections.sort(resList, Collections.reverseOrder());
+        Collections.sort(superMatchList, Collections.reverseOrder());
+        Collections.sort(otherMatchList, Collections.reverseOrder());
+        resList.addAll(superMatchList);
+        resList.addAll(otherMatchList);
         return resList;
     }
     
@@ -717,7 +763,18 @@ public class ReconciliationController {
     
     public static void fillResultsForWorks(final Map<String,Results> res, final String qid, final Query q, final String lang) {
         final String normalized = normalize(q.query, "Work");
-        final String qstr = getWorkQuery(normalized, "bo-x-ewts");
+        String personName = null;
+        String personName_lang = null;
+        String personId = null;
+        final Object value = getFirstPropertyValue(q, "hasAuthor");
+        if (value instanceof String) {
+            personName = (String) value;
+            personName_lang = guessLang(personName);
+        } else if (value instanceof Map) {
+            personId = ((Map<String,String>)value).getOrDefault("id", null);
+        }
+        final String qstr = getWorkQuery(normalized, "bo-x-ewts", personName, personName_lang, personId);
+        //System.out.println(qstr);
         final Model model;
         RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
         model = rvf.queryConstruct(qstr);
