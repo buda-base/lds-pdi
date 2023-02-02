@@ -581,7 +581,7 @@ public class MarcExport {
         return res;
     }
 
-    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list700) {
+    public static void addAuthors(final Model m, final Resource main, final Record r, final Index880 i880, final List<DataField> list880, final List<DataField> list720) {
         StmtIterator si = main.listProperties(creator);
         while (si.hasNext()) {
             final Resource agentAsRole = si.next().getResource();
@@ -595,130 +595,45 @@ public class MarcExport {
                 subfield_e = "author.";
             }
             final String subfield_1 = getSubfield1(m, agentR);
-            // here we want to keep an order among the various names and titles
-            // otherwise the output could be inconsistent among queries
-            final List<Literal> names = new ArrayList<>();
-            final List<Literal> otherNames = new ArrayList<>();
-            final List<Literal> primaryTitles = new ArrayList<>();
-            final List<Literal> tulkutitles = new ArrayList<>();
-            final List<Literal> otherTitles = new ArrayList<>();
-            StmtIterator nsi = agentR.listProperties(personName);
-            while (nsi.hasNext()) {
-                final Resource name = nsi.next().getResource();
-                final Resource type = name.getPropertyResourceValue(RDF.type);
-                final String typeLocalName = (type == null) ? "" : type.getLocalName();
-                switch (typeLocalName) {
-                case "PersonPrimaryName":
-                    addCreatorName(m, name, names);
-                    break;
-                case "PersonTulkuTitle":
-                    addCreatorName(m, name, tulkutitles);
-                    break;
-                case "PersonPrimaryTitle":
-                    addCreatorName(m, name, primaryTitles);
-                    break;
-                case "PersonTitle":
-                    addCreatorName(m, name, otherTitles);
-                    break;
-                default:
-                    addCreatorName(m, name, otherNames);
-                    break;
-                }
-            }
+            Statement prefLabelSt = agentR.getProperty(SKOS.prefLabel, "bo-x-ewts");
+            if (prefLabelSt == null)
+                prefLabelSt = agentR.getProperty(SKOS.prefLabel);
+            if (prefLabelSt == null)
+                continue;
+            final Literal prefLabelL = prefLabelSt.getLiteral();
             boolean has880 = false;
             String subfield_a = "";
-            String subfield_c = null;
-            String subfield_d = null;
             String subfield_a_880 = null;
-            String subfield_c_880 = null;
-            boolean hasTitle = false;
-            if (!names.isEmpty()) {
-                Collections.sort(names, baseComp);
-                subfield_a = getLangStr(names.get(0))+",";
-                subfield_a_880 = get880String(names.get(0))+",";
-                if (subfield_a_880 != null) {
-                    i880.addScript("Tibt");
-                    has880 = true;
-                }
-            } else if (!otherNames.isEmpty()) {
-                Collections.sort(otherNames, baseComp);
-                subfield_a = getLangStr(otherNames.get(0))+",";
-                subfield_a_880 = get880String(otherNames.get(0))+",";
-                if (subfield_a_880 != null) {
-                    i880.addScript("Tibt");
-                    has880 = true;
-                }
+            subfield_a = getLangStr(prefLabelL)+",";
+            subfield_a_880 = get880String(prefLabelL);
+            if (subfield_a_880 != null) {
+                subfield_a_880 += ",";
+                i880.addScript("Tibt");
+                has880 = true;
             }
-            else if (!primaryTitles.isEmpty()) {
-                hasTitle = true;
-                Collections.sort(primaryTitles, baseComp);
-                subfield_a = getLangStr(primaryTitles.get(0))+",";
-                subfield_a_880 = get880String(primaryTitles.get(0))+",";
-                if (subfield_a_880 != null) {
-                    i880.addScript("Tibt");
-                    has880 = true;
-                }
+            final String dateStr = getDateStr(m, agentR);
+            if (dateStr != null) {
+                subfield_a += " "+dateStr+",";
+                if (has880)
+                    subfield_a_880 += " "+dateStr+",";
             }
-            if (subfield_a.isEmpty()) {
-                log.error("can't find proper name for "+agentR.getLocalName());
-                continue;
-            }
-            if (!hasTitle) {
-                if (!tulkutitles.isEmpty()) {
-                    Collections.sort(tulkutitles, baseComp);
-                    subfield_c = getLangStr(tulkutitles.get(0))+",";
-                    if (has880) {
-                        final String title880 = get880String(tulkutitles.get(0));
-                        if (title880 != null) {
-                            subfield_c_880 = title880+",";
-                            i880.addScript("Tibt");
-                        } else {
-                            subfield_c_880 = subfield_c;
-                        }
-                    }
-                }
-                else if (!otherTitles.isEmpty()) {
-                    Collections.sort(otherTitles, baseComp);
-                    subfield_c = getLangStr(otherTitles.get(0))+",";
-                    if (has880) {
-                        final String title880 = get880String(otherTitles.get(0));
-                        if (title880 != null) {
-                            subfield_c_880 = title880+",";
-                            i880.addScript("Tibt");
-                        } else {
-                            subfield_c_880 = subfield_c;
-                        }
-                    }
-                }
-            }
-            subfield_d = getDateStr(m, agentR);
-            if (subfield_d != null)
-                subfield_d += ",";
-            final DataField f700_0_ = factory.newDataField("700", '0', ' ');
+            final DataField f720_0_ = factory.newDataField("720", '0', ' ');
             if (has880) {
                 String curi880 = i880.getNext();
                 final DataField f880 = factory.newDataField("880", '0', ' ');
                 list880.add(f880);
-                f700_0_.addSubfield(factory.newSubfield('6', "880-" + curi880));
-                f880.addSubfield(factory.newSubfield('6', "700-" + curi880));
+                f720_0_.addSubfield(factory.newSubfield('6', "880-" + curi880));
+                f880.addSubfield(factory.newSubfield('6', "720-" + curi880));
                 f880.addSubfield(factory.newSubfield('a', subfield_a_880));
-                if (subfield_c_880 != null)
-                    f880.addSubfield(factory.newSubfield('c', subfield_c_880));
-                if (subfield_d != null)
-                    f880.addSubfield(factory.newSubfield('d', subfield_d));
                 f880.addSubfield(factory.newSubfield('e', subfield_e));
                 if (subfield_1 != null)
                     f880.addSubfield(factory.newSubfield('1', subfield_1));
             }
-            f700_0_.addSubfield(factory.newSubfield('a', subfield_a));
-            if (subfield_c != null)
-                f700_0_.addSubfield(factory.newSubfield('c', subfield_c));
-            if (subfield_d != null)
-                f700_0_.addSubfield(factory.newSubfield('d', subfield_d));
-            f700_0_.addSubfield(factory.newSubfield('e', subfield_e));
+            f720_0_.addSubfield(factory.newSubfield('a', subfield_a));
+            f720_0_.addSubfield(factory.newSubfield('e', subfield_e));
             if (subfield_1 != null)
-                f700_0_.addSubfield(factory.newSubfield('1', subfield_1));
-            list700.add(f700_0_);
+                f720_0_.addSubfield(factory.newSubfield('1', subfield_1));
+            list720.add(f720_0_);
         }
     }
 
@@ -1554,10 +1469,10 @@ public class MarcExport {
         record.addVariableField(f588);
         addTopics(m, main, record); // 653
         addGenres(m, main, record); // 655
+        record.addVariableField(f710_2);
         for (DataField dfAuthorField : listPersonFields) {
             record.addVariableField(dfAuthorField);
         }
-        record.addVariableField(f710_2);
         if (scansMode) {
             addIsbn776(m, main, record);
             final DataField f856 = factory.newDataField("856", '4', '0');
