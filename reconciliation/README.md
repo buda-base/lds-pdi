@@ -29,3 +29,10 @@ To load it in OpenRefine and configure the BDRC API:
 - click on the arrow next to the "authors" cell -> `Reconcile` -> `Start reconciling`
 - click on `Add standard service` in the bottom left corner of the pop-up window
 - enter the url `https://ldspdi.bdrc.io/reconciliation/en/` and click on `Add service`
+
+### Tips
+
+The reconciliation of a list of authors + work titles can be done in several steps:
+- first reconciling the authors taking the works into account, this will usually leave a lot of unreconciled data
+- reconciling the works taking the authors into account
+- reconciling the authors taking the works into account again, this will have a slightly different effect since it will add the authors of the reconciled works to the list of candidates. Our experience is that this is a significant gain
