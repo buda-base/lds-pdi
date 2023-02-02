@@ -1,6 +1,6 @@
 # Reconciling data with BDRC
 
-BDRC implements the [Reconciliation API](https://reconciliation-api.github.io/specs/0.1/) and can now be used in the well known [OpenRefine](https://openrefine.org/).
+BDRC implements the [Reconciliation API](https://reconciliation-api.github.io/specs/0.1/) and can now be used in the well known [OpenRefine](https://openrefine.org/), along with [many other services](https://reconciliation-api.github.io/testbench/#/).
 
 ### Configuration
 
@@ -11,6 +11,8 @@ The currently supported types are `Person` and `Work`.
 Two properties can be used for [reconciling with additional columns](https://openrefine.org/docs/manual/reconciling#reconciling-with-additional-columns):
 - `authorOf` can be used when reconciling persons to indicate the work title or work id
 - `hasAuthor` can be used when reconciling works to indicate the author's name or id
+
+These properties must be known in advance by users, BDRC proposed a [modification to the specifications](https://github.com/reconciliation-api/specs/issues/107) allowing the listing of properties by the endpoint.
 
 The results are returned in Extended Wylie (EWTS), the names are expected to be either in Extended Wylie or Tibetan Unicode.
 
