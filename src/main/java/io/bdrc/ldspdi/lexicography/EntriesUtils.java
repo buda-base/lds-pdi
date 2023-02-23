@@ -18,6 +18,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -116,6 +117,8 @@ public class EntriesUtils {
     public static class Entry {
         @JsonProperty("word")
         public final Literal word;
+        @JsonIgnore
+        public final Literal normalized;
         @JsonProperty("def")
         public final Literal def;
         @JsonProperty("uri")
@@ -131,9 +134,10 @@ public class EntriesUtils {
         @JsonProperty("cursor_in_entry_end")
         public int cursor_in_entry_end = 0;
         
-        public Entry(final Literal word, final Literal def, final Resource res) {
+        public Entry(final Literal word, final Literal normalized, final Literal def, final Resource res) {
             this.word = word;
             this.def = def;
+            this.normalized = normalized;
             this.res_uri = res.getURI();
         }
         
@@ -145,8 +149,9 @@ public class EntriesUtils {
     
     public static List<Entry> searchInFuseki(final String cursor_string, final String cursor_string_left, final String cursor_string_right, final String lang) {
         final List<Entry> res = new ArrayList<>();
-        String sparql = "select distinct ?res ?word ?def where {";
+        String sparql = "select distinct ?res ?word ?normalized ?def where {";
         sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string.replace("\"", "")+"\"@bo . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+        sparql +=       " union {  ?res <http://purl.bdrc.io/ontology/core/normalizedForm> \""+cursor_string.replace("\"", "")+"\"@bo ; <https://www.w3.org/ns/lemon/ontolex#writtenForm> ?word ; <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?normalized) }";
         if (cursor_string_left != null) {
             sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_left.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
         }
@@ -154,7 +159,7 @@ public class EntriesUtils {
             sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_right.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
         }
         sparql +=       "} limit 200";
-        log.info(sparql);
+        log.debug(sparql);
         final String fusekiUrl = ServiceConfig.getProperty("fusekiLexiconsUrl");
         final Query q = QueryFactory.create(sparql);
         final QueryExecution qe = QueryExecution.service(fusekiUrl).query(q).build();
@@ -164,7 +169,10 @@ public class EntriesUtils {
             final Resource lx = qs.getResource("res");
             final Literal word = qs.getLiteral("word");
             final Literal def = qs.getLiteral("def");
-            final Entry e = new Entry(word, def, lx);
+            Literal normalized = word;
+            if (qs.contains("normalized"))
+                normalized = qs.getLiteral("normalized");
+            final Entry e = new Entry(word, normalized, def, lx);
             res.add(e);
         }
         return res;
@@ -191,8 +199,8 @@ public class EntriesUtils {
     public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) throws IOException {
         final List<Entry> res = new ArrayList<>();
         for (final Entry entry : entries) {
-            log.debug("looking at {}", entry.word);
-            final List<Token> word_tokens = getTokens(entry.word.getLexicalForm(), entry.word.getLanguage());
+            log.debug("looking at {}/{}", entry.word, entry.normalized);
+            final List<Token> word_tokens = getTokens(entry.normalized.getLexicalForm(), entry.normalized.getLanguage());
             final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
             if (match_start_ti == -1) {
                 log.error("couldn't find {} in {}", cursor_tokens.toString(), word_tokens.toString());
@@ -274,5 +282,5 @@ public class EntriesUtils {
         entries = selectAndFillEntries(entries, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1]);
         return entries;
     }
-    
+
 }
