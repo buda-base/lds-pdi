@@ -41,7 +41,7 @@ construct {
     ?mw ?p ?o .
   }
   union {
-    ?R_RES :instanceOf ?wa .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
     ?wa ?p ?o .
   }
   union {
@@ -50,11 +50,13 @@ construct {
           ?p ?o .
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:workIsAbout ?t .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa bdo:workIsAbout ?t .
     ?t skos:prefLabel ?to .
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:workGenre ?t .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa bdo:workGenre ?t .
     ?t skos:prefLabel ?to .
   }
   union {
@@ -75,26 +77,29 @@ construct {
     ?series skos:prefLabel ?seriesl .
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:creator ?aac .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa bdo:creator ?aac .
     ?aac ?aacp ?aaco .
     ?aac bdo:agent ?ag .
     ?ag ?agp ?ago .
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:creator ?aac .
-    ?aac ?aacp ?aaco .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa bdo:creator ?aac .
     ?aac bdo:agent ?o .
     ?o bdo:personName ?pname .
     ?pname ?pnamep ?pnameo .
   }
   union {
-    ?R_RES bdo:instanceOf/bdo:creator ?aac .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa bdo:creator ?aac .
     ?aac bdo:agent ?o .
     ?o bdo:personEvent ?pevent .
     ?pevent ?peventp ?pevento .
   }
   union {
-    ?R_RES :instanceOf/:language ?lango .
+    ?R_RES :instanceReproductionOf?/:instanceOf ?wa .
+    ?wa :language ?lango .
     ?lango ?langop ?langoo .
   }
   union {
@@ -113,7 +118,7 @@ construct {
   union {
       ?R_RES :instanceReproductionOf?/:hasTitle ?o .
       ?o ?op ?oo .
-  } 
+  }
   union {
     ?R_RES :instanceHasReproduction? ?ii .
     ?ii a :ImageInstance ;

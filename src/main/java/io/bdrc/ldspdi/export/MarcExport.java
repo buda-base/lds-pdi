@@ -260,8 +260,12 @@ public class MarcExport {
             return getLangStrNoConv(l);
         }
         String alalc = TransConverter.ewtsToAlalc(l.getString(), true);
-        alalc = alalc.replace("u0fbe", "x");
-        return StringUtils.capitalize(alalc.replace('-', ' ').trim());
+        alalc = alalc.replace("u0fbe", "x").replace('-', ' ').trim();
+        if (alalc.startsWith("ʼ")) {
+            // capitalize when string starts with apostrophe
+            return "ʼ" + StringUtils.capitalize(alalc.substring(1));
+        }
+        return StringUtils.capitalize(alalc);
     }
 
     public static String getLangStrNoConv(final Literal l) {
@@ -271,7 +275,7 @@ public class MarcExport {
         } else {
             st = StringUtils.capitalize(st);
         }
-        return st.replaceAll("[/|;]", "").trim();
+        return st.replaceAll("[/|;]", "").replace("ʾ", "ʼ").trim();
     }
 
     public static Map<String, String> getPubLoctoCC() {
@@ -1011,8 +1015,6 @@ public class MarcExport {
             return null;
         return interestingLiterals.get(0);
     }
-    
-    private static CompareStringLiterals baseComp = new CompareStringLiterals(null);
 
     private static List<Resource> getScriptLeaves(final Model m, final Resource main, final Property p) {
         StmtIterator lsi = main.listProperties(p);
