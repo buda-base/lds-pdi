@@ -3,7 +3,9 @@ package io.bdrc.ldspdi.lexicography;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -133,12 +135,15 @@ public class EntriesUtils {
         public int cursor_in_entry_start = 0;
         @JsonProperty("cursor_in_entry_end")
         public int cursor_in_entry_end = 0;
+        @JsonProperty("type")
+        public String type;
         
-        public Entry(final Literal word, final Literal normalized, final Literal def, final Resource res) {
+        public Entry(final Literal word, final Literal normalized, final Literal def, final Resource res, final Literal type) {
             this.word = word;
             this.def = def;
             this.normalized = normalized;
             this.res_uri = res.getURI();
+            this.type = type.getString();
         }
         
         @Override
@@ -149,15 +154,26 @@ public class EntriesUtils {
     
     public static List<Entry> searchInFuseki(final String cursor_string, final String cursor_string_left, final String cursor_string_right, final String lang) {
         final List<Entry> res = new ArrayList<>();
-        String sparql = "select distinct ?res ?word ?normalized ?def where {";
-        sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string.replace("\"", "")+"\"@bo . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
-        sparql +=       " union {  ?res <http://purl.bdrc.io/ontology/core/normalizedForm> \""+cursor_string.replace("\"", "")+"\"@bo ; <https://www.w3.org/ns/lemon/ontolex#writtenForm> ?word ; <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?normalized) }";
+        // type can be:
+        // - "e" for exact
+        // - "c" for context
+        // - "k" for match in keyword
+        // - "d" for match in definition
+        String sparql = "select distinct ?res ?word ?normalized ?def ?type where {";
+        // first exact matches, either the entry or its normalized form
+        sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string.replace("\"", "")+"\"@bo . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"e\" as ?type) }";
+        sparql +=       " union {  ?res <http://purl.bdrc.io/ontology/core/normalizedForm> \""+cursor_string.replace("\"", "")+"\"@bo ; <https://www.w3.org/ns/lemon/ontolex#writtenForm> ?word ; <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?normalized) BIND(\"e\" as ?type) }";
+        // then left / right context if relevant
         if (cursor_string_left != null) {
-            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_left.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_left.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"c\" as ?type) }";
         }
         if (cursor_string_right != null) {
-            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_right.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . }";
+            sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string_right.replace("\"", "")+"\\\"\"@"+lang+") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"c\" as ?type) }";
         }
+        // then matches in the keyword
+        sparql +=   " union { (?res ?sc ?word) <http://jena.apache.org/text#query> (<https://www.w3.org/ns/lemon/ontolex#writtenForm> \"\\\""+cursor_string.replace("\"", "")+"\\\"\"@"+lang+" \"highlight:\") . ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"k\" as ?type) }";
+        // matches in the definition
+        sparql +=   " union { (?res ?sc ?def) <http://jena.apache.org/text#query> (<http://purl.bdrc.io/ontology/core/definitionGMD> \"\\\""+cursor_string.replace("\"", "")+"\\\"\"@"+lang+" \"highlight:\") . ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> ?word . BIND(\"d\" as ?type) }";
         sparql +=       "} limit 200";
         log.debug(sparql);
         final String fusekiUrl = ServiceConfig.getProperty("fusekiLexiconsUrl");
@@ -169,10 +185,11 @@ public class EntriesUtils {
             final Resource lx = qs.getResource("res");
             final Literal word = qs.getLiteral("word");
             final Literal def = qs.getLiteral("def");
+            final Literal type = qs.getLiteral("type");
             Literal normalized = word;
             if (qs.contains("normalized"))
                 normalized = qs.getLiteral("normalized");
-            final Entry e = new Entry(word, normalized, def, lx);
+            final Entry e = new Entry(word, normalized, def, lx, type);
             res.add(e);
         }
         return res;
@@ -199,6 +216,10 @@ public class EntriesUtils {
     public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) throws IOException {
         final List<Entry> res = new ArrayList<>();
         for (final Entry entry : entries) {
+            if (entry.type.equals("d") || entry.type.equals("k")) {
+                res.add(entry);
+                continue;
+            }
             log.debug("looking at {}/{}", entry.word, entry.normalized);
             final List<Token> word_tokens = getTokens(entry.normalized.getLexicalForm(), entry.normalized.getLanguage());
             final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
