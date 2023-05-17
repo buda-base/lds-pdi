@@ -2,8 +2,10 @@ package io.bdrc.ldspdi.lexicography;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.jena.query.Query;
@@ -24,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.ibm.icu.text.Collator;
 
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.service.ServiceConfig;
@@ -32,6 +35,7 @@ import io.bdrc.lucene.bo.TibetanAnalyzer;
 public class EntriesUtils {
     
     public final static Logger log = LoggerFactory.getLogger(EntriesUtils.class);
+    public final static Collator tibUniCollator = Collator.getInstance(Locale.forLanguageTag("bo"));
     
     public static final class Token {
         public final int start;
@@ -186,6 +190,8 @@ public class EntriesUtils {
         final Query q = QueryFactory.create(sparql);
         final QueryExecution qe = QueryExecution.service(fusekiUrl).query(q).build();
         final ResultSet rs = qe.execSelect();
+        final List<Entry> res_k = new ArrayList<>();
+        final List<Entry> res_d = new ArrayList<>();
         while (rs.hasNext()) {
             final QuerySolution qs = rs.next();
             final Resource lx = qs.getResource("res");
@@ -196,8 +202,17 @@ public class EntriesUtils {
             if (qs.contains("normalized"))
                 normalized = qs.getLiteral("normalized");
             final Entry e = new Entry(word, normalized, def, lx, type);
-            res.add(e);
+            if (e.type.equals("d"))
+                res_d.add(e);
+            else if (e.type.equals("k"))
+                res_k.add(e);
+            else
+                res.add(e);
         }
+        Collections.sort(res_k, (d1, d2) -> { return tibUniCollator.compare(d1.word.getString(), d2.word.getString()); });
+        Collections.sort(res_d, (d1, d2) -> { return tibUniCollator.compare(d1.word.getString(), d2.word.getString()); });
+        res.addAll(res_k);
+        res.addAll(res_d);
         return res;
     }
     
