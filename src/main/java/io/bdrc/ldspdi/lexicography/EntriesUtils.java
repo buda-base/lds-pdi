@@ -215,11 +215,16 @@ public class EntriesUtils {
     
     public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) throws IOException {
         final List<Entry> res = new ArrayList<>();
+        final Map<String,Boolean> seenEntries = new HashMap<>();
         for (final Entry entry : entries) {
             if (entry.type.equals("d") || entry.type.equals("k")) {
                 res.add(entry);
                 continue;
             }
+            // don't show the same entry twice (can happen in the first two types)
+            if (seenEntries.containsKey(entry.res_uri))
+                continue;
+            seenEntries.put(entry.res_uri, true);
             log.debug("looking at {}/{}", entry.word, entry.normalized);
             final List<Token> word_tokens = getTokens(entry.normalized.getLexicalForm(), entry.normalized.getLanguage());
             final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
