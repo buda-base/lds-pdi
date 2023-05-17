@@ -157,7 +157,7 @@ public class EntriesUtils {
         }
     }
     
-    public static List<Entry> searchInFuseki(final String cursor_string, final String cursor_string_left, final String cursor_string_right, final String lang) {
+    public static List<Entry> searchInFuseki(final String cursor_string, final String raw_cursor_string, final String cursor_string_left, final String cursor_string_right, final String lang) {
         final List<Entry> res = new ArrayList<>();
         // type can be:
         // - "e" for exact
@@ -167,6 +167,7 @@ public class EntriesUtils {
         String sparql = "select distinct ?res ?word ?normalized ?def ?type where {";
         // first exact matches, either the entry or its normalized form
         sparql +=       " {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+cursor_string.replace("\"", "")+"\"@bo . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"e\" as ?type) }";
+        sparql +=       " union {  ?res <https://www.w3.org/ns/lemon/ontolex#writtenForm> \""+raw_cursor_string.replace("\"", "")+"\"@bo . BIND(\""+raw_cursor_string.replace("\"", "")+"\"@bo as ?word) ?res <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\"e\" as ?type) }";
         sparql +=       " union {  ?res <http://purl.bdrc.io/ontology/core/normalizedForm> \""+cursor_string.replace("\"", "")+"\"@bo ; <https://www.w3.org/ns/lemon/ontolex#writtenForm> ?word ; <http://purl.bdrc.io/ontology/core/definitionGMD> ?def . BIND(\""+cursor_string.replace("\"", "")+"\"@bo as ?normalized) BIND(\"e\" as ?type) }";
         // then left / right context if relevant
         if (cursor_string_left != null) {
@@ -306,19 +307,20 @@ public class EntriesUtils {
         }
         final List<Token> cursor_tokens = new ArrayList<>();
         String cursor_string = "";
+        final String raw_cursor_string = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]).end)+"་";
         for (int i = cursor_tokens_range[0] ; i <= cursor_tokens_range[1] ; i++) {
             final Token t = tokens.get(i);
             cursor_tokens.add(t);
             cursor_string += t.charTerm+"་";
         }
-        log.debug("cursor tokens {}, cursor string {}", cursor_tokens, cursor_string);
+        log.debug("cursor tokens {}, cursor string {}, raw cursor string {}", cursor_tokens, cursor_string, raw_cursor_string);
         String cursor_string_minus1 = null;
         if (cursor_tokens_range[0] > 0)
             cursor_string_minus1 = chunk.substring(tokens.get(cursor_tokens_range[0]-1).start, tokens.get(cursor_tokens_range[1]).end);
         String cursor_string_plus1 = null;
         if (cursor_tokens_range[1] < tokens.size()-1)
             cursor_string_plus1 = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]+1).end);
-        List<Entry> entries = searchInFuseki(cursor_string, cursor_string_minus1, cursor_string_plus1, chunk_lang);
+        List<Entry> entries = searchInFuseki(cursor_string, raw_cursor_string, cursor_string_minus1, cursor_string_plus1, chunk_lang);
         entries = selectAndFillEntries(entries, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1], ignore_stop_words);
         return entries;
     }
