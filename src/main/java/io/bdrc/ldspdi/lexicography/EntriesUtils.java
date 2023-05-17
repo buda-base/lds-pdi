@@ -2,7 +2,6 @@ package io.bdrc.ldspdi.lexicography;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,17 +51,23 @@ public class EntriesUtils {
     
     static public TibetanAnalyzer uniAnalyzer = null;
     static public TibetanAnalyzer ewtsAnalyzer = null;
+    static public TibetanAnalyzer uniAnalyzer_noStops = null;
+    static public TibetanAnalyzer ewtsAnalyzer_noStops = null;
     static {
         try {
             uniAnalyzer = new TibetanAnalyzer(false, true, true, "unicode", "");
             ewtsAnalyzer = new TibetanAnalyzer(false, true, true, "ewts", "");
+            uniAnalyzer_noStops = new TibetanAnalyzer(false, true, true, "unicode", null);
+            ewtsAnalyzer_noStops = new TibetanAnalyzer(false, true, true, "ewts", null);
         } catch (IOException e) {
             log.error("can't initialize Tibetan analyzer", e);
         }
     }
     
-    static public List<Token> getTokens(String inputStr, final String inputStr_lang) throws IOException {
-        final TibetanAnalyzer ta = inputStr_lang.equals("bo-x-ewts") ? ewtsAnalyzer : uniAnalyzer;
+    static public List<Token> getTokens(String inputStr, final String inputStr_lang, final boolean ignore_stop_words) throws IOException {
+        TibetanAnalyzer ta = inputStr_lang.equals("bo-x-ewts") ? ewtsAnalyzer : uniAnalyzer;
+        if (ignore_stop_words)
+            ta = inputStr_lang.equals("bo-x-ewts") ? ewtsAnalyzer_noStops : uniAnalyzer_noStops;
         final TokenStream ts =  ta.tokenStream("", inputStr);
         ts.reset();
         final List<Token> res = new ArrayList<>();
@@ -213,7 +218,7 @@ public class EntriesUtils {
         return -1;
     }
     
-    public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti) throws IOException {
+    public static List<Entry> selectAndFillEntries(final List<Entry> entries, final List<Token> chunk_tokens, final List<Token> cursor_tokens, final int cursor_start_ti, final int cursor_end_ti, final boolean ignore_stop_words) throws IOException {
         final List<Entry> res = new ArrayList<>();
         final Map<String,Boolean> seenEntries = new HashMap<>();
         for (final Entry entry : entries) {
@@ -226,7 +231,7 @@ public class EntriesUtils {
                 continue;
             seenEntries.put(entry.res_uri, true);
             log.debug("looking at {}/{}", entry.word, entry.normalized);
-            final List<Token> word_tokens = getTokens(entry.normalized.getLexicalForm(), entry.normalized.getLanguage());
+            final List<Token> word_tokens = getTokens(entry.normalized.getLexicalForm(), entry.normalized.getLanguage(), ignore_stop_words);
             final int match_start_ti = get_first_match(cursor_tokens, word_tokens, 0);
             if (match_start_ti == -1) {
                 log.error("couldn't find {} in {}", cursor_tokens.toString(), word_tokens.toString());
@@ -282,15 +287,23 @@ public class EntriesUtils {
     
     public static List<Entry> getEntries(final String chunk, final String chunk_lang, final int cursor_start, final int cursor_end) throws IOException, RestException {
         log.debug("get entries for {}@{}", chunk, chunk_lang);
-        final List<Token> tokens = getTokens(chunk, chunk_lang);
+        List<Token> tokens = getTokens(chunk, chunk_lang, false);
+        boolean ignore_stop_words = false;
         log.debug("found tokens {}", tokens);
-        final int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
+        int[] cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
         if (log.isDebugEnabled()) {
             log.debug("looking at tokens around {}", chunk.subSequence(cursor_start, cursor_end));
             log.debug("found tokens[{}:{}]", cursor_tokens_range[0], cursor_tokens_range[1]);
         }
-        if (cursor_tokens_range[0] == -1)
+        if (cursor_tokens_range[0] == -1) {
+            ignore_stop_words = true;
+            tokens = getTokens(chunk, chunk_lang, true);
+            log.debug("found tokens (ignoring stop words) {}", tokens);
+            cursor_tokens_range = getTokensRange(tokens, cursor_start, cursor_end);
+        }
+        if (cursor_tokens_range[0] == -1) {
             throw new RestException(404, 5000, "cannot find token around the cursor");
+        }
         final List<Token> cursor_tokens = new ArrayList<>();
         String cursor_string = "";
         for (int i = cursor_tokens_range[0] ; i <= cursor_tokens_range[1] ; i++) {
@@ -298,6 +311,7 @@ public class EntriesUtils {
             cursor_tokens.add(t);
             cursor_string += t.charTerm+"་";
         }
+        log.debug("cursor tokens {}, cursor string {}", cursor_tokens, cursor_string);
         String cursor_string_minus1 = null;
         if (cursor_tokens_range[0] > 0)
             cursor_string_minus1 = chunk.substring(tokens.get(cursor_tokens_range[0]-1).start, tokens.get(cursor_tokens_range[1]).end);
@@ -305,7 +319,7 @@ public class EntriesUtils {
         if (cursor_tokens_range[1] < tokens.size()-1)
             cursor_string_plus1 = chunk.substring(tokens.get(cursor_tokens_range[0]).start, tokens.get(cursor_tokens_range[1]+1).end);
         List<Entry> entries = searchInFuseki(cursor_string, cursor_string_minus1, cursor_string_plus1, chunk_lang);
-        entries = selectAndFillEntries(entries, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1]);
+        entries = selectAndFillEntries(entries, tokens, cursor_tokens, cursor_tokens_range[0], cursor_tokens_range[1], ignore_stop_words);
         return entries;
     }
 
