@@ -300,7 +300,7 @@ public class PublicDataController {
         }
         final String prefixedRes = GRAPH_PREFIX_SHORT + res;
         // useful approximation
-        final String fullResURI = RES_PREFIX + res;
+        final String fullResURI = GRAPH_PREFIX_FULL + res;
         final String graphType = "graph";
         final MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (format == null) {
