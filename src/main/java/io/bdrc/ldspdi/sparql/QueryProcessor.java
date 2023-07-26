@@ -76,6 +76,21 @@ public class QueryProcessor {
         }
     }
 
+    public static boolean getAsk(final String query, String fusekiUrl, String prefixes)
+            throws RestException {
+        if (prefixes == null) {
+            prefixes = ServiceConfig.PREFIX.getPrefixesString();
+        }
+        if (fusekiUrl == null) {
+            fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
+        }
+        final Query q = QueryFactory.create(query);
+        log.info("QUERY >> {}", query);
+        final RDFConnection conn = RDFConnectionRemote.create()
+                .destination(fusekiUrl).build();
+        return conn.queryAsk(q);
+    }
+    
     public static Model getSimpleResourceGraph(final String URI,
             final String queryName) throws RestException {
         return getSimpleResourceGraph(URI, queryName, null, null);

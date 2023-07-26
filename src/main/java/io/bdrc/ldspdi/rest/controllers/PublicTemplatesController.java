@@ -279,6 +279,39 @@ public class PublicTemplatesController {
 
     }
 
+    @GetMapping(value = "/query/ask/{file}")
+    public ResponseEntity<String> getAskTemplateResults(HttpServletResponse response, HttpServletRequest request,
+            @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,
+            @RequestParam(value = "format", required = false) String format, @PathVariable("file") String file) throws RestException {
+        // returning the json string "null", "true" or "false" (without the quotation marks)
+        Helpers.setCacheControl(response, "public");
+        String res = "null";
+        try {
+            // Settings
+            HashMap<String, String> hm = Helpers.convertMulti(request.getParameterMap());
+            // process
+            final LdsQuery qfp = LdsQueryService.get(file + ".arq");
+            if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
+                hm.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
+            }
+            final String query = qfp.getParametizedQuery(hm, true);
+            log.debug("getAskTemplateResults() Parametized query {}", query);
+            res = QueryProcessor.getAsk(query, fuseki, null) ? "true" : "false";
+        } catch (Exception e) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(baos));
+            RestException re = new RestException(500, LdsError.UNKNOWN_ERR, e.getClass().getName(), baos.toString(), "");
+            try {
+                baos.close();
+            } catch (IOException e1) {
+                throw new RestException(500, LdsError.UNKNOWN_ERR, e.getClass().getName(), "Failed to close exception trace byte output stream", "");
+            }
+            throw re;
+        }
+        return ResponseEntity.ok().eTag(ServiceConfig.getQueriesCommit()).contentType(MediaType.APPLICATION_JSON)
+                .body(res);
+    }
+    
     @PostMapping(value = "/query/graph/{file}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StreamingResponseBody> getGraphTemplateResultsPost(
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki,

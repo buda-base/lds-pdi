@@ -148,6 +148,8 @@ public class PublicDataController {
                 .header("Last-Modified", dateFormat.format(OntData.getLastUpdated())).eTag(OntData.getOntCommitId())
                 .body(OntData.JSONLD_CONTEXT);
     }
+    
+    
 
     @GetMapping(value = "/admindata/{res:.+}")
     public ResponseEntity<StreamingResponseBody> getAdResourceGraph(@PathVariable String res,
@@ -331,7 +333,7 @@ public class PublicDataController {
         Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null, graphType);
         log.info("Call to getResourceGraph with prefixedRes {}, fuseki {}, graphType {}", prefixedRes, fusekiUrl,
                 graphType);
-        if (model.size() == 0) {
+        if (model.size() == 0 || Helpers.isHidden(model)) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));
@@ -405,7 +407,7 @@ public class PublicDataController {
         }
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null,
                 computeGraphType(request));
-        if (model.size() == 0) {
+        if (model.size() == 0 || Helpers.isHidden(model)) {
             LdsError lds = new LdsError(LdsError.NO_GRAPH_ERR).setContext(prefixedRes);
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON)
                     .body(StreamingHelpers.getJsonObjectStream((ErrorMessage) ErrorMessage.getErrorMessage(404, lds)));

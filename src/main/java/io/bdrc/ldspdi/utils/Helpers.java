@@ -60,7 +60,13 @@ public class Helpers {
 
     public static StringBuffer multiChoiceTpl = getTemplateStr("multiChoice.tpl");
     public static String MAX_AGE_VALUE = ServiceConfig.getProperty("Max-Age");
-    public static Property IS_IN_ROOT_INSTANCE = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/core/inRootInstance");
+    public static final Property IS_IN_ROOT_INSTANCE = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/core/inRootInstance");
+    public static final Property status = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/admin/status");
+    public static final Property statusHidden = ResourceFactory.createProperty("http://purl.bdrc.io/admindata/StatusHidden");
+    
+    public static boolean isHidden(final Model m) {
+        return m.contains(null, status, statusHidden);
+    }
 
     public static InputStream getResourceOrFile(final String baseName) {
         InputStream stream = null;
