@@ -117,7 +117,9 @@ public class OntData {
             } else {
                 log.error("read only mode, don't update Fuseki with the ontology");
             }
+            log.info("step 2");
             readGithubJsonLDContext();
+            log.info("step 3");
             adminAnnotProps = OntData.getAdminAnnotProps();
             log.info("Done with OntData initialization !");
         } catch (Exception ex) {
