@@ -96,7 +96,9 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
 
         if (!ServiceConfig.isInChina()) {
             // shapes depend on the ontology for their labels
+            log.error("before shapes thread join");
             t_ont.join();
+            log.error("after shapes thread join");
             Webhook wh = new Webhook(null, GitService.SHAPES, 0);
             Thread t = new Thread(wh);
             t.start();
