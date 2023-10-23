@@ -87,6 +87,8 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup()
             throws InterruptedException, ExecutionException {
+        
+        log.error("doSomethingAfterStartup");
 
         Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
         Thread t_ont = new Thread(wh_ont);
