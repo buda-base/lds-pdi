@@ -36,6 +36,7 @@ public class Webhook implements Runnable {
 
     @Override
     public void run() {
+        log.info("run webhook mode {}", mode);
         String commitId = null;
         ResultsCache.clearCache();
         LdsQueryService.clearCache();

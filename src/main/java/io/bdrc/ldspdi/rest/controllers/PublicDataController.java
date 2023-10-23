@@ -784,7 +784,7 @@ public class PublicDataController {
 
     private ByteArrayOutputStream writeStream(Model m, String lang) {
         log.info("Jena Lang for writer is {}", lang);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
         if (lang == "STTL") {
             final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
             writer.output(os);

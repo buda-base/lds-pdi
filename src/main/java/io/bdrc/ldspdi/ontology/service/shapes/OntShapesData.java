@@ -43,7 +43,6 @@ public class OntShapesData {
     private static String commitId = null;
 
     public OntShapesData(String payload, String commit) {
-        super();
         this.payload = payload;
         commitId = commit;
     }
@@ -69,14 +68,16 @@ public class OntShapesData {
             oms.setDocumentManager(odm);
             final Iterator<String> it = odm.listDocuments();
             fullMod = ModelFactory.createDefaultModel();
+            int nbDocs = 0;
             while (it.hasNext()) {
                 final String uri = it.next();
+                nbDocs += 1;
                 log.info("OntManagerDoc : {}", uri);
                 final OntModel om = odm.getOntology(uri, oms);
                 OntShapesData.addOntModelByBase(parseBaseUri(uri), om);
                 fullMod.add(om);
             }
-            log.info("Done with OntShapesData initialization ! Uri set is {}", modelsBase.keySet());
+            log.info("Done with OntShapesData initialization ({} documents)! Uri set is {}", nbDocs, modelsBase.keySet());
         } catch (Exception ex) {
             log.error("Error updating OntShapesData Model", ex);
         }
