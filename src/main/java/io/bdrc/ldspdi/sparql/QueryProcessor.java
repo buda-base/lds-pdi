@@ -85,7 +85,7 @@ public class QueryProcessor {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
         final Query q = QueryFactory.create(query);
-        log.info("QUERY >> {}", query);
+        log.debug("QUERY >> {}", query);
         final RDFConnection conn = RDFConnectionRemote.create()
                 .destination(fusekiUrl).build();
         return conn.queryAsk(q);
@@ -113,7 +113,7 @@ public class QueryProcessor {
             map.put("R_RES", URI);
             String query = qfp.getParametizedQuery(map, true);
             Query q = QueryFactory.create(query);
-            log.info("QUERY >> {}", query);
+            log.debug("QUERY >> {}", query);
             RDFConnection conn = RDFConnectionRemote.create()
                     .destination(fusekiUrl).build();
             // model = conn.queryDescribe(q);
@@ -153,7 +153,7 @@ public class QueryProcessor {
         final int hash = Objects.hashCode(query);
         Model model = (Model) ResultsCache.getObjectFromCache(hash);
         if (model == null) {
-            log.info("getGraph: executing query: {}", query);
+            log.debug("getGraph: executing query: {}", query);
             final Query q;
             try {
                 q = QueryFactory.create(prefixes + " " + query);
