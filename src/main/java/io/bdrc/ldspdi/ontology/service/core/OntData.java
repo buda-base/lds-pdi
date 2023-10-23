@@ -102,32 +102,15 @@ public class OntData {
             oms.setDocumentManager(odm);
             ontAllMod = ModelFactory.createOntologyModel(oms, md);
             final Iterator<String> it = odm.listDocuments();
+            log.info("step 0");
             while (it.hasNext()) {
                 final String uri = it.next();
-                log.info("OntManagerDoc : {}", uri);
+                log.error("OntManagerDoc : {}", uri);
                 final OntModel om = odm.getOntology(uri, oms);
-                if (writeDebugFiles) {
-	                final String tmp = uri.substring(0, uri.length() - 1);
-	                File directory = new File("ontologies/");
-	                if (!directory.exists()) {
-	                    directory.mkdir();
-	                }
-	                directory = new File("ontologies/" + commitId);
-	                if (!directory.exists()) {
-	                    directory.mkdir();
-	                }
-	                String file = null;
-	                try {
-	                    file = "ontologies/" + commitId + "/" + tmp.substring(tmp.lastIndexOf("/") + 1) + ".ttl";
-	                    Helpers.writeModelToFile(om, file);
-	                } catch (Exception ex) {
-	                    // do absolutely nothing so the shapoes are loaded anyway - just log
-	                    log.info("Could not write file {}", file);
-	                }
-                }
                 ontAllMod.add(om);
                 OntData.addOntModelByBase(parseBaseUri(uri), om);
             }
+            log.info("step 1");
             boolean readonly = "true".equals(ServiceConfig.getProperty("readOnly"));
             if (!readonly) {
                 updateFusekiDataset();
