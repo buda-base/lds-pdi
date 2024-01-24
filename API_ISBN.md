@@ -2,7 +2,7 @@
 
 This endpoint takes as input any identifier of a book (ISBN, ISSN, EAN) and returns information about title, author, other identifiers and volumes.
 
-# `searchByID?id={id}`
+### `searchByID?id={id}`
 
 The HTTP header `Accept-Language` will have an impact on the results, set it to `bo` to get the Tibetan Unicode version.
 

@@ -1,0 +1,169 @@
+package io.bdrc.ldspdi.rest.controllers;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.SKOS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.bdrc.ewtsconverter.EwtsConverter;
+import io.bdrc.ldspdi.exceptions.LdsError;
+import io.bdrc.ldspdi.exceptions.RestException;
+import io.bdrc.ldspdi.sparql.QueryProcessor;
+import io.bdrc.libraries.Models;
+
+@RestController
+@RequestMapping("/")
+public class ISBNAPIController {
+
+    public static final EwtsConverter ewtsConverter = new EwtsConverter();
+    public final static Logger log = LoggerFactory.getLogger(ISBNAPIController.class);
+    final static ObjectMapper mapper = new ObjectMapper();
+    public static final String TMP = "http://purl.bdrc.io/ontology/tmp/";
+    
+    public String normalizeID(String id) {
+        final int slashidx = id.indexOf('/');
+        if (slashidx != -1)
+            id = id.substring(0, slashidx);
+        return id.replace("-", "").replace(">", "").replace(" ", "");
+    }
+    
+    public static final class Volinfo {
+        public Resource ig = null;
+        public Resource v = null;
+        public Integer volnum = null;
+        
+        public Volinfo() {}
+    }
+    
+    public static List<Volinfo> getVolumes(final Model m, final Resource mw) {
+        final Map<Integer,Volinfo> volumesRmap = new HashMap<>();
+        StmtIterator vsti = m.listStatements(mw, m.createProperty(TMP, "imageGroup"), (RDFNode) null);
+        while (vsti.hasNext()) {
+            final Resource ig = vsti.next().getResource();
+            final Statement vns = ig.getProperty(m.createProperty(Models.BDO, "volumeNumber"));
+            if (vns == null) {
+                log.error("image group {} has no volume number in model", ig.getLocalName());
+                continue;
+            }
+            final Volinfo vi = new Volinfo();
+            vi.ig = ig;
+            vi.volnum = vns.getInt();
+            volumesRmap.put(vns.getInt(), vi);
+        }
+        vsti = m.listStatements(mw, m.createProperty(TMP, "volume"), (RDFNode) null);
+        while (vsti.hasNext()) {
+            final Resource v = vsti.next().getResource();
+            // start looking for the volume number in the content location
+            Statement vns = v.getProperty(m.createProperty(Models.BDO, "volumeNumber"));
+            if (vns == null) {
+                // fallback on the part index, error prone
+                log.error("volume {} has no content location volume in model", v.getLocalName());
+                vns = v.getProperty(m.createProperty(Models.BDO, "partIndex"));
+            }
+            final Volinfo vi = volumesRmap.computeIfAbsent(vns.getInt(), x -> new Volinfo());
+            vi.v = v;
+            vi.volnum = vns.getInt();
+        }
+        final List<Integer> sortedVnums = new ArrayList<>(volumesRmap.keySet());
+        Collections.sort(sortedVnums);
+        final List<Volinfo> sortedR = new ArrayList<>();
+        for (final Integer vn : sortedVnums) {
+            sortedR.add(volumesRmap.get(vn));
+        }
+        return sortedR;
+    }
+    
+    public static String proplitToStr(final Resource r, final Property p, final String languageh) {
+        final StmtIterator si = r.listProperties(p);
+        String res = null;
+        while (si.hasNext()) {
+            final Literal l = si.next().getObject().asLiteral();
+            if (l.getLanguage().equals(languageh))
+                return l.getString();
+            if (l.getLanguage().equals("bo-x-ewts") && languageh.equals("bo")) {
+                return ewtsConverter.toUnicode(l.getString());
+            }
+            res = l.getString();
+        }
+        return res;
+    }
+    
+    public static ObjectNode objectFromModel(final Model m, final String languageh) {
+        final ObjectNode root = mapper.createObjectNode(); 
+        final StmtIterator st = m.listStatements(null, m.createProperty(Models.BDO, "inRootInstance"), (RDFNode) null);
+        while (st.hasNext()) {
+            final Statement s = st.next();
+            final Resource partR = s.getSubject();
+            final Resource rootR = s.getResource();
+            final List<Volinfo> volumes = getVolumes(m, rootR);
+            final ArrayNode an = root.arrayNode();
+            for (final Volinfo vi : volumes) {
+                final ObjectNode von = an.addObject();
+                if (vi.v != null) {
+                    von.put("id", vi.v.getURI());
+                    final String title = proplitToStr(vi.v, SKOS.prefLabel, languageh);
+                    von.put("title", title);
+                }
+                if (vi.ig != null) {
+                    final ArrayNode imgan = root.arrayNode();
+                    imgan.add(vi.ig.getURI());
+                    von.set("image_groups", imgan);
+                }
+                if (vi.volnum != null) {
+                    von.put("volume_number", vi.volnum);
+                }
+            }
+            
+            if (partR.equals(rootR)) {
+                if (volumes.size() > 1) {
+                    root.put("match_type", "full_multivolume");
+                    root.set("volumes", an);
+                } else {
+                    root.put("match_type", "monovolume");
+                }
+            } else {
+                root.put("match_type", "subset");
+            }
+            
+        }
+        return root;
+    }
+    
+    @GetMapping(value = "ID/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ObjectNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
+        id = normalizeID(id);
+        final Map<String, String> map = new HashMap<>();
+        map.put("L_ID", id);
+        final Model model = QueryProcessor.getSimpleGraph(map, id, "isbn.arq", null, null);
+        if (model.size() < 1) {
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(id));
+        }
+        final ObjectNode rootNode = objectFromModel(model);
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
+    }
+
+}
