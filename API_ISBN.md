@@ -2,7 +2,7 @@
 
 This endpoint takes as input any identifier of a book (ISBN, ISSN, EAN) and returns information about title, author, other identifiers and volumes.
 
-### `searchByID?id={id}`
+### `ID/searchByID?id={id}`
 
 The HTTP header `Accept-Language` will have an impact on the results, set it to `bo` to get the Tibetan Unicode version.
 
@@ -30,7 +30,7 @@ Example of a `monovolume` match (`id=9789380359700`, `Accept-Language "bo"`):
 ]
 ```
 
-Example of a `subset` match (`?id=9787800579875`), matches the first 6 volumes of MW1KG14896 but not the last 6.
+Example of a `subset` match (`?id=9787800579875`), matches the first 6 volumes of MW1KG14896 but not the last 6. Note that the `volumes` object only contains volumes that match the given id.
 
 ```json
 [
@@ -90,3 +90,4 @@ Example of a `subset` match (`?id=9787800579875`), matches the first 6 volumes o
 ]
 ```
 
+In the case of a `full_multivolume` match (ex: `?id=9787540929800`), the format is the same as a `subset` match except all volumes are listed.

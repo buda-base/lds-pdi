@@ -95,8 +95,16 @@ public class QueryProcessor {
             final String queryName) throws RestException {
         return getSimpleResourceGraph(URI, queryName, null, null);
     }
-
+    
     public static Model getSimpleResourceGraph(final String URI,
+            final String queryName, String fusekiUrl, String prefixes) throws RestException {
+        final Map<String, String> map = new HashMap<>();
+        map.put("R_RES", URI);
+        final String hash = URI;
+        return getSimpleGraph(map, hash, queryName, fusekiUrl, prefixes);
+    }
+
+    public static Model getSimpleGraph(final Map<String, String> map, final String hashStr,
             final String queryName, String fusekiUrl, String prefixes)
             throws RestException {
         if (prefixes == null) {
@@ -105,20 +113,18 @@ public class QueryProcessor {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        int hash = Objects.hashCode(queryName + "::" + URI);
-        Model model = (Model) ResultsCache.getObjectFromCache(hash);
+        int hashI = Objects.hashCode(queryName + "::" + hashStr);
+        Model model = (Model) ResultsCache.getObjectFromCache(hashI);
         if (model == null) {
             LdsQuery qfp = LdsQueryService.get(queryName, "library");
-            final Map<String, String> map = new HashMap<>();
-            map.put("R_RES", URI);
+            
             String query = qfp.getParametizedQuery(map, true);
             Query q = QueryFactory.create(query);
             log.debug("QUERY >> {}", query);
             RDFConnection conn = RDFConnectionRemote.create()
                     .destination(fusekiUrl).build();
-            // model = conn.queryDescribe(q);
             model = conn.queryConstruct(q);
-            ResultsCache.addToCache(model, hash);
+            ResultsCache.addToCache(model, hashI);
         }
         log.info(
                 "getSimpleResourceGraph() return model of size {} from fuseki {}",

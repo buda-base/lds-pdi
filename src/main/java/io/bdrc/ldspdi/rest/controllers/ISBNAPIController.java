@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -55,12 +57,14 @@ public class ISBNAPIController {
         public Resource ig = null;
         public Resource v = null;
         public Integer volnum = null;
+        public Boolean matching = false;
         
         public Volinfo() {}
     }
     
-    public static List<Volinfo> getVolumes(final Model m, final Resource mw) {
-        final Map<Integer,Volinfo> volumesRmap = new HashMap<>();
+    public static List<Volinfo> getVolumes(final Model m, final Resource mw, final List<Resource> matchingParts) {
+        final Map<Integer,Volinfo> volInfoMap = new HashMap<>();
+        final boolean requiresMatches = !(matchingParts == null || matchingParts.size() == 0 || (matchingParts.size() == 1 && matchingParts.get(0).equals(mw)));
         StmtIterator vsti = m.listStatements(mw, m.createProperty(TMP, "imageGroup"), (RDFNode) null);
         while (vsti.hasNext()) {
             final Resource ig = vsti.next().getResource();
@@ -72,10 +76,10 @@ public class ISBNAPIController {
             final Volinfo vi = new Volinfo();
             vi.ig = ig;
             vi.volnum = vns.getInt();
-            volumesRmap.put(vns.getInt(), vi);
+            volInfoMap.put(vns.getInt(), vi);
         }
         vsti = m.listStatements(mw, m.createProperty(TMP, "volume"), (RDFNode) null);
-        while (vsti.hasNext()) {
+        while (vsti.hasNext()) {            
             final Resource v = vsti.next().getResource();
             // start looking for the volume number in the content location
             Statement vns = v.getProperty(m.createProperty(Models.BDO, "volumeNumber"));
@@ -84,15 +88,19 @@ public class ISBNAPIController {
                 log.error("volume {} has no content location volume in model", v.getLocalName());
                 vns = v.getProperty(m.createProperty(Models.BDO, "partIndex"));
             }
-            final Volinfo vi = volumesRmap.computeIfAbsent(vns.getInt(), x -> new Volinfo());
+            final Volinfo vi = volInfoMap.computeIfAbsent(vns.getInt(), x -> new Volinfo());
             vi.v = v;
+            vi.matching = matchingParts.contains(v);
             vi.volnum = vns.getInt();
         }
-        final List<Integer> sortedVnums = new ArrayList<>(volumesRmap.keySet());
+        final List<Integer> sortedVnums = new ArrayList<>(volInfoMap.keySet());
         Collections.sort(sortedVnums);
         final List<Volinfo> sortedR = new ArrayList<>();
         for (final Integer vn : sortedVnums) {
-            sortedR.add(volumesRmap.get(vn));
+            final Volinfo vi = volInfoMap.get(vn);
+            if (requiresMatches && !vi.matching)
+                continue;
+            sortedR.add(vi);
         }
         return sortedR;
     }
@@ -112,15 +120,29 @@ public class ISBNAPIController {
         return res;
     }
     
-    public static ObjectNode objectFromModel(final Model m, final String languageh) {
-        final ObjectNode root = mapper.createObjectNode(); 
-        final StmtIterator st = m.listStatements(null, m.createProperty(Models.BDO, "inRootInstance"), (RDFNode) null);
-        while (st.hasNext()) {
-            final Statement s = st.next();
-            final Resource partR = s.getSubject();
-            final Resource rootR = s.getResource();
-            final List<Volinfo> volumes = getVolumes(m, rootR);
-            final ArrayNode an = root.arrayNode();
+    public static void addIds(final Resource r, final ObjectNode node) {
+        final ArrayNode an = node.arrayNode();
+        node.set("ids", an);
+        if (r == null)
+            return;
+        final StmtIterator idsi = r.listProperties(r.getModel().createProperty(TMP, "idvalue"));
+        while (idsi.hasNext()) {
+            final Statement s = idsi.next();
+            an.add(s.getString());
+        }
+        
+    }
+    
+    public static ArrayNode objectFromModel(final Model m, final String languageh) {
+        final ArrayNode root = mapper.createArrayNode(); 
+        final NodeIterator ni = m.listObjectsOfProperty(m.createProperty(Models.BDO, "inRootInstance"));
+        while (ni.hasNext()) {
+            final ObjectNode matchNode = root.addObject();
+            final Resource rootR = ni.next().asResource();
+            final List<Resource> matchingParts = m.listSubjectsWithProperty(m.createProperty(Models.BDO, "inRootInstance"), rootR).toList();
+            matchNode.put("id", rootR.getURI());
+            final List<Volinfo> volumes = getVolumes(m, rootR, matchingParts);
+            final ArrayNode an = matchNode.arrayNode();
             for (final Volinfo vi : volumes) {
                 final ObjectNode von = an.addObject();
                 if (vi.v != null) {
@@ -128,8 +150,9 @@ public class ISBNAPIController {
                     final String title = proplitToStr(vi.v, SKOS.prefLabel, languageh);
                     von.put("title", title);
                 }
+                addIds(vi.v, von);
                 if (vi.ig != null) {
-                    final ArrayNode imgan = root.arrayNode();
+                    final ArrayNode imgan = an.arrayNode();
                     imgan.add(vi.ig.getURI());
                     von.set("image_groups", imgan);
                 }
@@ -137,24 +160,30 @@ public class ISBNAPIController {
                     von.put("volume_number", vi.volnum);
                 }
             }
-            
-            if (partR.equals(rootR)) {
-                if (volumes.size() > 1) {
-                    root.put("match_type", "full_multivolume");
-                    root.set("volumes", an);
-                } else {
-                    root.put("match_type", "monovolume");
-                }
-            } else {
-                root.put("match_type", "subset");
+            matchNode.put("nb_volumes", volumes.size());
+            matchNode.set("volumes", an);
+            addIds(rootR, matchNode);
+            final Resource authorR = rootR.getPropertyResourceValue(m.createProperty(TMP, "mainAuthor"));
+            if (authorR != null) {
+                matchNode.put("author_id", authorR.getURI());
+                matchNode.put("author_name", proplitToStr(authorR, SKOS.prefLabel, languageh));
             }
-            
+            matchNode.put("title", proplitToStr(rootR, SKOS.prefLabel, languageh));
+            final Resource iiifThumbnail = rootR.getPropertyResourceValue(m.createProperty(TMP, "thumbnailIIIFService"));
+            if (iiifThumbnail != null)
+                matchNode.put("thumbnail_iiif_service", iiifThumbnail.getURI());
+            if (volumes.size() == 1)
+                matchNode.put("match_type", "monovolume");
+            else if (matchingParts.get(0).equals(rootR))
+                matchNode.put("match_type", "full_multivolume");
+            else
+                matchNode.put("match_type", "subset");
         }
         return root;
     }
     
     @GetMapping(value = "ID/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ObjectNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
+    public ResponseEntity<ArrayNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
         id = normalizeID(id);
         final Map<String, String> map = new HashMap<>();
         map.put("L_ID", id);
@@ -162,7 +191,7 @@ public class ISBNAPIController {
         if (model.size() < 1) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(id));
         }
-        final ObjectNode rootNode = objectFromModel(model);
+        final ArrayNode rootNode = objectFromModel(model, languageh);
         return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
     }
 
