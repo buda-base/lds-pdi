@@ -48,6 +48,25 @@ public class LibrarySearchController {
     public final static Logger log = LoggerFactory.getLogger(LibrarySearchController.class);
     public String fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
     public static final String ADM = "http://purl.bdrc.io/ontology/admin/";
+    
+    public static final void hackForLuceneBug(final HashMap<String, String> argsmap, final String file) {
+        if (file.startsWith("etext"))
+            return;
+        // dirty hack for https://github.com/buda-base/lucene-bo/issues/42
+        if (argsmap.containsKey("LG_NAME") && "bo".equals(argsmap.get("LG_NAME"))) {
+            String lname = argsmap.get("L_NAME");
+            lname = lname.replace("\u0f71", "");
+            lname = lname.replace("\u0f75", "\u0f74");
+            lname = lname.replace("\u0f4e", "\u0f53");
+            lname = lname.replace("\u0f4a", "\u0f4f");
+            lname = lname.replace("\u0f4c", "\u0f51");
+            lname = lname.replace("\u0f73", "\u0f72");
+            lname = lname.replace("\u0f9e", "\u0fa3");
+            lname = lname.replace("\u0f9a", "\u0f9f");
+            lname = lname.replace("\u0f9c", "\u0fa1");
+            argsmap.put("L_NAME", lname);
+        }
+    }
 
     @GetMapping(value = "/lib/{file}")
     public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, HttpServletResponse response,
@@ -55,6 +74,7 @@ public class LibrarySearchController {
             @RequestHeader("Accept") String format) throws RestException {
         log.info("Call to getLibGraphGet() with template name >> " + file);
         HashMap<String, String> map = Helpers.convertMulti(request.getParameterMap());
+        hackForLuceneBug(map, file);
         final LdsQuery qfp = LdsQueryService.get(file + ".arq", "library");
         if (qfp.getRequiredParams().contains(QueryConstants.RIC)) {
             map.put(QueryConstants.RIC, String.valueOf(GeoLocation.isFromChina(request)));
