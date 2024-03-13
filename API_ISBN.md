@@ -100,6 +100,70 @@ In the case of a `full_multivolume` match (ex: `?id=9787540929800`), the format 
 
 Note that for each image group a thumbnail can be obtained directly through the IIIF server. For instance for image group `http://purl.bdrc.io/resource/I1KG14911`, the IIIF base URL is `https://iiif.bdrc.io/bdr:I1KG14911::thumbnail/`.
 
+The results are in no particular order.
+
 ### `TLMS/SearchByTitle?title={title}
 
-This endpoint takes a title (or a part of a title) and returns each corresponding collection or volume. It adds ``
+This endpoint takes a title (or a part of a title) in Tibetan and returns each corresponding collection or volume in the exact same format as the ISBN search. It also takes the HTTP header `Accept-Language` into account.
+
+The only different is the presence of a value `title_matched` in the root or in the matching volumes. The format of the field is an array of string where the matched part of the title is surrounded by the characters `↦` and `↤`. For instance searching `བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ` will yield:
+
+```json
+[
+   {
+      "id":"http://purl.bdrc.io/resource/MW1KG13995",
+      "nb_volumes":1,
+      "volumes":[
+         {
+            "ids":[],
+            "image_groups":[
+               "http://purl.bdrc.io/resource/I1KG14309"
+            ],
+            "volume_number":1
+         }
+      ],
+      "ids":[
+         "9789380359700"
+      ],
+      "author_id":"http://purl.bdrc.io/resource/P9521",
+      "author_name":"བློ་བཟང་རྒྱལ་མཚན།",
+      "title":"བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ།",
+      "title_matched":[
+         "↦བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ↤་ཡི་གར་འཇོ་བའི་རོལ་རྩེད།",
+         "↦བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ↤།"
+      ],
+      "publisherName":"བོད་ཀྱི་དཔེ་མཛོད་ཁང་།",
+      "publisherLocation":"dharamsala, h.p.",
+      "publicationDate":"2012",
+      "thumbnail_iiif_service":"https://iiif.bdrc.io/bdr:I1KG14309::I1KG143090003.jpg",
+      "match_type":"monovolume"
+   },
+   {
+      "id":"http://purl.bdrc.io/resource/MW22149",
+      "nb_volumes":1,
+      "volumes":[
+         {
+            "ids":[],
+            "image_groups":[
+               "http://purl.bdrc.io/resource/I1KG22960"
+            ],
+            "volume_number":1
+         }
+      ],
+      "ids":[],
+      "author_id":"http://purl.bdrc.io/resource/P9521",
+      "author_name":"བློ་བཟང་རྒྱལ་མཚན།",
+      "title":"བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ་ཡི་གར་འཇོ་བའི་རོལ་རྩེད།",
+      "title_matched":[
+         "↦བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ↤་ཡི་གར་འཇོ་བའི་རོལ་རྩེད།"
+      ],
+      "publisherName":"བློ་བཟང་རྒྱལ་མཚན།",
+      "publisherLocation":"མེན་པཱཊ།",
+      "publicationDate":"1982",
+      "thumbnail_iiif_service":"https://iiif.bdrc.io/bdr:I1KG22960::I1KG229600003.jpg",
+      "match_type":"monovolume"
+   }
+]
+```
+
+The results are in no particular order.

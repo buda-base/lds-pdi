@@ -120,6 +120,22 @@ public class ISBNAPIController {
         return res;
     }
     
+    public static ArrayNode proplitToArray(final Resource r, final Property p, final String languageh) {
+        final StmtIterator si = r.listProperties(p);
+        ArrayNode res = null;
+        while (si.hasNext()) {
+            if (res == null)
+                res = mapper.createArrayNode();
+            final Literal l = si.next().getObject().asLiteral();
+            if (l.getLanguage().equals("bo-x-ewts") && languageh.equals("bo")) {
+                res.add(ewtsConverter.toUnicode(l.getString()));
+            } else {
+                res.add(l.getString());
+            }
+        }
+        return res;
+    }
+    
     public static void addIds(final Resource r, final ObjectNode node) {
         final ArrayNode an = node.arrayNode();
         node.set("ids", an);
@@ -134,7 +150,7 @@ public class ISBNAPIController {
     }
     
     public static ArrayNode objectFromModel(final Model m, final String languageh) {
-        final ArrayNode root = mapper.createArrayNode(); 
+        final ArrayNode root = mapper.createArrayNode();
         final NodeIterator ni = m.listObjectsOfProperty(m.createProperty(Models.BDO, "inRootInstance"));
         while (ni.hasNext()) {
             final ObjectNode matchNode = root.addObject();
@@ -148,7 +164,7 @@ public class ISBNAPIController {
                 if (vi.v != null) {
                     von.put("id", vi.v.getURI());
                     von.put("title", proplitToStr(vi.v, SKOS.prefLabel, languageh));
-                    von.put("title_matched", proplitToStr(rootR, m.createProperty(TMP, "labelMatch"), languageh));
+                    von.set("title_matched", proplitToArray(rootR, m.createProperty(TMP, "labelMatch"), languageh));
                 }
                 addIds(vi.v, von);
                 if (vi.ig != null) {
@@ -169,7 +185,7 @@ public class ISBNAPIController {
                 matchNode.put("author_name", proplitToStr(authorR, SKOS.prefLabel, languageh));
             }
             matchNode.put("title", proplitToStr(rootR, SKOS.prefLabel, languageh));
-            matchNode.put("title_matched", proplitToStr(rootR, m.createProperty(TMP, "labelMatch"), languageh));
+            matchNode.set("title_matched", proplitToArray(rootR, m.createProperty(TMP, "labelMatch"), languageh));
             matchNode.put("publisherName", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherName"), languageh));
             matchNode.put("publisherLocation", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherLocation"), languageh));
             matchNode.put("publicationDate", proplitToStr(rootR, m.createProperty(TMP, "publicationDate"), languageh));
