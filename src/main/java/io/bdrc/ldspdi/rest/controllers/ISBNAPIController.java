@@ -169,6 +169,9 @@ public class ISBNAPIController {
                 matchNode.put("author_name", proplitToStr(authorR, SKOS.prefLabel, languageh));
             }
             matchNode.put("title", proplitToStr(rootR, SKOS.prefLabel, languageh));
+            matchNode.put("publisherName", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherName"), languageh));
+            matchNode.put("publisherLocation", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherLocation"), languageh));
+            matchNode.put("publicationDate", proplitToStr(rootR, m.createProperty(TMP, "publicationDate"), languageh));
             final Resource iiifThumbnail = rootR.getPropertyResourceValue(m.createProperty(TMP, "thumbnailIIIFService"));
             if (iiifThumbnail != null)
                 matchNode.put("thumbnail_iiif_service", iiifThumbnail.getURI());
@@ -193,6 +196,11 @@ public class ISBNAPIController {
         }
         final ArrayNode rootNode = objectFromModel(model, languageh);
         return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
+    }
+    
+    @GetMapping(value = "TLMS/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ArrayNode> ISBNControllerTLMS(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
+        return ISBNController(id, languageh);
     }
 
 }

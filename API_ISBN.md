@@ -1,8 +1,8 @@
-# ISBN search API
+# TLMS simple APIs
 
-This endpoint takes as input any identifier of a book (ISBN, ISSN, EAN) and returns information about title, author, other identifiers and volumes.
+### `TLMS/searchByID?id={id}` 
 
-### `ID/searchByID?id={id}`
+This endpoint takes as input any identifier of a book (ISBN, ISSN, EAN) and returns information about title, author, other identifiers and volumes. See [this document](https://docs.google.com/document/d/1VImRdMdWpnbjjr-8kOZWPVjIvUHUOL_iNTsZLwpTJrM/edit#heading=h.plkylmk1ky3a) for BDRC's conventions to record ISBNs.
 
 The HTTP header `Accept-Language` will have an impact on the results, set it to `bo` to get the Tibetan Unicode version.
 
@@ -21,6 +21,9 @@ Example of a `monovolume` match (`id=9789380359700`, `Accept-Language "bo"`):
 		"id": "http://purl.bdrc.io/resource/MW1KG13995",
 		"title": "བཞིན་བཟང་མ་གཏུམ་དྲག་རོལ་པའི་སྒྲུང་གཏམ།",
 		"match_type": "monovolume",
+		"publisherName": "བོད་ཀྱི་དཔེ་མཛོད་ཁང་།",
+		"publisherLocation": "dharamsala, h.p.",
+		"publicationDate": "2012",
 		"author_name": "བློ་བཟང་རྒྱལ་མཚན།",
 		"author_id": "http://purl.bdrc.io/resource/P9521",
 		"nb_volumes": 1,
@@ -38,6 +41,9 @@ Example of a `subset` match (`?id=9787800579875`), matches the first 6 volumes o
 		"id": "http://purl.bdrc.io/resource/MW1KG14896",
 		"title": "མང་ཚོགས་སྒྱུ་རྩལ།་ལེགས་རྩོམ་དཔེ་ཚོགས།",
 		"nb_volumes": 12,
+		"publisherName": "ཀྲུང་གོའི་བོད་རིག་པ་དཔེ་སྐྲུན་ཁང་།",
+		"publisherLocation": "པེ་ཅིན།",
+		"publicationDate": "2009/2010",
 		"edition_statement": "པར་གཞི་དང་པོ།",
 		"match_type": "subset",
 		"thumbnail_iiif_service": "https://iiif.bdrc.io/bdr:I1KG14906::I1KG149060003.jpg",
@@ -91,3 +97,9 @@ Example of a `subset` match (`?id=9787800579875`), matches the first 6 volumes o
 ```
 
 In the case of a `full_multivolume` match (ex: `?id=9787540929800`), the format is the same as a `subset` match except all volumes are listed.
+
+Note that for each image group a thumbnail can be obtained directly through the IIIF server. For instance for image group `http://purl.bdrc.io/resource/I1KG14911`, the IIIF base URL is `https://iiif.bdrc.io/bdr:I1KG14911::thumbnail/`.
+
+### `TLMS/SearchByTitle?title={title}
+
+This endpoint takes a title (or a part of a title) and returns each corresponding collection or volume. It adds ``
