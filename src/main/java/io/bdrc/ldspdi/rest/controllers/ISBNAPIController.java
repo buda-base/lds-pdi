@@ -147,8 +147,8 @@ public class ISBNAPIController {
                 final ObjectNode von = an.addObject();
                 if (vi.v != null) {
                     von.put("id", vi.v.getURI());
-                    final String title = proplitToStr(vi.v, SKOS.prefLabel, languageh);
-                    von.put("title", title);
+                    von.put("title", proplitToStr(vi.v, SKOS.prefLabel, languageh));
+                    von.put("title_matched", proplitToStr(rootR, m.createProperty(TMP, "labelMatch"), languageh));
                 }
                 addIds(vi.v, von);
                 if (vi.ig != null) {
@@ -169,6 +169,7 @@ public class ISBNAPIController {
                 matchNode.put("author_name", proplitToStr(authorR, SKOS.prefLabel, languageh));
             }
             matchNode.put("title", proplitToStr(rootR, SKOS.prefLabel, languageh));
+            matchNode.put("title_matched", proplitToStr(rootR, m.createProperty(TMP, "labelMatch"), languageh));
             matchNode.put("publisherName", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherName"), languageh));
             matchNode.put("publisherLocation", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherLocation"), languageh));
             matchNode.put("publicationDate", proplitToStr(rootR, m.createProperty(TMP, "publicationDate"), languageh));
@@ -186,7 +187,9 @@ public class ISBNAPIController {
     }
     
     @GetMapping(value = "ID/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ArrayNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
+    public ResponseEntity<ArrayNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") String languageh) throws JsonProcessingException, RestException {
+        if (languageh == null)
+            languageh = "bo";
         id = normalizeID(id);
         final Map<String, String> map = new HashMap<>();
         map.put("L_ID", id);
@@ -199,8 +202,23 @@ public class ISBNAPIController {
     }
     
     @GetMapping(value = "TLMS/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ArrayNode> ISBNControllerTLMS(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
+    public ResponseEntity<ArrayNode> TLMSControllerISBN(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") final String languageh) throws JsonProcessingException, RestException {
         return ISBNController(id, languageh);
+    }
+    
+    @GetMapping(value = "TLMS/searchByTitle", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ArrayNode> TLMSControllerTitle(@RequestParam(value="title") String title, @RequestHeader("Accept-Language") String languageh) throws JsonProcessingException, RestException {
+        if (languageh == null)
+            languageh = "bo";
+        final Map<String, String> map = new HashMap<>();
+        map.put("L_NAME", "\""+title.replace("\"", "")+"\"");
+        map.put("LG_NAME", "bo");
+        final Model model = QueryProcessor.getSimpleGraph(map, title, "tlms_bytitle.arq", null, null);
+        if (model.size() < 1) {
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(title));
+        }
+        final ArrayNode rootNode = objectFromModel(model, languageh);
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
     }
 
 }
