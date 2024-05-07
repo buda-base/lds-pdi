@@ -57,6 +57,7 @@ public class ISBNAPIController {
         public Resource ig = null;
         public Resource v = null;
         public Integer volnum = null;
+        public Integer nbImages = null;
         public Boolean matching = false;
         
         public Volinfo() {}
@@ -73,8 +74,14 @@ public class ISBNAPIController {
                 log.error("image group {} has no volume number in model", ig.getLocalName());
                 continue;
             }
+            final Statement vptS = ig.getProperty(m.createProperty(Models.BDO, "volumePagesTotal"));
+            Integer vpt = null;
+            if (vptS != null) {
+                vpt = vptS.getInt();
+            }
             final Volinfo vi = new Volinfo();
             vi.ig = ig;
+            vi.nbImages = vpt;
             vi.volnum = vns.getInt();
             volInfoMap.put(vns.getInt(), vi);
         }
@@ -88,8 +95,15 @@ public class ISBNAPIController {
                 log.error("volume {} has no content location volume in model", v.getLocalName());
                 vns = v.getProperty(m.createProperty(Models.BDO, "partIndex"));
             }
+            final Statement vptS = v.getProperty(m.createProperty(Models.BDO, "volumePagesTotal"));
+            Integer vpt = null;
+            if (vptS != null) {
+                vpt = vptS.getInt();
+            }
             final Volinfo vi = volInfoMap.computeIfAbsent(vns.getInt(), x -> new Volinfo());
             vi.v = v;
+            if (vpt != null)
+                vi.nbImages = vpt;
             vi.matching = matchingParts.contains(v);
             vi.volnum = vns.getInt();
         }
@@ -166,6 +180,7 @@ public class ISBNAPIController {
                     von.put("title", proplitToStr(vi.v, SKOS.prefLabel, languageh));
                     von.set("title_matched", proplitToArray(rootR, m.createProperty(TMP, "labelMatch"), languageh));
                 }
+                von.put("nb_images", vi.nbImages);
                 addIds(vi.v, von);
                 if (vi.ig != null) {
                     final ArrayNode imgan = an.arrayNode();
