@@ -187,6 +187,8 @@ public class ISBNAPIController {
             matchNode.put("title", proplitToStr(rootR, SKOS.prefLabel, languageh));
             matchNode.set("title_matched", proplitToArray(rootR, m.createProperty(TMP, "labelMatch"), languageh));
             matchNode.put("publisherName", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherName"), languageh));
+            matchNode.put("editionStatement", proplitToStr(rootR, m.createProperty(Models.BDO, "editionStatement"), languageh));
+            matchNode.put("extentStatement", proplitToStr(rootR, m.createProperty(Models.BDO, "extentStatement"), languageh));
             matchNode.put("publisherLocation", proplitToStr(rootR, m.createProperty(Models.BDO, "publisherLocation"), languageh));
             matchNode.put("publicationDate", proplitToStr(rootR, m.createProperty(TMP, "publicationDate"), languageh));
             final Resource iiifThumbnail = rootR.getPropertyResourceValue(m.createProperty(TMP, "thumbnailIIIFService"));
