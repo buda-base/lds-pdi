@@ -151,6 +151,18 @@ public class ISBNAPIController {
         return res;
     }
     
+    public static ArrayNode proplitToUriArray(final Resource r, final Property p) {
+        final StmtIterator si = r.listProperties(p);
+        ArrayNode res = null;
+        while (si.hasNext()) {
+            if (res == null)
+                res = mapper.createArrayNode();
+            final Resource o = si.next().getResource();
+            res.add(o.getURI());
+        }
+        return res;
+    }
+    
     public static void addIds(final Resource r, final ObjectNode node) {
         final ArrayNode an = node.arrayNode();
         node.set("ids", an);
@@ -229,6 +241,7 @@ public class ISBNAPIController {
             matchNode.put("id", rootR.getURI());
             matchNode.put("name", proplitToStr(rootR, SKOS.prefLabel, languageh));
             matchNode.put("century", proplitToStr(rootR, m.createProperty(TMP, "associatedCentury"), languageh));
+            matchNode.set("tradition", proplitToUriArray(rootR, m.createProperty(Models.BDO, "associatedTradition")));
             matchNode.set("name_matched", proplitToArray(rootR, m.createProperty(TMP, "nameMatch"), languageh));
             StmtIterator si = rootR.listProperties(m.createProperty(Models.BDO, "personEvent"));
             while (si.hasNext()) {
