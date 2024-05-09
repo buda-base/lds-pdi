@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,6 +220,29 @@ public class ISBNAPIController {
         return root;
     }
     
+    public static ArrayNode personObjectFromModel(final Model m, final String languageh) {
+        final ArrayNode root = mapper.createArrayNode();
+        final ResIterator ni = m.listSubjectsWithProperty(m.createProperty(TMP, "isMain"));
+        while (ni.hasNext()) {
+            final ObjectNode matchNode = root.addObject();
+            final Resource rootR = ni.next();
+            matchNode.put("name", proplitToStr(rootR, SKOS.prefLabel, languageh));
+            matchNode.put("century", proplitToStr(rootR, m.createProperty(TMP, "associatedCentury"), languageh));
+            matchNode.set("name_matched", proplitToArray(rootR, m.createProperty(TMP, "nameMatch"), languageh));
+            StmtIterator si = rootR.listProperties(m.createProperty(Models.BDO, "personEvent"));
+            while (si.hasNext()) {
+                final Resource evt = si.next().getResource();
+                // by construction in the query, events have type and eventWhen
+                final Resource typeR = evt.getPropertyResourceValue(RDF.type);
+                final String type = typeR.getLocalName().toLowerCase();
+                final String when = evt.getProperty(m.createProperty(Models.BDO, "eventWhen")).getLiteral().getLexicalForm();
+                matchNode.put(type, when);
+            }
+            matchNode.set("all_names", proplitToArray(rootR, m.createProperty(TMP, "name"), languageh));
+        }
+        return root;
+    }
+    
     @GetMapping(value = "ID/searchByID", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ArrayNode> ISBNController(@RequestParam(value="id") String id, @RequestHeader("Accept-Language") String languageh) throws JsonProcessingException, RestException {
         if (languageh == null)
@@ -251,6 +275,21 @@ public class ISBNAPIController {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(title));
         }
         final ArrayNode rootNode = objectFromModel(model, languageh);
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
+    }
+    
+    @GetMapping(value = "TLMS/searchAuthor", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ArrayNode> TLMSControllerAuthor(@RequestParam(value="name") String name, @RequestHeader("Accept-Language") String languageh) throws JsonProcessingException, RestException {
+        if (languageh == null)
+            languageh = "bo";
+        final Map<String, String> map = new HashMap<>();
+        map.put("L_NAME", "\""+name.replace("\"", "")+"\"");
+        map.put("LG_NAME", "bo");
+        final Model model = QueryProcessor.getSimpleGraph(map, name, "tlms_author.arq", null, null);
+        if (model.size() < 1) {
+            throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setContext(name));
+        }
+        final ArrayNode rootNode = personObjectFromModel(model, languageh);
         return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(MediaType.APPLICATION_JSON).body(rootNode);
     }
 
