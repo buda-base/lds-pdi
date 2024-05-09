@@ -226,6 +226,7 @@ public class ISBNAPIController {
         while (ni.hasNext()) {
             final ObjectNode matchNode = root.addObject();
             final Resource rootR = ni.next();
+            matchNode.put("id", rootR.getURI());
             matchNode.put("name", proplitToStr(rootR, SKOS.prefLabel, languageh));
             matchNode.put("century", proplitToStr(rootR, m.createProperty(TMP, "associatedCentury"), languageh));
             matchNode.set("name_matched", proplitToArray(rootR, m.createProperty(TMP, "nameMatch"), languageh));
