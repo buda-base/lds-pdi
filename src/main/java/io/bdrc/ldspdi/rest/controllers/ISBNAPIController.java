@@ -222,12 +222,14 @@ public class ISBNAPIController {
             final Resource iiifThumbnail = rootR.getPropertyResourceValue(m.createProperty(TMP, "thumbnailIIIFService"));
             if (iiifThumbnail != null)
                 matchNode.put("thumbnail_iiif_service", iiifThumbnail.getURI());
-            if (volumes.size() == 1)
-                matchNode.put("match_type", "monovolume");
-            else if (matchingParts.get(0).equals(rootR))
-                matchNode.put("match_type", "full_multivolume");
-            else
+            if (matchingParts.get(0).equals(rootR)) {
+                if (volumes.size() == 1)
+                    matchNode.put("match_type", "monovolume");
+                else
+                    matchNode.put("match_type", "full_multivolume");
+            } else {
                 matchNode.put("match_type", "subset");
+            }
         }
         return root;
     }
