@@ -176,7 +176,6 @@ public class MarcExport {
     static final DataField f336 = factory.newDataField("336", ' ', ' ');
     static final DataField f337 = factory.newDataField("337", ' ', ' ');
     static final DataField f338 = factory.newDataField("338", ' ', ' ');
-    static final DataField f533 = factory.newDataField("533", ' ', ' ');
     static final DataField f710_2 = factory.newDataField("710", '2', ' ');
     // this is the identifier used by Harvard for BDRC, it hasn't been used by Columbia
     // see https://github.com/buda-base/lds-pdi/issues/227
@@ -230,10 +229,6 @@ public class MarcExport {
         f338.addSubfield(factory.newSubfield('a', "online resource"));
         f338.addSubfield(factory.newSubfield('b', "cr"));
         f338.addSubfield(factory.newSubfield('2', "rdacarrier"));
-        f533.addSubfield(factory.newSubfield('a', "Electronic reproduction."));
-        f533.addSubfield(factory.newSubfield('b', "Cambridge, Mass. :"));
-        f533.addSubfield(factory.newSubfield('c', "Buddhist Digital Resource Center."));
-        f533.addSubfield(factory.newSubfield('n', "Available via World Wide Web."));
         f710_2.addSubfield(factory.newSubfield('a', "Buddhist Digital Resource Center."));
         // see https://www.oclc.org/content/dam/oclc/digitalregistry/506F_vocabulary.pdf
         f506_restricted.addSubfield(factory.newSubfield('a', "Access restricted."));
@@ -1464,8 +1459,27 @@ public class MarcExport {
             f520.addSubfield(factory.newSubfield('a', getLangStrNoConv(catalogInfo)));
             record.addVariableField(f520);
         }
-        if (scansMode)
-            record.addVariableField(f533);
+        if (scansMode) {
+            si = main.listProperties(scanInfo);
+            String f533_n = null;
+            while (si.hasNext()) {
+                final String s = si.next().getString();
+                if (s.startsWith("Scanned or acquired in Tibetan areas of China by BDRC.")) {
+                    f533_n = null;
+                    break;
+                }
+                if (f533_n == null || f533_n.length() < s.length())
+                    f533_n = s.strip();
+            }
+            if (f533_n != null) {
+                if (!f533_n.endsWith("."))
+                    f533_n += ".";
+                final DataField f533 = factory.newDataField("533", ' ', ' ');
+                f533.addSubfield(factory.newSubfield('a', "Electronic reproduction."));
+                f533.addSubfield(factory.newSubfield('n', f533_n));
+                record.addVariableField(f533);
+            }
+        }
         final Resource cs = main.getPropertyResourceValue(copyrightStatus);
         if (cs == null || cs.getLocalName().equals("CopyrightPublicDomain")) {
             record.addVariableField(f542_PD);
