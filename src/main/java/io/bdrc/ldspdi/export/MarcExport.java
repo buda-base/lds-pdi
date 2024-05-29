@@ -116,6 +116,7 @@ public class MarcExport {
     public static final Property authorshipStatement = ResourceFactory.createProperty(BDO + "authorshipStatement");
     public static final Property catalogInfo = ResourceFactory.createProperty(BDO + "catalogInfo");
     public static final Property workBiblioNote = ResourceFactory.createProperty(BDO + "biblioNote");
+    public static final Property scanInfo = ResourceFactory.createProperty(BDO + "scanInfo");
     public static final Property creator = ResourceFactory.createProperty(BDO + "creator");
     public static final Property role = ResourceFactory.createProperty(BDO + "role");
     public static final Property agent = ResourceFactory.createProperty(BDO + "agent");
@@ -763,8 +764,13 @@ public class MarcExport {
         }
         boolean firstChineseDone = false;
         if (highestPrioList == null) {
-            // no title...
-            return;
+            si = main.listProperties(SKOS.prefLabel);
+            if (!si.hasNext())
+                return;
+            highestPrioList = new ArrayList<>();
+            while (si.hasNext()) {
+                highestPrioList.add(si.next().getLiteral());
+            }
         }
         final CompareStringLiterals compbcp = new CompareStringLiterals(bcp47lang);
         if (highestPrioList.size() > 1) {
