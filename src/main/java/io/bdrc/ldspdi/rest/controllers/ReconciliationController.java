@@ -876,7 +876,7 @@ public class ReconciliationController {
     public ResponseEntity<Map<String,List<SuggestReponse>>> query(@RequestParam(value="prefix") String prefix, @RequestParam(value="cursor", required=false) Integer cursor) throws IOException {
         final List<SuggestReponse> suggests = new ArrayList<>();
         final Map<String,List<SuggestReponse>> res = new HashMap<>();
-        res.put("results", suggests);
+        res.put("result", suggests);
         prefix = prefix.toLowerCase().strip();
         for (final Map.Entry<String, SuggestReponse> e : propertiesSuggest.entrySet()) {
             if (e.getKey().contains(prefix)) {
