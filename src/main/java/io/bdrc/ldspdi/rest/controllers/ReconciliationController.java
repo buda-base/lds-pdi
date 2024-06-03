@@ -149,7 +149,7 @@ public class ReconciliationController {
     
     public static final class PropertySuggestService {
         @JsonProperty(value="service_url")
-        public final String service_url = "https://ldspdi.bdrc.io/";
+        public final String service_url = "https://ldspdi.bdrc.io";
         
         @JsonProperty(value="service_path")
         public final String service_path = "/reconciliation/suggest/properties/";
