@@ -873,8 +873,10 @@ public class ReconciliationController {
     }
     
     @GetMapping(path = "/reconciliation/suggest/properties/")
-    public ResponseEntity<List<SuggestReponse>> query(@RequestParam(value="prefix") String prefix, @RequestParam(value="cursor", required=false) Integer cursor) throws IOException {
+    public ResponseEntity<Map<String,List<SuggestReponse>>> query(@RequestParam(value="prefix") String prefix, @RequestParam(value="cursor", required=false) Integer cursor) throws IOException {
         final List<SuggestReponse> suggests = new ArrayList<>();
+        final Map<String,List<SuggestReponse>> res = new HashMap<>();
+        res.put("results", suggests);
         prefix = prefix.toLowerCase().strip();
         for (final Map.Entry<String, SuggestReponse> e : propertiesSuggest.entrySet()) {
             if (e.getKey().contains(prefix)) {
@@ -882,7 +884,7 @@ public class ReconciliationController {
             }
         }
         return ResponseEntity.status(200).header("Content-Type", "application/json")
-                .body(suggests);
+                .body(res);
     }
     
 }
