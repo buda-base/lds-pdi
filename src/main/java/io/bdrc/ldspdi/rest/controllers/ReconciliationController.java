@@ -147,11 +147,39 @@ public class ReconciliationController {
         public final String url = "https://library.bdrc.io/show/bdr:{{id}}";
     }
     
+    public static final class PropertySuggestService {
+        @JsonProperty(value="service_url")
+        public final String service_url = "https://ldspdi.bdrc.io/";
+        
+        @JsonProperty(value="service_path")
+        public final String service_path = "/reconciliation/suggest/properties/";
+    }
+    
+    public static final class Suggests {
+        @JsonProperty(value="property")
+        public final PropertySuggestService property = new PropertySuggestService();
+    }
+    
     public final static class Service {
         @JsonProperty(value="name", required=true)
         public String name = null;
         
-        @JsonProperty(value="identifierSpace", required=false)
+        @JsonProperty(value="versions")
+        public final List<String> versions = Arrays.asList(new String[]{"0.1", "0.2"});
+        
+        @JsonProperty(value="documentation")
+        public final String documentation = "https://github.com/buda-base/lds-pdi/tree/master/reconciliation";
+        
+        @JsonProperty(value="logo")
+        public final String logo = "https://iiif.bdrc.io/static::logo.png/full/max/0/default.png";
+        
+        @JsonProperty(value="serviceVersion")
+        public final String serviceVersion = "0.1";
+        
+        @JsonProperty(value="batchSize")
+        public final Integer batchSize = 50;
+        
+        @JsonProperty(value="identifierSpace")
         public final String identifierSpace = "http://purl.bdrc.io/";
         
         @JsonProperty(value="schemaSpace", required=true)
@@ -160,12 +188,32 @@ public class ReconciliationController {
         @JsonProperty(value="defaultTypes", required=true)
         public List<DefaultType> defaultTypes = null;
         
+        @JsonProperty(value="suggest", required=true)
+        public Suggests suggest = new Suggests();
+        
         @JsonProperty(value="view", required=true)
         public final View view = new View();
         
         @JsonProperty(value="preview", required=true)
         public final Preview preview = new Preview();
 
+    }
+    
+    public static final class SuggestReponse {
+        @JsonProperty(value="name", required=true)
+        public String name;
+        
+        @JsonProperty(value="description", required=true)
+        public String description;
+        
+        @JsonProperty(value="id", required=true)
+        public String id;
+        
+        public SuggestReponse(final String name, final String description, final String id) {
+            this.name = name;
+            this.description = description;
+            this.id = id;
+        }
     }
     
     public static final Service service_en = new Service();
@@ -816,6 +864,25 @@ public class ReconciliationController {
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
+    }
+    
+    final static Map<String,SuggestReponse> propertiesSuggest = new HashMap<>();
+    static {
+        propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
+        propertiesSuggest.put("authorof", new SuggestReponse("author of", "use on person data to connect it with title data", "authorOf"));
+    }
+    
+    @GetMapping(path = "/reconciliation/suggest/properties/")
+    public ResponseEntity<List<SuggestReponse>> query(@RequestParam(value="prefix") String prefix, @RequestParam(value="cursor", required=false) Integer cursor) throws IOException {
+        final List<SuggestReponse> suggests = new ArrayList<>();
+        prefix = prefix.toLowerCase().strip();
+        for (final Map.Entry<String, SuggestReponse> e : propertiesSuggest.entrySet()) {
+            if (e.getKey().contains(prefix)) {
+                suggests.add(e.getValue());
+            }
+        }
+        return ResponseEntity.status(200).header("Content-Type", "application/json")
+                .body(suggests);
     }
     
 }
