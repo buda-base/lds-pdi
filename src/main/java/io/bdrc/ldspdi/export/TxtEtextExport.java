@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;

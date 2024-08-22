@@ -27,6 +27,7 @@ import java.util.Objects;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionBuilder;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
@@ -37,6 +38,7 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,12 +210,10 @@ public class QueryProcessor {
         if (fusekiUrl == null) {
             fusekiUrl = ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL);
         }
-        RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
-        QueryExecution qe = rvf.query(query);
+        QueryExecution qe = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).timeout(Long.parseLong(
+                ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT))).query(query).build();
         // QueryExecution qe = QueryExecutionFactory.sparqlService(fusekiUrl,
         // QueryFactory.create(query));
-        qe.setTimeout(Long.parseLong(
-                ServiceConfig.getProperty(QueryConstants.QUERY_TIMEOUT)));
         return qe;
     }
 

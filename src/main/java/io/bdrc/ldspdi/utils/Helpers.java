@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.validator.routines.UrlValidator;

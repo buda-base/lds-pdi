@@ -13,8 +13,6 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
@@ -23,6 +21,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.ResultSetMgr;
 import org.apache.jena.riot.resultset.ResultSetLang;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -137,7 +136,7 @@ public class JsonOutputTest {
     @Test
     public void testJenaJsonResultParsing() throws IOException {
 
-        ResultSet rs=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query1+" limit "+limit)).execSelect();
+        ResultSet rs = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(query1+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs);
         String json=new String(baos.toByteArray());
@@ -161,7 +160,7 @@ public class JsonOutputTest {
         ObjectMapper mapper = new ObjectMapper();
         String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rsw.getFusekiResultSet());
         //Jena Generated Json
-        ResultSet rs=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(query1+" limit "+limit)).execSelect();
+        ResultSet rs = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(query1+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs);
         String json2=new String(baos.toByteArray());
@@ -197,7 +196,7 @@ public class JsonOutputTest {
         ResultSetWrapper rsw=getResults(literal3+" limit "+limit, fusekiUrl);
         ObjectMapper mapper = new ObjectMapper();
         String json1=mapper.writeValueAsString(rsw.getFusekiResultSet());
-        ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(literal3+" limit "+limit)).execSelect();
+        ResultSet rs2 = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(literal3+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
         JsonNode node1=mapper.readTree(json1);
@@ -211,8 +210,7 @@ public class JsonOutputTest {
         ResultSetWrapper rsw=getResults(literal2+" limit "+limit, fusekiUrl);
         ObjectMapper mapper = new ObjectMapper();
         String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rsw.getFusekiResultSet());
-
-        ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(literal2+" limit "+limit)).execSelect();
+        ResultSet rs2 = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(literal2+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
         String json2=new String(baos.toByteArray());
@@ -228,8 +226,7 @@ public class JsonOutputTest {
         ResultSetWrapper rsw=getResults(literal1+" limit "+limit, fusekiUrl);
         ObjectMapper mapper = new ObjectMapper();
         String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rsw.getFusekiResultSet());
-
-        ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(literal1+" limit "+limit)).execSelect();
+        ResultSet rs2 = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(literal1+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
         String json2=new String(baos.toByteArray());
@@ -245,7 +242,7 @@ public class JsonOutputTest {
         ResultSetWrapper rsw=getResults(blank+" limit "+limit, fusekiUrl);
         ObjectMapper mapper = new ObjectMapper();
         String json1=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rsw.getFusekiResultSet());
-        ResultSet rs2=QueryExecutionFactory.sparqlService(fusekiUrl,QueryFactory.create(blank+" limit "+limit)).execSelect();
+        ResultSet rs2 = QueryExecutionHTTPBuilder.create().endpoint(fusekiUrl).query(blank+" limit "+limit).build().execSelect();
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ResultSetFormatter.outputAsJSON(baos, rs2);
         String json2=new String(baos.toByteArray());
@@ -264,7 +261,7 @@ public class JsonOutputTest {
     public static ResultSetWrapper getResults(String query, String fuseki) {
         ResultSetWrapper res;
         long start=System.currentTimeMillis();
-        QueryExecution qe=QueryExecutionFactory.sparqlService(fuseki,QueryFactory.create(query));
+        QueryExecution qe = QueryExecutionHTTPBuilder.create().endpoint(fuseki).query(query).build();
         ResultSet jrs=qe.execSelect();
         long elapsed=System.currentTimeMillis()-start;
         int psz=Integer.parseInt(ServiceConfig.getProperty(QueryConstants.PAGE_SIZE));
