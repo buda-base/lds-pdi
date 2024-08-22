@@ -68,7 +68,7 @@
     <dependency>
       <groupId>io.bdrc.ewtsconverter</groupId>
       <artifactId>ewts-converter</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>io.bdrc.lucene</groupId>
