@@ -58,13 +58,13 @@ public class OSControllers {
         BoolQueryBuilder etextPagesQuery = QueryBuilders.boolQuery()
                 .must(QueryBuilders.rangeQuery("etext_pages.cend").gte(cstart))
                 .must(QueryBuilders.rangeQuery("etext_pages.cstart").lte(cend));
-        boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder()));
+        boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
 
         // Nested queries for chunks
         BoolQueryBuilder chunksQuery = QueryBuilders.boolQuery()
                 .must(QueryBuilders.rangeQuery("chunks.cend").gte(cstart))
                 .must(QueryBuilders.rangeQuery("chunks.cstart").lte(cend));
-        boolQuery.must(QueryBuilders.nestedQuery("chunks", chunksQuery, ScoreMode.None).innerHit(new InnerHitBuilder()));
+        boolQuery.must(QueryBuilders.nestedQuery("chunks", chunksQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
 
         sourceBuilder.query(boolQuery);
         searchRequest.source(sourceBuilder);
@@ -75,5 +75,6 @@ public class OSControllers {
         // Return the search results
         return ResponseEntity.ok(searchResponse.getHits().getHits());
     }
+    
 
 }
