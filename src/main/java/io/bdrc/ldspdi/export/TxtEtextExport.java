@@ -89,7 +89,7 @@ public class TxtEtextExport {
             boolQuery.must(QueryBuilders.termQuery("_id", id));
         } else if (id.startsWith("VL")) {
             // Query by etext_vol field
-            boolQuery.must(QueryBuilders.termQuery("etext_vol.keyword", id));
+            boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
         }
 
         // Nested queries for chunks
