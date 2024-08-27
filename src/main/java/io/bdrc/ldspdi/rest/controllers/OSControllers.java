@@ -1,6 +1,7 @@
 package io.bdrc.ldspdi.rest.controllers;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
@@ -10,6 +11,8 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.opensearch.index.query.BoolQueryBuilder;
 import org.opensearch.index.query.InnerHitBuilder;
 import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +31,7 @@ public class OSControllers {
     static final String index_name = ServiceConfig.getProperty("opensearchIndex");
 
     @GetMapping("/osearch/etextchunks")
-    public ResponseEntity<?> search(
+    public ResponseEntity<?> etextchunks(
             @RequestParam String id,
             @RequestParam final int cstart,
             @RequestParam final int cend) throws IOException {
@@ -68,13 +71,76 @@ public class OSControllers {
 
         sourceBuilder.query(boolQuery);
         searchRequest.source(sourceBuilder);
-
         // Execute the search
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
         // Return the search results
         return ResponseEntity.ok(searchResponse.getHits().getHits());
     }
-    
+
+    @GetMapping("/osearch/etextpages")
+    public ResponseEntity<?> etextpages(
+                @RequestParam String id,
+                @RequestParam final int pstart,
+                @RequestParam final int pend) throws IOException {
+        if (id.startsWith("bdr:")) {
+            id = id.substring(4);
+        }
+        
+        // Create a SearchRequest targeting the index
+        SearchRequest searchRequest = new SearchRequest(index_name);
+
+        // Build the search query
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.fetchSource(false);  // Do not return the _source
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        if (id.startsWith("UT")) {
+            // Query by document ID
+            boolQuery.must(QueryBuilders.termQuery("_id", id));
+        } else if (id.startsWith("VL")) {
+            // Query by etext_vol field
+            boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
+        }
+
+        // Nested queries for etext_pages
+        BoolQueryBuilder etextPagesQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("etext_pages.pnum").gte(pstart))
+                .must(QueryBuilders.rangeQuery("etext_pages.pnum").lte(pend));
+        boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+        
+        sourceBuilder.query(boolQuery);
+        searchRequest.source(sourceBuilder);
+        // Execute the search
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        int minCstart = Integer.MAX_VALUE;
+        int maxCend = Integer.MIN_VALUE;
+        for (SearchHit hit : hits) {
+            if (hit.getInnerHits() != null) {
+                SearchHits innerHits = hit.getInnerHits().get("etext_pages");
+                for (SearchHit innerHit : innerHits.getHits()) {
+                    Map<String, Object> etextPage = innerHit.getSourceAsMap();
+                    int cstart = (int) etextPage.get("cstart");
+                    int cend = (int) etextPage.get("cend");
+
+                    // Update min and max values
+                    if (cstart < minCstart) {
+                        minCstart = cstart;
+                    }
+                    if (cend > maxCend) {
+                        maxCend = cend;
+                    }
+                }
+            }
+        }
+        
+        if (minCstart == Integer.MAX_VALUE || maxCend == Integer.MIN_VALUE) {
+            return ResponseEntity.notFound().build(); 
+        }
+        
+        return etextchunks(id, minCstart, maxCend);
+    }
 
 }
