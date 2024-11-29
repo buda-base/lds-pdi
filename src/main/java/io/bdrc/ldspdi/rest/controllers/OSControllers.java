@@ -129,7 +129,7 @@ public class OSControllers {
     
     static final AccessInfo getAccessInfo(final String reslname, final HttpServletRequest request) {
         String method = ((HttpServletRequest) request).getMethod();
-        UserProfile prof = null;
+        UserProfile prof = new UserProfile();
         if (ServiceConfig.useAuth() && !method.equalsIgnoreCase("OPTIONS")) {
             log.info("IIIF SERVER IS USING AUTH !");
             String token = getToken(((HttpServletRequest) request).getHeader("Authorization"));
