@@ -3,6 +3,7 @@ package io.bdrc.ldspdi.service;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -83,6 +84,16 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         //app.run(args);
         SpringApplication.run(SpringBootLdspdi.class, args);
     }
+    
+    // Helper method to get thread stack trace
+    private String getThreadStackTrace(Thread thread) {
+        StringBuilder sb = new StringBuilder();
+        StackTraceElement[] stackTrace = thread.getStackTrace();
+        for (StackTraceElement element : stackTrace) {
+            sb.append("\n\t").append(element.toString());
+        }
+        return sb.toString();
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup()
@@ -91,22 +102,48 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         log.error("doSomethingAfterStartup");
 
         Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
-        Thread t_ont = new Thread(wh_ont);
+        final AtomicReference<Throwable> threadException = new AtomicReference<>();
+        Thread t_ont = new Thread(() -> {
+            try {
+                wh_ont.run();
+            } catch (Throwable e) {
+                threadException.set(e);
+                log.error("Exception in ontology thread", e);
+            }
+        });
         t_ont.start();
 
         if (!ServiceConfig.isInChina()) {
             // shapes depend on the ontology for their labels
             log.error("before shapes thread join");
-            t_ont.join();
+            t_ont.join(10000);
+            if (t_ont.isAlive()) {
+                log.error("Ontology thread did not complete within 10 seconds!");
+                // Optionally dump thread stack trace
+                log.error("Thread stack trace: " + getThreadStackTrace(t_ont));
+            }
             log.error("after shapes thread join");
             Webhook wh = new Webhook(null, GitService.SHAPES, 0);
-            Thread t = new Thread(wh);
-            t.start();
+            t_ont = new Thread(() -> {
+                try {
+                    wh_ont.run();
+                } catch (Throwable e) {
+                    threadException.set(e);
+                    log.error("Exception in ontology thread", e);
+                }
+            });
+            t_ont.start();
             if ("true".equals(AuthProps.getProperty("useAuth"))) {
                 log.info("SpringBootLdspdi uses auth, updating auth data...");
                 RdfAuthModel.init();
                 RdfAuthModel.updateAuthData(
                         AuthProps.getProperty("fusekiAuthData"));
+            }
+            t_ont.join(10000);
+            if (t_ont.isAlive()) {
+                log.error("Ontology thread did not complete within 10 seconds!");
+                // Optionally dump thread stack trace
+                log.error("Thread stack trace: " + getThreadStackTrace(t_ont));
             }
         }
         log.info("SERVER IS IN CHINA {}", ServiceConfig.isInChina());
