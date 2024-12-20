@@ -101,7 +101,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
         
         log.error("doSomethingAfterStartup");
 
-        Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
+        final Webhook wh_ont = new Webhook(null, GitService.ONTOLOGIES, 0);
         final AtomicReference<Throwable> threadException = new AtomicReference<>();
         Thread t_ont = new Thread(() -> {
             try {
@@ -123,10 +123,10 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
                 log.error("Thread stack trace: " + getThreadStackTrace(t_ont));
             }
             log.error("after shapes thread join");
-            Webhook wh = new Webhook(null, GitService.SHAPES, 0);
+            final Webhook wh = new Webhook(null, GitService.SHAPES, 0);
             t_ont = new Thread(() -> {
                 try {
-                    wh_ont.run();
+                    wh.run();
                 } catch (Throwable e) {
                     threadException.set(e);
                     log.error("Exception in ontology thread", e);
@@ -141,7 +141,7 @@ public class SpringBootLdspdi extends SpringBootServletInitializer {
             }
             t_ont.join(10000);
             if (t_ont.isAlive()) {
-                log.error("Ontology thread did not complete within 10 seconds!");
+                log.error("Shapes thread did not complete within 10 seconds!");
                 // Optionally dump thread stack trace
                 log.error("Thread stack trace: " + getThreadStackTrace(t_ont));
             }
