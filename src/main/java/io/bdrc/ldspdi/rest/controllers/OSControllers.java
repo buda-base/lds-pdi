@@ -131,7 +131,7 @@ public class OSControllers {
         String method = ((HttpServletRequest) request).getMethod();
         UserProfile prof = new UserProfile();
         if (ServiceConfig.useAuth() && !method.equalsIgnoreCase("OPTIONS")) {
-            log.info("IIIF SERVER IS USING AUTH !");
+            log.info("ldspdi is using auth !");
             String token = getToken(((HttpServletRequest) request).getHeader("Authorization"));
             log.debug("TOKEN >> {}", token);
             if (token != null) {
@@ -367,12 +367,12 @@ public class OSControllers {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.fetchSource(true);  // Do not return the _source
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        boolQuery.must(QueryBuilders.termQuery("etext_for_instance", loc.rootInstanceLname));
+        boolQuery.must(QueryBuilders.termQuery("etext_for_root_instance", loc.rootInstanceLname));
         boolQuery.must(QueryBuilders.termQuery("volumeNumber", loc.volume_start));
         // Nested queries for etext_pages
         BoolQueryBuilder etextPagesQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("etext_pages.cend").gte(loc.page_start))
-                .must(QueryBuilders.rangeQuery("etext_pages.cstart").lte(loc.page_start+5));
+                .must(QueryBuilders.rangeQuery("etext_pages.pnum").gte(loc.page_start))
+                .must(QueryBuilders.rangeQuery("etext_pages.pnum").lte(loc.page_start+5));
         boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
         sourceBuilder.sort("etextNumber", SortOrder.ASC);
 
@@ -424,6 +424,7 @@ public class OSControllers {
         int page_start = 0;
         int volume_start = 0;
         String rootInstanceLname = null;
+        String ieLname = null;
     }
     
     static final Property contentLocationP = ResourceFactory.createProperty(Models.BDO+"contentLocation");
@@ -431,16 +432,21 @@ public class OSControllers {
     static final Property contentLocationPageP = ResourceFactory.createProperty(Models.BDO+"contentLocationPage");
     static final Property contentLocationVolumeP = ResourceFactory.createProperty(Models.BDO+"contentLocationVolume");
     static final Property inRootInstanceP = ResourceFactory.createProperty(Models.BDO+"inRootInstance");
+    static final Property hasEtextInstance = ResourceFactory.createProperty("http://purl.bdrc.io/ontology/tmp/hasEtextInstance");
     
     public static Location getLoc(final String mwlname) {
         final String qstr = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
+                + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
+                + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
+                + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
                 + "\n"
                 + "construct {\n"
                 + "  ?mw :contentLocation ?cl .\n"
                 + "  ?cl ?clp ?clo .\n"
                 + "  ?mw :partOf ?mwp .\n"
                 + "  bdr:"+mwlname+" :inRootInstance ?mwroot .\n"
+                + "  ?mwroot tmp:hasEtextInstance ?ie .\n"
                 + "} where {\n"
                 + "  {\n"
                 + "    bdr:"+mwlname+" :partOf* ?mw .\n"
@@ -448,7 +454,9 @@ public class OSControllers {
                 + "    ?mw :contentLocation ?cl .\n"
                 + "    ?cl ?clp ?clo .\n"
                 + "  } union {\n"
-                + "    bdr:"+mwlname+" :inRootInstance ?mwroot .\n"
+                + "    bdr:"+mwlname+" :inRootInstance* ?mwroot . \n"
+                + "    ?mwroot :instanceHasReproduction ?ie .\n"
+                + "    FILTER(exists{?ie a :EtextInstance . ?ieadm adm:adminAbout ?ie ; adm:status bda:StatusReleased })\n"
                 + "  }\n"
                 + "}";
         final Query q = QueryFactory.create(qstr);
@@ -465,6 +473,7 @@ public class OSControllers {
         if (root == null)
             return null;
         l.rootInstanceLname = root.getLocalName();
+        l.ieLname = root.getPropertyResourceValue(hasEtextInstance).getLocalName();
         while (mw != null) {
             final Resource cl = mw.getPropertyResourceValue(contentLocationP);
             if (cl == null) {
@@ -524,6 +533,16 @@ public class OSControllers {
             return ResponseEntity.notFound().build();
         }
         si = snippet_for_loc(loc);
+        if (si == null) {
+            si = new Snippet_info();
+            si.ut = null;
+            si.etext_vol = null;
+            si.etext_instance = loc.ieLname;
+            si.volumeNumber = loc.volume_start;
+            si.etext_quality = null;
+            si.precision = 0;
+            si.start_page_num = 0;
+        }
         return ResponseEntity.ok(si);
     }
 
