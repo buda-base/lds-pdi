@@ -90,6 +90,8 @@ public class TxtEtextExport {
         } else if (id.startsWith("VL")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
+        } else {
+            return null;
         }
 
         // Nested queries for chunks
@@ -107,7 +109,7 @@ public class TxtEtextExport {
             searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Chunks OS query failed", e);
-            return chunks;
+            return null;
         }
 
         // Parse the response to extract chunks
@@ -198,7 +200,7 @@ public class TxtEtextExport {
     public final static ResponseEntity<StreamingResponseBody> getResponse(final RestHighLevelClient client, final HttpServletRequest request, final String id, final Integer startChar, final Integer endChar, final String resName, final String prefLangs) throws RestException {
         log.info("get text for "+id+" ("+startChar+"-"+endChar+")");
         List<Chunk> res = getChunks(client, id, startChar, endChar);
-        if (res.size() < 1) {
+        if (res == null || res.size() < 1) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
         }
         
