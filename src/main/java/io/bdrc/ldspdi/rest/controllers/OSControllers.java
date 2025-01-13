@@ -267,6 +267,8 @@ public class OSControllers {
         } else if (id.startsWith("VL")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
+        } else {
+            return null;
         }
         sourceBuilder.sort("volumeNumber", SortOrder.ASC);
         sourceBuilder.sort("etextNumber", SortOrder.ASC);
