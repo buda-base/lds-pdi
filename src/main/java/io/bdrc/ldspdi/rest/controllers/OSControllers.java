@@ -212,7 +212,7 @@ public class OSControllers {
         if (id.startsWith("UT")) {
             // Query by document ID
             boolQuery.must(QueryBuilders.termQuery("_id", id));
-        } else if (id.startsWith("VL")) {
+        } else if (id.startsWith("VE")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
         }
@@ -245,7 +245,7 @@ public class OSControllers {
         public String ut;
         public Integer start_page_num = null;
         public Integer volumeNumber;
-        public Integer etext_quality;
+        public Double etext_quality;
         public int precision;
         public List<String[]> snippet = null;
     }
@@ -264,7 +264,7 @@ public class OSControllers {
         } else if (id.startsWith("MW")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_for_instance", id));
-        } else if (id.startsWith("VL")) {
+        } else if (id.startsWith("VE")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
         } else {
@@ -290,7 +290,7 @@ public class OSControllers {
         si.etext_vol = s.get("etext_vol").toString();
         si.etext_instance = s.get("etext_instance").toString();
         si.volumeNumber = (Integer) s.get("volumeNumber");
-        si.etext_quality = (Integer) s.get("etext_quality");
+        si.etext_quality = (Double) s.get("etext_quality");
         si.precision = 3;
 
         // add start_page_num by taking the "pnum" of the first object in the "etext_pages" array
@@ -394,7 +394,7 @@ public class OSControllers {
         si.etext_vol = s.get("etext_vol").toString();
         si.etext_instance = s.get("etext_instance").toString();
         si.volumeNumber = loc.volume_start;
-        si.etext_quality = (Integer) s.get("etext_quality");
+        si.etext_quality = (Double) s.get("etext_quality");
         si.precision = loc.precision;
         si.start_page_num = loc.page_start;
         
