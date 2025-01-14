@@ -262,8 +262,12 @@ public class OSControllers {
             // Query by document ID
             boolQuery.must(QueryBuilders.termQuery("_id", id));
         } else if (id.startsWith("MW")) {
-            // Query by etext_vol field
-            boolQuery.must(QueryBuilders.termQuery("etext_for_instance", id));
+            // Query by either etext_for_instance or etext_for_root_instance
+            BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery();
+            shouldQuery.should(QueryBuilders.termQuery("etext_for_instance", id));
+            shouldQuery.should(QueryBuilders.termQuery("etext_for_root_instance", id));
+            shouldQuery.minimumShouldMatch(1); // At least one should match
+            boolQuery.must(shouldQuery);
         } else if (id.startsWith("VE")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
