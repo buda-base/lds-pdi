@@ -87,7 +87,7 @@ public class TxtEtextExport {
         if (id.startsWith("UT")) {
             // Query by document ID
             boolQuery.must(QueryBuilders.termQuery("_id", id));
-        } else if (id.startsWith("VL")) {
+        } else if (id.startsWith("VE")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
         } else {
