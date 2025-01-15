@@ -245,7 +245,7 @@ public class OSControllers {
         public String ut;
         public Integer start_page_num = null;
         public Integer volumeNumber;
-        public Double etext_quality;
+        public Double etext_quality = null;
         public int precision;
         public List<String[]> snippet = null;
     }
@@ -296,7 +296,8 @@ public class OSControllers {
         si.etext_vol = s.get("etext_vol").toString();
         si.etext_instance = s.get("etext_instance").toString();
         si.volumeNumber = (Integer) s.get("volumeNumber");
-        si.etext_quality = ((Number) s.get("etext_quality")).doubleValue();
+        if (s.get("etext_quality") != null)
+            si.etext_quality = ((Number) s.get("etext_quality")).doubleValue();
         si.precision = 3;
 
         // add start_page_num by taking the "pnum" of the first object in the "etext_pages" array
@@ -400,7 +401,8 @@ public class OSControllers {
         si.etext_vol = s.get("etext_vol").toString();
         si.etext_instance = s.get("etext_instance").toString();
         si.volumeNumber = loc.volume_start;
-        si.etext_quality = ((Number) s.get("etext_quality")).doubleValue();
+        if (s.get("etext_quality") != null)
+            si.etext_quality = ((Number) s.get("etext_quality")).doubleValue();
         si.precision = loc.precision;
         si.start_page_num = loc.page_start;
         
