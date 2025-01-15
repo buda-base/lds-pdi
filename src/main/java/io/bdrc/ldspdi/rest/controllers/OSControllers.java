@@ -271,6 +271,8 @@ public class OSControllers {
         } else if (id.startsWith("VE")) {
             // Query by etext_vol field
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
+        } else if (id.startsWith("IE")) {
+            boolQuery.must(QueryBuilders.termQuery("etext_instance", id));
         } else {
             return null;
         }
@@ -539,16 +541,13 @@ public class OSControllers {
             return ResponseEntity.notFound().build();
         }
         si = snippet_for_loc(loc);
-        if (si == null) {
-            si = new Snippet_info();
-            si.ut = null;
-            si.etext_vol = null;
-            si.etext_instance = loc.ieLname;
-            si.volumeNumber = loc.volume_start;
-            si.etext_quality = null;
-            si.precision = 0;
-            si.start_page_num = 0;
+        if (si == null && loc.ieLname != null) {
+            si = snippet_direct(loc.ieLname);
+            if (si != null)
+                si.precision = 0;
         }
+        if (si == null)
+            return ResponseEntity.notFound().build();
         return ResponseEntity.ok(si);
     }
 
