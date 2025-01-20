@@ -69,7 +69,7 @@ public class AnnotationCollectionEndpoint {
         }
     }
 
-    @GetMapping("/{res}")
+    @GetMapping("/{res:[^.]+}")
     // whole collections (no subset)
     public ResponseEntity<StreamingResponseBody> getWholeCollection(@PathVariable("res") final String res,
             @RequestHeader(value = "Accept", required = false) final String accept,
@@ -95,7 +95,7 @@ public class AnnotationCollectionEndpoint {
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), "Choice");
     }
 
-    @GetMapping("/{res}.{ext}")
+    @GetMapping("/{res}.{ext:[a-zA-Z0-9]+}")
     public ResponseEntity<StreamingResponseBody> getWholeCollectionSuffix(@PathVariable("res") final String res,
             @PathVariable("ext") final String ext, @RequestHeader(value = "Prefer", required = false) final String preferHeader,
             HttpServletRequest request, HttpServletResponse response) throws RestException {
@@ -103,7 +103,7 @@ public class AnnotationCollectionEndpoint {
         log.info("Call to getWholeCollectionSuffix() with URL: {}", request.getServletPath());
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationUtils.mediaTypeChoiceResponse(request);
+            throw new RestException(404, new LdsError(LdsError.WRONG_MT_ERR).setContext(ext));
         final String prefixedCollectionRes = AnnotationEndpoint.ANC_PREFIX_SHORT + ':' + res;
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
@@ -153,7 +153,7 @@ public class AnnotationCollectionEndpoint {
         }
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationUtils.mediaTypeChoiceResponse(request);
+            throw new RestException(404, new LdsError(LdsError.WRONG_MT_ERR).setContext(prefixedCollectionRes));
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, CollectionUtils.SubsetType.NONE, defaultRange,
                 prefixedCollectionRes);
         return getResponse(model, DocType.ANP, AnnotationEndpoint.ANC_PREFIX + res, mediaType, prefer, request.getServletPath(), null);
@@ -195,7 +195,7 @@ public class AnnotationCollectionEndpoint {
         final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationUtils.mediaTypeChoiceResponse(request);
+            throw new RestException(404, new LdsError(LdsError.WRONG_MT_ERR).setContext(prefixedCollectionRes));
         final Prefer prefer = getPrefer(preferHeader);
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
         return getResponse(model, DocType.ANC, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
@@ -246,7 +246,7 @@ public class AnnotationCollectionEndpoint {
         final String collectionAliasUri = AnnotationEndpoint.ANC_PREFIX + res + "/sub/" + subtype + "/" + subcoordinates;
         final MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null)
-            return AnnotationUtils.mediaTypeChoiceResponse(request);
+            throw new RestException(404, new LdsError(LdsError.WRONG_MT_ERR).setContext(prefixedCollectionRes));
         final Model model = CollectionUtils.getSubsetGraph(prefixedCollectionRes, prefer, fusekiUrl, subtype, subcoordinates, collectionAliasUri);
         return getResponse(model, DocType.ANP, collectionAliasUri, mediaType, prefer, request.getServletPath(), null);
     }
