@@ -111,7 +111,7 @@ public class AnnotationEndpoint {
         log.info("Call to getResourceGraphSuffix() with URL: {}", request.getServletPath());
         MediaType mediaType = BudaMediaTypes.getMimeFromExtension(ext);
         if (mediaType == null) {
-            return AnnotationUtils.mediaTypeChoiceResponse(request);
+            throw new RestException(404, new LdsError(LdsError.WRONG_MT_ERR).setContext(ext));
         }
         if ("jsonld".equals(ext)) {
             mediaType = BudaMediaTypes.MT_JSONLD_WA;

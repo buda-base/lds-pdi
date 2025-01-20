@@ -76,7 +76,8 @@ public class LdsError {
 	public final static int NO_GRAPH_ERR = 5010;
 	public final static int PARSE_ERR = 5011;
 	public final static int SPARQL_ERR = 5012;
-
+	public final static int WRONG_MT_ERR = 5013;
+	
 	public final static int ONT_URI_ERR = 5020;
 
 	public final static int JSON_ERR = 5030;

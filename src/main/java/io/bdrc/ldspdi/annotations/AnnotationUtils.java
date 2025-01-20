@@ -23,7 +23,7 @@ public class AnnotationUtils {
 
     public static ResponseEntity<StreamingResponseBody> mediaTypeChoiceResponse(HttpServletRequest request) throws RestException {
         final String html = Helpers.getMultiChoicesHtml(request.getServletPath(), true);
-        BodyBuilder bb = ResponseEntity.status(300);
+        BodyBuilder bb = ResponseEntity.status(300).header("Content-Type", "text/html");
         bb = setRespHeaders(bb, request.getServletPath(), null, "List", null, MediaType.TEXT_HTML, false);
         return bb.header("Content-Location", request.getRequestURI() + "choice?path=" + request.getServletPath()).body(StreamingHelpers.getStream(html));
     }
