@@ -23,6 +23,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +45,24 @@ import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.MultiMatchQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.script.ScriptType;
+import org.opensearch.script.Script;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.sort.ScriptSortBuilder;
+import org.opensearch.search.sort.SortOrder;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/")
 public class ReconciliationController {
@@ -52,6 +71,11 @@ public class ReconciliationController {
      * Implementation of the Reconciliation API
      * https://reconciliation-api.github.io/specs/0.1/
      */
+    
+    @Autowired
+    private RestHighLevelClient client;
+    
+    static final String index_name = ServiceConfig.getProperty("opensearchIndex");
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
     public static final EwtsConverter converter = new EwtsConverter();
@@ -101,11 +125,14 @@ public class ReconciliationController {
         @JsonProperty(value="name", required=true)
         public String name = null;
         
+        @JsonProperty(value="description", required=false)
+        public String description = null;
+        
         @JsonProperty(value="type", required=true)
         public List<String> type = null;
         
         @JsonProperty(value="score", required=true)
-        public Integer score = null;
+        public Double score = null;
         
         @JsonProperty(value="match", required=true)
         public Boolean match = null;
@@ -177,7 +204,7 @@ public class ReconciliationController {
         public final String serviceVersion = "0.1";
         
         @JsonProperty(value="batchSize")
-        public final Integer batchSize = 50;
+        public final Integer batchSize = 20;
         
         @JsonProperty(value="identifierSpace")
         public final String identifierSpace = "http://purl.bdrc.io/";
@@ -355,6 +382,186 @@ public class ReconciliationController {
             throws IOException {
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(service_en);
+    }
+    
+    public static String normalize_res(final Object os_value, final String langSuffix, final boolean toUni) {
+        if (os_value == null)
+            return "";
+        if (os_value instanceof String) {
+            if (toUni && "bo_x_ewts".equals(langSuffix))
+                return converter.toUnicode((String) os_value);
+            return (String) os_value;
+        }
+        if (os_value instanceof List<?>) {
+            List<?> list = (List<?>) os_value;
+            if (!list.isEmpty() && list.get(0) instanceof String) {
+                if (toUni && "bo_x_ewts".equals(langSuffix)) {
+                    List<String> converted_list = new ArrayList<>();
+                    for (final Object v : list) {
+                        converted_list.add(converter.toUnicode((String) v));
+                    }
+                    return String.join(", ", converted_list);
+                }
+                return String.join(", ", (List<String>) list);
+            }
+        }
+        return "";
+    }
+    
+    final static List<String> langSuffixes = Arrays.asList("bo_x_ewts", "en", "hani");
+    public static void addSourceToResult(final Map<String,Object> sourcemap, final Result res, final String type, final boolean toUni) {
+        // first, prefLabel
+        final List<String> otherLabels = new ArrayList<>();
+        res.description = "";
+        boolean mainLabelFound = false;
+        for (final String langSuffix : langSuffixes) {
+            final String field = "prefLabel_"+langSuffix;
+            if (sourcemap.containsKey(field)) {
+                String value = normalize_res(sourcemap.get(field), langSuffix, toUni);
+                if (!mainLabelFound) {
+                    res.name = value;
+                    mainLabelFound = true;
+                } else {
+                    otherLabels.add(value);
+                }
+            }
+        }
+        for (final String langSuffix : langSuffixes) {
+            final String field = "altLabel_"+langSuffix;
+            if (sourcemap.containsKey(field))
+                otherLabels.add(normalize_res(sourcemap.get(field), langSuffix, toUni));
+        }
+        if ("Person".equals(type)) {
+            // look at birthDate, deathDate, flourishedDate
+            boolean dateAdded = false;
+            if (sourcemap.containsKey("birthDate")) {
+                res.description += "b. "+sourcemap.get("birthDate");
+                dateAdded = true;
+            }
+            if (sourcemap.containsKey("deathDate")) {
+                if (dateAdded)
+                    res.description += ", ";
+                res.description += "d. "+sourcemap.get("deathDate");
+                dateAdded = true;
+            }
+            if (!dateAdded && sourcemap.containsKey("flourishedDate")) {
+                res.description += "fl. "+sourcemap.get("flourishedDate");
+                dateAdded = true;
+            }
+            if (dateAdded)
+                res.description += "\n";
+        }
+        if ("Version".equals(type)) {
+            // look at volumeNumber?
+            // seriesName_*, issueName,
+            boolean lineAdded = false;
+            if (sourcemap.containsKey("issueName")) {
+                lineAdded = true;
+                res.description += "Issue: "+sourcemap.get("issueName")+" ";
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "seriesName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += "In: "+normalize_res(sourcemap.get(field), langSuffix, toUni);
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // publisherName_*, creation_date, publisherLocation_*
+            lineAdded = false;
+            for (final String langSuffix : langSuffixes) {
+                final String field = "publisherName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (sourcemap.containsKey("creation_date")) {
+                lineAdded = true;
+                res.description += sourcemap.get("creation_date")+", ";
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "publisherName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // authorName_*, authorshipStatement_*, 
+            lineAdded = false;
+            for (final String langSuffix : langSuffixes) {
+                final String field = "authorName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "authorshipStatement_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // extent
+            if (sourcemap.containsKey("extent")) {
+                res.description += sourcemap.get("extent")+"\n";
+            }
+        }
+        res.description += "Other names: "+String.join(", ", otherLabels)+"\n";
+        // finally, add comment_* ?
+        
+    }
+    
+    public List<Result> getOsPersonResultsBo(String searchTerm) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index_name);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        
+        boolean isUni = isAllTibetanUnicode(searchTerm);
+        
+        searchTerm = normalize(searchTerm, "Person");
+        
+        // Build the main query
+        var boolQuery = QueryBuilders.boolQuery()
+            .must(QueryBuilders.boolQuery()
+                .should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts", searchTerm).boost(10.0f))
+                .should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(5.0f))
+                .should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts", searchTerm).boost(2.0f))
+                .should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(1.0f)))
+            .filter(QueryBuilders.termQuery("type", "Person"));
+
+        // Add script score
+        Script script = new Script(ScriptType.STORED, null, "bdrc-score", null);
+        var functionScoreQuery = QueryBuilders.scriptScoreQuery(boolQuery, script);
+        
+        searchSourceBuilder.query(functionScoreQuery);
+        
+        // Configure source inclusion
+        searchSourceBuilder.fetchSource(true);
+        
+        // Set size (adjust as needed)
+        searchSourceBuilder.size(20);
+        
+        searchRequest.source(searchSourceBuilder);
+        
+        // Execute search
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        
+        final List<Result> res = new ArrayList<>();
+        
+        for (var hit : searchResponse.getHits().getHits()) {
+            final Result r = new Result();
+            r.score = Double.valueOf(hit.getScore());
+            r.id = hit.getId();
+            addSourceToResult(hit.getSourceAsMap(), r, "Person", isUni);
+            res.add(r);
+        }
+        return res;
     }
     
     public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang, final String workId) {
@@ -633,9 +840,9 @@ public class ReconciliationController {
             }
             Statement scoreS = main.getProperty(entityScore);
             if (scoreS != null)
-                res.score = scoreS.getInt();
+                res.score = Double.valueOf(scoreS.getInt());
             else
-                res.score = 1;
+                res.score = 1.0;
             String name = getPrefLabel(m, main, lang);
             final String dateStr = getDateStrEdtf(m, main);
             if (dateStr != null) {
@@ -688,14 +895,14 @@ public class ReconciliationController {
                 otherMatchList.add(res);
             }
             Statement scoreS = main.getProperty(entityScore);
-            int baseScore = 1;
+            Double baseScore = 1.0;
             if (scoreS != null) {
-                baseScore = scoreS.getInt();
+                baseScore = Double.valueOf(scoreS.getInt());
             }
             // work have a score of 1 in many cases, we differentiate them through their lucene score
             scoreS = main.getProperty(luceneScore);
             if (scoreS != null) {
-                res.score = Math.round(baseScore*scoreS.getFloat());
+                res.score = baseScore*scoreS.getFloat();
             } else {
                 res.score = baseScore;
             }
