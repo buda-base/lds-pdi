@@ -536,7 +536,7 @@ public class ReconciliationController {
             .filter(QueryBuilders.termQuery("type", "Person"));
 
         // Add script score
-        Script script = new Script(ScriptType.STORED, null, "bdrc-score", null);
+        Script script = new Script(ScriptType.STORED, null, "bdrc-score", Collections.emptyMap());
         var functionScoreQuery = QueryBuilders.scriptScoreQuery(boolQuery, script);
         
         searchSourceBuilder.query(functionScoreQuery);
@@ -558,125 +558,14 @@ public class ReconciliationController {
             final Result r = new Result();
             r.score = Double.valueOf(hit.getScore());
             r.id = hit.getId();
+            r.type = person_types;
             addSourceToResult(hit.getSourceAsMap(), r, "Person", isUni);
             res.add(r);
         }
         return res;
     }
     
-    public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang, final String workId) {
-        String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
-                + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
-                + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
-                + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
-                + "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n"
-                + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
-                + "prefix text:  <http://jena.apache.org/text#>\n"
-                + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
-                + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
-                + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
-                + "construct {\n"
-                + "    ?bdrcres tmp:luceneScore ?sc ;\n"
-                + "       tmp:isMain true ;"
-                + "       tmp:idMatch ?idMatch ;"
-                + "       tmp:superMatch ?superMatch .\n"
-                + "    ?bdrcres ?resp ?reso .\n"
-                + "    ?bdrcres bdo:personEvent ?evt .\n"
-                + "    ?evt :eventWhen ?evtw ;\n"
-                + "         a ?evtType .\n"
-                + "} where {\n"
-                + "  {\n"
-                + "    {\n"
-                + "        (?name ?sc) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res bdo:personName ?name .\n"
-                + "    } union {\n"
-                + "        (?res ?sc) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res a :Person .\n"
-                + "    }\n"
-                + "\n"
-                + "    ?res owl:sameAs* ?bdrcres ."
-                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                + "            adm:status    bda:StatusReleased .\n"
-                + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                + "    ?bdrcres ?resp ?reso .\n"
-                + "  } union {\n"
-                + "    # get events\n"
-                + "    {\n"
-                + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res bdo:personName ?name .\n"
-                + "    } union {\n"
-                + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res a :Person .\n"
-                + "    }\n"
-                + "\n"
-                + "    ?res owl:sameAs* ?bdrcres ."
-                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                + "            adm:status    bda:StatusReleased .\n"
-                + "    ?bdrcres bdo:personEvent ?evt .\n"
-                + "    ?evt a ?evtType .\n"
-                + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
-                + "    ?evt :eventWhen ?evtw .\n";
-                if (worktitle != null) {
-                    res += "  } union {"
-                        + "    # get matches with work\n"
-                        + "    {\n"
-                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res bdo:personName ?name .\n"
-                        + "    } union {\n"
-                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res a :Person .\n"
-                        + "    }\n"
-                        + "    ?res owl:sameAs* ?bdrcres ."
-                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                        + "            adm:status    bda:StatusReleased ."
-                        + "    ?wa text:query ( bdo:skosLabels \"\\\""+worktitle+"\\\"\"@"+worktitle_lang+" ) .\n"
-                        + "    ?wa a :Work ;\n"
-                        + "        :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    ?resAdm adm:adminAbout ?wa .\n"
-                        + "    ?resAdm adm:status    bda:StatusReleased .\n"
-                        + "    BIND(true as ?superMatch)\n";
-                } else if (workId != null) {
-                    res += "  } union {\n"
-                        + "    # get matches with work\n"
-                        + "    {\n"
-                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res bdo:personName ?name .\n"
-                        + "    } union {\n"
-                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res a :Person .\n"
-                        + "    }\n"
-                        + "    ?res owl:sameAs* ?bdrcres ."
-                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                        + "            adm:status    bda:StatusReleased ."
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?superMatch)\n"
-                        + "  } union {\n"
-                        // add creators of reconciled work
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?idMatch)\n"
-                        + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                        + "    ?bdrcres ?resp ?reso .\n"
-                        + "  } union {\n"
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?idMatch)\n"
-                        + "    ?bdrcres bdo:personEvent ?evt .\n"
-                        + "    ?evt a ?evtType .\n"
-                        + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
-                        + "    ?evt :eventWhen ?evtw .\n";
-                }
-                res += "  }\n"
-                + "}";
-                return res;
-    }
-    
+
     public static String getWorkQuery(final String name, final String lang, final String personName, final String personName_lang, final String personId) {
         String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
@@ -756,57 +645,7 @@ public class ReconciliationController {
         + "}";
         return res;
     }
-    
-    public static String getDateStrEdtf(final Model m, final Resource person) {
-        // TODO: handle century, see https://www.loc.gov/marc/bibliographic/bdx00.html for format
-        String birthStr = null;
-        String deathStr = null;
-        String floruitStr = null;
-        StmtIterator si = person.listProperties(MarcExport.personEvent);
-        while (si.hasNext()) {
-            final Resource event = si.next().getResource();
-            final Resource eventType = event.getPropertyResourceValue(RDF.type);
-            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    birthStr = event.getProperty(MarcExport.eventWhen).getLiteral().getLexicalForm();
-                }
-            }
-            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    deathStr = event.getProperty(MarcExport.eventWhen).getString();
-                }
-            }
-            if (eventType != null && eventType.getLocalName().equals("PersonFlourished")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    floruitStr = event.getProperty(MarcExport.eventWhen).getString();
-                }
-            }
-        }
-        if (birthStr != null || deathStr != null) {
-            String dateStr = "";
-            // There should be a coma at the end, except when the date ends with a hyphen.
-            if (birthStr == null) {
-                if (deathStr != null) {
-                    dateStr += "d. "+deathStr;
-                }
-            } else {
-                dateStr += birthStr+"-";
-                if (deathStr != null) {
-                    dateStr += deathStr;
-                }
-            }
-            return dateStr;
-        }
-        if (floruitStr != null) {
-            if (floruitStr.length() > 3)
-                return floruitStr;
-            return floruitStr+"XX";
-        }
-        final Statement centuryS = person.getProperty(associatedCentury);
-        if (centuryS != null)
-            return String.valueOf(centuryS.getInt()-1)+"XX";
-        return null;
-    }
+   
     
     public static final Property isMain = ResourceFactory.createProperty(MarcExport.TMP + "isMain");
     public static final Property entityScore = ResourceFactory.createProperty(MarcExport.TMP + "entityScore");
@@ -818,48 +657,6 @@ public class ReconciliationController {
     public static final List<String> person_types = Arrays.asList("Person");
     public static final List<String> work_types = Arrays.asList("Work");
     
-    public static List<Result> personModelToResult(final Model m, final String lang) {
-        final List<Result> resList = new ArrayList<>();
-        final List<Result> superMatchList = new ArrayList<>();
-        final List<Result> idMatchList = new ArrayList<>();
-        final List<Result> otherMatchList = new ArrayList<>();
-        final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
-        while (mainIt.hasNext()) {
-            final Result res = new Result();
-            res.type = person_types;
-            final Resource main = mainIt.next();
-            res.id = main.getLocalName();
-            res.match = false;
-            if (main.hasProperty(superMatch)) {
-                res.match = true;
-                superMatchList.add(res);
-            } else if (main.hasProperty(idMatch)) {
-                idMatchList.add(res);
-            } else {
-                otherMatchList.add(res);
-            }
-            Statement scoreS = main.getProperty(entityScore);
-            if (scoreS != null)
-                res.score = Double.valueOf(scoreS.getInt());
-            else
-                res.score = 1.0;
-            String name = getPrefLabel(m, main, lang);
-            final String dateStr = getDateStrEdtf(m, main);
-            if (dateStr != null) {
-                name += " ("+dateStr+")";
-                res.name = name;
-                continue;
-            }
-            res.name = name;
-        }
-        Collections.sort(superMatchList, Collections.reverseOrder());
-        Collections.sort(idMatchList, Collections.reverseOrder());
-        Collections.sort(otherMatchList, Collections.reverseOrder());
-        resList.addAll(superMatchList);
-        resList.addAll(idMatchList);
-        resList.addAll(otherMatchList);
-        return resList;
-    }
     
     public static final String getPrefLabel(final Model m, final Resource main, final String lang) {
         Statement nameS;
@@ -988,26 +785,8 @@ public class ReconciliationController {
         return null;
     }
     
-    public static void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) {
-        final String normalized = normalize(q.query, "Person");
-        String workTitle = null;
-        String workTitle_lang = null;
-        String workId = null;
-        final Object value = getFirstPropertyValue(q, "authorOf");
-        if (value instanceof String) {
-            workTitle = (String) value;
-            workTitle_lang = guessLang(workTitle);
-        } else if (value instanceof Map) {
-            workId = ((Map<String,String>)value).getOrDefault("id", null);
-        }
-        final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang, workId);
-        //System.out.println(qstr);
-        final Model model;
-        RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
-        model = rvf.queryConstruct(qstr);
-        rvf.close();
-        //model.write(System.out, "TTL");
-        final List<Result> resList = personModelToResult(model, lang);
+    public void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) throws IOException {
+        final List<Result> resList =  getOsPersonResultsBo(q.query);
         final Integer limit = q.limit;
         if (limit != null && limit < resList.size()) {
             res.put(qid, new Results(resList.subList(0, limit)));
@@ -1044,7 +823,7 @@ public class ReconciliationController {
         }
     }
     
-    public static Map<String,Results> runQueries(final Map<String,Query> queryBatch, final String lang) {
+    public Map<String,Results> runQueries(final Map<String,Query> queryBatch, final String lang) throws IOException {
         final Map<String,Results> res = new HashMap<>();
         for (final Entry<String,Query> e : queryBatch.entrySet()) {
             final Query q = e.getValue();
