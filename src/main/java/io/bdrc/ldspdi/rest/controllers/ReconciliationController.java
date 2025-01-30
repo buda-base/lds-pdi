@@ -49,11 +49,14 @@ import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.BoolQueryBuilder;
 import org.opensearch.index.query.MultiMatchQueryBuilder;
 import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.script.ScriptType;
 import org.opensearch.script.Script;
 import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightField;
 import org.opensearch.search.sort.ScriptSortBuilder;
 import org.opensearch.search.sort.SortOrder;
 
@@ -248,7 +251,7 @@ public class ReconciliationController {
         service_en.name = "Buddhist Digital Resource Center";
         service_en.defaultTypes = new ArrayList<>();
         service_en.defaultTypes.add(new DefaultType("person", "Person"));
-        service_en.defaultTypes.add(new DefaultType("work", "Work"));
+        service_en.defaultTypes.add(new DefaultType("version", "Version"));
     }
     
     public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
@@ -363,6 +366,8 @@ public class ReconciliationController {
     }
     
     public static String normalize(final String orig, final String type) {
+        if (orig == null)
+            return null;
         String repl = orig;
         if (isAllTibetanUnicode(orig))
             repl = converter.toWylie(orig);
@@ -477,12 +482,12 @@ public class ReconciliationController {
                     res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
                 }
             }
-            if (sourcemap.containsKey("creation_date")) {
+            if (sourcemap.containsKey("publicationDate")) {
                 lineAdded = true;
-                res.description += sourcemap.get("creation_date")+", ";
+                res.description += sourcemap.get("publicationDate")+", ";
             }
             for (final String langSuffix : langSuffixes) {
-                final String field = "publisherName_"+langSuffix;
+                final String field = "publisherLocation_"+langSuffix;
                 if (sourcemap.containsKey(field)) {
                     lineAdded = true;
                     res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
@@ -564,7 +569,95 @@ public class ReconciliationController {
         }
         return res;
     }
-    
+
+    public List<Result> getOsVersionResultsBo(String searchTerm, String publisherName) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index_name);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        
+        boolean isUni = isAllTibetanUnicode(searchTerm);
+        
+        searchTerm = normalize(searchTerm, "Version");
+        
+        publisherName = normalize(publisherName, "Version");
+        
+        // Create the main bool query
+        BoolQueryBuilder mainQuery = QueryBuilders.boolQuery();
+
+        // Add must_not for inRootInstance
+        mainQuery.mustNot(QueryBuilders.existsQuery("inRootInstance"));
+        
+        // Add should clauses for title search in both fields (must match at least one)
+        BoolQueryBuilder titleQuery = QueryBuilders.boolQuery();
+        titleQuery.should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts", searchTerm).boost(10.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(5.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts", searchTerm).boost(2.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(1.0f));
+        titleQuery.minimumShouldMatch(1);
+        mainQuery.must(titleQuery);
+        mainQuery.filter(QueryBuilders.termQuery("type", "Instance"));
+
+        // Add optional publisher match
+        if (publisherName != null && !publisherName.trim().isEmpty()) {
+            mainQuery.should(QueryBuilders.matchPhraseQuery("publisherName_bo_x_ewts", publisherName).boost(1000f));
+            mainQuery.should(QueryBuilders.matchPhraseQuery("publisherName_en", publisherName).boost(1000f));
+        }
+        
+        
+        // Create highlight builder
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("publisherName_bo_x_ewts")
+                       .requireFieldMatch(true)
+                       //.highlightQuery(QueryBuilders.matchPhraseQuery("publisherName_bo_x_ewts", publisherName))
+                       .preTags("<em>")
+                       .postTags("</em>");
+        
+        highlightBuilder.field("publisherName_en")
+                        .requireFieldMatch(true)
+                        //.highlightQuery(QueryBuilders.matchPhraseQuery("publisherName_en", publisherName))
+                        .preTags("<em>")
+                        .postTags("</em>");
+
+        // Add script score
+        Script script = new Script(ScriptType.STORED, null, "bdrc-score", Collections.emptyMap());
+        var functionScoreQuery = QueryBuilders.scriptScoreQuery(mainQuery, script);
+        searchSourceBuilder.query(mainQuery);
+        searchSourceBuilder.highlighter(highlightBuilder);
+        searchSourceBuilder.query(functionScoreQuery);
+        
+        // Configure source inclusion
+        searchSourceBuilder.fetchSource(true);
+        
+        // Set size (adjust as needed)
+        searchSourceBuilder.size(20);
+        
+        searchRequest.source(searchSourceBuilder);
+        
+        // Execute search
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        
+        final List<Result> res = new ArrayList<>();
+        
+        for (var hit : searchResponse.getHits().getHits()) {
+            final Result r = new Result();
+            r.score = Double.valueOf(hit.getScore());
+            r.id = hit.getId();
+            r.type = version_types;
+            boolean matchesPublisher = false;
+            if (publisherName != null && !publisherName.trim().isEmpty()) {
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                HighlightField publisherHighlight = highlightFields.get("publisherName_bo_x_ewts");
+                matchesPublisher = publisherHighlight != null && publisherHighlight.fragments().length > 0;
+                if (!matchesPublisher) {
+                    HighlightField publisherEnHighlight = highlightFields.get("publisherName_en");
+                    matchesPublisher = publisherEnHighlight != null && publisherEnHighlight.fragments().length > 0;
+                }
+                r.match = matchesPublisher;
+            }
+            addSourceToResult(hit.getSourceAsMap(), r, "Version", isUni);
+            res.add(r);
+        }
+        return res;
+    }
 
     public static String getWorkQuery(final String name, final String lang, final String personName, final String personName_lang, final String personId) {
         String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
@@ -655,6 +748,7 @@ public class ReconciliationController {
     public static final Property idMatch = ResourceFactory.createProperty(MarcExport.TMP + "idMatch");
     
     public static final List<String> person_types = Arrays.asList("Person");
+    public static final List<String> version_types = Arrays.asList("Version");
     public static final List<String> work_types = Arrays.asList("Work");
     
     
@@ -795,6 +889,23 @@ public class ReconciliationController {
         }
     }
     
+    public void fillResultsForVersions(final Map<String,Results> res, final String qid, final Query q, final String lang) throws IOException {
+        final Object value = getFirstPropertyValue(q, "hasPublisher");
+        String publisherName = null;
+        if (value instanceof String) {
+            publisherName = (String) value;
+        } else {
+            log.error("got map value for publisher, ignoring");
+        }
+        final List<Result> resList =  getOsVersionResultsBo(q.query, publisherName);
+        final Integer limit = q.limit;
+        if (limit != null && limit < resList.size()) {
+            res.put(qid, new Results(resList.subList(0, limit)));
+        } else {
+            res.put(qid, new Results(resList));
+        }
+    }
+    
     public static void fillResultsForWorks(final Map<String,Results> res, final String qid, final Query q, final String lang) {
         final String normalized = normalize(q.query, "Work");
         String personName = null;
@@ -833,6 +944,9 @@ public class ReconciliationController {
             case "Person":
                 fillResultsForPersons(res, e.getKey(), q, lang);
                 break;
+            case "Version":
+                fillResultsForVersions(res, e.getKey(), q, lang);
+                break;
             case "Work":
                 fillResultsForWorks(res, e.getKey(), q, lang);
                 break;
@@ -854,8 +968,9 @@ public class ReconciliationController {
     
     final static Map<String,SuggestReponse> propertiesSuggest = new HashMap<>();
     static {
-        propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
-        propertiesSuggest.put("authorof", new SuggestReponse("author of", "use on person data to connect it with title data", "authorOf"));
+        //propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
+        //propertiesSuggest.put("publisherof", new SuggestReponse("publisher of", "use on publisher name for versions", "publisherOf"));
+        propertiesSuggest.put("haspublisher", new SuggestReponse("has publisher", "use to match publisher name on versions", "hasPublisher"));
     }
     
     @GetMapping(path = "/reconciliation/suggest/properties/")
