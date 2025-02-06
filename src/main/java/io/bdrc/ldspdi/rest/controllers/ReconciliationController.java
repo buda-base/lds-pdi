@@ -45,6 +45,8 @@ import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 
+import org.opensearch.action.get.GetRequest;
+import org.opensearch.action.get.GetResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.client.RequestOptions;
@@ -79,6 +81,8 @@ public class ReconciliationController {
     private RestHighLevelClient client;
     
     static final String index_name = ServiceConfig.getProperty("opensearchIndex");
+    
+    static final String baseUrl = "https://ldspdi-dev.bdrc.io"; // TODO: hack, to change
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
     public static final EwtsConverter converter = new EwtsConverter();
@@ -169,7 +173,7 @@ public class ReconciliationController {
         public final Integer height = 400;
         
         @JsonProperty(value="url", required=true)
-        public final String url = "https://library.bdrc.io/preview/bdr:{{id}}";
+        public final String url = baseUrl+"/reconciliation/preview/{{id}}";
     }
     
     public final static class View {
@@ -179,7 +183,7 @@ public class ReconciliationController {
     
     public static final class PropertySuggestService {
         @JsonProperty(value="service_url")
-        public final String service_url = "https://ldspdi.bdrc.io";
+        public final String service_url = baseUrl;
         
         @JsonProperty(value="service_path")
         public final String service_path = "/reconciliation/suggest/properties/";
@@ -964,6 +968,47 @@ public class ReconciliationController {
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
+    }
+    
+    public Map<String, Object> getDocumentSourceById(final String documentId) throws IOException {
+        GetResponse response = client.get(
+            new GetRequest(index_name, documentId), 
+            RequestOptions.DEFAULT
+        );
+        if (!response.isExists() || response.isSourceEmpty())
+            return null;
+        return response.getSource();
+    }
+    
+    public static String resultToHtml(final Result r, final String type) {
+        String res = "<html>\n"
+                + "   <head><meta charset=\"utf-8\" /></head>\n"
+                + "   <body>\n"
+                + "      <h1>"+r.name+"</h1>\n";
+        if ("Version".equals(type)) {
+            res += "         <img src=\"https://iiif.bdrc.io/bdr:"+r.id+"::thumbnail/full/!1000,130/0/default.jpg\"/>";
+        }
+        res    += "      <p>"+r.description.replaceAll("\n", "<br/>")+"</p>\n"
+                + "   </body>\n"
+                + "</html>";
+        return res;
+    }
+    
+    @GetMapping(path = "/reconciliation/preview/{id}", produces = "text/html")
+    public ResponseEntity<String> preview(@PathVariable("id") String id) throws IOException {
+        //System.out.println(jsonStr);
+        id = id.strip();
+        final Map<String,Object> source = getDocumentSourceById(id);
+        if (source == null)
+            return ResponseEntity.status(404).body("not found");
+        final String type = id.startsWith("P") ? "Person" : "Version";
+        // weird shortcut
+        final Result r = new Result();
+        r.id = id;
+        addSourceToResult(source, r, type, true); // the true here is a bit uncertain...
+        final String html = resultToHtml(r, type);
+        return ResponseEntity.status(200).header("Content-Type", "text/html")
+                .body(html);
     }
     
     final static Map<String,SuggestReponse> propertiesSuggest = new HashMap<>();
