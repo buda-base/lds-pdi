@@ -256,6 +256,7 @@ public class ReconciliationController {
         service_en.defaultTypes = new ArrayList<>();
         service_en.defaultTypes.add(new DefaultType("person", "Person"));
         service_en.defaultTypes.add(new DefaultType("version", "Version"));
+        service_en.defaultTypes.add(new DefaultType("work", "Work"));
     }
     
     public final static TypeReference<Map<String,Query>> QueryBatchTR = new TypeReference<Map<String,Query>>(){};
@@ -1013,7 +1014,7 @@ public class ReconciliationController {
     
     final static Map<String,SuggestReponse> propertiesSuggest = new HashMap<>();
     static {
-        //propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
+        propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
         //propertiesSuggest.put("publisherof", new SuggestReponse("publisher of", "use on publisher name for versions", "publisherOf"));
         propertiesSuggest.put("haspublisher", new SuggestReponse("has publisher", "use to match publisher name on versions", "hasPublisher"));
     }
