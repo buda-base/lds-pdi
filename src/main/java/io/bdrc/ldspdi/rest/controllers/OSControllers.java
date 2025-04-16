@@ -222,6 +222,11 @@ public class OSControllers {
                 .must(QueryBuilders.rangeQuery("etext_pages.cend").gte(cstart))
                 .must(QueryBuilders.rangeQuery("etext_pages.cstart").lte(cend));
         boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+        
+        BoolQueryBuilder etextSpansQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("etext_spans.cend").gte(cstart))
+                .must(QueryBuilders.rangeQuery("etext_spans.cstart").lte(cend));
+        boolQuery.must(QueryBuilders.nestedQuery("etext_spans", etextSpansQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
 
         // Nested queries for chunks
         BoolQueryBuilder chunksQuery = QueryBuilders.boolQuery()
@@ -383,6 +388,11 @@ public class OSControllers {
                 .must(QueryBuilders.rangeQuery("etext_pages.pnum").gte(loc.page_start))
                 .must(QueryBuilders.rangeQuery("etext_pages.pnum").lte(loc.page_start+5));
         boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+     // Nested queries for etext_pages
+        BoolQueryBuilder etextSpansQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("etext_spans.pnum").gte(loc.page_start))
+                .must(QueryBuilders.rangeQuery("etext_spans.pnum").lte(loc.page_start+5));
+        boolQuery.must(QueryBuilders.nestedQuery("etext_spans", etextSpansQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
         sourceBuilder.sort("etextNumber", SortOrder.ASC);
 
         // Limit the number of results to 2
