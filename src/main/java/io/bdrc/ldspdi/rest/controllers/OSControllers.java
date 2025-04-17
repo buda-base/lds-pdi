@@ -217,16 +217,18 @@ public class OSControllers {
             boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
         }
 
-        // Nested queries for etext_pages
-        BoolQueryBuilder etextPagesQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("etext_pages.cend").gte(cstart))
-                .must(QueryBuilders.rangeQuery("etext_pages.cstart").lte(cend));
-        boolQuery.must(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
-        
-        BoolQueryBuilder etextSpansQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("etext_spans.cend").gte(cstart))
-                .must(QueryBuilders.rangeQuery("etext_spans.cstart").lte(cend));
-        boolQuery.must(QueryBuilders.nestedQuery("etext_spans", etextSpansQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+	     // Use should instead of must for the nested queries
+	     // Nested queries for etext_pages
+	     BoolQueryBuilder etextPagesQuery = QueryBuilders.boolQuery()
+	             .must(QueryBuilders.rangeQuery("etext_pages.cend").gte(cstart))
+	             .must(QueryBuilders.rangeQuery("etext_pages.cstart").lte(cend));
+	     boolQuery.should(QueryBuilders.nestedQuery("etext_pages", etextPagesQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+	
+	     // Nested queries for etext_spans
+	     BoolQueryBuilder etextSpansQuery = QueryBuilders.boolQuery()
+	             .must(QueryBuilders.rangeQuery("etext_spans.cend").gte(cstart))
+	             .must(QueryBuilders.rangeQuery("etext_spans.cstart").lte(cend));
+	     boolQuery.should(QueryBuilders.nestedQuery("etext_spans", etextSpansQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
 
         // Nested queries for chunks
         BoolQueryBuilder chunksQuery = QueryBuilders.boolQuery()

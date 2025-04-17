@@ -82,7 +82,7 @@ public class ReconciliationController {
     
     static final String index_name = ServiceConfig.getProperty("opensearchIndex");
     
-    static final String baseUrl = "https://ldspdi-dev.bdrc.io"; // TODO: hack, to change
+    static final String baseUrl = "http://localhost:8080"; // TODO: hack, to change
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
     public static final EwtsConverter converter = new EwtsConverter();
@@ -964,7 +964,7 @@ public class ReconciliationController {
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
-        //System.out.println(jsonStr);
+        System.out.println(jsonStr);
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
