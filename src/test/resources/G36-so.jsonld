@@ -1,0 +1,30 @@
+{
+  "@context" : "https://schema.org",
+  "@id" : "http://purl.bdrc.io/resource/G36",
+  "@type" : "Place",
+  "identifier" : [ "bdr:G36", "http://purl.bdrc.io/resource/G36" ],
+  "name" : "དཔལ་སྤུངས་དགོན་པ།",
+  "alternateName" : [ {
+    "@value" : "dpal spungs dgon pa/",
+    "@language" : "bo-Latn"
+  }, "八帮寺", "སྡེ་དགེ་དཔལ་སྤུངས་དགོན་པ།", {
+    "@value" : "sde dge dpal spungs dgon pa/",
+    "@language" : "bo-Latn"
+  }, "ཐུབ་བསྟན་ཆོས་འཁོར་གླིང་།", {
+    "@value" : "thub bstan chos 'khor gling /",
+    "@language" : "bo-Latn"
+  }, "babang si", "དཔལ་སྤུངས་ཐུབ་བསྟན་ཆོས་འཁོར་གླིང་།", {
+    "@value" : "dpal spungs thub bstan chos 'khor gling /",
+    "@language" : "bo-Latn"
+  }, "八蚌寺", "དཔལ་སྤུངས་ཆོས་འཁོར་གླིང་།", {
+    "@value" : "dpal spungs chos 'khor gling /",
+    "@language" : "bo-Latn"
+  } ],
+  "sameAs" : [ "http://www.wikidata.org/entity/Q2068342", "https://sakyaresearch.org/places/369" ],
+  "geo" : {
+    "@type" : "GeoCoordinates",
+    "latitude" : 31.65,
+    "longitude" : 98.78333
+  },
+  "foundingDate" : "1717"
+}

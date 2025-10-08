@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -57,6 +58,68 @@ class SchemaOrgTest {
         }
     }
 
+    @Test
+    void test_P1583_jsonld_matches_expected() throws Exception {
+        Path ttlPath = resolvePath("MW12827-so.ttl");
+        Path expectedJsonPath = resolvePath("P1583-so.jsonld");
+
+        // 1) Load RDF (TTL) into Jena
+        Model model = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(model, ttlPath.toUri().toString(), Lang.TURTLE);
+
+        // 2) Locate the main resource (MW12827)
+        String uri = "http://purl.bdrc.io/resource/P1583";
+        Resource main = model.getResource(uri);
+
+        // 3) Produce JSON-LD via your exporter
+        JsonNode actual = SchemaOrgJsonLDExport.getObject(model, main); // static; adjust if your method is instance-based
+
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
+        // 4) Load expected JSON-LD
+        JsonNode expected = MAPPER.readTree(Files.readAllBytes(expectedJsonPath));
+        
+
+        // 5) Canonicalize both and compare
+        JsonNode canExpected = canonicalize(expected);
+        JsonNode canActual   = canonicalize(actual);
+
+        if (!canExpected.equals(canActual)) {
+            String msg = diffMessage(canExpected, canActual);
+            Assertions.fail("Actual JSON-LD does not match expected.\n" + msg);
+        }
+    }
+
+    @Test
+    void test_G36_jsonld_matches_expected() throws Exception {
+        Path ttlPath = resolvePath("MW12827-so.ttl");
+        Path expectedJsonPath = resolvePath("G36-so.jsonld");
+
+        // 1) Load RDF (TTL) into Jena
+        Model model = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(model, ttlPath.toUri().toString(), Lang.TURTLE);
+
+        // 2) Locate the main resource (MW12827)
+        String uri = "http://purl.bdrc.io/resource/G36";
+        Resource main = model.getResource(uri);
+
+        // 3) Produce JSON-LD via your exporter
+        JsonNode actual = SchemaOrgJsonLDExport.getObject(model, main); // static; adjust if your method is instance-based
+
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
+        // 4) Load expected JSON-LD
+        JsonNode expected = MAPPER.readTree(Files.readAllBytes(expectedJsonPath));
+        
+
+        // 5) Canonicalize both and compare
+        JsonNode canExpected = canonicalize(expected);
+        JsonNode canActual   = canonicalize(actual);
+
+        if (!canExpected.equals(canActual)) {
+            String msg = diffMessage(canExpected, canActual);
+            Assertions.fail("Actual JSON-LD does not match expected.\n" + msg);
+        }
+    }
+    
     /* -----------------------------------------------------------
        Helpers
        ----------------------------------------------------------- */

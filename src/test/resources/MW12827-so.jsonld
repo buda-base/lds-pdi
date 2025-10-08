@@ -1,1 +1,32 @@
-{}
+{
+  "@context" : "https://schema.org",
+  "@id" : "http://purl.bdrc.io/resource/MW12827",
+  "@type" : "BookSeries",
+  "identifier" : [ "bdr:MW12827", "http://purl.bdrc.io/resource/MW12827" ],
+  "name" : "སྙིང་ཐིག་ཡ་བཞི།",
+  "alternateName" : [ {
+    "@value" : "snying thig ya bzhi/",
+    "@language" : "bo-Latn"
+  } ],
+  "inLanguage" : [ "bo" ],
+  "license" : "https://creativecommons.org/publicdomain/mark/1.0/",
+  "publisher" : {
+    "@type" : "Organization",
+    "name" : "Taklung Tsetrul Rinpoche Pema Wangyal, Orgyan Kunsang",
+    "address" : "Darjeeling, W.B"
+  },
+  "author" : [ {
+    "@type" : "Person",
+    "@id" : "http://purl.bdrc.io/resource/P1583",
+    "identifier" : [ "bdr:P1583", "http://purl.bdrc.io/resource/P1583" ],
+    "name" : "ཀློང་ཆེན་རབ་འབྱམས་པ་དྲི་མེད་འོད་ཟེར།",
+    "alternateName" : [ {
+      "@value" : "klong chen rab 'byams pa dri med 'od zer/",
+      "@language" : "bo-Latn"
+    }, "隆钦热降巴·赤墨俄色" ],
+    "sameAs" : [ "http://viaf.org/viaf/29615126", "http://www.wikidata.org/entity/Q1708503", "http://viaf.org/viaf/5817155566441013380003", "http://api.treasuryoflives.org/resource/TOLP2882" ],
+    "birthDate" : "1308",
+    "deathDate" : "1364"
+  } ],
+  "datePublished" : "{1975,1976}"
+}

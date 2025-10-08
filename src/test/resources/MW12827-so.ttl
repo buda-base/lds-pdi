@@ -140,3 +140,32 @@ bdr:MW12827  rdf:type                bdo:Instance;
         bdo:script                   bdr:ScriptDbuCan;
         tmp:thumbnailIIIFService     <https://iiif.bdrc.io/bdr:I2061::020610001.tiff>;
         skos:prefLabel               "snying thig ya bzhi/"@bo-x-ewts .
+
+bdr:EV0AA9FD2B4F1871F7
+   a             bdo:PlaceFounded ;
+   bdo:associatedTradition  bdr:TraditionKarmaKagyu ;
+   bdo:eventWhen  "1727"^^<http://id.loc.gov/datatypes/edtf/EDTF> ;
+   bdo:onYear    "1727"^^xsd:gYear .
+
+bdr:EVBCC87A0C7BE6A2B0
+   a             bdo:PlaceFounded ;
+   bdo:eventWhen  "1717"^^<http://id.loc.gov/datatypes/edtf/EDTF> ;
+   bdo:eventWho  bdr:P956 ;
+   bdo:onYear    "1717"^^xsd:gYear .
+
+bdr:G36  a       bdo:Place ;
+   skos:altLabel  "dpal spungs chos 'khor gling /"@bo-x-ewts , "dpal spungs thub bstan chos 'khor gling /"@bo-x-ewts , "sde dge dpal spungs dgon pa/"@bo-x-ewts , "thub bstan chos 'khor gling /"@bo-x-ewts , "八蚌寺"@zh-hans , "babang si"@zh-latn-pinyin-x-ndia ;
+   skos:prefLabel  "dpal spungs dgon pa/"@bo-x-ewts , "八帮寺"@zh-hans ;
+   bf:identifiedBy  bdr:IDF2E17B4637C8B594 ;
+   bdo:associatedTradition  bdr:TraditionKarmaKagyu ;
+   bdo:note      bdr:NT20B81DAF88B81713 , bdr:NT7BC655A0277C95F6 , bdr:NT992A6B94E5180567 , bdr:NTCA94FC3B77A9900C , bdr:NTDEDD3FE261C1F9DE ;
+   bdo:placeContains  bdr:G37 , bdr:G3JT12497 ;
+   bdo:placeEvent  bdr:EV0AA9FD2B4F1871F7 , bdr:EVBCC87A0C7BE6A2B0 ;
+   bdo:placeGonpaPerEcumen  "8.26" ;
+   bdo:placeIsNear  bdr:G37 , bdr:G3JT12602 ;
+   bdo:placeLat  31.65000 ;
+   bdo:placeLocatedIn  bdr:G1539 ;
+   bdo:placeLong  98.78333 ;
+   bdo:placeType  bdr:PT0037 ;
+   tmp:entityScore  51 ;
+   owl:sameAs    wd:Q2068342 , srcpl:369 .
