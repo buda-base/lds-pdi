@@ -77,6 +77,7 @@ import io.bdrc.ldspdi.exceptions.LdsError;
 import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.export.MarcExport;
 import io.bdrc.ldspdi.export.MockTbrcXmlExport;
+import io.bdrc.ldspdi.export.SchemaOrgJsonLDExport;
 import io.bdrc.ldspdi.export.TxtEtextExport;
 import io.bdrc.ldspdi.ontology.service.core.OntClassModel;
 import io.bdrc.ldspdi.ontology.service.core.OntData;
@@ -377,7 +378,10 @@ public class PublicDataController {
         Helpers.setCacheControl(response, "public");
         MediaType mediaType = BudaMediaTypes.selectVariant(format, BudaMediaTypes.resVariants);
         if (res.contains(".")) {
+        	
             String[] parts = res.split("\\.");
+            if (res.endsWith(".schema.jsonld"))
+        		return getFormattedResourceGraph(parts[0], "schema.jsonld", startChar, endChar, prefLangs, fusekiUrl, style, response, request);
             return getFormattedResourceGraph(parts[0], parts[1], startChar, endChar, prefLangs, fusekiUrl, style, response, request);
         }
         String prefixedRes = RES_PREFIX_SHORT + res;
@@ -459,6 +463,9 @@ public class PublicDataController {
         log.info("Call to getFormattedResourceGraph() res {}, ext {}, style {}", res, ext, style);
         final String prefixedRes = RES_PREFIX_SHORT + res;
         final String fullResURI = GRAPH_PREFIX_FULL + res;
+        final boolean JsonLDSchemaMode = "schema.jsonld".equals(ext);
+        if (JsonLDSchemaMode)
+        	ext = "jsonld";
         MediaType media = BudaMediaTypes.getMimeFromExtension(ext);
         log.info("Call to getFormattedResourceGraph() path is {}", request.getServletPath());
         // dirty hack
@@ -491,6 +498,8 @@ public class PublicDataController {
                     Integer.parseInt(endChar), res, prefLangs);
         else if (ext.equals("xml") && "tbrc-ia".equals(style))
             return MockTbrcXmlExport.getResponse(RES_PREFIX+res);
+        else if (JsonLDSchemaMode)
+        	return SchemaOrgJsonLDExport.getResponse(RES_PREFIX+res);
         final Model model = QueryProcessor.getCoreResourceGraph(prefixedRes, fusekiUrl, null,
                 computeGraphType(request));
         if (model.size() == 0) {

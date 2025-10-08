@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -96,7 +97,7 @@ public class SchemaOrgJsonLDExport {
         return model;
     }
     
-    public static ResponseEntity<JsonNode> getResponse(final String resUri) throws RestException, JsonProcessingException {
+    public static ResponseEntity<StreamingResponseBody> getResponse(final String resUri) throws RestException, JsonProcessingException {
         final Model m;
         final Resource main;
 
@@ -104,7 +105,12 @@ public class SchemaOrgJsonLDExport {
         main = m.getResource(resUri);
         
         JsonNode res = getObject(m, main);
-        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(BudaMediaTypes.MT_JSONLD).body(res);
+        
+        StreamingResponseBody body = outputStream -> {
+            MAPPER.writerWithDefaultPrettyPrinter().writeValue(outputStream, res);
+        };
+        
+        return ResponseEntity.ok().header("Allow", "GET, OPTIONS, HEAD").contentType(BudaMediaTypes.MT_JSONLD).body(body);
     }
     
     private static final ObjectMapper MAPPER = new ObjectMapper(); 

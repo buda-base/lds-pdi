@@ -43,7 +43,7 @@ class SchemaOrgTest {
         // 3) Produce JSON-LD via your exporter
         JsonNode actual = SchemaOrgJsonLDExport.getObject(model, main); // static; adjust if your method is instance-based
 
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
+        //System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
         // 4) Load expected JSON-LD
         JsonNode expected = MAPPER.readTree(Files.readAllBytes(expectedJsonPath));
         
@@ -74,7 +74,7 @@ class SchemaOrgTest {
         // 3) Produce JSON-LD via your exporter
         JsonNode actual = SchemaOrgJsonLDExport.getObject(model, main); // static; adjust if your method is instance-based
 
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
+        //System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
         // 4) Load expected JSON-LD
         JsonNode expected = MAPPER.readTree(Files.readAllBytes(expectedJsonPath));
         
@@ -105,7 +105,7 @@ class SchemaOrgTest {
         // 3) Produce JSON-LD via your exporter
         JsonNode actual = SchemaOrgJsonLDExport.getObject(model, main); // static; adjust if your method is instance-based
 
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
+        //System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
         // 4) Load expected JSON-LD
         JsonNode expected = MAPPER.readTree(Files.readAllBytes(expectedJsonPath));
         
