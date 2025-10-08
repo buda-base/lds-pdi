@@ -1,0 +1,142 @@
+PREFIX :        <http://purl.bdrc.io/ontology/core/>
+PREFIX adm:     <http://purl.bdrc.io/ontology/admin/>
+PREFIX adr:     <http://purl.bdrc.io/resource-nc/auth/>
+PREFIX as:      <http://www.w3.org/ns/activitystreams#>
+PREFIX aut:     <http://purl.bdrc.io/ontology/ext/auth/>
+PREFIX bd:      <http://www.bigdata.com/rdf#>
+PREFIX bda:     <http://purl.bdrc.io/admindata/>
+PREFIX bdac:    <http://purl.bdrc.io/anncollection/>
+PREFIX bdan:    <http://purl.bdrc.io/annotation/>
+PREFIX bdg:     <http://purl.bdrc.io/graph/>
+PREFIX bdgu:    <http://purl.bdrc.io/graph-nc/user/>
+PREFIX bdgup:   <http://purl.bdrc.io/graph-nc/user-private/>
+PREFIX bdo:     <http://purl.bdrc.io/ontology/core/>
+PREFIX bdou:    <http://purl.bdrc.io/ontology/ext/user/>
+PREFIX bdr:     <http://purl.bdrc.io/resource/>
+PREFIX bds:     <http://purl.bdrc.io/ontology/shapes/core/>
+PREFIX bdu:     <http://purl.bdrc.io/resource-nc/user/>
+PREFIX bf:      <http://id.loc.gov/ontologies/bibframe/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dila:    <http://purl.dila.edu.tw/resource/>
+PREFIX eftr:    <http://purl.84000.co/resource/core/>
+PREFIX f:       <java:io.bdrc.libraries.sparql.functions.>
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX iiif2:   <http://iiif.io/api/presentation/2#>
+PREFIX iiif3:   <http://iiif.io/api/presentation/3#>
+PREFIX ldp:     <http://www.w3.org/ns/ldp#>
+PREFIX mbbt:    <http://mbingenheimer.net/tools/bibls/>
+PREFIX oa:      <http://www.w3.org/ns/oa#>
+PREFIX ola:     <https://openlibrary.org/authors/>
+PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rsh:     <http://purl.bdrc.io/shacl/core/shape/>
+PREFIX sh:      <http://www.w3.org/ns/shacl#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX srcd:    <https://sakyaresearch.org/deities/>
+PREFIX srcl:    <https://sakyaresearch.org/literary_forms/>
+PREFIX srcpe:   <https://sakyaresearch.org/persons/>
+PREFIX srcpl:   <https://sakyaresearch.org/places/>
+PREFIX srcs:    <https://sakyaresearch.org/sources/>
+PREFIX srct:    <https://sakyaresearch.org/topics/>
+PREFIX tbr:     <http://purl.bdrc.io/ontology/toberemoved/>
+PREFIX text:    <http://jena.apache.org/text#>
+PREFIX tmp:     <http://purl.bdrc.io/ontology/tmp/>
+PREFIX vcard:   <http://www.w3.org/2006/vcard/ns#>
+PREFIX viaf:    <http://viaf.org/viaf/>
+PREFIX wd:      <http://www.wikidata.org/entity/>
+PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+
+bdr:T354  rdf:type       bdo:Topic;
+        bdo:note         bdr:NT6DA60052B5D48C74 , bdr:NT86D7225E11BFCE5D , bdr:NTBFC8DCC8E53B591F;
+        tmp:entityScore  1332;
+        skos:altLabel    "rdzogs pa chen po/"@bo-x-ewts;
+        skos:prefLabel   "大圆满"@zh-Hans , "mahasanti"@sa-alalc97 , "great perfection"@en , "rdzogs chen/"@bo-x-ewts .
+
+bdr:EVDD9AB2BD104D0A7D
+        rdf:type        bdo:PersonBirth;
+        bdo:eventWhen   "1308"^^<http://id.loc.gov/datatypes/edtf/EDTF>;
+        bdo:eventWhere  bdr:G967;
+        bdo:onYear      "1308"^^xsd:gYear .
+
+bdr:EV00B857229AAA1BF0
+        rdf:type       bdo:PersonDeath;
+        bdo:eventWhen  "1364"^^<http://id.loc.gov/datatypes/edtf/EDTF>;
+        bdo:onYear     "1364"^^xsd:gYear .
+
+bdr:EV81A442B676BCDB2A
+        rdf:type        bdo:PersonOccupiesSeat;
+        bdo:eventWhere  bdr:G521 .
+
+bdr:P1583  rdf:type              bdo:Person;
+        bdo:associatedTradition  bdr:TraditionNyingma;
+        bdo:hasFather            bdr:P1584;
+        bdo:hasMother            bdr:P1585;
+        bdo:hasParent            bdr:P1585 , bdr:P1584;
+        bdo:kinWith              bdr:P1585 , bdr:P1584;
+        bdo:note                 bdr:NTDAA95D67ECFAB1A7 , bdr:NTE1C8F77F6AFC308F , bdr:NTF24F5C4DD8140821 , bdr:NTB25CDA7F05164BEA , bdr:NT93D338F6A346B51D , bdr:NTABB307C08F280C09;
+        bdo:personEvent          bdr:EVDD9AB2BD104D0A7D , bdr:EV00B857229AAA1BF0 , bdr:EV81A442B676BCDB2A;
+        bdo:personGender         bdr:GenderMale;
+        bdo:personName           bdr:NM27A9E6B52AE2AFD6 , bdr:NM9C8DEB6FF7CEC129 , bdr:NMFB54273C9888828B , bdr:NMF942A81B0A73E4AA , bdr:NMBC6B2B658373DD69 , bdr:NMED06EB68CC7F2B88 , bdr:NME2F236C649A1C622 , bdr:NM6E5B539FC14B81F1;
+        bdo:personStudentOf      bdr:P2JM186 , bdr:P2JM185 , bdr:P403 , bdr:P1587 , bdr:P2JM189 , bdr:P4860 , bdr:P2349 , bdr:P2JM183 , bdr:P1584 , bdr:P1588 , bdr:P1586 , bdr:P144 , bdr:P2JM187 , bdr:P2JM191 , bdr:P66 , bdr:P1226 , bdr:P4312 , bdr:P2085 , bdr:P2JM184 , bdr:P2JM190 , bdr:P2JM188;
+        bdo:personTeacherOf      bdr:P8527 , bdr:P2JM197 , bdr:P2JM194 , bdr:P2JM206 , bdr:P2JM199 , bdr:P8764 , bdr:P5911 , bdr:P2JM204 , bdr:P2JM196 , bdr:P2JM200 , bdr:P2JM202 , bdr:P2JM203 , bdr:P8784 , bdr:P2JM207 , bdr:P2JM201 , bdr:P2JM192 , bdr:P7091 , bdr:P2JM205 , bdr:P2JM193 , bdr:P6861 , bdr:P8528 , bdr:P2JM195 , bdr:P314 , bdr:P2JM198;
+        tmp:associatedCentury    14;
+        tmp:entityScore          6747;
+        owl:sameAs               <http://api.treasuryoflives.org/resource/TOLP2882> , viaf:5817155566441013380003 , viaf:29615126 , wd:Q1708503;
+        skos:prefLabel           "klong chen rab 'byams pa dri med 'od zer/"@bo-x-ewts , "隆钦热降巴·赤墨俄色"@zh-Hans .
+
+bdr:CRWA3CN501YYQBKKCM
+        rdf:type   bdo:AgentAsCreator;
+        bdo:agent  bdr:P1583;
+        bdo:role   bdr:R0ER0019 .
+
+bdr:WA3CN501  rdf:type       bdo:Work;
+        bdo:catalogInfo      "Nyingtig Yabzhi of Longche Rabjam Drime Ozer (1308-1364). Collection of profound Dzogchen teachings that consists of the Kandro Nyingtik, Kandro Yangtik, Bima Nyingtik, Lama Yangtik, and Zabmo Yangtik."@en;
+        bdo:creator          bdr:CRWA3CN501YYQBKKCM;
+        bdo:language         bdr:LangBo;
+        bdo:workHasInstance  bdr:MW2PD19078 , bdr:W3CN3025 , bdr:W2PD19078 , bdr:W1KG12048 , bdr:W12827 , bdr:MW12827 , bdr:MW1KG12048 , bdr:MW4PD2049 , bdr:W4PD2049 , bdr:MW4PD2043 , bdr:W4PD2043 , bdr:MW1KG9720 , bdr:W1KG9720 , bdr:MW3CN501 , bdr:W3CN501 , bdr:MW3CN3025;
+        bdo:workIsAbout      bdr:T354;
+        tmp:entityScore      18;
+        skos:prefLabel       "snying thig ya bzhi/"@bo-x-ewts .
+
+bdr:ID9E0972E23D10FF0F
+        rdf:type   bf:Lccn;
+        rdf:value  "75903140" .
+
+bdr:IDEC1B3ED2EB801B0F
+        rdf:type   bdr:HollisId;
+        rdf:value  "014254676" .
+
+bdr:ID4CF611CFA57E16D8
+        rdf:type   bf:ShelfMarkLcc;
+        rdf:value  "BQ7662.4 .S62" .
+
+bdr:EVF192DCB4E6693489
+        rdf:type       bdo:PublishedEvent;
+        bdo:eventWhen  "{1975,1976}"^^<http://id.loc.gov/datatypes/edtf/EDTF>;
+        bdo:notAfter   "1976"^^xsd:gYear;
+        bdo:notBefore  "1975"^^xsd:gYear .
+
+bdr:MW12827  rdf:type                bdo:Instance;
+        bf:identifiedBy              bdr:ID4CF611CFA57E16D8 , bdr:IDEC1B3ED2EB801B0F , bdr:ID9E0972E23D10FF0F;
+        bdo:authorshipStatement      "arranged and structured by klong-chen rab-'byams-pa"@en;
+        bdo:biblioNote               "reproduced from a set of prints from a-'dzom chos-sgar blocks"@en;
+        bdo:binding                  bdr:Binding_Codex_Perfect;
+        bdo:copyrightStatus          bdr:CopyrightPublicDomain;
+        bdo:extentStatement          "13 v.";
+        bdo:hasOutline               bdr:O01CT0042;
+        bdo:hasSourcePrintery        bdr:G3JT12503;
+        bdo:hasTitle                 bdr:TT7FFDCDE93527101E , bdr:TTMW128273HKMMZTA;
+        bdo:inCollection             bdr:PR1PL480;
+        bdo:instanceEvent            bdr:EVF192DCB4E6693489;
+        bdo:instanceHasReproduction  bdr:W12827;
+        bdo:instanceOf               bdr:WA3CN501;
+        bdo:material                 bdr:MaterialPaper;
+        bdo:note                     bdr:NTMW12827239GXDN6 , bdr:NT7E4CD6992DD16DE1;
+        bdo:numberOfVolumes          13;
+        bdo:printMethod              bdr:PrintMethod_Relief_WoodBlock;
+        bdo:publisherLocation        "Darjeeling, W.B"@en;
+        bdo:publisherName            "Taklung Tsetrul Rinpoche Pema Wangyal, Orgyan Kunsang"@en;
+        bdo:script                   bdr:ScriptDbuCan;
+        tmp:thumbnailIIIFService     <https://iiif.bdrc.io/bdr:I2061::020610001.tiff>;
+        skos:prefLabel               "snying thig ya bzhi/"@bo-x-ewts .

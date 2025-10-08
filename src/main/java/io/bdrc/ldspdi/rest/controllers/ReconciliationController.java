@@ -23,6 +23,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +45,29 @@ import io.bdrc.ldspdi.results.ResultsCache;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
 
+import org.opensearch.action.get.GetRequest;
+import org.opensearch.action.get.GetResponse;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.MultiMatchQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.script.ScriptType;
+import org.opensearch.script.Script;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightField;
+import org.opensearch.search.sort.ScriptSortBuilder;
+import org.opensearch.search.sort.SortOrder;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/")
 public class ReconciliationController {
@@ -52,6 +76,13 @@ public class ReconciliationController {
      * Implementation of the Reconciliation API
      * https://reconciliation-api.github.io/specs/0.1/
      */
+    
+    @Autowired
+    private RestHighLevelClient client;
+    
+    static final String index_name = ServiceConfig.getProperty("opensearchIndex");
+    
+    static final String baseUrl = "http://localhost:8080"; // TODO: hack, to change
     
     public static final ObjectMapper objectMapper = new ObjectMapper();
     public static final EwtsConverter converter = new EwtsConverter();
@@ -101,11 +132,14 @@ public class ReconciliationController {
         @JsonProperty(value="name", required=true)
         public String name = null;
         
+        @JsonProperty(value="description", required=false)
+        public String description = null;
+        
         @JsonProperty(value="type", required=true)
         public List<String> type = null;
         
         @JsonProperty(value="score", required=true)
-        public Integer score = null;
+        public Double score = null;
         
         @JsonProperty(value="match", required=true)
         public Boolean match = null;
@@ -139,7 +173,7 @@ public class ReconciliationController {
         public final Integer height = 400;
         
         @JsonProperty(value="url", required=true)
-        public final String url = "https://library.bdrc.io/preview/bdr:{{id}}";
+        public final String url = baseUrl+"/reconciliation/preview/{{id}}";
     }
     
     public final static class View {
@@ -149,7 +183,7 @@ public class ReconciliationController {
     
     public static final class PropertySuggestService {
         @JsonProperty(value="service_url")
-        public final String service_url = "https://ldspdi.bdrc.io";
+        public final String service_url = baseUrl;
         
         @JsonProperty(value="service_path")
         public final String service_path = "/reconciliation/suggest/properties/";
@@ -177,7 +211,7 @@ public class ReconciliationController {
         public final String serviceVersion = "0.1";
         
         @JsonProperty(value="batchSize")
-        public final Integer batchSize = 50;
+        public final Integer batchSize = 20;
         
         @JsonProperty(value="identifierSpace")
         public final String identifierSpace = "http://purl.bdrc.io/";
@@ -221,6 +255,7 @@ public class ReconciliationController {
         service_en.name = "Buddhist Digital Resource Center";
         service_en.defaultTypes = new ArrayList<>();
         service_en.defaultTypes.add(new DefaultType("person", "Person"));
+        service_en.defaultTypes.add(new DefaultType("version", "Version"));
         service_en.defaultTypes.add(new DefaultType("work", "Work"));
     }
     
@@ -336,6 +371,8 @@ public class ReconciliationController {
     }
     
     public static String normalize(final String orig, final String type) {
+        if (orig == null)
+            return null;
         String repl = orig;
         if (isAllTibetanUnicode(orig))
             repl = converter.toWylie(orig);
@@ -357,119 +394,276 @@ public class ReconciliationController {
                 .body(service_en);
     }
     
-    public static String getPersonQuery(final String name, final String lang, final String worktitle, final String worktitle_lang, final String workId) {
-        String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
-                + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
-                + "prefix bdo:   <http://purl.bdrc.io/ontology/core/>\n"
-                + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
-                + "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n"
-                + "prefix bda:   <http://purl.bdrc.io/admindata/>\n"
-                + "prefix text:  <http://jena.apache.org/text#>\n"
-                + "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n"
-                + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
-                + "prefix bdr:   <http://purl.bdrc.io/resource/>\n"
-                + "construct {\n"
-                + "    ?bdrcres tmp:luceneScore ?sc ;\n"
-                + "       tmp:isMain true ;"
-                + "       tmp:idMatch ?idMatch ;"
-                + "       tmp:superMatch ?superMatch .\n"
-                + "    ?bdrcres ?resp ?reso .\n"
-                + "    ?bdrcres bdo:personEvent ?evt .\n"
-                + "    ?evt :eventWhen ?evtw ;\n"
-                + "         a ?evtType .\n"
-                + "} where {\n"
-                + "  {\n"
-                + "    {\n"
-                + "        (?name ?sc) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res bdo:personName ?name .\n"
-                + "    } union {\n"
-                + "        (?res ?sc) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res a :Person .\n"
-                + "    }\n"
-                + "\n"
-                + "    ?res owl:sameAs* ?bdrcres ."
-                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                + "            adm:status    bda:StatusReleased .\n"
-                + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                + "    ?bdrcres ?resp ?reso .\n"
-                + "  } union {\n"
-                + "    # get events\n"
-                + "    {\n"
-                + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res bdo:personName ?name .\n"
-                + "    } union {\n"
-                + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                + "        ?res a :Person .\n"
-                + "    }\n"
-                + "\n"
-                + "    ?res owl:sameAs* ?bdrcres ."
-                + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                + "            adm:status    bda:StatusReleased .\n"
-                + "    ?bdrcres bdo:personEvent ?evt .\n"
-                + "    ?evt a ?evtType .\n"
-                + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
-                + "    ?evt :eventWhen ?evtw .\n";
-                if (worktitle != null) {
-                    res += "  } union {"
-                        + "    # get matches with work\n"
-                        + "    {\n"
-                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res bdo:personName ?name .\n"
-                        + "    } union {\n"
-                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res a :Person .\n"
-                        + "    }\n"
-                        + "    ?res owl:sameAs* ?bdrcres ."
-                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                        + "            adm:status    bda:StatusReleased ."
-                        + "    ?wa text:query ( bdo:skosLabels \"\\\""+worktitle+"\\\"\"@"+worktitle_lang+" ) .\n"
-                        + "    ?wa a :Work ;\n"
-                        + "        :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    ?resAdm adm:adminAbout ?wa .\n"
-                        + "    ?resAdm adm:status    bda:StatusReleased .\n"
-                        + "    BIND(true as ?superMatch)\n";
-                } else if (workId != null) {
-                    res += "  } union {\n"
-                        + "    # get matches with work\n"
-                        + "    {\n"
-                        + "        (?name) text:query ( rdfs:label \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res bdo:personName ?name .\n"
-                        + "    } union {\n"
-                        + "        (?res) text:query ( bdo:skosLabels \"\\\""+name+"\\\"\"@"+lang+" ) .\n"
-                        + "        ?res a :Person .\n"
-                        + "    }\n"
-                        + "    ?res owl:sameAs* ?bdrcres ."
-                        + "    ?resAdm adm:adminAbout ?bdrcres .\n"
-                        + "    ?resAdm adm:metadataLegal  bda:LD_BDRC_CC0 ;\n"
-                        + "            adm:status    bda:StatusReleased ."
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?superMatch)\n"
-                        + "  } union {\n"
-                        // add creators of reconciled work
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?idMatch)\n"
-                        + "    VALUES ?resp { skos:prefLabel tmp:entityScore tmp:associatedCentury tmp:hasRole }\n"
-                        + "    ?bdrcres ?resp ?reso .\n"
-                        + "  } union {\n"
-                        + "    bdr:"+workId+" :creator ?aac .\n"
-                        + "    ?aac :agent ?bdrcres .\n"
-                        + "    BIND(true as ?idMatch)\n"
-                        + "    ?bdrcres bdo:personEvent ?evt .\n"
-                        + "    ?evt a ?evtType .\n"
-                        + "    FILTER (?evtType IN(bdo:PersonBirth , bdo:PersonDeath , bdo:PersonFlourished))\n"
-                        + "    ?evt :eventWhen ?evtw .\n";
+    public static String normalize_res(final Object os_value, final String langSuffix, final boolean toUni) {
+        if (os_value == null)
+            return "";
+        if (os_value instanceof String) {
+            if (toUni && "bo_x_ewts".equals(langSuffix))
+                return converter.toUnicode((String) os_value);
+            return (String) os_value;
+        }
+        if (os_value instanceof List<?>) {
+            List<?> list = (List<?>) os_value;
+            if (!list.isEmpty() && list.get(0) instanceof String) {
+                if (toUni && "bo_x_ewts".equals(langSuffix)) {
+                    List<String> converted_list = new ArrayList<>();
+                    for (final Object v : list) {
+                        converted_list.add(converter.toUnicode((String) v));
+                    }
+                    return String.join(", ", converted_list);
                 }
-                res += "  }\n"
-                + "}";
-                return res;
+                return String.join(", ", (List<String>) list);
+            }
+        }
+        return "";
     }
     
+    final static List<String> langSuffixes = Arrays.asList("bo_x_ewts", "en", "hani");
+    public static void addSourceToResult(final Map<String,Object> sourcemap, final Result res, final String type, final boolean toUni) {
+        // first, prefLabel
+        final List<String> otherLabels = new ArrayList<>();
+        res.description = "";
+        boolean mainLabelFound = false;
+        for (final String langSuffix : langSuffixes) {
+            final String field = "prefLabel_"+langSuffix;
+            if (sourcemap.containsKey(field)) {
+                String value = normalize_res(sourcemap.get(field), langSuffix, toUni);
+                if (!mainLabelFound) {
+                    res.name = value;
+                    mainLabelFound = true;
+                } else {
+                    otherLabels.add(value);
+                }
+            }
+        }
+        for (final String langSuffix : langSuffixes) {
+            final String field = "altLabel_"+langSuffix;
+            if (sourcemap.containsKey(field))
+                otherLabels.add(normalize_res(sourcemap.get(field), langSuffix, toUni));
+        }
+        if ("Person".equals(type)) {
+            // look at birthDate, deathDate, flourishedDate
+            boolean dateAdded = false;
+            if (sourcemap.containsKey("birthDate")) {
+                res.description += "b. "+sourcemap.get("birthDate");
+                dateAdded = true;
+            }
+            if (sourcemap.containsKey("deathDate")) {
+                if (dateAdded)
+                    res.description += ", ";
+                res.description += "d. "+sourcemap.get("deathDate");
+                dateAdded = true;
+            }
+            if (!dateAdded && sourcemap.containsKey("flourishedDate")) {
+                res.description += "fl. "+sourcemap.get("flourishedDate");
+                dateAdded = true;
+            }
+            if (dateAdded)
+                res.description += "\n";
+        }
+        if ("Version".equals(type)) {
+            // look at volumeNumber?
+            // seriesName_*, issueName,
+            boolean lineAdded = false;
+            if (sourcemap.containsKey("issueName")) {
+                lineAdded = true;
+                res.description += "Issue: "+sourcemap.get("issueName")+" ";
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "seriesName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += "In: "+normalize_res(sourcemap.get(field), langSuffix, toUni);
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // publisherName_*, creation_date, publisherLocation_*
+            lineAdded = false;
+            for (final String langSuffix : langSuffixes) {
+                final String field = "publisherName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (sourcemap.containsKey("publicationDate")) {
+                lineAdded = true;
+                res.description += sourcemap.get("publicationDate")+", ";
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "publisherLocation_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // authorName_*, authorshipStatement_*, 
+            lineAdded = false;
+            for (final String langSuffix : langSuffixes) {
+                final String field = "authorName_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            for (final String langSuffix : langSuffixes) {
+                final String field = "authorshipStatement_"+langSuffix;
+                if (sourcemap.containsKey(field)) {
+                    lineAdded = true;
+                    res.description += normalize_res(sourcemap.get(field), langSuffix, toUni)+", ";
+                }
+            }
+            if (lineAdded)
+                res.description += "\n";
+            // extent
+            if (sourcemap.containsKey("extent")) {
+                res.description += sourcemap.get("extent")+"\n";
+            }
+        }
+        res.description += "Other names: "+String.join(", ", otherLabels)+"\n";
+        // finally, add comment_* ?
+        
+    }
+    
+    public List<Result> getOsPersonResultsBo(String searchTerm) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index_name);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        
+        boolean isUni = isAllTibetanUnicode(searchTerm);
+        
+        searchTerm = normalize(searchTerm, "Person");
+        
+        // Build the main query
+        var boolQuery = QueryBuilders.boolQuery()
+            .must(QueryBuilders.boolQuery()
+                .should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts", searchTerm).boost(10.0f))
+                .should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(5.0f))
+                .should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts", searchTerm).boost(2.0f))
+                .should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(1.0f)))
+            .filter(QueryBuilders.termQuery("type", "Person"));
+
+        // Add script score
+        Script script = new Script(ScriptType.STORED, null, "bdrc-score", Collections.emptyMap());
+        var functionScoreQuery = QueryBuilders.scriptScoreQuery(boolQuery, script);
+        
+        searchSourceBuilder.query(functionScoreQuery);
+        
+        // Configure source inclusion
+        searchSourceBuilder.fetchSource(true);
+        
+        // Set size (adjust as needed)
+        searchSourceBuilder.size(20);
+        
+        searchRequest.source(searchSourceBuilder);
+        
+        // Execute search
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        
+        final List<Result> res = new ArrayList<>();
+        
+        for (var hit : searchResponse.getHits().getHits()) {
+            final Result r = new Result();
+            r.score = Double.valueOf(hit.getScore());
+            r.id = hit.getId();
+            r.type = person_types;
+            addSourceToResult(hit.getSourceAsMap(), r, "Person", isUni);
+            res.add(r);
+        }
+        return res;
+    }
+
+    public List<Result> getOsVersionResultsBo(String searchTerm, String publisherName) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index_name);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        
+        boolean isUni = isAllTibetanUnicode(searchTerm);
+        
+        searchTerm = normalize(searchTerm, "Version");
+        
+        publisherName = normalize(publisherName, "Version");
+        
+        // Create the main bool query
+        BoolQueryBuilder mainQuery = QueryBuilders.boolQuery();
+
+        // Add must_not for inRootInstance
+        mainQuery.mustNot(QueryBuilders.existsQuery("inRootInstance"));
+        
+        // Add should clauses for title search in both fields (must match at least one)
+        BoolQueryBuilder titleQuery = QueryBuilders.boolQuery();
+        titleQuery.should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts", searchTerm).boost(10.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("prefLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(5.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts", searchTerm).boost(2.0f));
+        titleQuery.should(QueryBuilders.matchPhraseQuery("altLabel_bo_x_ewts.ewts-phonetic", searchTerm).boost(1.0f));
+        titleQuery.minimumShouldMatch(1);
+        mainQuery.must(titleQuery);
+        mainQuery.filter(QueryBuilders.termQuery("type", "Instance"));
+
+        // Add optional publisher match
+        if (publisherName != null && !publisherName.trim().isEmpty()) {
+            mainQuery.should(QueryBuilders.matchPhraseQuery("publisherName_bo_x_ewts", publisherName).boost(1000f));
+            mainQuery.should(QueryBuilders.matchPhraseQuery("publisherName_en", publisherName).boost(1000f));
+        }
+        
+        
+        // Create highlight builder
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("publisherName_bo_x_ewts")
+                       .requireFieldMatch(true)
+                       //.highlightQuery(QueryBuilders.matchPhraseQuery("publisherName_bo_x_ewts", publisherName))
+                       .preTags("<em>")
+                       .postTags("</em>");
+        
+        highlightBuilder.field("publisherName_en")
+                        .requireFieldMatch(true)
+                        //.highlightQuery(QueryBuilders.matchPhraseQuery("publisherName_en", publisherName))
+                        .preTags("<em>")
+                        .postTags("</em>");
+
+        // Add script score
+        Script script = new Script(ScriptType.STORED, null, "bdrc-score", Collections.emptyMap());
+        var functionScoreQuery = QueryBuilders.scriptScoreQuery(mainQuery, script);
+        searchSourceBuilder.query(mainQuery);
+        searchSourceBuilder.highlighter(highlightBuilder);
+        searchSourceBuilder.query(functionScoreQuery);
+        
+        // Configure source inclusion
+        searchSourceBuilder.fetchSource(true);
+        
+        // Set size (adjust as needed)
+        searchSourceBuilder.size(20);
+        
+        searchRequest.source(searchSourceBuilder);
+        
+        // Execute search
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        
+        final List<Result> res = new ArrayList<>();
+        
+        for (var hit : searchResponse.getHits().getHits()) {
+            final Result r = new Result();
+            r.score = Double.valueOf(hit.getScore());
+            r.id = hit.getId();
+            r.type = version_types;
+            boolean matchesPublisher = false;
+            if (publisherName != null && !publisherName.trim().isEmpty()) {
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                HighlightField publisherHighlight = highlightFields.get("publisherName_bo_x_ewts");
+                matchesPublisher = publisherHighlight != null && publisherHighlight.fragments().length > 0;
+                if (!matchesPublisher) {
+                    HighlightField publisherEnHighlight = highlightFields.get("publisherName_en");
+                    matchesPublisher = publisherEnHighlight != null && publisherEnHighlight.fragments().length > 0;
+                }
+                r.match = matchesPublisher;
+            }
+            addSourceToResult(hit.getSourceAsMap(), r, "Version", isUni);
+            res.add(r);
+        }
+        return res;
+    }
+
     public static String getWorkQuery(final String name, final String lang, final String personName, final String personName_lang, final String personId) {
         String res = "prefix :      <http://purl.bdrc.io/ontology/core/>\n"
                 + "prefix tmp:   <http://purl.bdrc.io/ontology/tmp/>\n"
@@ -549,57 +743,7 @@ public class ReconciliationController {
         + "}";
         return res;
     }
-    
-    public static String getDateStrEdtf(final Model m, final Resource person) {
-        // TODO: handle century, see https://www.loc.gov/marc/bibliographic/bdx00.html for format
-        String birthStr = null;
-        String deathStr = null;
-        String floruitStr = null;
-        StmtIterator si = person.listProperties(MarcExport.personEvent);
-        while (si.hasNext()) {
-            final Resource event = si.next().getResource();
-            final Resource eventType = event.getPropertyResourceValue(RDF.type);
-            if (eventType != null && eventType.getLocalName().equals("PersonBirth")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    birthStr = event.getProperty(MarcExport.eventWhen).getLiteral().getLexicalForm();
-                }
-            }
-            if (eventType != null && eventType.getLocalName().equals("PersonDeath")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    deathStr = event.getProperty(MarcExport.eventWhen).getString();
-                }
-            }
-            if (eventType != null && eventType.getLocalName().equals("PersonFlourished")) {
-                if (event.hasProperty(MarcExport.eventWhen)) {
-                    floruitStr = event.getProperty(MarcExport.eventWhen).getString();
-                }
-            }
-        }
-        if (birthStr != null || deathStr != null) {
-            String dateStr = "";
-            // There should be a coma at the end, except when the date ends with a hyphen.
-            if (birthStr == null) {
-                if (deathStr != null) {
-                    dateStr += "d. "+deathStr;
-                }
-            } else {
-                dateStr += birthStr+"-";
-                if (deathStr != null) {
-                    dateStr += deathStr;
-                }
-            }
-            return dateStr;
-        }
-        if (floruitStr != null) {
-            if (floruitStr.length() > 3)
-                return floruitStr;
-            return floruitStr+"XX";
-        }
-        final Statement centuryS = person.getProperty(associatedCentury);
-        if (centuryS != null)
-            return String.valueOf(centuryS.getInt()-1)+"XX";
-        return null;
-    }
+   
     
     public static final Property isMain = ResourceFactory.createProperty(MarcExport.TMP + "isMain");
     public static final Property entityScore = ResourceFactory.createProperty(MarcExport.TMP + "entityScore");
@@ -609,50 +753,9 @@ public class ReconciliationController {
     public static final Property idMatch = ResourceFactory.createProperty(MarcExport.TMP + "idMatch");
     
     public static final List<String> person_types = Arrays.asList("Person");
+    public static final List<String> version_types = Arrays.asList("Version");
     public static final List<String> work_types = Arrays.asList("Work");
     
-    public static List<Result> personModelToResult(final Model m, final String lang) {
-        final List<Result> resList = new ArrayList<>();
-        final List<Result> superMatchList = new ArrayList<>();
-        final List<Result> idMatchList = new ArrayList<>();
-        final List<Result> otherMatchList = new ArrayList<>();
-        final ResIterator mainIt = m.listSubjectsWithProperty(isMain);
-        while (mainIt.hasNext()) {
-            final Result res = new Result();
-            res.type = person_types;
-            final Resource main = mainIt.next();
-            res.id = main.getLocalName();
-            res.match = false;
-            if (main.hasProperty(superMatch)) {
-                res.match = true;
-                superMatchList.add(res);
-            } else if (main.hasProperty(idMatch)) {
-                idMatchList.add(res);
-            } else {
-                otherMatchList.add(res);
-            }
-            Statement scoreS = main.getProperty(entityScore);
-            if (scoreS != null)
-                res.score = scoreS.getInt();
-            else
-                res.score = 1;
-            String name = getPrefLabel(m, main, lang);
-            final String dateStr = getDateStrEdtf(m, main);
-            if (dateStr != null) {
-                name += " ("+dateStr+")";
-                res.name = name;
-                continue;
-            }
-            res.name = name;
-        }
-        Collections.sort(superMatchList, Collections.reverseOrder());
-        Collections.sort(idMatchList, Collections.reverseOrder());
-        Collections.sort(otherMatchList, Collections.reverseOrder());
-        resList.addAll(superMatchList);
-        resList.addAll(idMatchList);
-        resList.addAll(otherMatchList);
-        return resList;
-    }
     
     public static final String getPrefLabel(final Model m, final Resource main, final String lang) {
         Statement nameS;
@@ -688,14 +791,14 @@ public class ReconciliationController {
                 otherMatchList.add(res);
             }
             Statement scoreS = main.getProperty(entityScore);
-            int baseScore = 1;
+            Double baseScore = 1.0;
             if (scoreS != null) {
-                baseScore = scoreS.getInt();
+                baseScore = Double.valueOf(scoreS.getInt());
             }
             // work have a score of 1 in many cases, we differentiate them through their lucene score
             scoreS = main.getProperty(luceneScore);
             if (scoreS != null) {
-                res.score = Math.round(baseScore*scoreS.getFloat());
+                res.score = baseScore*scoreS.getFloat();
             } else {
                 res.score = baseScore;
             }
@@ -781,26 +884,25 @@ public class ReconciliationController {
         return null;
     }
     
-    public static void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) {
-        final String normalized = normalize(q.query, "Person");
-        String workTitle = null;
-        String workTitle_lang = null;
-        String workId = null;
-        final Object value = getFirstPropertyValue(q, "authorOf");
-        if (value instanceof String) {
-            workTitle = (String) value;
-            workTitle_lang = guessLang(workTitle);
-        } else if (value instanceof Map) {
-            workId = ((Map<String,String>)value).getOrDefault("id", null);
+    public void fillResultsForPersons(final Map<String,Results> res, final String qid, final Query q, final String lang) throws IOException {
+        final List<Result> resList =  getOsPersonResultsBo(q.query);
+        final Integer limit = q.limit;
+        if (limit != null && limit < resList.size()) {
+            res.put(qid, new Results(resList.subList(0, limit)));
+        } else {
+            res.put(qid, new Results(resList));
         }
-        final String qstr = getPersonQuery(normalized, "bo-x-ewts", workTitle, workTitle_lang, workId);
-        //System.out.println(qstr);
-        final Model model;
-        RDFConnection rvf = RDFConnectionFuseki.create().destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL)).build();
-        model = rvf.queryConstruct(qstr);
-        rvf.close();
-        //model.write(System.out, "TTL");
-        final List<Result> resList = personModelToResult(model, lang);
+    }
+    
+    public void fillResultsForVersions(final Map<String,Results> res, final String qid, final Query q, final String lang) throws IOException {
+        final Object value = getFirstPropertyValue(q, "hasPublisher");
+        String publisherName = null;
+        if (value instanceof String) {
+            publisherName = (String) value;
+        } else {
+            log.error("got map value for publisher, ignoring");
+        }
+        final List<Result> resList =  getOsVersionResultsBo(q.query, publisherName);
         final Integer limit = q.limit;
         if (limit != null && limit < resList.size()) {
             res.put(qid, new Results(resList.subList(0, limit)));
@@ -837,7 +939,7 @@ public class ReconciliationController {
         }
     }
     
-    public static Map<String,Results> runQueries(final Map<String,Query> queryBatch, final String lang) {
+    public Map<String,Results> runQueries(final Map<String,Query> queryBatch, final String lang) throws IOException {
         final Map<String,Results> res = new HashMap<>();
         for (final Entry<String,Query> e : queryBatch.entrySet()) {
             final Query q = e.getValue();
@@ -846,6 +948,9 @@ public class ReconciliationController {
             switch (q.type) {
             case "Person":
                 fillResultsForPersons(res, e.getKey(), q, lang);
+                break;
+            case "Version":
+                fillResultsForVersions(res, e.getKey(), q, lang);
                 break;
             case "Work":
                 fillResultsForWorks(res, e.getKey(), q, lang);
@@ -859,17 +964,59 @@ public class ReconciliationController {
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<Map<String,Results>> query(@RequestParam Map<String,String> paramMap, @PathVariable("lang") String lang) throws IOException {
         final String jsonStr = paramMap.get("queries");
-        //System.out.println(jsonStr);
+        System.out.println(jsonStr);
         final Map<String,Query> queryBatch = objectMapper.readValue(jsonStr, QueryBatchTR);
         final Map<String,Results> res = runQueries(queryBatch, lang);
         return ResponseEntity.status(200).header("Content-Type", "application/json")
                 .body(res);
     }
     
+    public Map<String, Object> getDocumentSourceById(final String documentId) throws IOException {
+        GetResponse response = client.get(
+            new GetRequest(index_name, documentId), 
+            RequestOptions.DEFAULT
+        );
+        if (!response.isExists() || response.isSourceEmpty())
+            return null;
+        return response.getSource();
+    }
+    
+    public static String resultToHtml(final Result r, final String type) {
+        String res = "<html>\n"
+                + "   <head><meta charset=\"utf-8\" /></head>\n"
+                + "   <body>\n"
+                + "      <h1>"+r.name+"</h1>\n";
+        if ("Version".equals(type)) {
+            res += "         <img src=\"https://iiif.bdrc.io/bdr:"+r.id+"::thumbnail/full/!1000,130/0/default.jpg\"/>";
+        }
+        res    += "      <p>"+r.description.replaceAll("\n", "<br/>")+"</p>\n"
+                + "   </body>\n"
+                + "</html>";
+        return res;
+    }
+    
+    @GetMapping(path = "/reconciliation/preview/{id}", produces = "text/html")
+    public ResponseEntity<String> preview(@PathVariable("id") String id) throws IOException {
+        //System.out.println(jsonStr);
+        id = id.strip();
+        final Map<String,Object> source = getDocumentSourceById(id);
+        if (source == null)
+            return ResponseEntity.status(404).body("not found");
+        final String type = id.startsWith("P") ? "Person" : "Version";
+        // weird shortcut
+        final Result r = new Result();
+        r.id = id;
+        addSourceToResult(source, r, type, true); // the true here is a bit uncertain...
+        final String html = resultToHtml(r, type);
+        return ResponseEntity.status(200).header("Content-Type", "text/html")
+                .body(html);
+    }
+    
     final static Map<String,SuggestReponse> propertiesSuggest = new HashMap<>();
     static {
         propertiesSuggest.put("hasauthor", new SuggestReponse("has author", "use on work or version data to connect it with authors data", "hasAuthor"));
-        propertiesSuggest.put("authorof", new SuggestReponse("author of", "use on person data to connect it with title data", "authorOf"));
+        //propertiesSuggest.put("publisherof", new SuggestReponse("publisher of", "use on publisher name for versions", "publisherOf"));
+        propertiesSuggest.put("haspublisher", new SuggestReponse("has publisher", "use to match publisher name on versions", "hasPublisher"));
     }
     
     @GetMapping(path = "/reconciliation/suggest/properties/")

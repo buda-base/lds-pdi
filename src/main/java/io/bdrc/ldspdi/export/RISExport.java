@@ -4,8 +4,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.jena.rdf.model.Model;
@@ -128,6 +130,13 @@ public class RISExport {
     
     public static MediaType RISMD = new MediaType("application", "x-research-info-systems", Charset.forName("utf-8"));
     
+    public static final Set<HttpMethod> gho = new HashSet<>();
+    static {
+        gho.add(HttpMethod.GET);
+        gho.add(HttpMethod.HEAD);
+        gho.add(HttpMethod.OPTIONS);
+    }
+    
     public static ResponseEntity<String> getResponse(final String resUri, final String lang) throws RestException, JsonProcessingException {
         final Model m;
         final Resource main;
@@ -140,7 +149,7 @@ public class RISExport {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(RISMD);
         headers.setContentDispositionFormData("attachment", main.getLocalName() + "-" + lang + ".ris");
-        headers.setAllow(EnumSet.of(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS));
+        headers.setAllow(gho);
         return ResponseEntity.ok().headers(headers).body(ris.toString());
     }
     

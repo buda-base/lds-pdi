@@ -96,7 +96,7 @@ public class OntPropModel {
         }
         Resource rs = null;
         if (st.getObject().isAnon()) {
-            rs = OntData.ontAllMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeId()));
+            rs = OntData.ontAllMod.createResource(new AnonId(st.getObject().asNode().getBlankNodeLabel()));
             StmtIterator stmt = rs.listProperties(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#unionOf"));
             while (stmt.hasNext()) {
                 List<RDFNode> list = stmt.next().getObject().asResource().as(RDFList.class).asJavaList();

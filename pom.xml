@@ -9,11 +9,10 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    
-    <jena.version>4.6.1</jena.version>
-    <jcs.version>2.2.1</jcs.version>
-    <lucene.version>8.11.1</lucene.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <jena.version>4.10.0</jena.version>
+    <lucene.version>9.10.0</lucene.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>  
   <repositories>
     <repository>
@@ -30,7 +29,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>    
-    <version>2.7.3</version>
+    <version>3.3.2</version>
     <relativePath></relativePath>    
     </parent>  
   <dependencies>  
@@ -50,41 +49,67 @@
     <dependency>
         <groupId>org.apache.tomcat.embed</groupId>
         <artifactId>tomcat-embed-jasper</artifactId>
+        <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jstl</artifactId>
-        <version>1.2</version>
+        <groupId>jakarta.servlet.jsp.jstl</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+        <version>3.0.1</version>
     </dependency>
+    <dependency>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+        <version>3.0.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.expressly</groupId>
+        <artifactId>expressly</artifactId>
+        <version>5.0.0</version>
+    </dependency>
+    <dependency>
+	    <groupId>org.opensearch</groupId>
+	    <artifactId>opensearch</artifactId>
+	    <version>2.16.0</version>
+	    <scope>provided</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.opensearch.client</groupId>
+	  <artifactId>opensearch-rest-high-level-client</artifactId>
+	  <version>2.16.0</version>
+	</dependency>
+  <dependency>
+      <groupId>org.opensearch.client</groupId>
+      <artifactId>opensearch-rest-client</artifactId>
+      <version>2.16.0</version>
+  </dependency>
     <dependency>
       <groupId>org.marc4j</groupId>
       <artifactId>marc4j</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.5</version>
     </dependency>
     <dependency>
         <groupId>org.ehcache</groupId>
         <artifactId>ehcache</artifactId>
-        <version>3.10.1</version>   
-    </dependency>
+        </dependency>
     <dependency>
       <groupId>io.bdrc.ewtsconverter</groupId>
       <artifactId>ewts-converter</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>io.bdrc.lucene</groupId>
       <artifactId>lucene-bo</artifactId>
-      <version>1.7.1</version>
+      <version>2.2.0</version>
     </dependency>
     <dependency>
         <groupId>commons-validator</groupId>
         <artifactId>commons-validator</artifactId>
-        <version>1.7</version>
+        <version>1.9.0</version>
     </dependency>
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>5.7.0</version>
+      <version>5.9</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jena</groupId>
@@ -94,7 +119,7 @@
     <dependency>
         <groupId>com.maxmind.geoip2</groupId>
         <artifactId>geoip2</artifactId>
-        <version>3.0.1</version>
+        <version>4.2.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.lucene</groupId>
@@ -104,11 +129,11 @@
     <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>73.1</version>
+        <version>75.1</version>
     </dependency>
     <dependency>
         <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-analyzers-common</artifactId>
+        <artifactId>lucene-analysis-common</artifactId>
         <version>${lucene.version}</version>
     </dependency>
     <dependency>
@@ -127,8 +152,17 @@
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
+        <exclusion>
+	      <groupId>org.apache.jena</groupId>
+	      <artifactId>jena-fuseki-prometheus</artifactId>
+	    </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+	  <groupId>io.micrometer</groupId>
+	  <artifactId>micrometer-registry-prometheus</artifactId>
+	  <scope>test</scope>
+	</dependency>
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -155,6 +189,7 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
+      <version>2.3.1</version>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
@@ -165,19 +200,19 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
-      <version>1.9</version>
+      <version>1.12.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
+      <version>2.16.1</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit -->
     <dependency>
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
-      <version>6.3.0.202209071007-r</version>
+      <version>6.10.0.202406032230-r</version>
     </dependency>   
     <!-- https://mvnrepository.com/artifact/io.bdrc/bdrc-auth-lib -->
     <dependency>
@@ -189,7 +224,7 @@
           <artifactId>slf4j-simple</artifactId>
         </exclusion>
       </exclusions>
-      <version>3.2.0</version>
+      <version>3.3.0</version>
     </dependency> 
     <dependency>
       <groupId>io.bdrc.libraries</groupId>
@@ -200,7 +235,7 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.21.1</version>
+      <version>0.22.0</version>
     </dependency> 
   </dependencies> 
   <build>

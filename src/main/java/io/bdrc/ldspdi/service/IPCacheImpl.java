@@ -15,26 +15,26 @@ import io.bdrc.auth.rdf.IPCache;
 
 public class IPCacheImpl implements IPCache {
 
-    public static Cache<String, String> CACHE;
+    public static Cache<String, String> CACHE_SUB;
     public final static Logger log = LoggerFactory.getLogger(IPCacheImpl.class.getName());
 
     public IPCacheImpl() {
         CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
         cacheManager.init();
-        CACHE = cacheManager.createCache("ipcache", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+        CACHE_SUB = cacheManager.createCache("ipcache", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
                 ResourcePoolsBuilder.newResourcePoolsBuilder().heap(100, EntryUnit.ENTRIES)));
-        log.debug("Cache was initialized {}", CACHE);
+        log.debug("Cache was initialized {}", CACHE_SUB);
     }
     
     @Override
     public String getSubscriber(final String ip, final Loader loader) throws IOException {
         try {
-            String value = CACHE.get(ip);
+            String value = CACHE_SUB.get(ip);
             if (value == null) {
                 value = loader.loadSubscriber(ip);
                 if (value == null)
                     value = "";
-                CACHE.put(ip, value);
+                CACHE_SUB.put(ip, value);
             }
             if (value.isEmpty())
                 return null;

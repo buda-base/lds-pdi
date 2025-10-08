@@ -53,8 +53,7 @@ public class ServiceConfig {
             .getLogger(ServiceConfig.class);
 
     // getting the default properties from ldspdi.properties that is packaged
-    // with
-    // the jar
+    // with the jar
     public static void init()
             throws JsonParseException, JsonMappingException, IOException {
         log.info("user.dir = " + System.getProperty("user.dir"));

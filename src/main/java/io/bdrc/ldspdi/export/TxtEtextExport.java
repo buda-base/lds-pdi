@@ -1,5 +1,7 @@
 package io.bdrc.ldspdi.export;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,12 +10,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.lucene.search.join.ScoreMode;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.InnerHitBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +41,7 @@ import io.bdrc.ldspdi.exceptions.RestException;
 import io.bdrc.ldspdi.rest.controllers.PublicDataController;
 import io.bdrc.ldspdi.rest.features.CorsFilter;
 import io.bdrc.ldspdi.results.ResultSetWrapper;
+import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
 import io.bdrc.ldspdi.sparql.LdsQueryService;
 import io.bdrc.ldspdi.sparql.QueryProcessor;
@@ -37,55 +52,108 @@ public class TxtEtextExport {
     
     public static final EwtsConverter ewtsConverter = new EwtsConverter();
     public final static Logger log = LoggerFactory.getLogger(TxtEtextExport.class);
+    static final String index_name = ServiceConfig.getProperty("opensearchIndex");
+    
+    public static final class Chunk {
+        public final String text;
+        public final String os_langtag;
+        public final int cstart;
+        public final int cend;
 
-    public static ResultSetWrapper getResults(final String resUri, final Integer startChar, final Integer endChar) throws RestException {
-        Map<String, String> args = new HashMap<>();
-        args.put("R_RES", resUri);
-        args.put("I_START", startChar.toString());
-        args.put("I_END", endChar.toString());
-        // process
-        final LdsQuery qfp = LdsQueryService.get("ChunksByRange.arq", "library");
-        final String query = qfp.getParametizedQuery(args, true);
-        ResultSetWrapper res = QueryProcessor.getResults(query, null, null, "100000");
-        return res;
-    }
-
-    static class StartCharComparator implements Comparator<QuerySolution> {
-        @Override
-        public int compare(final QuerySolution a, final QuerySolution b) {
-            // there is one solution that contains the access, etc. we put it first
-            if (!a.contains("chunkstart")) return -1;
-            if (!b.contains("chunkstart")) return 1;
-            final Integer ai = a.getLiteral("chunkstart").getInt();
-            final Integer bi = b.getLiteral("chunkstart").getInt();
-            return ai.compareTo(bi);
+        public Chunk(final String text, final String os_langtag, final int cstart, final int cend) {
+            this.text = text;
+            this.cstart = cstart;
+            this.cend = cend;
+            this.os_langtag = os_langtag;
         }
     }
+    
+    public static List<Chunk> getChunks(RestHighLevelClient client, String id, final int cstart, final int cend) {
+        List<Chunk> chunks = new ArrayList<>();
+        
+        if (id.startsWith("bdr:")) {
+            id = id.substring(4);
+        }
 
-    static final StartCharComparator startCharComparatorInstance = new StartCharComparator();
+        // Create a SearchRequest targeting the index
+        SearchRequest searchRequest = new SearchRequest(index_name);
 
-    public static String getStringForTxt(final ResultSetWrapper res, final Integer startChar, final Integer endChar, final Map<String,String> ltagConversionMap) {
-        List<QuerySolution> sols = res.getQuerySolutions();
-        Collections.sort(sols, startCharComparatorInstance);
-        final StringBuilder sb = new StringBuilder();
-        for (QuerySolution qs : sols) {
-            if (!qs.contains("chunkstart"))
-                continue;
-            final int qsStartChar = qs.getLiteral("chunkstart").getInt();
-            final int qsEndChar = qs.getLiteral("chunkend").getInt();
-            final Literal qsContent = qs.getLiteral("chunkcontent").asLiteral();
-            final String qsContentS = qsContent.getString();
-            final String qsContentSToAdd;
-            if (qsStartChar < startChar && qsEndChar > endChar) {
-                qsContentSToAdd = qsContentS.substring(startChar - qsStartChar, endChar - qsStartChar);
-            } else if (qsStartChar < startChar) {
-                qsContentSToAdd = qsContentS.substring(startChar - qsStartChar);
-            } else if (qsEndChar > endChar) {
-                qsContentSToAdd = qsContentS.substring(0, endChar - qsStartChar);
-            } else {
-                qsContentSToAdd = qsContentS;
+        // Build the search query
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.fetchSource(false);  // Do not return the _source
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        if (id.startsWith("UT")) {
+            // Query by document ID
+            boolQuery.must(QueryBuilders.termQuery("_id", id));
+        } else if (id.startsWith("VE")) {
+            // Query by etext_vol field
+            boolQuery.must(QueryBuilders.termQuery("etext_vol", id));
+        } else {
+            return null;
+        }
+
+        // Nested queries for chunks
+        BoolQueryBuilder chunksQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("chunks.cend").gte(cstart))
+                .must(QueryBuilders.rangeQuery("chunks.cstart").lte(cend));
+        boolQuery.must(QueryBuilders.nestedQuery("chunks", chunksQuery, ScoreMode.None).innerHit(new InnerHitBuilder().setSize(10000)));
+
+        sourceBuilder.query(boolQuery);
+        searchRequest.source(sourceBuilder);
+
+        // Execute the search
+        SearchResponse searchResponse;
+        try {
+            searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error("Chunks OS query failed", e);
+            return null;
+        }
+
+        // Parse the response to extract chunks
+        for (SearchHit hit : searchResponse.getHits().getHits()) {
+            final Map<String, SearchHits> innerHits = hit.getInnerHits();
+            if (innerHits != null && innerHits.containsKey("chunks")) {
+                for (SearchHit innerHit : innerHits.get("chunks").getHits()) {
+                    Map<String, Object> sourceAsMap = innerHit.getSourceAsMap();
+                    final int chunkCstart = (int) sourceAsMap.get("cstart");
+                    final int chunkCend = (int) sourceAsMap.get("cend");
+                    if (sourceAsMap.containsKey("text_bo")) {
+                        final String text = (String) sourceAsMap.get("text_bo");
+                        chunks.add(new Chunk(text, "bo", chunkCstart, chunkCend));
+                    } else if (sourceAsMap.containsKey("text_en")) {
+                        final String text = (String) sourceAsMap.get("text_en");
+                        chunks.add(new Chunk(text, "en", chunkCstart, chunkCend));
+                    } else if (sourceAsMap.containsKey("text_hani")) {
+                        final String text = (String) sourceAsMap.get("text_hani");
+                        chunks.add(new Chunk(text, "hani", chunkCstart, chunkCend));
+                    } 
+                }
             }
-            if (ltagConversionMap.containsKey(qsContent.getLanguage())) {
+        }
+
+        // Sort the chunks by cstart
+        chunks.sort((c1, c2) -> Integer.compare(c1.cstart, c2.cstart));
+
+        return chunks;
+    }
+    
+    public static String getStringForTxt(final List<Chunk> chunks, final Integer startChar, final Integer endChar, final Map<String,String> ltagConversionMap) {
+        final StringBuilder sb = new StringBuilder();
+        for (Chunk c : chunks) {
+            final String qsContentSToAdd;
+            if (c.cstart < startChar && c.cend > endChar) {
+                qsContentSToAdd = c.text.substring(startChar - c.cstart, endChar - c.cend);
+            } else if (c.cstart < startChar) {
+                qsContentSToAdd = c.text.substring(startChar - c.cstart);
+            } else if (c.cend > endChar) {
+                qsContentSToAdd = c.text.substring(0, endChar - c.cend);
+            } else {
+                qsContentSToAdd = c.text;
+            }
+            if (ltagConversionMap.containsKey(c.os_langtag)) {
                 // here we just assume that we're converting to ewts since it's the only thing that
                 // can happen in the code
                 sb.append(ewtsConverter.toWylie(qsContentSToAdd));
@@ -117,37 +185,25 @@ public class TxtEtextExport {
         }
     }
     
-    public static ResponseEntity<StreamingResponseBody> getResponse(final HttpServletRequest request, final String resUri, final Integer startChar, final Integer endChar, final String resName, final String prefLangs) throws RestException {
-        final ResultSetWrapper res = getResults(resUri, startChar, endChar);
-        if (res.numResults < 2) {
+    // TODO: access control
+    
+    public static ResultSetWrapper getResults(final String resUri) throws RestException {
+        Map<String, String> args = new HashMap<>();
+        args.put("R_RES", resUri);
+        // process
+        final LdsQuery qfp = LdsQueryService.get("ChunksByRange.arq", "library");
+        final String query = qfp.getParametizedQuery(args, true);
+        ResultSetWrapper res = QueryProcessor.getResults(query, null, null, "100000");
+        return res;
+    }
+    
+    public final static ResponseEntity<StreamingResponseBody> getResponse(final RestHighLevelClient client, final HttpServletRequest request, final String id, final Integer startChar, final Integer endChar, final String resName, final String prefLangs) throws RestException {
+        log.info("get text for "+id+" ("+startChar+"-"+endChar+")");
+        List<Chunk> res = getChunks(client, id, startChar, endChar);
+        if (res == null || res.size() < 1) {
             throw new RestException(404, new LdsError(LdsError.NO_GRAPH_ERR).setMsg("Resource does not exist or no character in range"));
         }
-        List<QuerySolution> sols = res.getQuerySolutions();
-        Collections.sort(sols, startCharComparatorInstance);
-        QuerySolution qs = sols.get(0);
-        if (!qs.contains("ric")) {
-            throw new RestException(500, LdsError.UNKNOWN_ERR, "cannot get information from Fuseki about access of "+resUri);
-        }
-        boolean restrictedInChina = qs.get("ric").asLiteral().getBoolean();
-        if (restrictedInChina && GeoLocation.isFromChina(request)) {
-            return ResponseEntity.status(451).contentType(MediaType.TEXT_PLAIN).body(StreamingHelpers.getStream("Etext not available in your geographical area"));
-        }
-        AccessInfo acc = (AccessInfo) request.getAttribute("access");
-        if (acc == null)
-            acc = new AccessInfoAuthImpl();
-        final String accessShortName = qs.get("access").asResource().getLocalName();
-        final String statusShortName = qs.get("status").asResource().getLocalName();
-        final AccessInfoAuthImpl.AccessLevel al = acc.hasResourceAccess(accessShortName, statusShortName, qs.get("einst").asResource().getURI());
-        if (al != AccessInfoAuthImpl.AccessLevel.OPEN) {
-            return ResponseEntity.status(acc.isLogged() ? 403 : 401).cacheControl(CacheControl.noCache())
-                    .body(StreamingHelpers.getStream("Insufficient rights"));
-        }
-        CacheControl cc = CacheControl.maxAge(CorsFilter.ACCESS_CONTROL_MAX_AGE_IN_SECONDS, TimeUnit.SECONDS);
-        if (!accessShortName.equals("AccessOpen") || restrictedInChina) {
-            cc = cc.cachePrivate();
-        } else {
-            cc = cc.cachePublic();
-        }
+        
         String fName =  resName;
         if ((!startChar.equals(0)) || !endChar.equals(PublicDataController.defaultMaxValI)) {
             fName += "-" + startChar.toString() + "-";
@@ -165,7 +221,6 @@ public class TxtEtextExport {
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).header("Allow", "GET, OPTIONS, HEAD")
                 .header("Vary", "Negotiate, Accept")
                 .header("Content-Disposition", "attachment; filename=\""+fName+"\"")
-                .cacheControl(cc)
                 .body(StreamingHelpers.getStream(resStr));
     }
 

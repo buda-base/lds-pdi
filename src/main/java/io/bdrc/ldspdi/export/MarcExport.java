@@ -32,8 +32,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdf.model.Selector;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
@@ -1103,8 +1101,7 @@ public class MarcExport {
     }
 
     private static void addOutline(final Model m, final Resource main, final Record record, final String bcp47lang, final boolean limitSize) {
-        final Selector selector = new SimpleSelector(null, hasPart, (RDFNode) null);
-        final StmtIterator si = m.listStatements(selector);
+        final StmtIterator si = m.listStatements(null, hasPart, (RDFNode) null);
         StringBuilder sb = new StringBuilder();
         final Map<String, Literal> parts = new TreeMap<>();
         int nbParts = 0;

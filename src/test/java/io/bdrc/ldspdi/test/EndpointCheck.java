@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.auth0.client.auth.AuthAPI;
 import com.auth0.exception.Auth0Exception;
-import com.auth0.net.AuthRequest;
+import com.auth0.net.TokenRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -106,11 +106,11 @@ public class EndpointCheck {
     }
 
     private static void setPublicToken() {
-        AuthRequest req = auth.login("publicuser@bdrc.com", AuthProps.getProperty("publicuser@bdrc.com"));
+        TokenRequest req = auth.login("publicuser@bdrc.com", AuthProps.getProperty("publicuser@bdrc.com"));
         req.setScope("openid offline_access");
         req.setAudience("https://bdrc-io.auth0.com/api/v2/");
         try {
-            publicToken = req.execute().getIdToken();
+            publicToken = req.execute().getBody().getIdToken();
         } catch (Auth0Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -119,11 +119,11 @@ public class EndpointCheck {
     }
 
     private static void setAdminToken() {
-        AuthRequest req = auth.login("tchame@rimay.net", AuthProps.getProperty("tchame@rimay.net"));
+        TokenRequest req = auth.login("tchame@rimay.net", AuthProps.getProperty("tchame@rimay.net"));
         req.setScope("openid offline_access");
         req.setAudience("https://bdrc-io.auth0.com/api/v2/");
         try {
-            adminToken = req.execute().getIdToken();
+            adminToken = req.execute().getBody().getIdToken();
         } catch (Auth0Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

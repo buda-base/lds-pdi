@@ -30,6 +30,16 @@ fusekiAuthData=http://localhost:13180/fuseki/authrw/
 #activate/desactivate auth0
 useAuth=false
 
+#### Opensearch config ####
+
+opensearchHost=localhost
+opensearchPort=9200
+opensearchScheme=http
+opensearchUser=
+opensearchPassword=
+opensearchIndex=bdrc_prod
+
+
 #### Home page info ####
 
 # Brand settings, change this with the name and logo url of your organization

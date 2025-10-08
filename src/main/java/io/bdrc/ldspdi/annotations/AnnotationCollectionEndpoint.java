@@ -3,8 +3,8 @@ package io.bdrc.ldspdi.annotations;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;

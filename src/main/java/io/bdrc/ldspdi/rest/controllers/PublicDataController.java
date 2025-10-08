@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
@@ -52,8 +52,10 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.system.PrefixMap;
+import org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -104,6 +106,9 @@ public class PublicDataController {
     public static final String GRAPH_PREFIX_SHORT = ServiceConfig.getProperty("endpoints.graph.shortprefix");
     public static final String GRAPH_PREFIX_FULL = ServiceConfig.getProperty("endpoints.graph.fullprefix");
     private List<String> COLUMBIA_IDS = null;
+    
+    @Autowired
+    private RestHighLevelClient client;
 
     public void ensureColumbiaIDsLoaded() {
         if (COLUMBIA_IDS == null) {
@@ -482,7 +487,7 @@ public class PublicDataController {
         if (ext.startsWith("mrc"))
             return MarcExport.getResponse(media, RES_PREFIX + res, style);
         else if (ext.equals("txt"))
-            return TxtEtextExport.getResponse(request, RES_PREFIX + res, Integer.parseInt(startChar),
+            return TxtEtextExport.getResponse(this.client, request, res, Integer.parseInt(startChar),
                     Integer.parseInt(endChar), res, prefLangs);
         else if (ext.equals("xml") && "tbrc-ia".equals(style))
             return MockTbrcXmlExport.getResponse(RES_PREFIX+res);

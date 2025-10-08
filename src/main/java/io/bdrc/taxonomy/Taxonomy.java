@@ -1,6 +1,5 @@
 package io.bdrc.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.bdrc.ldspdi.exceptions.RestException;
-import io.bdrc.ldspdi.results.Field;
 import io.bdrc.ldspdi.results.library.WorkResults;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.sparql.LdsQuery;
@@ -86,8 +84,7 @@ public class Taxonomy {
             final String query = qfp.getParametizedQuery(map, true);
             model = QueryProcessor.getGraph(query);
             ROOT = new TaxNode(rootUri, model);
-            Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
-            this.buildTree(t, ROOT);
+            this.buildTree(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY, ROOT);
         } catch (Exception e) {
             log.error("error when building taxonomy "+rootUri, e);
         }
@@ -98,29 +95,27 @@ public class Taxonomy {
         try {
             this.model = model;
             ROOT = new TaxNode(rootUri, model);
-            Triple t = new Triple(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY);
-            this.buildTree(t, ROOT);
+            this.buildTree(NodeFactory.createURI(ROOTURI), hasSubClass, Node.ANY, ROOT);
         } catch (Exception e) {
             log.error("error when building taxonomy "+rootUri, e);
         }
     }
 
-    public TaxNode buildTree(Triple t, TaxNode root) {
+    public TaxNode buildTree(final Node subject, final Node property, final Node object, final TaxNode root) {
         final Graph mGraph = model.getGraph();
-        ExtendedIterator<Triple> ext = mGraph.find(t);
+        ExtendedIterator<Triple> ext = mGraph.find(subject, property, object);
         while (ext.hasNext()) {
             final Triple tp = ext.next();
             final String uri = tp.getObject().getURI();
             final TaxNode nn = new TaxNode(uri, model);
             allNodes.put(uri, nn);
             root.addChild(nn);
-            final Triple ttp = new Triple(tp.getObject(), hasSubClass, Node.ANY);
-            buildTree(ttp, nn);
+            buildTree(tp.getObject(), hasSubClass, Node.ANY, nn);
         }
         return root;
     }
     
-    public void buildFacetTree(HashSet<String> leafTopics, Map<String, Integer> topics, final Map<String,Map<String, Object>> res) throws RestException {
+    public void buildFacetTree(final HashSet<String> leafTopics, final Map<String, Integer> topics, final Map<String,Map<String, Object>> res) throws RestException {
         if (leafTopics.size() == 0) {
             return;
         }

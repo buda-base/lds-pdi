@@ -11,8 +11,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdf.model.Selector;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
@@ -97,8 +95,7 @@ public class CollectionUtils {
         }
         int total = 0;
         final Set<Resource> items = new TreeSet<Resource>(new SimpleUriResourceComparator());
-        final Selector sel = new SimpleSelector(null, annToColl, main);
-        final StmtIterator it = model.listStatements(sel);
+        final StmtIterator it = model.listStatements(null, annToColl, main);
         while (it.hasNext()) {
             final Statement currentS = it.next();
             final Resource ann = currentS.getSubject();

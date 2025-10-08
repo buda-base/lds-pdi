@@ -1,6 +1,26 @@
 # Reconciling data with BDRC
 
-BDRC implements the [Reconciliation API](https://reconciliation-api.github.io/specs/0.1/) and can now be used in the well known [OpenRefine](https://openrefine.org/), along with [many other services](https://reconciliation-api.github.io/testbench/#/).
+BDRC implements the [Reconciliation API v0.2](https://www.w3.org/community/reports/reconciliation/CG-FINAL-specs-0.2-20230410/) and can now be used in the well known [OpenRefine](https://openrefine.org/), along with [many other services](https://reconciliation-api.github.io/testbench/#/).
+
+Persons:
+- dates
+- traditions
+
+Versions:
+- author_names, authorshipstatement
+- author_id ?
+- publishername
+- publisherlocation
+- isbns
+- publicationdate
+- extent
+
+Volume:
+- in collection
+- volume_number
+
+if author ends with sogs or is ma nges or me nges, ignore
+
 
 ### Configuration
 
