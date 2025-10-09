@@ -230,7 +230,7 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-      <version>0.22.0</version>
+      <version>0.22.1</version>
     </dependency> 
   </dependencies> 
   <build>
