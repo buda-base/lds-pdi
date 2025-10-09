@@ -159,38 +159,6 @@ public class SchemaOrgJsonLDExport {
             obj.set("geo", geo);
         }
 
-        // Founding date (from placeEvent of type PlaceFounded); founders from eventWho
-        String foundingDate = null;
-        ArrayNode founders = MAPPER.createArrayNode();
-        StmtIterator evIt = m.listStatements(place, placeEvent, (RDFNode) null);
-        try {
-            while (evIt.hasNext()) {
-                RDFNode evN = evIt.next().getObject();
-                if (!evN.isResource()) continue;
-                Resource ev = evN.asResource();
-
-                // If event is a PlaceFounded, extract date and founder(s)
-                if (m.contains(ev, RDF.type, BDO_PlaceFounded)) {
-                    String d = extractEventDate(m, ev);
-                    if (d != null && (foundingDate == null || d.compareTo(foundingDate) < 0)) {
-                        foundingDate = d;
-                    }
-                    // founders
-                    StmtIterator whoIt = m.listStatements(ev, eventWho, (RDFNode) null);
-                    while (whoIt.hasNext()) {
-                        RDFNode w = whoIt.next().getObject();
-                        if (!w.isResource()) continue;
-                        Resource pe = w.asResource();
-                        // Build as lightweight Person (with labels) if possible
-                        ObjectNode founder = buildPersonNode(m, pe);
-                        founders.add(founder);
-                    }
-                    whoIt.close();
-                }
-            }
-        } finally { evIt.close(); }
-        if (foundingDate != null) obj.put("foundingDate", foundingDate);
-
         return obj;
     }
     
