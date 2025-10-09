@@ -28,5 +28,6 @@
     "birthDate" : "1308",
     "deathDate" : "1364"
   } ],
-  "datePublished" : "{1975,1976}"
+  "datePublished" : "{1975,1976}",
+  "thumbnailUrl" : "https://iiif.bdrc.io/bdr:I2061::020610001.tiff/full/max/0/default.png"
 }

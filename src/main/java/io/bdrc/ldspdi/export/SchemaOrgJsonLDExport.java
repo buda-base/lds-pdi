@@ -242,7 +242,6 @@ public class SchemaOrgJsonLDExport {
         entity.put("@context", "https://schema.org");
         entity.put("@id", resUri);
         entity.put("@type", detectSchemaType(m, main));
-        //entity.put("url", pageUrl);
 
         // identifiers (compact + full URI)
         ArrayNode identifiers = MAPPER.createArrayNode();
@@ -268,23 +267,22 @@ public class SchemaOrgJsonLDExport {
 
         // authors (persons with same label rules)
         addAuthors(m, main, entity);
-
-        // Build the WebPage node (CC0) and wire mainEntity relations
-        //ObjectNode page = MAPPER.createObjectNode();
-        //page.put("@context", "https://schema.org");
-        //page.put("@type", "WebPage");
-        //page.put("@id", pageUrl);
-        //page.put("url", pageUrl);
-        //page.put("license", "https://creativecommons.org/publicdomain/zero/1.0/");
-
-        // mainEntity links
-        //page.set("mainEntity", MAPPER.createObjectNode().put("@id", resUri));
-        //entity.set("mainEntityOfPage", MAPPER.createObjectNode().put("@id", pageUrl));
         
         String pubDate = extractEventDateFromLink(m, main, instanceEvent, PublishedEvent);
         if (pubDate != null) entity.put("datePublished", pubDate);
+        
+        addThumbnail(m, main, entity);
 
         return entity;
+    }
+    
+    private static void addThumbnail(Model m, Resource main, ObjectNode root) {
+        final Resource th = main.getPropertyResourceValue(thumbnailIIIFService);
+        if (th == null) return;
+        String url = th.getURI();
+        final boolean pngmode = url.endsWith("f") || url.endsWith("F");
+        url += "/full/max/0/default."+(pngmode ? "png" : "jpg");
+        root.put("thumbnailUrl", url);
     }
     
     private static ArrayNode collectSameAs(Model m, Resource r) {
