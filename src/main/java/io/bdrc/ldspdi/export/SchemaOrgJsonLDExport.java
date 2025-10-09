@@ -251,6 +251,7 @@ public class SchemaOrgJsonLDExport {
         final boolean pngmode = url.endsWith("f") || url.endsWith("F");
         url += "/full/max/0/default."+(pngmode ? "png" : "jpg");
         root.put("thumbnailUrl", url);
+        root.put("image", url);
     }
     
     private static ArrayNode collectSameAs(Model m, Resource r) {
@@ -385,7 +386,7 @@ public class SchemaOrgJsonLDExport {
     private static String detectSchemaType(Model m, Resource main) {
         boolean isInstance = m.contains(main, RDF.type, BDO_Instance);
         int vols = getInt(m, main, numberOfVolumes);
-        if (isInstance) return (vols > 1) ? "BookSeries" : "Book";
+        if (isInstance) return (vols > 1) ? "Book" : "Book"; // could be BookSeries, Collection, ArchiveComponent?
         return "CreativeWork";
     }
 

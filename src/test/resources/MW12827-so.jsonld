@@ -1,7 +1,7 @@
 {
   "@context" : "https://schema.org",
   "@id" : "http://purl.bdrc.io/resource/MW12827",
-  "@type" : "BookSeries",
+  "@type" : "Book",
   "identifier" : [ "bdr:MW12827", "http://purl.bdrc.io/resource/MW12827" ],
   "name" : "སྙིང་ཐིག་ཡ་བཞི།",
   "alternateName" : [ {
@@ -29,5 +29,6 @@
     "deathDate" : "1364"
   } ],
   "datePublished" : "{1975,1976}",
-  "thumbnailUrl" : "https://iiif.bdrc.io/bdr:I2061::020610001.tiff/full/max/0/default.png"
+  "thumbnailUrl" : "https://iiif.bdrc.io/bdr:I2061::020610001.tiff/full/max/0/default.png",
+  "image" : "https://iiif.bdrc.io/bdr:I2061::020610001.tiff/full/max/0/default.png"
 }
