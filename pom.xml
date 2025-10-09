@@ -174,12 +174,6 @@
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-rdfconnection</artifactId>
       <version>${jena.version}</version>
-    </dependency>         
-    <!-- https://mvnrepository.com/artifact/io.bdrc/jena-stable-turtle -->
-    <dependency>
-      <groupId>io.bdrc</groupId>
-      <artifactId>jena-stable-turtle</artifactId>
-      <version>0.8.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
