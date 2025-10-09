@@ -74,7 +74,7 @@ public class ShaclDataController {
             extension = "ttl";
         }
         return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
-                .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
+                .body(StreamingHelpers.getModelStreamNoStable(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
     }
 
     private ResponseEntity<StreamingResponseBody> processShapeUrl(String url, boolean resource, HttpServletResponse response) throws RestException {
@@ -109,7 +109,7 @@ public class ShaclDataController {
         Helpers.setCacheControl(response, "public");
         if (m != null && m.size() > 0) {
             return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
-                    .body(StreamingHelpers.getModelStream(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
+                    .body(StreamingHelpers.getModelStreamNoStable(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         log.error("couldn't find shape for {} ({}, {})", url, isBaseUri, m);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)
