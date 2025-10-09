@@ -660,8 +660,10 @@ public class PublicDataController {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (model != null) {
                 if (JenaLangStr == "STTL") {
-                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
-                    writer.output(baos);
+                    //final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, params.getBaseUri());
+                    //writer.output(baos);
+                	// dirty patch to avoid dependency hell
+                    model.write(baos, "TURTLE");
                 } else {
                     if (JenaLangStr == RDFLanguages.strLangTurtle) {
                         model.write(baos, "TURTLE");
@@ -695,8 +697,10 @@ public class PublicDataController {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (model != null && model.size() > 0) {
                 if (JenaLangStr == "STTL") {
-                    final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, null);
-                    writer.output(baos);
+                    //final RDFWriter writer = (RDFWriter) TTLRDFWriter.getSTTLRDFWriter(model, null);
+                    //writer.output(baos);
+                	// dirty patch to avoid dependency hell
+                    model.write(baos, "TURTLE");
                 } else {
                     if (JenaLangStr == RDFLanguages.strLangTurtle) {
                         model.write(baos, "TURTLE");
@@ -749,8 +753,10 @@ public class PublicDataController {
         log.info("Call to getAllOntologyData(); with ext {}", ext);
         Model model = OntData.ontAllMod;
         Helpers.setCacheControl(resp, "public");
-        final String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
-        
+        String JenaLangStr = BudaMediaTypes.getJenaFromExtension(ext);
+        // dirty patch to avoid dependency hell
+        if (JenaLangStr.equals("STTL"))
+        	JenaLangStr = "TTL";
         // Inference here if required
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (model != null) {
@@ -800,8 +806,10 @@ public class PublicDataController {
         log.info("Jena Lang for writer is {}", lang);
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         if (lang == "STTL") {
-            final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
-            writer.output(os);
+            //final RDFWriter writer = TTLRDFWriter.getSTTLRDFWriter(m, "");
+            //writer.output(os);
+        	// dirty path to avoid dependency hell
+            m.write(os, "TTL");
         } else {
             if (lang.equals(RDFLanguages.strLangRDFXML)) {
                 m.write(os, lang, "");
