@@ -5,6 +5,7 @@ import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
@@ -106,10 +107,18 @@ public class ShaclDataController {
             String query = "describe <" + url + ">";
             m = QueryProcessor.getGraphFromModel(query, OntShapesData.getFullModel());
         }
+        Model out = m;
+        if (m instanceof OntModel) {
+            // Materialize the UNION view into a plain model so imports are serialized
+            Model flattened = ModelFactory.createDefaultModel();
+            flattened.setNsPrefixes(m.getNsPrefixMap()); // keep your prefixes
+            flattened.add(m); // IMPORTANT: .add(OntModel) iterates over the UNION view
+            out = flattened;
+        }
         Helpers.setCacheControl(response, "public");
-        if (m != null && m.size() > 0) {
+        if (out != null && out.size() > 0) {
             return ResponseEntity.ok().eTag(OntShapesData.getCommitId()).contentType(mt)
-                    .body(StreamingHelpers.getModelStreamNoStable(m, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
+                    .body(StreamingHelpers.getModelStreamNoStable(out, extension, url, null, ServiceConfig.PREFIX.getPrefixMap()));
         }
         log.error("couldn't find shape for {} ({}, {})", url, isBaseUri, m);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_PLAIN)
