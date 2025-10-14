@@ -11,14 +11,18 @@ import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestHighLevelClient;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.apache.jena.vocabulary.SKOS;
 import org.apache.lucene.search.join.ScoreMode;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -37,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +57,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import io.bdrc.ldspdi.service.ServiceConfig;
 import io.bdrc.ldspdi.utils.GeoLocation;
 import io.bdrc.libraries.Models;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.opensearch.action.get.MultiGetItemResponse;
+import org.opensearch.action.get.MultiGetRequest;
+import org.opensearch.action.get.MultiGetResponse;
+import org.opensearch.search.fetch.subphase.FetchSourceContext;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class OSControllers {
@@ -70,6 +88,7 @@ public class OSControllers {
     }
     
     static final String index_name = ServiceConfig.getProperty("opensearchIndex");
+    private final ObjectMapper mapper = new ObjectMapper();
     
     static final class EtextAccessProps {
         final String status_lname;
@@ -629,5 +648,312 @@ public class OSControllers {
         
         return etextchunks(id, minCstart, maxCend, request);
     }
+    
 
+    @GetMapping("/etextrefs/{ielname}")
+    public ResponseEntity<JsonNode> getEtextsByInstance(@PathVariable("ielname") String ielname) throws IOException {
+        // 1) Search etext docs for the instance, but only fetch the small fields we need
+    	if (ielname.startsWith("bdr:"))
+    		ielname = ielname.substring(4);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
+                .query(QueryBuilders.termQuery("etext_instance", ielname))
+                .size(10000)
+                // Only include the small fields we need (avoid pulling giant text fields)
+                .fetchSource(new FetchSourceContext(true,
+                        new String[]{
+                                "etext_for_instance",
+                                "etext_for_root_instance",
+                                "etext_vol",
+                                "volumeNumber",
+                                "etextNumber",
+                                "cstart",
+                                "cend",
+                                "join_field" // to access join_field.parent
+                        },
+                        new String[]{}));
+        //log.debug("OpenSearch query: {}", sourceBuilder.toString());
+        SearchRequest searchRequest = new SearchRequest(index_name).source(sourceBuilder);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+
+        SearchHit[] hitsArray = response.getHits().getHits();
+        if (hitsArray.length == 0) {
+            ObjectNode empty = mapper.createObjectNode();
+            empty.set("volumes", mapper.createArrayNode());
+            return ResponseEntity
+                    .notFound().build();
+        }
+
+        // 2) Collect parent ids (to label each text). Assume routing == parent id.
+        Set<String> parentIds = new HashSet<>();
+        Map<String, String> routingByParentId = new HashMap<>();
+
+        for (SearchHit hit : hitsArray) {
+            Map<String, Object> src = hit.getSourceAsMap();
+            Map<?, ?> joinField = (Map<?, ?>) src.get("join_field");
+            if (joinField != null && joinField.get("parent") != null) {
+                String parentId = String.valueOf(joinField.get("parent"));
+                parentIds.add(parentId);
+                routingByParentId.put(parentId, parentId); // adjust if your routing differs
+            }
+        }
+
+        // 3) Batch fetch parent docs for labels/partType
+        Map<String, LabelBundle> parentLabels = mgetLabelBundles(index_name, parentIds, routingByParentId);
+
+        // 4) Group hits by volumeNumber then sort
+        Map<Integer, List<SearchHit>> groupedByVolume = Arrays.stream(hitsArray)
+                .collect(Collectors.groupingBy(hit -> {
+                    Object v = hit.getSourceAsMap().get("volumeNumber");
+                    return (v instanceof Number) ? ((Number) v).intValue() : 0;
+                }));
+
+        ObjectNode root = mapper.createObjectNode();
+        ArrayNode volumesArray = mapper.createArrayNode();
+
+        groupedByVolume.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    Integer volumeNumber = entry.getKey();
+                    List<SearchHit> hits = entry.getValue();
+
+                    // Sort etexts by etextNumber
+                    hits.sort(Comparator.comparingInt(h -> {
+                        Object n = h.getSourceAsMap().get("etextNumber");
+                        return (n instanceof Number) ? ((Number) n).intValue() : Integer.MAX_VALUE;
+                    }));
+
+                    // Volume node
+                    ObjectNode volumeNode = mapper.createObjectNode();
+                    // take etext_vol from first hit in the group
+                    String volumeId = asString(hits.get(0).getSourceAsMap().get("etext_vol"));
+                    if (volumeId != null) volumeNode.put("@id", volumeId);
+                    volumeNode.put("volumeNumber", volumeNumber);
+
+                    // (No volume labels yet—per your instruction we’ll fetch those differently later)
+
+                    // Etexts
+                    ArrayNode etextsArray = mapper.createArrayNode();
+                    for (SearchHit h : hits) {
+                        Map<String, Object> src = h.getSourceAsMap();
+                        ObjectNode etextNode = mapper.createObjectNode();
+                        etextNode.put("@id", h.getId());
+                        etextNode.put("etext_for_instance", asString(src.get("etext_for_instance")));
+                        etextNode.put("cstart", asInt(src.get("cstart")));
+                        etextNode.put("cend", asInt(src.get("cend")));
+                        etextNode.put("etextNumber", asInt(src.get("etextNumber")));
+
+                        // Parent labels for this text
+                        Map<?, ?> join = (Map<?, ?>) src.get("join_field");
+                        String pId = (join != null && join.get("parent") != null) ? String.valueOf(join.get("parent")) : null;
+                        LabelBundle tLb = (pId != null) ? parentLabels.get(pId) : null;
+                        attachLabels(etextNode, tLb);
+
+                        etextsArray.add(etextNode);
+                    }
+
+                    volumeNode.set("etexts", etextsArray);
+                    volumesArray.add(volumeNode);
+                });
+
+        root.set("volumes", volumesArray);
+        String mwlname = null;
+        for (SearchHit h : hitsArray) { // find first non-null root instance
+            Object v = h.getSourceAsMap().get("etext_for_root_instance");
+            if (v != null) { mwlname = String.valueOf(v); break; }
+        }
+        if (mwlname != null && !mwlname.isEmpty()) {
+            addVolumes(mwlname.replaceFirst("^bdr:", ""), root); 
+            // ^ if your value already contains "bdr:", remove it; the query above adds bdr: itself.
+        }
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(root);
+    }
+
+    /** Batch fetch parent docs to extract label bundle fields. */
+    private Map<String, LabelBundle> mgetLabelBundles(String index,
+                                                      Set<String> ids,
+                                                      Map<String, String> routingById) throws IOException {
+        Map<String, LabelBundle> out = new HashMap<>();
+        if (ids.isEmpty()) return out;
+
+        MultiGetRequest mget = new MultiGetRequest();
+        for (String id : ids) {
+            MultiGetRequest.Item item = new MultiGetRequest.Item(index, id);
+            String routing = routingById.get(id);
+            if (routing != null) item.routing(routing);
+
+            // Only fetch the needed fields from parents
+            item.fetchSourceContext(new FetchSourceContext(true,
+                    new String[]{"prefLabel_bo_x_ewts", "prefLabel_en", "prefLabel_hani", "partType"},
+                    new String[]{}));
+            mget.add(item);
+        }
+
+        MultiGetResponse resp = client.mget(mget, RequestOptions.DEFAULT);
+        for (MultiGetItemResponse itemResp : resp.getResponses()) {
+            if (itemResp.getResponse() != null && itemResp.getResponse().isExists()) {
+                Map<String, Object> src = itemResp.getResponse().getSourceAsMap();
+                LabelBundle lb = new LabelBundle(
+                        asString(src.get("prefLabel_bo_x_ewts")),
+                        asString(src.get("prefLabel_en")),
+                        asString(src.get("prefLabel_hani")),
+                        asString(src.get("partType"))
+                );
+                out.put(itemResp.getId(), lb);
+            }
+        }
+        return out;
+    }
+
+    /** Attach label fields to a JSON node (omits nulls). */
+    private void attachLabels(ObjectNode node, LabelBundle lb) {
+        if (lb == null) return;
+        if (lb.prefBo != null) node.put("prefLabel_bo_x_ewts", lb.prefBo);
+        if (lb.prefEn != null) node.put("prefLabel_en", lb.prefEn);
+        if (lb.prefZh != null) node.put("prefLabel_hani", lb.prefZh);
+        if (lb.partType != null) node.put("partType", lb.partType);
+    }
+    
+    private static String asString(Object o) {
+        if (o == null) return null;
+        if (o instanceof Collection<?>) {
+            Collection<?> c = (Collection<?>) o;
+            if (c.isEmpty()) return null;
+            Object first = c.iterator().next();
+            return first == null ? null : String.valueOf(first);
+        }
+        if (o.getClass().isArray()) {
+            Object[] arr = (Object[]) o;
+            return arr.length == 0 ? null : String.valueOf(arr[0]);
+        }
+        return String.valueOf(o);
+    }
+
+    private static int asInt(Object o) {
+        if (o instanceof Number) return ((Number) o).intValue();
+        if (o == null) return 0;
+        try { return Integer.parseInt(String.valueOf(o)); } catch (Exception e) { return 0; }
+    }
+
+    private static class LabelBundle {
+        final String prefBo, prefEn, prefZh, partType;
+        LabelBundle(String prefBo, String prefEn, String prefZh, String partType) {
+            this.prefBo = prefBo;
+            this.prefEn = prefEn;
+            this.prefZh = prefZh;
+            this.partType = partType;
+        }
+    }
+
+    static final Property volumeNumber = ResourceFactory.createProperty(Models.BDO+"volumeNumber");
+    static final Property hasPart = ResourceFactory.createProperty(Models.BDO+"hasPart");
+    
+    public static void addVolumes(final String mwlname, JsonNode res) {
+        final String qstr =
+                "prefix :      <http://purl.bdrc.io/ontology/core/>\n" +
+                "prefix bdr:   <http://purl.bdrc.io/resource/>\n" +
+                "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n" +
+                "prefix bda:   <http://purl.bdrc.io/admindata/>\n" +
+                "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n" +
+                "\n" +
+                "CONSTRUCT {\n" +
+                "  bdr:" + mwlname + " :hasPart ?mwv .\n" +
+                "  ?mwv skos:prefLabel ?pl ;\n" +
+                "       :volumeNumber ?vn .\n" +
+                "} WHERE {\n" +
+                "  ?outline :outlineOf bdr:" + mwlname + " .\n" +
+                "  ?oadm adm:adminAbout ?outline ;\n" +
+                "        adm:status bda:StatusReleased ;\n" +
+                "        adm:graphId ?og .\n" +
+                "  graph ?og {\n" +
+                "    values ?t { bdr:PartTypeVolume bdr:PartTypeCodicologicalVolume }\n" +
+                "    ?mwv :partType ?t ; skos:prefLabel ?pl ; :contentLocation ?cl .\n" +
+                "    ?cl :contentLocationVolume ?vn .\n" +
+                "  }\n" +
+                "}";
+
+        final Query q = QueryFactory.create(qstr);
+        log.debug("QUERY >> {}", qstr);
+
+        // Run the CONSTRUCT
+        final Model model;
+        try (RDFConnection conn = RDFConnectionRemote.create()
+                .destination(ServiceConfig.getProperty(ServiceConfig.FUSEKI_URL))
+                .build()) {
+            model = conn.queryConstruct(q);
+        }
+
+        if (model == null || model.isEmpty()) return;
+        if (!(res instanceof ObjectNode)) return; // nothing to mutate
+        final ObjectNode root = (ObjectNode) res;
+        final JsonNode volsNode = root.get("volumes");
+        if (!(volsNode instanceof ArrayNode)) return;
+        final ArrayNode volumesArray = (ArrayNode) volsNode;
+
+        // Build vn -> VolInfo map
+        Map<Integer, VolInfo> byVn = new HashMap<>();
+
+        StmtIterator it = model.listStatements(null, volumeNumber, (RDFNode) null);
+        while (it.hasNext()) {
+            Statement s = it.nextStatement();
+            Resource mwv = s.getSubject();
+            RDFNode vnNode = s.getObject();
+            if (!vnNode.isLiteral()) continue;
+
+            int vn;
+            try {
+                vn = vnNode.asLiteral().getInt();
+            } catch (Exception e) {
+                continue;
+            }
+
+            VolInfo info = byVn.computeIfAbsent(vn, k -> new VolInfo(mwv.getLocalName()));
+
+            // collect all prefLabels on this mwv
+            NodeIterator labs = model.listObjectsOfProperty(mwv, SKOS.prefLabel);
+            while (labs.hasNext()) {
+                RDFNode lab = labs.next();
+                if (!lab.isLiteral()) continue;
+                Literal lit = lab.asLiteral();
+                String lang = lit.getLanguage(); // e.g., "bo-x-ewts", "en", "zh", or ""
+                String val = lit.getString();
+                if ("bo-x-ewts".equalsIgnoreCase(lang)) info.prefBo = val;
+                else if ("en".equalsIgnoreCase(lang))   info.prefEn = val;
+                else if (lang.startsWith("zh"))   info.prefZh = val;
+                // ignore other langs for this API
+            }
+        }
+
+        // Join onto JSON by volumeNumber
+        for (int i = 0; i < volumesArray.size(); i++) {
+            JsonNode v = volumesArray.get(i);
+            if (!(v instanceof ObjectNode)) continue;
+            ObjectNode vObj = (ObjectNode) v;
+
+            JsonNode vnNode = vObj.get("volumeNumber");
+            if (vnNode == null || !vnNode.isNumber()) continue;
+            int vn = vnNode.asInt();
+
+            VolInfo info = byVn.get(vn);
+            if (info == null) continue;
+
+            // mw (localname of ?mwv)
+            if (info.mwLocal != null) vObj.put("mw", info.mwLocal);
+
+            // labels (if present)
+            if (info.prefBo != null) vObj.put("prefLabel_bo_x_ewts", info.prefBo);
+            if (info.prefEn != null) vObj.put("prefLabel_en", info.prefEn);
+            if (info.prefZh != null) vObj.put("prefLabel_hani", info.prefZh);
+        }
+    }
+
+    private static class VolInfo {
+        String mwLocal;
+        String prefBo;
+        String prefEn;
+        String prefZh;
+        VolInfo(String mwLocal) { this.mwLocal = mwLocal; }
+    }
 }
