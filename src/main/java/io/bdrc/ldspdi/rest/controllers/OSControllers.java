@@ -786,7 +786,7 @@ public class OSControllers {
 
             // Only fetch the needed fields from parents
             item.fetchSourceContext(new FetchSourceContext(true,
-                    new String[]{"prefLabel_bo_x_ewts", "prefLabel_en", "prefLabel_hani", "partType"},
+                    new String[]{"prefLabel_bo_x_ewts", "prefLabel_en", "prefLabel_hani", "type"},
                     new String[]{}));
             mget.add(item);
         }
@@ -799,7 +799,7 @@ public class OSControllers {
                         asString(src.get("prefLabel_bo_x_ewts")),
                         asString(src.get("prefLabel_en")),
                         asString(src.get("prefLabel_hani")),
-                        asString(src.get("partType"))
+                        asString(src.get("type"))
                 );
                 out.put(itemResp.getId(), lb);
             }
