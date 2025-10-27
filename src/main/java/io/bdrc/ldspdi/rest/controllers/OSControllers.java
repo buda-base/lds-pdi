@@ -729,23 +729,21 @@ public class OSControllers {
                     if (volumeId != null) volumeNode.put("@id", volumeId);
                     volumeNode.put("volumeNumber", volumeNumber);
 
-                    // (No volume labels yet—per your instruction we’ll fetch those differently later)
-
                     // Etexts
                     ArrayNode etextsArray = mapper.createArrayNode();
                     for (SearchHit h : hits) {
                         Map<String, Object> src = h.getSourceAsMap();
                         ObjectNode etextNode = mapper.createObjectNode();
                         etextNode.put("@id", h.getId());
-                        etextNode.put("etext_for_instance", asString(src.get("etext_for_instance")));
+                        final String etext_for_instance = asString(src.get("etext_for_instance"));
+                        etextNode.put("etext_for_instance", etext_for_instance);
                         etextNode.put("cstart", asInt(src.get("cstart")));
                         etextNode.put("cend", asInt(src.get("cend")));
                         etextNode.put("etextNumber", asInt(src.get("etextNumber")));
 
-                        // Parent labels for this text
-                        Map<?, ?> join = (Map<?, ?>) src.get("join_field");
-                        String pId = (join != null && join.get("parent") != null) ? String.valueOf(join.get("parent")) : null;
-                        LabelBundle tLb = (pId != null) ? parentLabels.get(pId) : null;
+                        // Parent labels for this text. We only use etext_for_instance,
+                        // and ignore parent, and parent can be the root instance in case there's no outline
+                        LabelBundle tLb = (etext_for_instance != null) ? parentLabels.get(etext_for_instance) : null;
                         attachLabels(etextNode, tLb);
 
                         etextsArray.add(etextNode);
