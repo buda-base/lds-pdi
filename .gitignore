@@ -96,3 +96,5 @@ catalog-v001.xml
 
 #JCS caching stuffs
 jcs_swap/
+/.apt_generated/
+/.apt_generated_tests/

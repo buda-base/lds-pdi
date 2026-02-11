@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -71,10 +72,14 @@ public class LibrarySearchController {
     /**
      * Debug endpoint to inspect subscriber resolution and collections.
      * GET /lib/debug-subscriber returns JSON: ipAddress, subscriberLname, collections.
+     * Optional ?ip=... to test with a specific IP address.
      */
     @GetMapping(value = "/lib/debug-subscriber")
-    public ResponseEntity<Map<String, Object>> debugSubscriberCollections(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-Real-IP");
+    public ResponseEntity<Map<String, Object>> debugSubscriberCollections(HttpServletRequest request,
+            @RequestParam(value = "ip", required = false) String ipParam) {
+        String ipAddress = (ipParam != null && !ipParam.isEmpty())
+                ? ipParam
+                : request.getHeader("X-Real-IP");
         if (ipAddress == null || ipAddress.isEmpty()) {
             ipAddress = request.getRemoteAddr();
         }
