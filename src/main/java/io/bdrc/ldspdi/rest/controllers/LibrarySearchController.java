@@ -68,6 +68,27 @@ public class LibrarySearchController {
         }
     }
 
+    /**
+     * Debug endpoint to inspect subscriber resolution and collections.
+     * GET /lib/debug-subscriber returns JSON: ipAddress, subscriberLname, collections.
+     */
+    @GetMapping(value = "/lib/debug-subscriber")
+    public ResponseEntity<Map<String, Object>> debugSubscriberCollections(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Real-IP");
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            ipAddress = request.getRemoteAddr();
+        }
+        String subscriberLname = Subscribers.getCachedSubscriber(ipAddress);
+        List<String> collections = (subscriberLname != null && !subscriberLname.isEmpty())
+                ? Subscribers.collectionsOfSubscriber(subscriberLname)
+                : null;
+        Map<String, Object> out = new HashMap<>();
+        out.put("ipAddress", ipAddress);
+        out.put("subscriberLname", subscriberLname != null ? subscriberLname : "");
+        out.put("collections", collections != null ? collections : List.of());
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(out);
+    }
+
     @GetMapping(value = "/lib/{file}")
     public ResponseEntity<StreamingResponseBody> getLibGraphGet(HttpServletRequest request, HttpServletResponse response,
             @RequestHeader(value = "fusekiUrl", required = false) final String fuseki, @PathVariable("file") String file,
